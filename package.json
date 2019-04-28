@@ -8,9 +8,8 @@
     "build-lib": "ng build ngx-diagrams",
     "test": "ng test",
     "lint": "ng lint",
-    "lint-lib": "ng lint angular-exemplify",
     "e2e": "ng e2e",
-    "commit": "git-cz",
+    "commit": "git cz",
     "travis-deploy-once": "travis-deploy-once --pro",
     "semantic-release": "semantic-release"
   },
@@ -24,7 +23,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint && npm run lint-lib",
+      "pre-commit": "npm run lint",
       "commit-msg": "commitlint --edit"
     }
   },
