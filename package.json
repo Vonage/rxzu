@@ -4,12 +4,29 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --base-href /ngx-diagrams/ --prod",
+    "build-lib": "ng build ngx-diagrams",
     "test": "ng test",
     "lint": "ng lint",
+    "lint-lib": "ng lint angular-exemplify",
     "e2e": "ng e2e",
-    "version": "lerna version --conventional-commits",
-    "publish": "lerna release"
+    "commit": "git-cz",
+    "travis-deploy-once": "travis-deploy-once --pro",
+    "semantic-release": "semantic-release"
+  },
+  "release": {
+    "pkgRoot": "dist/ngx-diagrams"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint && npm run lint-lib",
+      "commit-msg": "commitlint --edit"
+    }
   },
   "private": true,
   "dependencies": {
@@ -32,11 +49,14 @@
     "@angular/cli": "~7.3.8",
     "@angular/compiler-cli": "~7.2.0",
     "@angular/language-service": "~7.2.0",
+    "@commitlint/cli": "^7.5.2",
+    "@commitlint/config-conventional": "^7.5.0",
     "@types/jasmine": "~2.8.8",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
     "codelyzer": "~4.5.0",
     "cz-conventional-changelog": "^2.1.0",
+    "husky": "^2.1.0",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.0.0",
@@ -44,9 +64,11 @@
     "karma-coverage-istanbul-reporter": "~2.0.1",
     "karma-jasmine": "~1.1.2",
     "karma-jasmine-html-reporter": "^0.2.2",
-    "lerna": "^3.7.1",
     "ng-packagr": "^5.1.0",
+    "prettier": "^1.17.0",
     "protractor": "~5.4.0",
+    "semantic-release": "^15.13.3",
+    "travis-deploy-once": "^5.0.11",
     "ts-node": "~7.0.0",
     "tsickle": ">=0.34.0",
     "tslib": "^1.9.0",
