@@ -8,13 +8,14 @@
     "build-lib": "ng build ngx-diagrams",
     "test": "ng test",
     "lint": "ng lint",
+    "lint-lib": "ng lint ngx-diagrams",
     "e2e": "ng e2e",
     "commit": "git-cz",
     "travis-deploy-once": "travis-deploy-once --pro",
     "semantic-release": "semantic-release"
   },
   "release": {
-    "pkgRoot": "dist/angular-exemplify"
+    "pkgRoot": "dist/ngx-diagrams"
   },
   "private": true,
   "dependencies": {
