@@ -1,0 +1,33 @@
+dist: trusty
+sudo: false
+language: node_js
+node_js:
+  - "8"
+
+install:
+  - npm ci
+cache:
+  directories:
+    - $HOME/.npm
+script:
+  - npm run lint-lib
+  - npm run build-lib && npm run build
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  keep-history: true
+  local-dir: dist/ngx-diagrams-playground
+  on:
+    branch: master
+
+git:
+  depth: 3
+
+after_success:
+  - npm run travis-deploy-once "npm run semantic-release"
+
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+$/
