@@ -18,7 +18,7 @@ deploy:
   skip-cleanup: true
   github-token: $GITHUB_TOKEN
   keep-history: true
-  local-dir: dist/ngx-diagrams-playground
+  local-dir: dist/playground
   on:
     branch: master
 

@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --base-href /ngx-diagrams-playground/ --prod",
+    "build": "ng build --base-href /playground/ --prod",
     "build-lib": "ng build ngx-diagrams",
     "test": "ng test",
     "lint": "ng lint",
