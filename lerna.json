@@ -1,6 +1,7 @@
 {
-  "packages": ["projects/*"],
+  "packages": ["projects/ngx-diagrams"],
   "version": "independent",
+  "npmClient": "npm",
   "command": {
     "publish": {
       "conventionalCommits": true
