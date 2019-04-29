@@ -3,5 +3,9 @@
   "dest": "../../dist/ngx-diagrams",
   "lib": {
     "entryFile": "src/public-api.ts"
-  }
+  },
+  "whitelistedNonPeerDependencies": [
+    "pathfinding",
+    "paths-js"
+  ]
 }
