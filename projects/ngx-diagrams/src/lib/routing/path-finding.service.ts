@@ -93,10 +93,10 @@ export class PathFinding {
         };
     }
 
-	/**
-	 * Puts everything together: merges the paths from/to the centre of the ports,
-	 * with the path calculated around other elements.
-	 */
+    /**
+     * Puts everything together: merges the paths from/to the centre of the ports,
+     * with the path calculated around other elements.
+     */
     calculateDynamicPath(
         routingMatrix: number[][],
         start: {

@@ -6,7 +6,6 @@ import { Injectable } from '@angular/core';
 /**
  * Utility pathing and routing service
  */
-@Injectable({ providedIn: 'root' })
 export class Toolkit {
 
     /**
