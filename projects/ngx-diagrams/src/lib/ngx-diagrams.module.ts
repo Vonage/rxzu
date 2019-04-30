@@ -1,15 +1,15 @@
 import { NgModule } from '@angular/core';
-import { NgxDiagramsComponent } from './containers/diagram/diagram.component';
+import { NgxDiagramComponent } from './containers/diagram/diagram.component';
 import { CommonModule } from '@angular/common';
 import { DefaultNodeComponent } from './defaults/widgets/node/node.component';
 
 @NgModule({
-  declarations: [NgxDiagramsComponent, DefaultNodeComponent],
+  declarations: [NgxDiagramComponent, DefaultNodeComponent],
   imports: [
     CommonModule
   ],
   providers: [
   ],
-  exports: [NgxDiagramsComponent]
+  exports: [NgxDiagramComponent]
 })
 export class NgxDiagramsModule { }
