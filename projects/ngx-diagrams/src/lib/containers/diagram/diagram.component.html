@@ -3,14 +3,15 @@
   <!-- TODO: replace this default node component with a factory generated component injected in the
     diagram model -->
   <ngdx-default-node
-    *ngFor="let node of nodes$ | async"
+    *ngFor="let node of nodes$ | async | keyvalue"
     class="ngdx-node"
-    [node]="node"
+    [node]="node.value"
+    [key]="node.key"
     [ngStyle]="{
-      'height.px': node.height,
-      'width.px': node.width,
-      'top.px': node.y,
-      'right.px': node.x
+      'height.px': node.value.height,
+      'width.px': node.value.width,
+      'top.px': node.value.y,
+      'right.px': node.value.x
     }"
   ></ngdx-default-node>
   <!-- Ports Layer -->

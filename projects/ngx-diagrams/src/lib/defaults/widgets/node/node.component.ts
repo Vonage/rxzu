@@ -9,6 +9,7 @@ import { NodeModel } from '../../../models/node.model';
 export class DefaultNodeComponent implements OnInit {
 
   @Input() node: NodeModel;
+  @Input() key: string;
 
   constructor() { }
 

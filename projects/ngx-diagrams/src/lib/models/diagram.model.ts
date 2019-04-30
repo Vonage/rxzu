@@ -1,11 +1,14 @@
 import { BehaviorSubject } from 'rxjs';
 import { NodeModel } from './node.model';
 import { LinkModel } from './link.model';
-import { Injectable } from '@angular/core';
 
 export interface DiagramDataModel {
-    nodes$: BehaviorSubject<NodeModel[]>;
-    links$: BehaviorSubject<any[]>;
+    nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
+    links$: BehaviorSubject<{ [s: string]: LinkModel }>;
+    zoom: number;
+    offsetX: number;
+    offsetY: number;
+    gridSize: number;
 }
 
 // @Injectable()
@@ -13,8 +16,12 @@ export class DiagramModel {
 
     // TODO: add types for nodes and links!
     private model: DiagramDataModel = {
-        nodes$: new BehaviorSubject<NodeModel[]>([]),
-        links$: new BehaviorSubject<LinkModel[]>([])
+        nodes$: new BehaviorSubject<{ [s: string]: NodeModel }>({}),
+        links$: new BehaviorSubject<{ [s: string]: LinkModel }>({}),
+        zoom: 100,
+        offsetX: 0,
+        offsetY: 0,
+        gridSize: 0
     };
 
     // TODO: support the following events for links and nodes
@@ -26,7 +33,7 @@ export class DiagramModel {
      */
     addNode(title: string, x: number, y: number): NodeModel {
         const newNode = new NodeModel(title, x, y);
-        this.model.nodes$.next([...this.model.nodes$.value, newNode]);
+        this.model.nodes$.next({ ...this.model.nodes$.value, [newNode.getId()]: newNode });
         return newNode;
     }
 
@@ -34,30 +41,18 @@ export class DiagramModel {
      * Delete a node from the diagram
      */
     deleteNode(nodeOrId: NodeModel | string): void {
-        let index = -1;
-        if (typeof nodeOrId === 'string') {
-            index = this.model.nodes$.value.findIndex(node => node.getId() === nodeOrId);
-        } else {
-            index = this.model.nodes$.value.indexOf(nodeOrId);
-        }
+        const nodeId: string = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.getId();
 
         // TODO: delete all related links
-        const updNodes = [...this.model.nodes$.value];
-        updNodes.splice(index, 1);
+        const updNodes = { ...this.model.nodes$.value };
+        delete updNodes[nodeId];
         this.model.nodes$.next(updNodes);
     }
 
     /**
-     * Get raw value of nodes
+     * Get nodes behaviour subject, use `.value` for snapshot
      */
-    getNodes(): NodeModel[] {
-        return this.model.nodes$.value;
-    }
-
-    /**
-     * Get subscribable for the nodes
-     */
-    selectNodes(): BehaviorSubject<NodeModel[]> {
+    selectNodes(): BehaviorSubject<{ [s: string]: NodeModel }> {
         return this.model.nodes$;
     }
 
@@ -67,7 +62,7 @@ export class DiagramModel {
      */
     addLink(from: Coordinates, to: Coordinates): LinkModel {
         const newLink = new LinkModel(from, to);
-        this.model.links$.next([...this.model.links$.value, newLink]);
+        this.model.links$.next({ ...this.model.links$.value, [newLink.getId()]: newLink });
         return newLink;
     }
 
@@ -75,29 +70,18 @@ export class DiagramModel {
      * Delete link
      */
     deleteLink(linkOrId: LinkModel | string) {
-        let index = -1;
-        if (typeof linkOrId === 'string') {
-            index = this.model.links$.value.findIndex(node => node.getId() === linkOrId);
-        } else {
-            index = this.model.links$.value.indexOf(linkOrId);
-        }
+        const linkId: string = typeof linkOrId === 'string' ? linkOrId : linkOrId.getId();
 
-        const updLinks = [...this.model.links$.value];
-        updLinks.splice(index, 1);
+        const updLinks = { ...this.model.links$.value };
+        delete updLinks[linkId];
+
         this.model.links$.next(updLinks);
     }
 
     /**
-     * Get raw value of links
+     * Get links behaviour subject, use `.value` for snapshot
      */
-    getLinks(): LinkModel[] {
-        return this.model.links$.value;
-    }
-
-    /**
-     * Get subscribable for the links
-     */
-    selectLinks(): BehaviorSubject<LinkModel[]> {
+    selectLinks(): BehaviorSubject<{ [s: string]: LinkModel }> {
         return this.model.links$;
     }
 

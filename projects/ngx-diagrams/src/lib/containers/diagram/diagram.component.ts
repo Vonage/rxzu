@@ -12,8 +12,9 @@ import { LinkModel } from '../../models/link.model';
 export class NgxDiagramComponent implements OnInit {
 
   @Input() model: DiagramModel;
-  nodes$: BehaviorSubject<NodeModel[]>;
-  links$: BehaviorSubject<LinkModel[]>;
+  @Input() allowCanvasZoon = true;
+  nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
+  links$: BehaviorSubject<{ [s: string]: LinkModel }>;
 
   constructor() {
   }
@@ -29,6 +30,14 @@ export class NgxDiagramComponent implements OnInit {
     if (e.button === 3) { return; }
     // TODO: handle selections
     // https://github.com/projectstorm/react-diagrams/blob/master/src/widgets/DiagramWidget.tsx#L479-L536
+  }
+
+  onMouseWheel(e: MouseEvent) {
+    if (this.allowCanvasZoon) {
+      e.preventDefault();
+      e.stopPropagation();
+
+    }
   }
 
 }
