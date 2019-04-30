@@ -1,4 +1,19 @@
-<div class="ngds-diagram" (mousedown)="onMouseDown($event)">
-  <!-- just to make sure the div ain't empty -->
-  &nbsp;
+<div class="ngdx-diagram" (mousedown)="onMouseDown($event)">
+  <!-- Nodes Layer -->
+  <!-- TODO: replace this default node component with a factory generated component injected in the
+    diagram model -->
+  <ngdx-default-node
+    *ngFor="let node of nodes$ | async"
+    class="ngdx-node"
+    [node]="node"
+    [ngStyle]="{
+      'height.px': node.height,
+      'width.px': node.width,
+      'top.px': node.y,
+      'right.px': node.x
+    }"
+  ></ngdx-default-node>
+  <!-- Ports Layer -->
+
+  <!-- Links Layer -->
 </div>

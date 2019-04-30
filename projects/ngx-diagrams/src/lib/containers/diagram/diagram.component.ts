@@ -1,15 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { DiagramModel } from '../../models/diagram.model';
+import { NodeModel } from '../../models/node.model';
+import { BehaviorSubject } from 'rxjs';
+import { LinkModel } from '../../models/link.model';
 
 @Component({
-  selector: 'ngds-ngx-diagrams',
+  selector: 'ngdx-diagram',
   templateUrl: 'diagram.component.html',
   styleUrls: ['diagram.component.scss']
 })
-export class NgxDiagramsComponent implements OnInit {
+export class NgxDiagramComponent implements OnInit {
 
-  constructor() { }
+  @Input() model: DiagramModel;
+  nodes$: BehaviorSubject<NodeModel[]>;
+  links$: BehaviorSubject<LinkModel[]>;
+
+  constructor() {
+  }
 
   ngOnInit() {
+    if (this.model) {
+      this.nodes$ = this.model.selectNodes();
+      this.links$ = this.model.selectLinks();
+    }
   }
 
   onMouseDown(e: MouseEvent) {
