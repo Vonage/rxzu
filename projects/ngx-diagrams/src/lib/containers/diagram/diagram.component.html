@@ -1,20 +1,50 @@
-<div class="ngdx-diagram" (mousedown)="onMouseDown($event)">
+<div
+  class="ngdx-diagram"
+  (mousedown)="onMouseDown($event)"
+  (wheel)="onMouseWheel($event)"
+>
   <!-- Nodes Layer -->
-  <!-- TODO: replace this default node component with a factory generated component injected in the
-    diagram model -->
-  <ngdx-default-node
-    *ngFor="let node of nodes$ | async | keyvalue"
-    class="ngdx-node"
-    [node]="node.value"
-    [key]="node.key"
+  <div
+    class="ngdx-nodes-layer"
     [ngStyle]="{
-      'height.px': node.value.height,
-      'width.px': node.value.width,
-      'top.px': node.value.y,
-      'right.px': node.value.x
+      transform:
+        'translate(' +
+        (offsetX$ | async) +
+        'px, ' +
+        (offsetY$ | async) +
+        'px) scale(' +
+        (zoomLevel$ | async) / 100.0 +
+        ')'
     }"
-  ></ngdx-default-node>
-  <!-- Ports Layer -->
-
+  >
+    <!-- TODO: replace this default node component with a factory generated component injected in the diagram model -->
+    <ngdx-default-node
+      *ngFor="let node of nodes$ | async | keyvalue"
+      class="ngdx-node"
+      [node]="node.value"
+      [key]="node.key"
+      [ngStyle]="{
+        'height.px': node.value.height,
+        'width.px': node.value.width,
+        'top.px': node.value.y,
+        'right.px': node.value.x
+      }"
+    ></ngdx-default-node>
+  </div>
   <!-- Links Layer -->
+  <div
+    class="ngdx-links-layer"
+    [ngStyle]="{
+      transform:
+        'translate(' +
+        (offsetX$ | async) +
+        'px, ' +
+        (offsetY$ | async) +
+        'px) scale(' +
+        (zoomLevel$ | async) / 100.0 +
+        ')'
+    }"
+  >
+    &nbsp;
+  </div>
 </div>

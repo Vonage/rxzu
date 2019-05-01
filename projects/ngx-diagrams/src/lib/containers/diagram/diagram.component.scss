@@ -11,8 +11,32 @@
     border: solid 2px rgb(0, 192, 255);
   }
 
-  .ngdx-node {
+  .ngdx-nodes-layer {
     position: absolute;
-    display: flex;
+    height: 100%;
+    width: 100%;
+    transform-origin: 0 0;
+    overflow: visible !important;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    .ngdx-node {
+      position: absolute;
+      display: flex;
+    }
+  }
+
+  .ngdx-links-layer {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    transform-origin: 0 0;
+    overflow: visible !important;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
   }
 }

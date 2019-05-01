@@ -14,5 +14,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     const newNode = this.diagramModel.addNode('test', 200, 300);
+    newNode.addPort('test', 'out');
   }
 }

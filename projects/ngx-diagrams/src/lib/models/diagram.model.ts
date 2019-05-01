@@ -5,23 +5,22 @@ import { LinkModel } from './link.model';
 export interface DiagramDataModel {
     nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
     links$: BehaviorSubject<{ [s: string]: LinkModel }>;
-    zoom: number;
-    offsetX: number;
-    offsetY: number;
-    gridSize: number;
+    zoom$: BehaviorSubject<number>;
+    offsetX$: BehaviorSubject<number>;
+    offsetY$: BehaviorSubject<number>;
+    gridSize$: BehaviorSubject<number>;
 }
 
 // @Injectable()
 export class DiagramModel {
 
-    // TODO: add types for nodes and links!
     private model: DiagramDataModel = {
         nodes$: new BehaviorSubject<{ [s: string]: NodeModel }>({}),
         links$: new BehaviorSubject<{ [s: string]: LinkModel }>({}),
-        zoom: 100,
-        offsetX: 0,
-        offsetY: 0,
-        gridSize: 0
+        zoom$: new BehaviorSubject(100),
+        offsetX$: new BehaviorSubject(0),
+        offsetY$: new BehaviorSubject(0),
+        gridSize$: new BehaviorSubject(0)
     };
 
     // TODO: support the following events for links and nodes
@@ -100,4 +99,32 @@ export class DiagramModel {
         this.model = JSON.parse(serializedModel);
     }
 
+    setOffset(x: number, y: number) {
+        this.model.offsetX$.next(x);
+        this.model.offsetY$.next(y);
+    }
+
+    setOffsetX(x: number) {
+        this.model.offsetX$.next(x);
+    }
+
+    getOffsetX(): BehaviorSubject<number> {
+        return this.model.offsetX$;
+    }
+
+    setOffsetY(y: number) {
+        this.model.offsetY$.next(y);
+    }
+
+    getOffsetY(): BehaviorSubject<number> {
+        return this.model.offsetY$;
+    }
+
+    setZoomLevel(z: number) {
+        this.model.zoom$.next(z);
+    }
+
+    getZoomLevel(): BehaviorSubject<number> {
+        return this.model.zoom$;
+    }
 }

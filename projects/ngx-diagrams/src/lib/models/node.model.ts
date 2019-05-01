@@ -1,5 +1,6 @@
 import { Toolkit } from '../tool-kit.service';
 import { BehaviorSubject } from 'rxjs';
+import { DefaultPort } from './port.model';
 
 export class NodeModel {
 
@@ -9,8 +10,7 @@ export class NodeModel {
     private id: string;
     private width: number;
     private height: number;
-    // TODO: define type for PORT!
-    private ports$: BehaviorSubject<any[]>;
+    private ports$: BehaviorSubject<{ [s: string]: DefaultPort }>;
 
     constructor(title: string, x: number, y: number, id: string = Toolkit.UID(),
                 width: number = 200, height: number = 300, ports: any[] = []) {
@@ -20,7 +20,7 @@ export class NodeModel {
         this.y = y;
         this.width = width;
         this.height = height;
-        this.ports$ = new BehaviorSubject([]);
+        this.ports$ = new BehaviorSubject({});
     }
 
     /**
@@ -35,7 +35,7 @@ export class NodeModel {
             type
         };
 
-        this.ports$.next([...this.ports$.value, newPort]);
+        this.ports$.next({ ...this.ports$.value, [newPort.id]: newPort });
 
         return newPort.id;
     }

@@ -3,8 +3,11 @@
     {{ node.title }}
   </div>
   <div class="ports">
-    <div class="port" *ngFor="let port of ports$ | async">
-      port
-    </div>
+    <ngdx-default-port
+      *ngFor="let port of node.ports$ | async | keyvalue"
+      [port]="port.value"
+      [key]="port.key"
+    >
+    </ngdx-default-port>
   </div>
 </div>
