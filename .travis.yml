@@ -11,7 +11,7 @@ cache:
     - $HOME/.npm
 script:
   - npm run lint-lib
-  - npm run build-lib && build-storybook
+  - npm run build-lib && npm run build-storybook
 
 deploy:
   provider: pages
