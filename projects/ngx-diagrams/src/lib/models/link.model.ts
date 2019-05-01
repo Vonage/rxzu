@@ -1,4 +1,4 @@
-import { Toolkit } from '../tool-kit.service';
+import * as Toolkit from '../tool-kit.service';
 
 export class LinkModel {
     private id: string;

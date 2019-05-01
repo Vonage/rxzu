@@ -1,26 +1,26 @@
-import { Toolkit } from '../tool-kit.service';
+import * as Toolkit from '../tool-kit.service';
 import { BehaviorSubject } from 'rxjs';
 import { DefaultPort } from './port.model';
 
 export class NodeModel {
 
-    private title: string;
-    private x: number;
-    private y: number;
-    private id: string;
-    private width: number;
-    private height: number;
-    private ports$: BehaviorSubject<{ [s: string]: DefaultPort }>;
+    title: string;
+    x: number;
+    y: number;
+    id: string;
+    width: number;
+    height: number;
+    ports$: BehaviorSubject<{ [s: string]: DefaultPort }>;
 
     constructor(title: string, x: number, y: number, id: string = Toolkit.UID(),
-                width: number = 200, height: number = 300, ports: any[] = []) {
+                width: number = 200, height: number = 300, ports: { [s: string]: DefaultPort } = {}) {
         this.id = id;
         this.title = title;
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.ports$ = new BehaviorSubject({});
+        this.ports$ = new BehaviorSubject(ports);
     }
 
     /**

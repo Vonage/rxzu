@@ -1,5 +1,6 @@
 import * as PF from 'pathfinding';
 import { Injectable } from '@angular/core';
+import { DiagramEngine } from '../engine.service';
 
 export const ROUTING_SCALING_FACTOR = 5;
 
@@ -8,7 +9,7 @@ export class PathFinding {
 
     private pathFinderInstance;
 
-    constructor(private diagramEngine: any) {
+    constructor(private diagramEngine: DiagramEngine) {
         this.pathFinderInstance = new PF.JumpPointFinder({
             heuristic: PF.Heuristic.manhattan,
             diagonalMovement: PF.DiagonalMovement.Never
@@ -19,27 +20,27 @@ export class PathFinding {
      * Taking as argument a fully unblocked walking matrix, this method
      * finds a direct path from point A to B.
      */
-    calculateDirectPath(
-        from: {
-            x: number;
-            y: number;
-        },
-        to: {
-            x: number;
-            y: number;
-        }
-    ): number[][] {
-        const matrix = this.diagramEngine.getCanvasMatrix();
-        const grid = new PF.Grid(matrix);
+    // calculateDirectPath(
+    //     from: {
+    //         x: number;
+    //         y: number;
+    //     },
+    //     to: {
+    //         x: number;
+    //         y: number;
+    //     }
+    // ): number[][] {
+    //     const matrix = this.diagramEngine.getCanvasMatrix();
+    //     const grid = new PF.Grid(matrix);
 
-        return this.pathFinderInstance.findPath(
-            this.diagramEngine.translateRoutingX(Math.floor(from.x / ROUTING_SCALING_FACTOR)),
-            this.diagramEngine.translateRoutingY(Math.floor(from.y / ROUTING_SCALING_FACTOR)),
-            this.diagramEngine.translateRoutingX(Math.floor(to.x / ROUTING_SCALING_FACTOR)),
-            this.diagramEngine.translateRoutingY(Math.floor(to.y / ROUTING_SCALING_FACTOR)),
-            grid
-        );
-    }
+    //     return this.pathFinderInstance.findPath(
+    //         this.diagramEngine.translateRoutingX(Math.floor(from.x / ROUTING_SCALING_FACTOR)),
+    //         this.diagramEngine.translateRoutingY(Math.floor(from.y / ROUTING_SCALING_FACTOR)),
+    //         this.diagramEngine.translateRoutingX(Math.floor(to.x / ROUTING_SCALING_FACTOR)),
+    //         this.diagramEngine.translateRoutingY(Math.floor(to.y / ROUTING_SCALING_FACTOR)),
+    //         grid
+    //     );
+    // }
 
     /**
      * Using @link{#calculateDirectPath}'s result as input, we here
@@ -97,30 +98,30 @@ export class PathFinding {
      * Puts everything together: merges the paths from/to the centre of the ports,
      * with the path calculated around other elements.
      */
-    calculateDynamicPath(
-        routingMatrix: number[][],
-        start: {
-            x: number;
-            y: number;
-        },
-        end: {
-            x: number;
-            y: number;
-        },
-        pathToStart: number[][],
-        pathToEnd: number[][]
-    ) {
-        // generate the path based on the matrix with obstacles
-        const grid = new PF.Grid(routingMatrix);
-        const dynamicPath = this.pathFinderInstance.findPath(start.x, start.y, end.x, end.y, grid);
+    // calculateDynamicPath(
+    //     routingMatrix: number[][],
+    //     start: {
+    //         x: number;
+    //         y: number;
+    //     },
+    //     end: {
+    //         x: number;
+    //         y: number;
+    //     },
+    //     pathToStart: number[][],
+    //     pathToEnd: number[][]
+    // ) {
+    //     // generate the path based on the matrix with obstacles
+    //     const grid = new PF.Grid(routingMatrix);
+    //     const dynamicPath = this.pathFinderInstance.findPath(start.x, start.y, end.x, end.y, grid);
 
-        // aggregate everything to have the calculated path ready for rendering
-        const pathCoords = pathToStart
-            .concat(dynamicPath, pathToEnd)
-            .map(coords => [
-                this.diagramEngine.translateRoutingX(coords[0], true),
-                this.diagramEngine.translateRoutingY(coords[1], true)
-            ]);
-        return PF.Util.compressPath(pathCoords);
-    }
+    //     // aggregate everything to have the calculated path ready for rendering
+    //     const pathCoords = pathToStart
+    //         .concat(dynamicPath, pathToEnd)
+    //         .map(coords => [
+    //             this.diagramEngine.translateRoutingX(coords[0], true),
+    //             this.diagramEngine.translateRoutingY(coords[1], true)
+    //         ]);
+    //     return PF.Util.compressPath(pathCoords);
+    // }
 }
