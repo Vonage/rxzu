@@ -3,7 +3,7 @@ import { AppComponent } from "projects/playground/src/app/app.component";
 import { NgxDiagramsModule } from "ngx-diagrams";
 import readme from "../README.md";
 
-storiesOf("ngx diagrams", module)
+storiesOf("Examples", module)
   .addDecorator(
     moduleMetadata({
       imports: [NgxDiagramsModule]

@@ -1,20 +1,20 @@
-import * as PF from 'pathfinding';
+// import * as PF from 'pathfinding';
 import { Injectable } from '@angular/core';
-import { DiagramEngine } from '../engine.service';
+// import { DiagramEngine } from '../engine.service';
 
 export const ROUTING_SCALING_FACTOR = 5;
 
 @Injectable()
 export class PathFinding {
 
-    private pathFinderInstance;
+    // private pathFinderInstance;
 
-    constructor(private diagramEngine: DiagramEngine) {
-        this.pathFinderInstance = new PF.JumpPointFinder({
-            heuristic: PF.Heuristic.manhattan,
-            diagonalMovement: PF.DiagonalMovement.Never
-        });
-    }
+    // constructor(private diagramEngine: DiagramEngine) {
+    //     this.pathFinderInstance = new PF.JumpPointFinder({
+    //         heuristic: PF.Heuristic.manhattan,
+    //         diagonalMovement: PF.DiagonalMovement.Never
+    //     });
+    // }
 
     /**
      * Taking as argument a fully unblocked walking matrix, this method
@@ -47,52 +47,52 @@ export class PathFinding {
      * determine the first walkable point found in the matrix that includes
      * blocked paths.
      */
-    calculateLinkStartEndCoords(
-        matrix: number[][],
-        path: number[][]
-    ): {
-        start: {
-            x: number;
-            y: number;
-        };
-        end: {
-            x: number;
-            y: number;
-        };
-        pathToStart: number[][];
-        pathToEnd: number[][];
-    } {
-        const startIndex = path.findIndex(point => matrix[point[1]][point[0]] === 0);
-        const endIndex =
-            path.length -
-            1 -
-            path
-                .slice()
-                .reverse()
-                .findIndex(point => matrix[point[1]][point[0]] === 0);
+    // calculateLinkStartEndCoords(
+    //     matrix: number[][],
+    //     path: number[][]
+    // ): {
+    //     start: {
+    //         x: number;
+    //         y: number;
+    //     };
+    //     end: {
+    //         x: number;
+    //         y: number;
+    //     };
+    //     pathToStart: number[][];
+    //     pathToEnd: number[][];
+    // } {
+    //     const startIndex = path.findIndex(point => matrix[point[1]][point[0]] === 0);
+    //     const endIndex =
+    //         path.length -
+    //         1 -
+    //         path
+    //             .slice()
+    //             .reverse()
+    //             .findIndex(point => matrix[point[1]][point[0]] === 0);
 
-        // are we trying to create a path exclusively through blocked areas?
-        // if so, let's fallback to the linear routing
-        if (startIndex === -1 || endIndex === -1) {
-            return undefined;
-        }
+    //     // are we trying to create a path exclusively through blocked areas?
+    //     // if so, let's fallback to the linear routing
+    //     if (startIndex === -1 || endIndex === -1) {
+    //         return undefined;
+    //     }
 
-        const pathToStart = path.slice(0, startIndex);
-        const pathToEnd = path.slice(endIndex);
+    //     const pathToStart = path.slice(0, startIndex);
+    //     const pathToEnd = path.slice(endIndex);
 
-        return {
-            start: {
-                x: path[startIndex][0],
-                y: path[startIndex][1]
-            },
-            end: {
-                x: path[endIndex][0],
-                y: path[endIndex][1]
-            },
-            pathToStart,
-            pathToEnd
-        };
-    }
+    //     return {
+    //         start: {
+    //             x: path[startIndex][0],
+    //             y: path[startIndex][1]
+    //         },
+    //         end: {
+    //             x: path[endIndex][0],
+    //             y: path[endIndex][1]
+    //         },
+    //         pathToStart,
+    //         pathToEnd
+    //     };
+    // }
 
     /**
      * Puts everything together: merges the paths from/to the centre of the ports,
