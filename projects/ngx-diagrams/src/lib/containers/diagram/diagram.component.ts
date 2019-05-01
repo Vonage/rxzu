@@ -14,7 +14,7 @@ export class NgxDiagramComponent implements OnInit {
 
   @Input() model: DiagramModel;
   @Input() allowCanvasZoon = true;
-  @Input() inverseZoom = false;
+  @Input() inverseZoom = true;
   nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
   links$: BehaviorSubject<{ [s: string]: LinkModel }>;
   offsetX$: Observable<number>;
