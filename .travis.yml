@@ -11,14 +11,14 @@ cache:
     - $HOME/.npm
 script:
   - npm run lint-lib
-  - npm run build-lib && npm run build
+  - npm run build-lib && build-storybook
 
 deploy:
   provider: pages
   skip-cleanup: true
   github-token: $GITHUB_TOKEN
   keep-history: true
-  local-dir: dist/playground
+  local-dir: dist/docs
   on:
     branch: master
 

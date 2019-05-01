@@ -12,7 +12,9 @@
     "e2e": "ng e2e",
     "commit": "git-cz",
     "travis-deploy-once": "travis-deploy-once --pro",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "storybook": "start-storybook",
+    "build-storybook": "build-storybook -c .storybook -o ./dist/docs"
   },
   "release": {
     "pkgRoot": "dist/ngx-diagrams"
@@ -29,7 +31,6 @@
     "@angular/router": "~7.2.0",
     "core-js": "^2.5.4",
     "rxjs": "~6.3.3",
-    "tslib": "^1.9.0",
     "zone.js": "~0.8.26"
   },
   "devDependencies": {
@@ -38,11 +39,16 @@
     "@angular/cli": "~7.3.8",
     "@angular/compiler-cli": "~7.2.0",
     "@angular/language-service": "~7.2.0",
+    "@babel/core": "^7.4.4",
     "@commitlint/cli": "^7.5.2",
     "@commitlint/config-conventional": "^7.5.0",
+    "@storybook/addon-notes": "^5.0.11",
+    "@storybook/addon-storysource": "^5.0.11",
+    "@storybook/angular": "^5.0.11",
     "@types/jasmine": "~2.8.8",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
+    "babel-loader": "^8.0.5",
     "codelyzer": "~4.5.0",
     "cz-conventional-changelog": "^2.1.0",
     "husky": "^2.1.0",
