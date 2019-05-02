@@ -3,9 +3,11 @@ import { BehaviorSubject } from 'rxjs';
 import { PortModel } from './port.model';
 import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
+import { DiagramEngine } from '../engine.service';
 
 export class NodeModel extends BaseModel<DiagramModel> {
 
+    diagramEngine: DiagramEngine;
     x: number;
     y: number;
     id: string;

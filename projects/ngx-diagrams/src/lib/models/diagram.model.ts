@@ -1,8 +1,8 @@
 import { BehaviorSubject } from 'rxjs';
 import { NodeModel } from './node.model';
 import { LinkModel } from './link.model';
-import { Coordinates } from '../interfaces/coords.interface';
 import { BaseEntity } from '../base.entity';
+import { DiagramEngine } from '../engine.service';
 
 export interface DiagramDataModel {
     nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
@@ -11,10 +11,14 @@ export interface DiagramDataModel {
     offsetX$: BehaviorSubject<number>;
     offsetY$: BehaviorSubject<number>;
     gridSize$: BehaviorSubject<number>;
+    diagramEngine: DiagramEngine;
 }
 
-// @Injectable()
 export class DiagramModel extends BaseEntity {
+
+    constructor(private diagramEngine: DiagramEngine) {
+        super();
+    }
 
     private model: DiagramDataModel = {
         nodes$: new BehaviorSubject<{ [s: string]: NodeModel }>({}),
@@ -22,7 +26,8 @@ export class DiagramModel extends BaseEntity {
         zoom$: new BehaviorSubject(100),
         offsetX$: new BehaviorSubject(0),
         offsetY$: new BehaviorSubject(0),
-        gridSize$: new BehaviorSubject(0)
+        gridSize$: new BehaviorSubject(0),
+        diagramEngine: this.diagramEngine
     };
 
     // TODO: support the following events for links and nodes
@@ -30,7 +35,7 @@ export class DiagramModel extends BaseEntity {
 
     /**
      * Add a node to the diagram
-     * @returns New Node
+     * @returns Inserted Node
      */
     addNode(node: NodeModel): NodeModel {
         this.model.nodes$.next({ ...this.model.nodes$.getValue(), [node.getID()]: node });
@@ -126,5 +131,9 @@ export class DiagramModel extends BaseEntity {
 
     getZoomLevel(): BehaviorSubject<number> {
         return this.model.zoom$;
+    }
+
+    getDiagramEngine(): DiagramEngine {
+        return this.model.diagramEngine;
     }
 }

@@ -6,11 +6,13 @@ import { PortModel } from '../../../models/port.model';
   templateUrl: './port.component.html',
   styleUrls: ['./port.component.scss']
 })
-export class PortComponent implements OnInit {
+export class PortComponent extends PortModel implements OnInit {
   @Input() port: PortModel;
   @Input() key: string;
 
-  constructor() { }
+  constructor() {
+    super('port', 'default');
+  }
 
   ngOnInit() {
   }

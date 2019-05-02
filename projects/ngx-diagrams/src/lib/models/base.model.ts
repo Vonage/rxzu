@@ -5,11 +5,13 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
     private type: string;
     private selected: boolean;
     private parent: X;
+    private painted: boolean;
 
     constructor(type?: string, id?: string) {
         super(id);
         this.type = type;
         this.selected = false;
+        this.painted = false;
     }
 
     getParent(): X {
@@ -22,6 +24,14 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 
     getSelectedEntities(): BaseModel<X>[] {
         return this.selected ? [this] : [];
+    }
+
+    shouldPaint(): boolean {
+        return this.painted;
+    }
+
+    setPainted(painted: boolean = true) {
+        this.painted = painted;
     }
 
     getType() {

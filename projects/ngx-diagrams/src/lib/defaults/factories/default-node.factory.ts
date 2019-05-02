@@ -1,18 +1,27 @@
 import { DefaultNodeComponent, DefaultNodeModel } from '../widgets/node/node.component';
-import { DiagramEngine } from '../../engine.service';
 import { AbstractNodeFactory } from '../../factories/node.factory';
-import { ComponentFactoryResolver } from '@angular/core';
+import { ComponentFactoryResolver, ViewContainerRef, ComponentRef, ComponentFactory } from '@angular/core';
+import { DiagramEngine } from '../../engine.service';
 
-// export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeComponent> {
-//     constructor(private resolver: ComponentFactoryResolver) {
-//         super('default');
-//     }
+export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeComponent> {
 
-//     generateWidget(diagramEngine: DiagramEngine, node: DefaultNodeModel): any {
-        // this.resolver.
-    // }
+    constructor(private resolver: ComponentFactoryResolver) {
+        super('default');
+    }
 
-    // getNewInstance(initialConfig?: any) {
-        // return
-    // }
-// }
+    generateWidget(diagramEngine: DiagramEngine, node: DefaultNodeModel, nodesHost: ViewContainerRef): ComponentRef<DefaultNodeComponent> {
+        const componentRef = nodesHost.createComponent(this.getRecipe());
+
+        Object.keys(node).forEach(key => {
+            componentRef.instance[key] = node[key];
+        });
+        componentRef.instance.node = node;
+        componentRef.instance.diagramEngine = diagramEngine;
+
+        return componentRef;
+    }
+
+    getRecipe(): ComponentFactory<DefaultNodeComponent> {
+        return this.resolver.resolveComponentFactory(DefaultNodeComponent);
+    }
+}

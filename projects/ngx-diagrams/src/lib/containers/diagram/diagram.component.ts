@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Renderer2, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Renderer2, Output, EventEmitter, ViewChild, ViewContainerRef } from '@angular/core';
 import { DiagramModel } from '../../models/diagram.model';
 import { NodeModel } from '../../models/node.model';
 import { LinkModel } from '../../models/link.model';
@@ -22,6 +22,9 @@ export class NgxDiagramComponent implements OnInit {
   @Output() actionStillFiring: EventEmitter<BaseAction> = new EventEmitter();
   @Output() actionStoppedFiring: EventEmitter<BaseAction> = new EventEmitter();
 
+  @ViewChild('nodesLayer', { read: ViewContainerRef }) nodesLayer: ViewContainerRef;
+  @ViewChild('linksLayer', { read: ViewContainerRef }) linksLayer: ViewContainerRef;
+
   nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
   links$: BehaviorSubject<{ [s: string]: LinkModel }>;
   action$: BehaviorSubject<BaseAction> = new BehaviorSubject(null);
@@ -32,8 +35,7 @@ export class NgxDiagramComponent implements OnInit {
   private mouseUpListener = () => { };
   private mouseMoveListener = () => { };
 
-  constructor(private renderer: Renderer2) {
-  }
+  constructor(private renderer: Renderer2) { }
 
   ngOnInit() {
     if (this.model) {
@@ -42,6 +44,12 @@ export class NgxDiagramComponent implements OnInit {
       this.offsetX$ = this.model.getOffsetX().pipe(share());
       this.offsetY$ = this.model.getOffsetY().pipe(share());
       this.zoomLevel$ = this.model.getZoomLevel().pipe(share());
+
+      this.nodes$.subscribe(nodes => {
+        Object.entries(nodes).forEach(([key, value]) => {
+          this.model.getDiagramEngine().generateWidgetForNode(value, this.nodesLayer);
+        });
+      });
     }
   }
 

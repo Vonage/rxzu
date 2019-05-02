@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { NodeModel } from '../../../models/node.model';
 
-export interface DefaultNodeModel {
+export interface DefaultNodeModel extends NodeModel {
   name: string;
   color: string;
 }
