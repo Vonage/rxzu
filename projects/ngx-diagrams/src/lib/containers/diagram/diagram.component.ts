@@ -1,11 +1,10 @@
-import { Component, OnInit, Input, Renderer2 } from '@angular/core';
+import { Component, OnInit, Input, Renderer2, Output, EventEmitter } from '@angular/core';
 import { DiagramModel } from '../../models/diagram.model';
 import { NodeModel } from '../../models/node.model';
 import { LinkModel } from '../../models/link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
-import { BaseAction } from '../../actions/base.action';
-import { MoveCanvasAction } from '../../actions/move-canvas.action';
+import { BaseAction, MoveCanvasAction } from '../../actions';
 
 @Component({
   selector: 'ngdx-diagram',
@@ -19,9 +18,9 @@ export class NgxDiagramComponent implements OnInit {
   @Input() allowCanvasTranslation = true;
   @Input() inverseZoom = true;
 
-  @Input() actionStartedFiring?: (action: BaseAction) => boolean;
-  @Input() actionStillFiring?: (action: BaseAction) => void;
-  @Input() actionStoppedFiring?: (action: BaseAction) => void;
+  @Output() actionStartedFiring: EventEmitter<BaseAction> = new EventEmitter();
+  @Output() actionStillFiring: EventEmitter<BaseAction> = new EventEmitter();
+  @Output() actionStoppedFiring: EventEmitter<BaseAction> = new EventEmitter();
 
   nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
   links$: BehaviorSubject<{ [s: string]: LinkModel }>;
@@ -50,8 +49,8 @@ export class NgxDiagramComponent implements OnInit {
    * fire the action registered and notify subscribers
    */
   fireAction() {
-    if (this.action$.getValue() && this.actionStillFiring) {
-      this.actionStillFiring(this.action$.getValue());
+    if (this.action$.getValue()) {
+      this.actionStillFiring.emit(this.action$.getValue());
     }
   }
 
@@ -59,8 +58,8 @@ export class NgxDiagramComponent implements OnInit {
    * Unregister the action, post firing and notify subscribers
    */
   stopFiringAction(shouldSkipEvent?: boolean) {
-    if (this.actionStoppedFiring && !shouldSkipEvent) {
-      this.actionStoppedFiring(this.action$.getValue());
+    if (!shouldSkipEvent) {
+      this.actionStoppedFiring.emit(this.action$.getValue());
     }
     this.action$.next(null);
   }
@@ -69,13 +68,8 @@ export class NgxDiagramComponent implements OnInit {
    * Register the new action, pre firing and notify subscribers
    */
   startFiringAction(action: BaseAction) {
-    let setState = true;
-    if (this.actionStartedFiring) {
-      setState = this.actionStartedFiring(action);
-    }
-    if (setState) {
-      this.action$.next(action);
-    }
+    this.action$.next(action);
+    this.actionStartedFiring.emit(action);
   }
 
   onMouseUp = (event: MouseEvent) => {

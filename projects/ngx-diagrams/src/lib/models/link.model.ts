@@ -1,24 +1,20 @@
-import * as Toolkit from '../tool-kit.service';
+import { BaseModel } from './base.model';
+import { DiagramModel } from './diagram.model';
+import { PortModel } from './port.model';
 
-export class LinkModel {
-    private id: string;
-    private from: Coordinates;
-    private to: Coordinates;
-    private positionFrom: any;
-    private positionTo: any;
-    private points: any[];
+export class LinkModel extends BaseModel<DiagramModel> {
+    sourcePort: PortModel | null;
+    targetPort: PortModel | null;
+    // TODO: create point model!
+    points: any[];
+    extras: any;
 
-    constructor(from: Coordinates, to: Coordinates, positionFrom: any = {}, positionTo: any = {},
-                id: string = Toolkit.UID(), points: any[] = []) {
-        this.id = id;
-        this.from = from;
-        this.to = to;
-        this.positionFrom = positionFrom;
-        this.positionTo = positionTo;
-        this.points = points;
-    }
-
-    getId() {
-        return this.id;
+    constructor(linkType: string = 'default', id?: string) {
+        super(linkType, id);
+        // TODO: handle default initial points!
+        this.points = [];
+        this.extras = {};
+        this.sourcePort = null;
+        this.targetPort = null;
     }
 }

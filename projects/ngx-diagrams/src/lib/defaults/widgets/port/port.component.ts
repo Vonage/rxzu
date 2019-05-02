@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { DefaultPort } from '../../../models/port.model';
+import { PortModel } from '../../../models/port.model';
 
 @Component({
   selector: 'ngdx-default-port',
@@ -7,7 +7,7 @@ import { DefaultPort } from '../../../models/port.model';
   styleUrls: ['./port.component.scss']
 })
 export class PortComponent implements OnInit {
-  @Input() port: DefaultPort;
+  @Input() port: PortModel;
   @Input() key: string;
 
   constructor() { }

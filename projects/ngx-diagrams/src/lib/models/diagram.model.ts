@@ -1,6 +1,8 @@
 import { BehaviorSubject } from 'rxjs';
 import { NodeModel } from './node.model';
 import { LinkModel } from './link.model';
+import { Coordinates } from '../interfaces/coords.interface';
+import { BaseEntity } from '../base.entity';
 
 export interface DiagramDataModel {
     nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
@@ -12,7 +14,7 @@ export interface DiagramDataModel {
 }
 
 // @Injectable()
-export class DiagramModel {
+export class DiagramModel extends BaseEntity {
 
     private model: DiagramDataModel = {
         nodes$: new BehaviorSubject<{ [s: string]: NodeModel }>({}),
@@ -30,17 +32,16 @@ export class DiagramModel {
      * Add a node to the diagram
      * @returns New Node
      */
-    addNode(title: string, x: number, y: number): NodeModel {
-        const newNode = new NodeModel(title, x, y);
-        this.model.nodes$.next({ ...this.model.nodes$.getValue(), [newNode.getId()]: newNode });
-        return newNode;
+    addNode(node: NodeModel): NodeModel {
+        this.model.nodes$.next({ ...this.model.nodes$.getValue(), [node.getID()]: node });
+        return node;
     }
 
     /**
      * Delete a node from the diagram
      */
     deleteNode(nodeOrId: NodeModel | string): void {
-        const nodeId: string = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.getId();
+        const nodeId: string = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.getID();
 
         // TODO: delete all related links
         const updNodes = { ...this.model.nodes$.getValue() };
@@ -59,17 +60,16 @@ export class DiagramModel {
      * Add link
      * @returns Newly created link
      */
-    addLink(from: Coordinates, to: Coordinates): LinkModel {
-        const newLink = new LinkModel(from, to);
-        this.model.links$.next({ ...this.model.links$.getValue(), [newLink.getId()]: newLink });
-        return newLink;
+    addLink(link: LinkModel): LinkModel {
+        this.model.links$.next({ ...this.model.links$.getValue(), [link.getID()]: link });
+        return link;
     }
 
     /**
      * Delete link
      */
     deleteLink(linkOrId: LinkModel | string) {
-        const linkId: string = typeof linkOrId === 'string' ? linkOrId : linkOrId.getId();
+        const linkId: string = typeof linkOrId === 'string' ? linkOrId : linkOrId.getID();
 
         const updLinks = { ...this.model.links$.getValue() };
         delete updLinks[linkId];
