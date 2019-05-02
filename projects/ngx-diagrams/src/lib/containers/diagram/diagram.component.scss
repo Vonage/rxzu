@@ -22,10 +22,11 @@
     left: 0;
     right: 0;
 
-    .ngdx-node {
-      position: absolute;
-      display: flex;
-    }
+    // TODO: figure out how to wrap a factory projected component.
+    // .ngdx-node {
+    //   position: absolute;
+    //   display: flex;
+    // }
   }
 
   .ngdx-links-layer {

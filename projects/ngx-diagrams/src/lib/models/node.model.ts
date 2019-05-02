@@ -8,17 +8,17 @@ import { DiagramEngine } from '../engine.service';
 export class NodeModel extends BaseModel<DiagramModel> {
 
     diagramEngine: DiagramEngine;
-    x: number;
-    y: number;
+    x$: BehaviorSubject<number>;
+    y$: BehaviorSubject<number>;
     id: string;
-    extras: { [s: string]: any };
+    extras$: BehaviorSubject<{ [s: string]: any }>;
     ports$: BehaviorSubject<{ [s: string]: PortModel }>;
 
-    constructor(nodeType: string = 'default', id?: string) {
+    constructor(nodeType: string = 'default', extras: { [s: string]: any } = {}, x: number = 0, y: number = 0, id?: string) {
         super(nodeType, id);
-        this.x = 0;
-        this.y = 0;
-        this.extras = {};
+        this.x$ = new BehaviorSubject(x);
+        this.y$ = new BehaviorSubject(y);
+        this.extras$ = new BehaviorSubject(extras);
         this.ports$ = new BehaviorSubject({});
     }
 
@@ -26,8 +26,8 @@ export class NodeModel extends BaseModel<DiagramModel> {
         // update ports position as well
         // https://github.com/projectstorm/react-diagrams/blob/master/src/models/NodeModel.ts#L31-L44
 
-        this.x = x;
-        this.y = y;
+        this.x$.next(x);
+        this.y$.next(y);
     }
 
     /**

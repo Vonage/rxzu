@@ -3,6 +3,10 @@
   background-color: white;
   border-radius: 10px;
   border: 1px solid blue;
+  position: absolute;
+  display: flex;
+  transition: all 0.3s ease-in-out;
+
   cursor: auto;
   .title {
     padding: 10px;

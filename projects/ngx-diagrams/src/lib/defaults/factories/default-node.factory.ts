@@ -11,11 +11,9 @@ export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeComponent
 
     generateWidget(diagramEngine: DiagramEngine, node: DefaultNodeModel, nodesHost: ViewContainerRef): ComponentRef<DefaultNodeComponent> {
         const componentRef = nodesHost.createComponent(this.getRecipe());
-
-        Object.keys(node).forEach(key => {
-            componentRef.instance[key] = node[key];
+        Object.entries(node).forEach(([key, value]) => {
+            componentRef.instance[key] = value;
         });
-        componentRef.instance.node = node;
         componentRef.instance.diagramEngine = diagramEngine;
 
         return componentRef;

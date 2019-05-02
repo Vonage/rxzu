@@ -13,10 +13,7 @@ export interface DefaultNodeModel extends NodeModel {
 })
 export class DefaultNodeComponent extends NodeModel implements OnInit {
 
-  @Input() name: string;
-  @Input() color: string;
   @Input() node: NodeModel;
-  @Input() key: string;
 
   constructor() {
     super('default');

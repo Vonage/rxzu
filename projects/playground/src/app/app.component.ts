@@ -25,13 +25,20 @@ export class AppComponent implements OnInit {
     // this.diagramModel = new DiagramModel();
     const node1 = new NodeModel();
     node1.setPosition(500, 300);
-    console.log(node1);
+    node1.extras$.next({ height: 100, width: 200 });
     this.diagramModel.addNode(node1);
+
+    node1.setLocked();
     // node1.addPort('out1', 'out');
 
     // const node2 = new NodeModel();
     // node2.setPosition(200, 300);
     // this.diagramModel.addNode(node2);
     // node2.addPort('in1', 'in');
+
+    // example for reactivity
+    setTimeout(() => {
+      node1.extras$.next({ height: 150, width: 150 });
+    }, 3000);
   }
 }

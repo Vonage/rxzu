@@ -1,14 +1,16 @@
 import { UID } from './tool-kit.service';
+import { BehaviorSubject } from 'rxjs';
 
 
 export type BaseEntityType = 'node' | 'link' | 'port';
 
 export class BaseEntity {
     public id: string;
-    public locked: boolean;
+    public locked$: BehaviorSubject<boolean>;
 
     constructor(id?: string) {
         this.id = id || UID();
+        this.locked$ = new BehaviorSubject(false);
     }
 
     getID() {
@@ -16,11 +18,11 @@ export class BaseEntity {
     }
 
     isLocked() {
-        return this.locked;
+        return this.locked$;
     }
 
     setLocked(locked: boolean = true) {
-        this.locked = locked;
+        this.locked$.next(locked);
         // TODO: handle instance events somehow, maybe event bus?
         // https://github.com/projectstorm/react-diagrams/blob/master/src/BaseEntity.ts#L109-L112
     }

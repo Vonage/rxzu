@@ -1,37 +1,38 @@
 import { BaseEntity } from '../base.entity';
+import { BehaviorSubject } from 'rxjs';
 
 export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 
     private type: string;
-    private selected: boolean;
-    private parent: X;
-    private painted: boolean;
+    private selected$: BehaviorSubject<boolean>;
+    private parent$: BehaviorSubject<X>;
+    private painted$: BehaviorSubject<boolean>;
 
     constructor(type?: string, id?: string) {
         super(id);
         this.type = type;
-        this.selected = false;
-        this.painted = false;
+        this.selected$ = new BehaviorSubject(false);
+        this.painted$ = new BehaviorSubject(false);
     }
 
-    getParent(): X {
-        return this.parent;
+    getParent() {
+        return this.parent$;
     }
 
     setParent(parent: X) {
-        this.parent = parent;
+        this.parent$.next(parent);
     }
 
     getSelectedEntities(): BaseModel<X>[] {
-        return this.selected ? [this] : [];
+        return this.selected$ ? [this] : [];
     }
 
-    shouldPaint(): boolean {
-        return this.painted;
+    isPainted() {
+        return this.painted$;
     }
 
     setPainted(painted: boolean = true) {
-        this.painted = painted;
+        this.painted$.next(painted);
     }
 
     getType() {
@@ -43,11 +44,11 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
     }
 
     isSelected() {
-        return this.selected;
+        return this.selected$;
     }
 
     setSelected(selected: boolean = true) {
-        this.selected = selected;
+        this.selected$.next(selected);
     }
 
     public remove() {

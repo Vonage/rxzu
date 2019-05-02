@@ -34,7 +34,6 @@ export class DiagramEngine {
 
     registerNodeFactory(nodeFactory: AbstractNodeFactory) {
         this.nodeFactories[nodeFactory.getType()] = nodeFactory;
-        console.log(this.nodeFactories);
     }
 
 

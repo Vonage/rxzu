@@ -5,6 +5,7 @@ import { LinkModel } from '../../models/link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
 import { BaseAction, MoveCanvasAction } from '../../actions';
+import { filter } from 'minimatch';
 
 @Component({
   selector: 'ngdx-diagram',
@@ -45,11 +46,15 @@ export class NgxDiagramComponent implements OnInit {
       this.offsetY$ = this.model.getOffsetY().pipe(share());
       this.zoomLevel$ = this.model.getZoomLevel().pipe(share());
 
-      this.nodes$.subscribe(nodes => {
-        Object.entries(nodes).forEach(([key, value]) => {
-          this.model.getDiagramEngine().generateWidgetForNode(value, this.nodesLayer);
+      this.nodes$
+        .subscribe(nodes => {
+          Object.entries(nodes).forEach(([key, value]) => {
+            if (!value.isPainted().getValue()) {
+              this.model.getDiagramEngine().generateWidgetForNode(value, this.nodesLayer);
+              value.setPainted(true);
+            }
+          });
         });
-      });
     }
   }
 

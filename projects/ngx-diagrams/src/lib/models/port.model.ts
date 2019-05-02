@@ -20,7 +20,7 @@ export class PortModel extends BaseModel<NodeModel> {
         this.maximumLinks = maximumLinks;
     }
 
-    getNode(): NodeModel {
+    getNode() {
         return this.getParent();
     }
 
@@ -62,7 +62,7 @@ export class PortModel extends BaseModel<NodeModel> {
     }
 
     isLocked() {
-        return super.isLocked() || this.getParent().isLocked();
+        return super.isLocked() || this.getParent().getValue().isLocked();
     }
 
 
