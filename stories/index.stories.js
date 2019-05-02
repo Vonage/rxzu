@@ -1,9 +1,9 @@
 import { storiesOf, moduleMetadata } from "@storybook/angular";
 import { AppComponent } from "projects/playground/src/app/app.component";
 import { MarkdownWrapperComponent } from "projects/playground/src/app/components/markdown-wrapper/markdown-wrapper.component";
-import { NgxDiagramsModule } from "ngx-diagrams";
+import { NgxDiagramsModule, DefaultNodeComponent } from "ngx-diagrams";
+import { MarkdownModule } from "ngx-markdown";
 import readme from "../README.md";
-import { MarkdownModule } from "ngx-markdown/esm5/src/markdown.module";
 
 storiesOf("Docs", module)
   .addDecorator(
@@ -21,7 +21,8 @@ storiesOf("Docs", module)
 storiesOf("Examples", module)
   .addDecorator(
     moduleMetadata({
-      imports: [NgxDiagramsModule]
+      imports: [NgxDiagramsModule],
+      entryComponents: [DefaultNodeComponent]
     })
   )
   .add(
