@@ -6,7 +6,6 @@
 /out-tsc
 # Only exists if Bazel was run
 /bazel-out
-
 # dependencies
 node_modules/
 
@@ -15,6 +14,7 @@ chrome-profiler-events.json
 speed-measure-plugin.json
 
 # IDEs and editors
+.editorconfig
 /.idea
 .project
 .classpath

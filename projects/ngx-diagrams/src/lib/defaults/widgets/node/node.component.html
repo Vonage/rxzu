@@ -7,9 +7,6 @@
     'right.px': x$ | async
   }"
 >
-  <div class="title">
-    {{ title }}
-  </div>
   <div class="ports">
     <ngdx-default-port
       *ngFor="let port of ports$ | async | keyvalue"
