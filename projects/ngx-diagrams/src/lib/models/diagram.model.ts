@@ -32,7 +32,7 @@ export class DiagramModel {
      */
     addNode(title: string, x: number, y: number): NodeModel {
         const newNode = new NodeModel(title, x, y);
-        this.model.nodes$.next({ ...this.model.nodes$.value, [newNode.getId()]: newNode });
+        this.model.nodes$.next({ ...this.model.nodes$.getValue(), [newNode.getId()]: newNode });
         return newNode;
     }
 
@@ -43,13 +43,13 @@ export class DiagramModel {
         const nodeId: string = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.getId();
 
         // TODO: delete all related links
-        const updNodes = { ...this.model.nodes$.value };
+        const updNodes = { ...this.model.nodes$.getValue() };
         delete updNodes[nodeId];
         this.model.nodes$.next(updNodes);
     }
 
     /**
-     * Get nodes behaviour subject, use `.value` for snapshot
+     * Get nodes behaviour subject, use `.getValue()` for snapshot
      */
     selectNodes(): BehaviorSubject<{ [s: string]: NodeModel }> {
         return this.model.nodes$;
@@ -61,7 +61,7 @@ export class DiagramModel {
      */
     addLink(from: Coordinates, to: Coordinates): LinkModel {
         const newLink = new LinkModel(from, to);
-        this.model.links$.next({ ...this.model.links$.value, [newLink.getId()]: newLink });
+        this.model.links$.next({ ...this.model.links$.getValue(), [newLink.getId()]: newLink });
         return newLink;
     }
 
@@ -71,14 +71,14 @@ export class DiagramModel {
     deleteLink(linkOrId: LinkModel | string) {
         const linkId: string = typeof linkOrId === 'string' ? linkOrId : linkOrId.getId();
 
-        const updLinks = { ...this.model.links$.value };
+        const updLinks = { ...this.model.links$.getValue() };
         delete updLinks[linkId];
 
         this.model.links$.next(updLinks);
     }
 
     /**
-     * Get links behaviour subject, use `.value` for snapshot
+     * Get links behaviour subject, use `.getValue()` for snapshot
      */
     selectLinks(): BehaviorSubject<{ [s: string]: LinkModel }> {
         return this.model.links$;

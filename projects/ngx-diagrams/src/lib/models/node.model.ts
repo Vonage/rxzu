@@ -35,7 +35,7 @@ export class NodeModel {
             type
         };
 
-        this.ports$.next({ ...this.ports$.value, [newPort.id]: newPort });
+        this.ports$.next({ ...this.ports$.getValue(), [newPort.id]: newPort });
 
         return newPort.id;
     }
