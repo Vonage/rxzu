@@ -1,0 +1,49 @@
+{
+	"pkgRoot": "dist/ngx-diagrams",
+	"branch": "master",
+	"plugins": [
+		[
+			"@semantic-release/commit-analyzer",
+			{
+				"parserOpts": {
+					"noteKeywords": [
+						"BREAKING CHANGE",
+						"BREAKING CHANGES",
+						"BREAKING"
+					]
+				}
+			}
+		],
+		[
+			"@semantic-release/release-notes-generator",
+			{
+				"parserOpts": {
+					"noteKeywords": [
+						"BREAKING CHANGE",
+						"BREAKING CHANGES",
+						"BREAKING"
+					]
+				}
+			}
+		],
+		"@semantic-release/changelog",
+		"@semantic-release/npm",
+		"@semantic-release/git"
+	],
+	"prepare": [
+		"@semantic-release/changelog",
+		"@semantic-release/npm",
+		[
+			"@semantic-release/git",
+			{
+				"assets": [
+					"dist/ngx-diagrams/**/*",
+					"package.json",
+					"CHANGELOG.md"
+				],
+				"message": "build(release): release <%= nextRelease.version %> - <%= new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %> [skip ci]\n\n<%= nextRelease.notes %>"
+			}
+		]
+	]
+}
+
