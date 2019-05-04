@@ -11,31 +11,31 @@ cache:
     - $HOME/.npm
 
 jobs:
-	include:
-		- stage: lint
-			script: npm run lint-lib
-		- stage: build
-			script: npm run build-lib
-			script: npm run build-storybook
-		- stage: release
-			if: branch = master
-			script: skip
-			deploy:
-				provider: script
-				skip_cleanup: true
-				env:
-					- GITHUB_TOKEN: $GITHUB_TOKEN
-				script: npm run semantic-release
-
-			- stage: deploy storybook
-			if: branch = master
-			script: skip
-			deploy:
-				provider: pages
-				skip-cleanup: true
-				github-token: $GITHUB_TOKEN
-				keep-history: true
-				local-dir: dist/docs
+  include:
+    - stage: lint
+      script: npm run lint-lib
+    - stage: build
+      script:
+        - npm run build-lib
+        - npm run build-storybook
+    - stage: release
+      if: branch = master
+      script: skip
+      deploy:
+        provider: script
+        skip_cleanup: true
+        env:
+          - GITHUB_TOKEN: $GITHUB_TOKEN
+        script: npm run semantic-release
+    - stage: deploy storybook
+      if: branch = master
+      script: skip
+      deploy:
+        provider: pages
+        skip-cleanup: true
+        github-token: $GITHUB_TOKEN
+        keep-history: true
+        local-dir: dist/docs
 
 git:
   depth: 3
