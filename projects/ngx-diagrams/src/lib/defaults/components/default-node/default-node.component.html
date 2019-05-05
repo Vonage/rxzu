@@ -1,8 +1,8 @@
 <div
 	class="default-node"
 	[ngStyle]="{
-		'height.px': (extras$ | async).height,
-		'width.px': (extras$ | async).width
+		'height.px': height$ | async,
+		'width.px': width$ | async
 	}"
 >
 	<div class="ports">

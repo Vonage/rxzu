@@ -7,7 +7,7 @@ module.exports = {
 		{ value: 'style',    name: '🎨  - STYLE: changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc) '},
 		{ value: 'refactor', name: '👷‍  - REFACTOR: a code change that neither fixes a bug nor adds a feature' },
 		{ value: 'perf',     name: '⚡️  - PERFORMANCE: code change that improves performance' },
-		{ value: 'ci',       name: '🐱‍🏍 - CONTINUOUS INTEGRATION: changes that affect either the build or deployment process' }
+		{ value: 'ci',       name: '💨  - CONTINUOUS INTEGRATION: changes that affect either the build or deployment process' },
 		{ value: 'test',     name: '✅  - TEST: adding missing tests or correcting existing test' }
 	],
 
