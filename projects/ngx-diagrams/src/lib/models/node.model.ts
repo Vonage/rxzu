@@ -9,12 +9,12 @@ export class NodeModel extends BaseModel<DiagramModel> {
 	id: string;
 	diagramEngine: DiagramEngine;
 
-	private extras$: BehaviorSubject<{ [s: string]: any }>;
-	private ports$: BehaviorSubject<{ [s: string]: PortModel }>;
-	private x$: BehaviorSubject<number>;
-	private y$: BehaviorSubject<number>;
-	private width$: BehaviorSubject<number>;
-	private height$: BehaviorSubject<number>;
+	public readonly extras$: BehaviorSubject<{ [s: string]: any }>;
+	public readonly ports$: BehaviorSubject<{ [s: string]: PortModel }>;
+	public readonly x$: BehaviorSubject<number>;
+	public readonly y$: BehaviorSubject<number>;
+	public readonly width$: BehaviorSubject<number>;
+	public readonly height$: BehaviorSubject<number>;
 
 	constructor(
 		nodeType: string = 'default',
