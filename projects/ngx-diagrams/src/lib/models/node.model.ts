@@ -63,13 +63,13 @@ export class NodeModel extends BaseModel<DiagramModel> {
 	 * @returns the inserted port
 	 */
 	addPort<T extends PortModel>(port: T): T {
-		port.setParent(this);
-		this.ports$.next({ ...this.ports$.getValue(), [port.id]: port });
+		port.parent = this;
+		this.ports$.next({ ...this.ports$.value, [port.id]: port });
 		return port;
 	}
 
 	getPort(name: string): PortModel {
-		return this.ports$.getValue()[name];
+		return this.ports$.value[name];
 	}
 
 	selectPorts(): Observable<{ [s: string]: PortModel }> {
@@ -77,11 +77,11 @@ export class NodeModel extends BaseModel<DiagramModel> {
 	}
 
 	getPorts(): { [s: string]: PortModel } {
-		return this.ports$.getValue();
+		return this.ports$.value;
 	}
 
 	getPortByID(id: string): PortModel | null {
-		const ports = this.ports$.getValue();
+		const ports = this.ports$.value;
 		return Object.values(ports).find(port => port.id === id);
 	}
 
@@ -95,7 +95,7 @@ export class NodeModel extends BaseModel<DiagramModel> {
 	}
 
 	getExtras() {
-		return this.extras$.getValue();
+		return this.extras$.value;
 	}
 
 	setExtras(extras: any) {

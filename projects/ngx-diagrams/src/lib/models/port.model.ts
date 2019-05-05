@@ -41,17 +41,17 @@ export class PortModel extends BaseModel<NodeModel> {
 	}
 
 	removeLink(link: LinkModel) {
-		const links = this.links$.getValue();
+		const links = this.links$.value;
 		delete links[link.id];
 		this.links$.next({ ...links });
 	}
 
 	addLink(link: LinkModel) {
-		this.links$.next({ ...this.links$.getValue(), [link.id]: link });
+		this.links$.next({ ...this.links$.value, [link.id]: link });
 	}
 
 	getLinks(): { [id: string]: LinkModel } {
-		return this.links$.getValue();
+		return this.links$.value;
 	}
 
 	selectLinks(): Observable<{ [id: string]: LinkModel }> {
@@ -67,9 +67,5 @@ export class PortModel extends BaseModel<NodeModel> {
 
 	canLinkToPort(port: PortModel): boolean {
 		return true;
-	}
-
-	isLocked() {
-		return this.locked || this.parent.locked;
 	}
 }

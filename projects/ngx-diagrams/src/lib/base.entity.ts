@@ -1,67 +1,44 @@
 import { UID } from './utils/tool-kit.util';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { map, mapTo, take, takeUntil } from 'rxjs/operators';
-
-export interface BaseEvent<T extends BaseEntity = BaseEntity> {
-	entity: T;
-	stopPropagation: () => any;
-	firing: boolean;
-	id: string;
-}
-export interface LockEvent<T extends BaseEntity = BaseEntity> extends BaseEvent<T> {
-	locked: boolean;
-}
-
-export function createBaseEvent<T extends BaseEntity = BaseEntity>(thisArg: T): BaseEvent<T> {
-	return {
-		id: UID(),
-		entity: thisArg,
-		firing: true,
-		stopPropagation: () => (this.firing = false)
-	};
-}
-
-export function createLockedEvent<T extends BaseEntity = BaseEntity>(thisArg: T, locked: boolean = false): LockEvent<T> {
-	return {
-		...createBaseEvent(this),
-		locked
-	};
-}
+import { map, mapTo, takeUntil } from 'rxjs/operators';
+import { BaseEvent, createBaseEvent, createLockedEvent, LockEvent } from './interfaces/event.interface';
 
 export type BaseEntityType = 'node' | 'link' | 'port';
 
 export class BaseEntity {
-	protected _id: string;
-	protected readonly _destroyed: Subject<void> = new Subject();
-	protected readonly _destroyed$: Observable<void> = this._destroyed.asObservable();
-	protected readonly _locked: BehaviorSubject<boolean> = new BehaviorSubject(false);
-	protected readonly _locked$: Observable<boolean> = this._locked.asObservable();
+	private _id: string;
+	private _destroyed: Subject<void> = new Subject();
+	private _destroyed$: Observable<void> = this._destroyed.asObservable();
+	private _locked: BehaviorSubject<boolean> = new BehaviorSubject(false);
+	private _locked$: Observable<boolean> = this._locked.asObservable();
 
 	constructor(id?: string) {
 		this._id = id || UID();
 	}
 
-	get id(): string {
+	public get id(): string {
 		return this._id;
 	}
 
-	set id(id: string) {
+	public set id(id: string) {
 		this._id = id;
 	}
 
-	lockChanges(): Observable<LockEvent> {
-		return this._locked$.pipe(
-			takeUntil(this._destroyed),
-			map(locked => createLockedEvent(this, locked))
-		);
-	}
-
-	get locked(): boolean {
+	// TODO: revert back to get locked()
+	getLocked(): boolean {
 		return this._locked.value;
 	}
 
-	set locked(locked: boolean) {
+	// TODO: revert back to set locked()
+	setLocked(locked: boolean = true) {
 		this._locked.next(locked);
+	}
+
+	public lockChanges(): Observable<LockEvent> {
+		return this._locked$.pipe(
+			takeUntil(this._destroyed$),
+			map(locked => createLockedEvent(this, locked))
+		);
 	}
 
 	public destroy() {
@@ -69,7 +46,7 @@ export class BaseEntity {
 		this._destroyed.complete();
 	}
 
-	onEntityDestroy(): Observable<BaseEvent<BaseEntity>> {
+	public onEntityDestroy(): Observable<BaseEvent<BaseEntity>> {
 		return this._destroyed$.pipe(mapTo(createBaseEvent(this)));
 	}
 }

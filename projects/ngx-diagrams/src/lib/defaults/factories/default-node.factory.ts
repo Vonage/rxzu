@@ -1,7 +1,7 @@
 import { DefaultNodeComponent } from '../components/default-node/default-node.component';
 import { AbstractNodeFactory } from '../../factories/node.factory';
 import { ComponentFactoryResolver, ViewContainerRef, ComponentRef, ComponentFactory } from '@angular/core';
-import { DiagramEngine } from '../../engine.service';
+import { DiagramEngine } from '../../services/engine.service.js';
 import { DefaultNodeModel } from '../models/default-node.model';
 
 export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {

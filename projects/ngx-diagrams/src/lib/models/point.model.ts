@@ -9,20 +9,20 @@ export class PointModel extends BaseModel<LinkModel> {
 		super();
 		this.x = points.x;
 		this.y = points.y;
-		this.setParent(link);
+		this.parent = link;
 	}
 
 	isConnectedToPort() {
-		return this.getParent().getPortForPoint(this) !== null;
+		return this.parent.getPortForPoint(this) !== null;
 	}
 
 	getLink(): LinkModel {
-		return this.getParent();
+		return this.parent;
 	}
 
 	remove() {
-		if (this.getParent()) {
-			this.getParent().removePoint(this);
+		if (this.parent) {
+			this.parent.removePoint(this);
 		}
 
 		super.remove();
@@ -34,9 +34,5 @@ export class PointModel extends BaseModel<LinkModel> {
 
 	getY(): number {
 		return this.y;
-	}
-
-	isLocked() {
-		return this.isLocked() || this.getParent().isLocked();
 	}
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DiagramModel } from 'projects/ngx-diagrams/src/lib/models/diagram.model';
-import { DiagramEngine } from 'ngx-diagrams';
 import { NodeModel } from 'projects/ngx-diagrams/src/lib/models/node.model';
+import { DiagramEngine } from 'ngx-diagrams';
 
 @Component({
 	selector: 'app-root',
@@ -28,6 +28,10 @@ export class AppComponent implements OnInit {
 		this.diagramModel.addNode(node1);
 
 		node1.setLocked();
+
+		// TODO: THIS THROWS ERROR
+		// console.log(node1.locked);
+
 		// node1.addPort('out1', 'out');
 
 		// const node2 = new NodeModel();

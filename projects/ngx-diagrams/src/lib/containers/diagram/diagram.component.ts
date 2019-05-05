@@ -60,8 +60,8 @@ export class NgxDiagramComponent implements OnInit {
 	 * fire the action registered and notify subscribers
 	 */
 	fireAction() {
-		if (this.action$.getValue()) {
-			this.actionStillFiring.emit(this.action$.getValue());
+		if (this.action$.value) {
+			this.actionStillFiring.emit(this.action$.value);
 		}
 	}
 
@@ -70,7 +70,7 @@ export class NgxDiagramComponent implements OnInit {
 	 */
 	stopFiringAction(shouldSkipEvent?: boolean) {
 		if (!shouldSkipEvent) {
-			this.actionStoppedFiring.emit(this.action$.getValue());
+			this.actionStoppedFiring.emit(this.action$.value);
 		}
 		this.action$.next(null);
 	}
@@ -89,7 +89,7 @@ export class NgxDiagramComponent implements OnInit {
 	};
 
 	onMouseMove = (event: MouseEvent) => {
-		const action = this.action$.getValue();
+		const action = this.action$.value;
 
 		if (action instanceof MoveCanvasAction) {
 			if (this.allowCanvasTranslation) {

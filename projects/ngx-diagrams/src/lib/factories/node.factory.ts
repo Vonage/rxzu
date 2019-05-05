@@ -1,6 +1,6 @@
 import { NodeModel } from '../models/node.model';
 import { AbstractFactory } from './base.factory';
-import { DiagramEngine } from '../engine.service';
+import { DiagramEngine } from '../services/engine.service';
 import { ViewContainerRef, ComponentRef } from '@angular/core';
 
 export abstract class AbstractNodeFactory<T extends NodeModel = NodeModel> extends AbstractFactory<T> {

@@ -58,20 +58,20 @@ export class LinkModel extends BaseModel<DiagramModel> {
 	}
 
 	getPortForPoint(point: PointModel): PortModel {
-		if (this.sourcePort !== null && this.getFirstPoint().getID() === point.getID()) {
+		if (this.sourcePort !== null && this.getFirstPoint().id === point.id) {
 			return this.sourcePort;
 		}
-		if (this.targetPort !== null && this.getLastPoint().getID() === point.getID()) {
+		if (this.targetPort !== null && this.getLastPoint().id === point.id) {
 			return this.targetPort;
 		}
 		return null;
 	}
 
 	getPointForPort(port: PortModel): PointModel {
-		if (this.sourcePort !== null && this.sourcePort.getID() === port.getID()) {
+		if (this.sourcePort !== null && this.sourcePort.id === port.id) {
 			return this.getFirstPoint();
 		}
-		if (this.targetPort !== null && this.targetPort.getID() === port.getID()) {
+		if (this.targetPort !== null && this.targetPort.id === port.id) {
 			return this.getLastPoint();
 		}
 		return null;
@@ -118,7 +118,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
 	}
 
 	// addLabel(label: LabelModel) {
-	//     label.setParent(this);
+	//     label.parent = this;
 	//     this.labels.push(label);
 	// }
 
@@ -128,7 +128,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
 	setPoints(points: PointModel[]) {
 		points.forEach(point => {
-			point.setParent(this);
+			point.parent = this;
 		});
 		this.points = points;
 	}
@@ -152,7 +152,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
 	}
 
 	addPoint<P extends PointModel>(pointModel: P, index = 1): P {
-		pointModel.setParent(this);
+		pointModel.parent = this;
 		this.points.splice(index, 0, pointModel);
 		return pointModel;
 	}

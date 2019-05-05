@@ -1,38 +1,18 @@
-import { BaseEntity, BaseEvent, createBaseEvent } from '../base.entity';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { map, mapTo } from 'rxjs/operators';
+import { BaseEntity } from '../base.entity';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import {
+	createPaintedEvent,
+	createParentEvent,
+	createSelectionEvent,
+	PaintedEvent,
+	ParentChangeEvent,
+	SelectionEvent
+} from '../interfaces/event.interface';
 
-export type ParentChangeEvent<T = BaseModel, P extends BaseModel = BaseModel> = BaseEvent<T> & {
-	parent: P;
-};
-export type SelectionEvent<T = BaseModel> = BaseEvent<T> & { isSelected: boolean };
-export type PaintedEvent<T = BaseModel> = BaseEvent<T> & { isPainted: boolean };
-
-export function createParentEvent<T extends BaseModel = BaseModel, P extends BaseModel = BaseModel>(
-	thisArg: T,
-	parent: P
-): ParentChangeEvent<T, P> {
-	return {
-		...createBaseEvent<T>(this),
-		parent
-	};
-}
-export function createSelectionEvent<T extends BaseModel = BaseModel>(thisArg: T, isSelected: boolean): SelectionEvent<T> {
-	return {
-		...createBaseEvent<T>(this),
-		isSelected
-	};
-}
-export function createPaintedEvent<T extends BaseModel = BaseModel>(thisArg: T, painted: boolean): PaintedEvent<T> {
-	return {
-		...createBaseEvent<T>(this),
-		isPainted: painted
-	};
-}
-
-export class BaseModel<X extends BaseModel = BaseModel> extends BaseEntity {
+export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 	private readonly _type: string;
-	private readonly _parent: BehaviorSubject<X>;
+	private readonly _parent: BehaviorSubject<X> = new BehaviorSubject(null);
 	private readonly _parent$: Observable<X> = this._parent.asObservable();
 	private readonly _selected: BehaviorSubject<boolean> = new BehaviorSubject(false);
 	private readonly _selected$: Observable<boolean> = this._selected.asObservable();
@@ -44,9 +24,10 @@ export class BaseModel<X extends BaseModel = BaseModel> extends BaseEntity {
 		this._type = type;
 	}
 
-	get locked() {
-		return super.locked || this.parent.locked;
+	get locked(): boolean {
+		return this.parent.getLocked() || this.getLocked();
 	}
+
 	get parent(): X {
 		return this._parent.value;
 	}
@@ -55,15 +36,16 @@ export class BaseModel<X extends BaseModel = BaseModel> extends BaseEntity {
 		this._parent.next(parent);
 	}
 
+	// @ts-ignore
 	parentChanges(): Observable<ParentChangeEvent> {
-		this._parent$.pipe(map(p => createParentEvent<X>(this, p)));
+		this._parent$.pipe(map(p => createParentEvent<BaseModel>(this, p)));
 	}
 
 	get painted(): boolean {
 		return this._painted.value;
 	}
 
-	set painted(painted: boolean = true) {
+	set painted(painted: boolean) {
 		this._painted.next(painted);
 	}
 
@@ -79,7 +61,7 @@ export class BaseModel<X extends BaseModel = BaseModel> extends BaseEntity {
 		return this._selected.value;
 	}
 
-	set selected(selected: boolean = true) {
+	set selected(selected: boolean) {
 		this._selected.next(selected);
 	}
 

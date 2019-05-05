@@ -65,7 +65,7 @@ export class DiagramModel extends BaseEntity {
 	 * @returns Newly created link
 	 */
 	addLink(link: LinkModel): LinkModel {
-		this.model.links$.next({ ...this.model.links$.getValue(), [link.id]: link });
+		this.model.links$.next({ ...this.model.links$.value, [link.id]: link });
 		return link;
 	}
 
