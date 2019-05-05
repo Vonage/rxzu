@@ -6,14 +6,12 @@ import { DefaultNodeModel } from '../../models/default-node.model';
 	templateUrl: './default-node.component.html',
 	styleUrls: ['./default-node.component.scss']
 })
-export class DefaultNodeComponent extends DefaultNodeModel implements OnInit {
+export class DefaultNodeComponent extends DefaultNodeModel {
 	@Input() node: DefaultNodeModel;
 
 	constructor() {
 		super('default');
 	}
-
-	ngOnInit() {}
 
 	// https://github.com/projectstorm/react-diagrams/blob/master/src/defaults/models/DefaultNodeModel.ts
 }
