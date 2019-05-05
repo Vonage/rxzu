@@ -4,7 +4,7 @@ import { ComponentFactoryResolver, ViewContainerRef, ComponentRef, ComponentFact
 import { DiagramEngine } from '../../engine.service';
 import { DefaultNodeModel } from '../models/default-node.model';
 
-export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeComponent> {
+export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 	constructor(private resolver: ComponentFactoryResolver) {
 		super('default');
 	}
