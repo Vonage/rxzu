@@ -38,8 +38,6 @@ export class BaseModel<X extends BaseModel = BaseModel> extends BaseEntity {
 	private readonly _selected$: Observable<boolean> = this._selected.asObservable();
 	private readonly _painted: BehaviorSubject<boolean> = new BehaviorSubject(false);
 	private readonly _painted$: Observable<boolean> = this._painted.asObservable();
-	private readonly _removed: Subject<boolean> = new Subject();
-	private readonly _removed$: Observable<boolean> = this._removed.asObservable();
 
 	constructor(type?: string, id?: string) {
 		super(id);
@@ -93,11 +91,8 @@ export class BaseModel<X extends BaseModel = BaseModel> extends BaseEntity {
 		return this._selected.value ? [this] : [];
 	}
 
-	get removed$(): Observable<boolean> {
-		return this._removed$;
-	}
-
-	set removed(val: boolean) {
-		this._removed.next(val);
+	public remove() {
+		// TODO: event bus?
+		// https://github.com/projectstorm/react-diagrams/blob/master/src/models/BaseModel.ts#L79-L83
 	}
 }

@@ -46,10 +46,10 @@ export class NgxDiagramComponent implements OnInit {
 			this.zoomLevel$ = this.model.getZoomLevel().pipe(share());
 
 			this.nodes$.subscribe(nodes => {
-				Object.entries(nodes).forEach(([key, value]) => {
-					if (!value.painted) {
-						this.model.getDiagramEngine().generateWidgetForNode(value, this.nodesLayer);
-						value.painted = true;
+				Object.values(nodes).forEach(node => {
+					if (!node.painted) {
+						this.model.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);
+						node.painted = true;
 					}
 				});
 			});
@@ -119,7 +119,7 @@ export class NgxDiagramComponent implements OnInit {
 
 		const selectedModel = this.getMouseElement(event);
 
-		// canvas isSelected
+		// canvas selected
 		if (selectedModel === null) {
 			// multiple selection
 			if (event.shiftKey) {

@@ -6,9 +6,7 @@ node_js:
 
 install:
   - npm ci
-cache:
-  directories:
-    - $HOME/.npm
+cache: npm
 
 jobs:
   include:
@@ -26,6 +24,7 @@ jobs:
         skip_cleanup: true
         env:
           - GITHUB_TOKEN: $GITHUB_TOKEN
+          - NPM_TOKEN: $NPM_TOKEN
         script: npm run semantic-release
     - stage: deploy storybook
       if: branch = master

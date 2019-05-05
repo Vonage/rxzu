@@ -8,7 +8,6 @@ export interface BaseEvent<T extends BaseEntity = BaseEntity> {
 	firing: boolean;
 	id: string;
 }
-
 export interface LockEvent<T extends BaseEntity = BaseEntity> extends BaseEvent<T> {
 	locked: boolean;
 }

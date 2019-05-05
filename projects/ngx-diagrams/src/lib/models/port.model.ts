@@ -1,23 +1,27 @@
 import { BaseModel } from './base.model';
 import { NodeModel } from './node.model';
 import { LinkModel } from './link.model';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 export class PortModel extends BaseModel<NodeModel> {
-	name: string;
-	links$: BehaviorSubject<{ [id: string]: LinkModel }>;
-	maximumLinks: number;
+	private name: string;
+	private links$: BehaviorSubject<{ [id: string]: LinkModel }>;
+	private maximumLinks: number;
 
-	x: number;
-	y: number;
-	width: number;
-	height: number;
+	private x$: BehaviorSubject<number>;
+	private y$: BehaviorSubject<number>;
+	private width$: BehaviorSubject<number>;
+	private height$: BehaviorSubject<number>;
 
 	constructor(name: string, type?: string, id?: string, maximumLinks?: number) {
 		super(type, id);
 		this.name = name;
 		this.links$ = new BehaviorSubject({});
 		this.maximumLinks = maximumLinks;
+		this.x$ = new BehaviorSubject(0);
+		this.y$ = new BehaviorSubject(0);
+		this.height$ = new BehaviorSubject(0);
+		this.width$ = new BehaviorSubject(0);
 	}
 
 	getNode() {
@@ -46,18 +50,26 @@ export class PortModel extends BaseModel<NodeModel> {
 		this.links$.next({ ...this.links$.getValue(), [link.id]: link });
 	}
 
-	getLinks(): BehaviorSubject<{ [id: string]: LinkModel }> {
-		return this.links$;
+	getLinks(): { [id: string]: LinkModel } {
+		return this.links$.getValue();
+	}
+
+	selectLinks(): Observable<{ [id: string]: LinkModel }> {
+		return this.links$.asObservable();
 	}
 
 	updateCoords({ x, y, width, height }: { x: number; y: number; width: number; height: number }) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
+		this.x$.next(x);
+		this.y$.next(y);
+		this.width$.next(width);
+		this.height$.next(height);
 	}
 
 	canLinkToPort(port: PortModel): boolean {
 		return true;
+	}
+
+	isLocked() {
+		return this.locked || this.parent.locked;
 	}
 }

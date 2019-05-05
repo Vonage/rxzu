@@ -1,0 +1,14 @@
+.default-node {
+	width: 100%;
+	background-color: white;
+	border-radius: 10px;
+	border: 1px solid blue;
+	transition: all 0.3s ease-in-out;
+
+	cursor: auto;
+	.title {
+		padding: 10px;
+		text-align: center;
+		border-bottom: 1px solid blue;
+	}
+}

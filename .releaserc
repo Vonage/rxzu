@@ -38,8 +38,8 @@
 			{
 				"assets": [
 					"dist/ngx-diagrams/**/*",
-					"package.json",
-					"CHANGELOG.md"
+					"dist/ngx-diagrams/package.json",
+					"dist/ngx-diagrams/CHANGELOG.md"
 				],
 				"message": "build(release): release <%= nextRelease.version %> - <%= new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %> [skip ci]\n\n<%= nextRelease.notes %>"
 			}

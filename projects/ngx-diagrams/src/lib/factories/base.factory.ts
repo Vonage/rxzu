@@ -10,4 +10,6 @@ export abstract class AbstractFactory<T extends BaseModel> {
 	get type(): string {
 		return this.type;
 	}
+
+	abstract getNewInstance(initialConfig?: any): T;
 }
