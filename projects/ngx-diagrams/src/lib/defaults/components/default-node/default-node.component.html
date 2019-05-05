@@ -2,10 +2,11 @@
 	class="default-node"
 	[ngStyle]="{
 		'height.px': height$ | async,
-		'width.px': width$ | async
+		'width.px': width$ | async,
+		'background-color': color
 	}"
 >
 	<div class="ports">
-		<ngdx-default-port *ngFor="let port of ports$ | async | keyvalue"> </ngdx-default-port>
+		<ngdx-default-port *ngFor="let port of ports$ | async | keyvalue" [port]="port.value"> </ngdx-default-port>
 	</div>
 </div>

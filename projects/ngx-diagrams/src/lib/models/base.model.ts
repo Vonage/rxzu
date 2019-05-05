@@ -12,6 +12,7 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 		this.type = type;
 		this.selected$ = new BehaviorSubject(false);
 		this.painted$ = new BehaviorSubject(false);
+		this.parent$ = new BehaviorSubject(null);
 	}
 
 	selectParent() {

@@ -1,7 +1,12 @@
 import { AbstractPortFactory } from '../../factories/port.factory';
+import { DefaultPortModel } from '../models/default-port.model';
 
-// TODO: implement default port factory!
+export class DefaultPortFactory extends AbstractPortFactory<DefaultPortModel> {
+	constructor() {
+		super('default');
+	}
 
-// export class DefaultPortFactory extends AbstractPortFactory<DefaultPortModel> {
-
-// }
+	getNewInstance(initialConfig?: any): DefaultPortModel {
+		return new DefaultPortModel(true, 'unknown', ...initialConfig);
+	}
+}
