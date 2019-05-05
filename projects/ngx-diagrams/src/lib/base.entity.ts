@@ -60,7 +60,7 @@ export class BaseEntity {
 		return this._locked.value;
 	}
 
-	setLocked(locked: boolean = true) {
+	set locked(locked: boolean) {
 		this._locked.next(locked);
 	}
 
