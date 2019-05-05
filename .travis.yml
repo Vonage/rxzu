@@ -14,10 +14,12 @@ jobs:
   include:
     - stage: lint
       script: npm run lint-lib
+      install: true
     - stage: build
       script:
         - npm run build-lib
         - npm run build-storybook
+      install: true
     - stage: release
       if: branch = master
       script: skip
@@ -27,6 +29,7 @@ jobs:
         env:
           - GITHUB_TOKEN: $GITHUB_TOKEN
         script: npm run semantic-release
+      install: true
     - stage: deploy storybook
       if: branch = master
       script: skip
@@ -36,6 +39,7 @@ jobs:
         github-token: $GITHUB_TOKEN
         keep-history: true
         local-dir: dist/docs
+      install: true
 
 git:
   depth: 3
