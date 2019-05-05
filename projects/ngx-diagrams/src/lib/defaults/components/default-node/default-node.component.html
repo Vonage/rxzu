@@ -7,6 +7,6 @@
 	}"
 >
 	<div class="ports">
-		<ngdx-default-port *ngFor="let port of ports$ | async | keyvalue" [port]="port.value"> </ngdx-default-port>
+		<ng-template #portsLayer></ng-template>
 	</div>
 </div>

@@ -1,11 +1,12 @@
 import { BaseEntity } from '../base.entity';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, ReplaySubject } from 'rxjs';
 
 export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 	private type: string;
 	private selected$: BehaviorSubject<boolean>;
 	private parent$: BehaviorSubject<X>;
 	private painted$: BehaviorSubject<boolean>;
+	private destroyed$: ReplaySubject<boolean>;
 
 	constructor(type?: string, id?: string) {
 		super(id);
@@ -13,6 +14,7 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 		this.selected$ = new BehaviorSubject(false);
 		this.painted$ = new BehaviorSubject(false);
 		this.parent$ = new BehaviorSubject(null);
+		this.destroyed$ = new ReplaySubject(0);
 	}
 
 	selectParent() {
@@ -55,8 +57,12 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 		this.selected$.next(selected);
 	}
 
+	isDestroyed() {
+		return this.destroyed$.asObservable();
+	}
+
 	public remove() {
-		// TODO: event bus?
-		// https://github.com/projectstorm/react-diagrams/blob/master/src/models/BaseModel.ts#L79-L83
+		this.destroyed$.next(true);
+		this.destroyed$.complete();
 	}
 }

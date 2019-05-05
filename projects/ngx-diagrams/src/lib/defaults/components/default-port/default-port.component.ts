@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DefaultPortModel } from '../../models/default-port.model';
 
 @Component({
@@ -6,12 +6,8 @@ import { DefaultPortModel } from '../../models/default-port.model';
 	templateUrl: './default-port.component.html',
 	styleUrls: ['./default-port.component.scss']
 })
-export class DefaultPortComponent implements OnInit {
-	@Input() port: DefaultPortModel;
-
+export class DefaultPortComponent extends DefaultPortModel {
 	constructor() {
-		console.log(this);
+		super();
 	}
-
-	ngOnInit() {}
 }

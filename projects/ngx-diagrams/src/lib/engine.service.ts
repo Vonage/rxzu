@@ -7,6 +7,7 @@ import { AbstractLinkFactory } from './factories/link.factory';
 import { AbstractPortFactory } from './factories/port.factory';
 import { DefaultPortFactory } from './defaults/factories/default-port.factory';
 import { LinkModel } from './models/link.model';
+import { PortModel } from './models/port.model';
 
 @Injectable({ providedIn: 'root' })
 export class DiagramEngine {
@@ -30,7 +31,7 @@ export class DiagramEngine {
 
 	registerDefaultFactories() {
 		this.registerNodeFactory(new DefaultNodeFactory(this.resolver));
-		this.registerPortFactory(new DefaultPortFactory());
+		this.registerPortFactory(new DefaultPortFactory(this.resolver));
 
 		// TODO: implement defaultLinkFactory
 		// this.registerLinkFactory(new DefaultLinkFactory())
@@ -79,6 +80,18 @@ export class DiagramEngine {
 			return this.portFactories[type];
 		}
 		throw new Error(`cannot find factory for port of type: [${type}]`);
+	}
+
+	getFactoryForPort(port: PortModel): AbstractPortFactory | null {
+		return this.getPortFactory(port.getType());
+	}
+
+	generateWidgetForPort(port: PortModel, portsHost: ViewContainerRef): ComponentRef<PortModel> | null {
+		const portFactory = this.getFactoryForPort(port);
+		if (!portFactory) {
+			throw new Error(`Cannot find widget factory for port: ${port.getType()}`);
+		}
+		return portFactory.generateWidget(port, portsHost);
 	}
 
 	// LINKS
