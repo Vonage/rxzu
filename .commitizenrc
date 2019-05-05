@@ -7,20 +7,13 @@ module.exports = {
 		{ value: 'style',    name: '🎨  - STYLE: changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc) '},
 		{ value: 'refactor', name: '👷‍  - REFACTOR: a code change that neither fixes a bug nor adds a feature' },
 		{ value: 'perf',     name: '⚡️  - PERFORMANCE: code change that improves performance' },
+		{ value: 'ci',       name: '🐱‍🏍 - CONTINUOUS INTEGRATION: changes that affect either the build or deployment process' }
 		{ value: 'test',     name: '✅  - TEST: adding missing tests or correcting existing test' }
-	],
-
-	scopes: [
-		{ name: 'git' },
-		{ name: 'build' },
-		{ name: 'view' },
-		{ name: 'content' }
 	],
 
 	messages: {
 		type:          'ℹ️  - Select the type of change that you\'re committing:',
-		scope:         '⤴️  - Denote the SCOPE of this change (optional):',
-		customScope:   '❔  - Denote the SCOPE of this change:',
+		customScope:   '⤴️  - Denote the SCOPE of this change, e.g. file name or module:',
 		subject:       '✏️  - Write a SHORT, IMPERATIVE tense description of the change:\n',
 		body:          '📚  - Provide a LONGER description of the change (optional). Use "|" to break new line:\n',
 		breaking:      '💥  - List any BREAKING CHANGES (optional):\n',

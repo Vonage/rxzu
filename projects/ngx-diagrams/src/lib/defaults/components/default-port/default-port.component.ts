@@ -3,8 +3,8 @@ import { PortModel } from '../../../models/port.model';
 
 @Component({
 	selector: 'ngdx-default-port',
-	templateUrl: './port.component.html',
-	styleUrls: ['./port.component.scss']
+	templateUrl: './default-port.component.html',
+	styleUrls: ['./default-port.component.scss']
 })
 export class PortComponent extends PortModel implements OnInit {
 	@Input() port: PortModel;
@@ -12,7 +12,6 @@ export class PortComponent extends PortModel implements OnInit {
 
 	constructor() {
 		super('port', 'default');
-		console.log(this);
 	}
 
 	ngOnInit() {}

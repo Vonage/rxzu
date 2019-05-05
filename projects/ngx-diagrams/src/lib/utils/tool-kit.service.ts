@@ -10,23 +10,23 @@
  * Generates a unique ID
  */
 export function UID(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-        const r = (Math.random() * 16) | 0;
-        const v = c === 'x' ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-    });
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+		const r = (Math.random() * 16) | 0;
+		const v = c === 'x' ? r : (r & 0x3) | 0x8;
+		return v.toString(16);
+	});
 }
 
 export function generateLinePath(firstPoint: any, lastPoint: any): string {
-    return `M${firstPoint.x},${firstPoint.y} L ${lastPoint.x},${lastPoint.y}`;
+	return `M${firstPoint.x},${firstPoint.y} L ${lastPoint.x},${lastPoint.y}`;
 }
 
 export function generateCurvePath(firstPoint: any, lastPoint: any, curvy: number = 0): string {
-    const isHorizontal = Math.abs(firstPoint.x - lastPoint.x) > Math.abs(firstPoint.y - lastPoint.y);
-    const curvyX = isHorizontal ? curvy : 0;
-    const curvyY = isHorizontal ? 0 : curvy;
+	const isHorizontal = Math.abs(firstPoint.x - lastPoint.x) > Math.abs(firstPoint.y - lastPoint.y);
+	const curvyX = isHorizontal ? curvy : 0;
+	const curvyY = isHorizontal ? 0 : curvy;
 
-    return `M${firstPoint.x},${firstPoint.y} C ${firstPoint.x + curvyX},${firstPoint.y + curvyY}
+	return `M${firstPoint.x},${firstPoint.y} C ${firstPoint.x + curvyX},${firstPoint.y + curvyY}
     ${lastPoint.x - curvyX},${lastPoint.y - curvyY} ${lastPoint.x},${lastPoint.y}`;
 }
 

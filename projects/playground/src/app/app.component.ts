@@ -24,11 +24,11 @@ export class AppComponent implements OnInit {
 		// this.diagramModel = new DiagramModel();
 		const node1 = new NodeModel();
 		node1.setPosition(500, 300);
-		node1.extras$.next({ height: 100, width: 200 });
+		node1.updateDimensions({ height: 200, width: 200 });
 		this.diagramModel.addNode(node1);
 
 		node1.setLocked();
-		node1.addPort('out1', 'out');
+		// node1.addPort('out1', 'out');
 
 		// const node2 = new NodeModel();
 		// node2.setPosition(200, 300);
@@ -37,7 +37,7 @@ export class AppComponent implements OnInit {
 
 		// example for reactivity
 		setTimeout(() => {
-			node1.extras$.next({ height: 150, width: 150 });
+			node1.updateDimensions({ width: 150, height: 150 });
 			node1.setPosition(300, 500);
 		}, 3000);
 	}
