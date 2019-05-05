@@ -47,7 +47,7 @@ export class NgxDiagramComponent implements OnInit {
 
 			this.nodes$.subscribe(nodes => {
 				Object.values(nodes).forEach(node => {
-					if (!node.isPainted().getValue()) {
+					if (!node.isPainted()) {
 						this.model.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);
 						node.setPainted(true);
 					}

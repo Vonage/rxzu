@@ -8,10 +8,10 @@ export class NodeModel extends BaseModel<DiagramModel> {
 	id: string;
 	diagramEngine: DiagramEngine;
 
-	private x$: BehaviorSubject<number>;
-	private y$: BehaviorSubject<number>;
 	private extras$: BehaviorSubject<{ [s: string]: any }>;
 	private ports$: BehaviorSubject<{ [s: string]: PortModel }>;
+	private x$: BehaviorSubject<number>;
+	private y$: BehaviorSubject<number>;
 	private width$: BehaviorSubject<number>;
 	private height$: BehaviorSubject<number>;
 
