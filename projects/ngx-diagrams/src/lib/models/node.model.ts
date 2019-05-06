@@ -59,7 +59,7 @@ export class NodeModel extends BaseModel<DiagramModel> {
 	}
 
 	/**
-	 * Creates new port and set the node as its parent
+	 * Assign a port to the node and set the node as its parent
 	 * @returns the inserted port
 	 */
 	addPort<T extends PortModel>(port: T): T {
