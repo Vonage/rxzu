@@ -11,8 +11,8 @@
 		"lint-lib": "ng lint ngx-diagrams",
 		"e2e": "ng e2e",
 		"semantic-release": "semantic-release",
-		"storybook": "start-storybook",
-		"build-storybook": "build-storybook -c .storybook -o ./dist/docs"
+		"storybook": "start-storybook -s .storybook/static",
+		"build-storybook": "build-storybook -c .storybook -o ./dist/docs .storybook/static"
 	},
 	"private": true,
 	"dependencies": {
