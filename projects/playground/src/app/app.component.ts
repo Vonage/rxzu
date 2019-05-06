@@ -14,9 +14,7 @@ export class AppComponent implements OnInit {
 	title = 'playground';
 	diagramModel: DiagramModel;
 
-	constructor(
-		private diagramEngine: DiagramEngine
-	) { }
+	constructor(private diagramEngine: DiagramEngine) {}
 
 	ngOnInit() {
 		const nodesDefaultDimensions = { height: 200, width: 200 };
@@ -29,19 +27,22 @@ export class AppComponent implements OnInit {
 		node1.updateDimensions(nodesDefaultDimensions);
 		node1.addPort(inPort);
 
-		const node2 = new DefaultNodeModel();
 		const outPort = new DefaultPortModel(false, 'outport');
+		const node2 = new DefaultNodeModel();
 		node2.setPosition(200, 200);
 		node2.updateDimensions(nodesDefaultDimensions);
 		node2.addPort(outPort);
 
-		this.diagramModel.addAll(node1, node2);
+		const node3 = new DefaultNodeModel();
+		node3.setPosition(200, 2000);
+		node3.updateDimensions(nodesDefaultDimensions);
 
-		// example for reactivity and locking
-		// setTimeout(() => {
-		// 	node1.updateDimensions({ width: 150, height: 150 });
-		// 	node1.setPosition(300, 500);
-		// 	node1.setLocked();
-		// }, 3000);
+		const node4 = new DefaultNodeModel();
+		node4.setPosition(1200, 200);
+		node4.updateDimensions(nodesDefaultDimensions);
+
+		this.diagramModel.addAll(node1, node2, node3, node4);
+
+		this.diagramModel.getDiagramEngine().zoomToFit();
 	}
 }

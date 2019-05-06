@@ -8,20 +8,24 @@ import { AbstractPortFactory } from '../factories/port.factory';
 import { DefaultPortFactory } from '../defaults/factories/default-port.factory';
 import { LinkModel } from '../models/link.model';
 import { PortModel } from '../models/port.model';
+import { Observable, BehaviorSubject, Subject, ReplaySubject } from 'rxjs';
+import { take, delay } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class DiagramEngine {
 	diagramModel: DiagramModel;
 
-	// TODO: add types to factories
-	nodeFactories: { [s: string]: AbstractNodeFactory };
-	linkFactories: { [s: string]: AbstractLinkFactory };
-	portFactories: { [s: string]: AbstractPortFactory };
+	private nodeFactories: { [s: string]: AbstractNodeFactory };
+	private linkFactories: { [s: string]: AbstractLinkFactory };
+	private portFactories: { [s: string]: AbstractPortFactory };
+
+	private canvas$: ReplaySubject<Element>;
 
 	constructor(private resolver: ComponentFactoryResolver) {
 		this.nodeFactories = {};
 		this.linkFactories = {};
 		this.portFactories = {};
+		this.canvas$ = new ReplaySubject<Element>();
 	}
 
 	createDiagram() {
@@ -122,4 +126,28 @@ export class DiagramEngine {
 		return linkFactory.generateWidget(this, link, linksHost);
 	}
 	//#endregion
+
+	setCanvas(canvas: Element) {
+		this.canvas$.next(canvas);
+	}
+
+	/**
+	 * fit the canvas zoom levels to the elements contained.
+	 * @param additionalZoomFactor allow for further zooming out to make sure edges doesn't cut
+	 */
+	zoomToFit(additionalZoomFactor: number = 0.005) {
+		this.canvas$
+			.pipe(
+				take(1),
+				delay(0)
+			)
+			.subscribe(canvas => {
+				const xFactor = canvas.clientWidth / canvas.scrollWidth;
+				const yFactor = canvas.clientHeight / canvas.scrollHeight;
+				const zoomFactor = xFactor < yFactor ? xFactor : yFactor;
+
+				this.diagramModel.setZoomLevel(this.diagramModel.getZoomLevel().value * (zoomFactor - additionalZoomFactor));
+				this.diagramModel.setOffset(0, 0);
+			});
+	}
 }

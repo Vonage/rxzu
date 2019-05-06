@@ -1,11 +1,10 @@
-import { Component, OnInit, Input, Renderer2, Output, EventEmitter, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, Input, Renderer2, Output, EventEmitter, ViewChild, ViewContainerRef, ElementRef } from '@angular/core';
 import { DiagramModel } from '../../models/diagram.model';
 import { NodeModel } from '../../models/node.model';
 import { LinkModel } from '../../models/link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { mergeMap, share, switchMap } from 'rxjs/operators';
+import { share } from 'rxjs/operators';
 import { BaseAction, MoveCanvasAction } from '../../actions';
-import { filter } from 'minimatch';
 
 @Component({
 	selector: 'ngdx-diagram',
@@ -24,6 +23,7 @@ export class NgxDiagramComponent implements OnInit {
 
 	@ViewChild('nodesLayer', { read: ViewContainerRef }) nodesLayer: ViewContainerRef;
 	@ViewChild('linksLayer', { read: ViewContainerRef }) linksLayer: ViewContainerRef;
+	@ViewChild('canvas', { read: ElementRef }) canvas: ElementRef;
 
 	nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
 	links$: BehaviorSubject<{ [s: string]: LinkModel }>;
@@ -39,6 +39,8 @@ export class NgxDiagramComponent implements OnInit {
 
 	ngOnInit() {
 		if (this.model) {
+			this.model.getDiagramEngine().setCanvas(this.canvas.nativeElement);
+
 			this.nodes$ = this.model.selectNodes();
 			this.links$ = this.model.selectLinks();
 			this.offsetX$ = this.model.getOffsetX().pipe(share());
@@ -103,9 +105,10 @@ export class NgxDiagramComponent implements OnInit {
 	};
 
 	getMouseElement(event: MouseEvent): { model: any; element: Element } {
-		// iterate over all possible models
+		// TODO: iterate over all possible models
 		// port, point, link, node and return it and the element
 		// else return null.
+		// console.log(event);
 
 		return null;
 	}
