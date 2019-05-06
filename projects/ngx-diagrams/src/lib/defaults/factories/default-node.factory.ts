@@ -17,7 +17,9 @@ export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 
 		rootNode.style.position = 'absolute';
 		rootNode.style.display = 'block';
-		const xSub = node.selectY().subscribe(x => (rootNode.style.left = `${x}px`));
+
+		// subscribe to node coordinates
+		const xSub = node.selectX().subscribe(x => (rootNode.style.left = `${x}px`));
 		const ySub = node.selectY().subscribe(y => (rootNode.style.top = `${y}px`));
 
 		// onDestroy unsubscribe from coordinates to prevent memory leaks!

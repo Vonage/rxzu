@@ -74,7 +74,6 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 	}
 
 	public remove() {
-		// TODO: event bus?
-		// https://github.com/projectstorm/react-diagrams/blob/master/src/models/BaseModel.ts#L79-L83
+		this.destroy();
 	}
 }

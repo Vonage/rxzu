@@ -3,6 +3,7 @@ import { NodeModel } from './node.model';
 import { LinkModel } from './link.model';
 import { BaseEntity } from '../base.entity';
 import { DiagramEngine } from '../services/engine.service';
+import { BaseModel } from './base.model';
 
 export interface DiagramDataModel {
 	nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
@@ -134,5 +135,16 @@ export class DiagramModel extends BaseEntity {
 
 	getDiagramEngine(): DiagramEngine {
 		return this.model.diagramEngine;
+	}
+
+	addAll(...models: BaseModel[]) {
+		models.forEach(model => {
+			if (model instanceof LinkModel) {
+				this.addLink(model);
+			} else if (model instanceof NodeModel) {
+				this.addNode(model);
+			}
+		});
+		return models;
 	}
 }

@@ -1,18 +1,13 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { PortModel } from '../../../models/port.model';
+import { Component, OnInit } from '@angular/core';
+import { DefaultPortModel } from '../../models/default-port.model';
 
 @Component({
 	selector: 'ngdx-default-port',
 	templateUrl: './default-port.component.html',
 	styleUrls: ['./default-port.component.scss']
 })
-export class PortComponent extends PortModel implements OnInit {
-	@Input() port: PortModel;
-	@Input() key: string;
-
+export class DefaultPortComponent extends DefaultPortModel {
 	constructor() {
-		super('port', 'default');
+		super();
 	}
-
-	ngOnInit() {}
 }

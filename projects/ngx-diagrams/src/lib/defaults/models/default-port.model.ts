@@ -7,7 +7,7 @@ export class DefaultPortModel extends PortModel {
 	label: string;
 	links: { [id: string]: any };
 
-	constructor(isInput: boolean, name: string, label: string = null, id?: string) {
+	constructor(isInput: boolean = true, name: string = 'port', label: string = null, id?: string) {
 		super(name, 'default', id);
 		this.in = isInput;
 		this.label = label || name;
