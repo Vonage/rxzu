@@ -90,11 +90,12 @@ export class NgxDiagramComponent implements OnInit {
 	onMouseUp = (event: MouseEvent) => {
 		this.mouseUpListener();
 		this.mouseMoveListener();
+		this.action$.next(null);
 	};
 
 	onMouseMove = (event: MouseEvent) => {
 		const action = this.action$.value;
-
+		console.log(action);
 		if (action instanceof MoveCanvasAction) {
 			if (this.allowCanvasTranslation) {
 				this.diagramModel.setOffset(
@@ -169,10 +170,10 @@ export class NgxDiagramComponent implements OnInit {
 				this.startFiringAction(new MoveCanvasAction(event.clientX, event.clientY, this.diagramModel));
 			}
 		} else {
-			console.log(selectedModel);
+			// console.log(selectedModel);
 		}
 
-		// create moveMove and mouseUp listeners
+		// create mouseMove and mouseUp listeners
 		this.mouseMoveListener = this.renderer.listen(document, 'mousemove', this.onMouseMove);
 		this.mouseUpListener = this.renderer.listen(document, 'mouseup', this.onMouseUp);
 	}
