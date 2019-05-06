@@ -143,6 +143,47 @@ export class DiagramEngine {
 		return selector;
 	}
 
+	getPortCenter(port: PortModel) {
+		const sourceElement = this.getNodePortElement(port);
+		const sourceRect = sourceElement.getBoundingClientRect();
+		const rel = this.getRelativePoint(sourceRect.left, sourceRect.top);
+
+		return {
+			x:
+				sourceElement.offsetWidth / 2 +
+				(rel.x - this.diagramModel.getOffsetX().getValue()) / (this.diagramModel.getZoomLevel().getValue() / 100.0),
+			y:
+				sourceElement.offsetHeight / 2 +
+				(rel.y - this.diagramModel.getOffsetY().getValue()) / (this.diagramModel.getZoomLevel().getValue() / 100.0)
+		};
+	}
+
+	/**
+	 * Calculate rectangular coordinates of the port passed in.
+	 */
+	getPortCoords(
+		port: PortModel
+	): {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	} {
+		const sourceElement = this.getNodePortElement(port);
+		const sourceRect = sourceElement.getBoundingClientRect();
+		const canvasRect = this.canvas$.getValue().getBoundingClientRect() as ClientRect;
+
+		return {
+			x:
+				(sourceRect.x - this.diagramModel.getOffsetX().getValue()) / (this.diagramModel.getZoomLevel().getValue() / 100.0) -
+				canvasRect.left,
+			y:
+				(sourceRect.y - this.diagramModel.getOffsetY().getValue()) / (this.diagramModel.getZoomLevel().getValue() / 100.0) - canvasRect.top,
+			width: sourceRect.width,
+			height: sourceRect.height
+		};
+	}
+
 	/**
 	 * Determine the width and height of the node passed in.
 	 * It currently assumes nodes have a rectangular shape, can be overriden for customised shapes.
