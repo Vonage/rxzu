@@ -1,8 +1,13 @@
-import { Injectable, ComponentFactoryResolver, ViewContainerRef } from '@angular/core';
+import { Injectable, ComponentFactoryResolver, ViewContainerRef, ComponentRef } from '@angular/core';
 import { AbstractNodeFactory } from '../factories/node.factory';
 import { DiagramModel } from '../models/diagram.model';
 import { DefaultNodeFactory } from '../defaults/factories/default-node.factory';
 import { NodeModel } from '../models/node.model';
+import { AbstractLinkFactory } from '../factories/link.factory';
+import { AbstractPortFactory } from '../factories/port.factory';
+import { DefaultPortFactory } from '../defaults/factories/default-port.factory';
+import { LinkModel } from '../models/link.model';
+import { PortModel } from '../models/port.model';
 
 @Injectable({ providedIn: 'root' })
 export class DiagramEngine {
@@ -10,15 +15,13 @@ export class DiagramEngine {
 
 	// TODO: add types to factories
 	nodeFactories: { [s: string]: AbstractNodeFactory };
-	linkFactories: { [s: string]: any };
-	portFactories: { [s: string]: any };
-	labelFactories: { [s: string]: any };
+	linkFactories: { [s: string]: AbstractLinkFactory };
+	portFactories: { [s: string]: AbstractPortFactory };
 
 	constructor(private resolver: ComponentFactoryResolver) {
 		this.nodeFactories = {};
 		this.linkFactories = {};
 		this.portFactories = {};
-		this.labelFactories = {};
 	}
 
 	createDiagram() {
@@ -27,15 +30,19 @@ export class DiagramEngine {
 	}
 
 	registerDefaultFactories() {
-		// TODO: initialize all factories with default component
 		this.registerNodeFactory(new DefaultNodeFactory(this.resolver));
+		this.registerPortFactory(new DefaultPortFactory(this.resolver));
+
+		// TODO: implement defaultLinkFactory
+		// this.registerLinkFactory(new DefaultLinkFactory())
 	}
 
+	//#region Factories
+	// NODES
 	registerNodeFactory(nodeFactory: AbstractNodeFactory) {
 		this.nodeFactories[nodeFactory.type] = nodeFactory;
 	}
 
-	//#region Factories
 	getNodeFactories(): { [s: string]: AbstractNodeFactory } {
 		return this.nodeFactories;
 	}
@@ -51,7 +58,7 @@ export class DiagramEngine {
 		return this.getNodeFactory(node.type);
 	}
 
-	generateWidgetForNode(node: NodeModel, nodesHost: ViewContainerRef): any | null {
+	generateWidgetForNode(node: NodeModel, nodesHost: ViewContainerRef): ComponentRef<NodeModel> | null {
 		const nodeFactory = this.getFactoryForNode(node);
 		if (!nodeFactory) {
 			throw new Error(`Cannot find widget factory for node: ${node.type}`);
@@ -59,52 +66,60 @@ export class DiagramEngine {
 		return nodeFactory.generateWidget(this, node, nodesHost);
 	}
 
-	// getLinkFactories(): { [s: string]: AbstractLinkFactory } {
-	//     return this.linkFactories;
-	// }
+	// PORTS
+	registerPortFactory(factory: AbstractPortFactory) {
+		this.portFactories[factory.type] = factory;
+	}
 
-	// registerPortFactory(factory: AbstractPortFactory) {
-	//     this.portFactories[factory.type] = factory;
-	// this.iterateListeners(listener => {
-	//     if (listener.portFactoriesUpdated) {
-	//         listener.portFactoriesUpdated();
-	//     }
-	// });
-	// }
+	getPortFactories() {
+		return this.portFactories;
+	}
 
-	// registerLinkFactory(factory: AbstractLinkFactory) {
-	//     this.linkFactories[factory.type] = factory;
-	// this.iterateListeners(listener => {
-	//     if (listener.linkFactoriesUpdated) {
-	//         listener.linkFactoriesUpdated();
-	//     }
-	// });
-	// }
+	getPortFactory(type: string): AbstractPortFactory {
+		if (this.portFactories[type]) {
+			return this.portFactories[type];
+		}
+		throw new Error(`cannot find factory for port of type: [${type}]`);
+	}
 
-	// getPortFactory(type: string): AbstractPortFactory {
-	//     if (this.portFactories[type]) {
-	//         return this.portFactories[type];
-	//     }
-	//     throw new Error(`cannot find factory for port of type: [${type}]`);
-	// }
+	getFactoryForPort(port: PortModel): AbstractPortFactory | null {
+		return this.getPortFactory(port.type);
+	}
 
-	// getLinkFactory(type: string): AbstractLinkFactory {
-	//     if (this.linkFactories[type]) {
-	//         return this.linkFactories[type];
-	//     }
-	//     throw new Error(`cannot find factory for link of type: [${type}]`);
-	// }
+	generateWidgetForPort(port: PortModel, portsHost: ViewContainerRef): ComponentRef<PortModel> | null {
+		const portFactory = this.getFactoryForPort(port);
+		if (!portFactory) {
+			throw new Error(`Cannot find widget factory for port: ${port.type}`);
+		}
+		return portFactory.generateWidget(port, portsHost);
+	}
 
-	// getFactoryForLink(link: LinkModel): AbstractLinkFactory | null {
-	//     return this.getLinkFactory(link.type);
-	// }
+	// LINKS
+	getLinkFactories(): { [s: string]: AbstractLinkFactory } {
+		return this.linkFactories;
+	}
 
-	// generateWidgetForLink(link: LinkModel): JSX.Element | null {
-	//     const linkFactory = this.getFactoryForLink(link);
-	//     if (!linkFactory) {
-	//         throw new Error(`Cannot find link factory for link: ${link.type}`);
-	//     }
-	//     return linkFactory.generateReactWidget(this, link);
-	// }
+	registerLinkFactory(factory: AbstractLinkFactory) {
+		this.linkFactories[factory.type] = factory;
+	}
+
+	getLinkFactory(type: string): AbstractLinkFactory {
+		if (this.linkFactories[type]) {
+			return this.linkFactories[type];
+		}
+		throw new Error(`cannot find factory for link of type: [${type}]`);
+	}
+
+	getFactoryForLink(link: LinkModel): AbstractLinkFactory | null {
+		return this.getLinkFactory(link.type);
+	}
+
+	generateWidgetForLink(link: LinkModel, linksHost: ViewContainerRef): ComponentRef<LinkModel> | null {
+		const linkFactory = this.getFactoryForLink(link);
+		if (!linkFactory) {
+			throw new Error(`Cannot find link factory for link: ${link.type}`);
+		}
+		return linkFactory.generateWidget(this, link, linksHost);
+	}
 	//#endregion
 }

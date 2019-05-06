@@ -19,13 +19,13 @@ export class DefaultNodeComponent extends DefaultNodeModel implements OnInit {
 		this.selectPorts()
 			.pipe(
 				distinctUntilChanged(),
-				takeUntil(this.isDestroyed())
+				takeUntil(this.onEntityDestroy())
 			)
 			.subscribe(ports => {
 				Object.values(ports).forEach(port => {
-					if (!port.isPainted()) {
+					if (!port.painted) {
 						this.generatePort(port);
-						port.setPainted();
+						port.painted = true;
 					}
 				});
 			});
