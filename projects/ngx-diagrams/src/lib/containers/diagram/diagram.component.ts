@@ -95,7 +95,11 @@ export class NgxDiagramComponent implements OnInit {
 
 	onMouseMove = (event: MouseEvent) => {
 		const action = this.action$.value;
-		console.log(action);
+
+		if (action === null || action === undefined) {
+			return;
+		}
+
 		if (action instanceof MoveCanvasAction) {
 			if (this.allowCanvasTranslation) {
 				this.diagramModel.setOffset(
