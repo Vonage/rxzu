@@ -15,8 +15,12 @@ export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 		// attach coordinates and default positional behaviour to the generated component host
 		const rootNode = (componentRef.hostView as any).rootNodes[0] as HTMLElement;
 
+		// default style for node
 		rootNode.style.position = 'absolute';
 		rootNode.style.display = 'block';
+
+		// data attributes
+		rootNode.setAttribute('data-nodeid', node.id);
 
 		// subscribe to node coordinates
 		const xSub = node.selectX().subscribe(x => (rootNode.style.left = `${x}px`));

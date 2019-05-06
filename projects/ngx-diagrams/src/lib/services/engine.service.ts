@@ -8,8 +8,8 @@ import { AbstractPortFactory } from '../factories/port.factory';
 import { DefaultPortFactory } from '../defaults/factories/default-port.factory';
 import { LinkModel } from '../models/link.model';
 import { PortModel } from '../models/port.model';
-import { Observable, BehaviorSubject, Subject, ReplaySubject } from 'rxjs';
-import { take, delay } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
+import { take, delay, filter } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class DiagramEngine {
@@ -19,13 +19,13 @@ export class DiagramEngine {
 	private linkFactories: { [s: string]: AbstractLinkFactory };
 	private portFactories: { [s: string]: AbstractPortFactory };
 
-	private canvas$: ReplaySubject<Element>;
+	private canvas$: BehaviorSubject<Element>;
 
 	constructor(private resolver: ComponentFactoryResolver) {
 		this.nodeFactories = {};
 		this.linkFactories = {};
 		this.portFactories = {};
-		this.canvas$ = new ReplaySubject<Element>();
+		this.canvas$ = new BehaviorSubject<Element>(null);
 	}
 
 	createDiagram() {
@@ -127,8 +127,58 @@ export class DiagramEngine {
 	}
 	//#endregion
 
+	getNodeElement(node: NodeModel): Element {
+		const selector = this.canvas$.getValue().querySelector(`[data-nodeid="${node.id}"]`);
+		if (selector === null) {
+			throw new Error('Cannot find Node element with nodeID: [' + node.id + ']');
+		}
+		return selector;
+	}
+
+	getNodePortElement(port: PortModel): any {
+		const selector = this.canvas$.getValue().querySelector(`[data-portid="${port.id}"][data-nodeid="${port.parent.id}"]`);
+		if (selector === null) {
+			throw new Error('Cannot find Node Port element with nodeID: [' + port.parent.id + '] and port id: [' + port.id + ']');
+		}
+		return selector;
+	}
+
+	/**
+	 * Determine the width and height of the node passed in.
+	 * It currently assumes nodes have a rectangular shape, can be overriden for customised shapes.
+	 */
+	getNodeDimensions(node: NodeModel): { width: number; height: number } {
+		if (!this.canvas$.getValue()) {
+			return {
+				width: 0,
+				height: 0
+			};
+		}
+
+		const nodeElement = this.getNodeElement(node);
+		const nodeRect = nodeElement.getBoundingClientRect();
+
+		return {
+			width: nodeRect.width,
+			height: nodeRect.height
+		};
+	}
+
 	setCanvas(canvas: Element) {
 		this.canvas$.next(canvas);
+	}
+
+	getRelativeMousePoint(event: MouseEvent): { x: number; y: number } {
+		const point = this.getRelativePoint(event.clientX, event.clientY);
+		return {
+			x: (point.x - this.diagramModel.getOffsetX().value) / (this.diagramModel.getZoomLevel().value / 100.0),
+			y: (point.y - this.diagramModel.getOffsetY().value) / (this.diagramModel.getZoomLevel().value / 100.0)
+		};
+	}
+
+	getRelativePoint(x: number, y: number) {
+		const canvasRect = this.canvas$.getValue().getBoundingClientRect();
+		return { x: x - canvasRect.left, y: y - canvasRect.top };
 	}
 
 	/**
@@ -138,6 +188,7 @@ export class DiagramEngine {
 	zoomToFit(additionalZoomFactor: number = 0.005) {
 		this.canvas$
 			.pipe(
+				filter(Boolean),
 				take(1),
 				delay(0)
 			)

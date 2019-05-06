@@ -5,30 +5,23 @@ import { BaseEntity } from '../base.entity';
 import { DiagramEngine } from '../services/engine.service';
 import { BaseModel } from './base.model';
 
-export interface DiagramDataModel {
-	nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
+export class DiagramModel extends BaseEntity {
 	links$: BehaviorSubject<{ [s: string]: LinkModel }>;
+	nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
 	zoom$: BehaviorSubject<number>;
 	offsetX$: BehaviorSubject<number>;
 	offsetY$: BehaviorSubject<number>;
 	gridSize$: BehaviorSubject<number>;
-	diagramEngine: DiagramEngine;
-}
 
-export class DiagramModel extends BaseEntity {
 	constructor(private diagramEngine: DiagramEngine, id?: string) {
 		super(id);
+		this.nodes$ = new BehaviorSubject<{ [s: string]: NodeModel }>({});
+		this.links$ = new BehaviorSubject<{ [s: string]: LinkModel }>({});
+		this.zoom$ = new BehaviorSubject(100);
+		this.offsetX$ = new BehaviorSubject(0);
+		this.offsetY$ = new BehaviorSubject(0);
+		this.gridSize$ = new BehaviorSubject(0);
 	}
-
-	private model: DiagramDataModel = {
-		nodes$: new BehaviorSubject<{ [s: string]: NodeModel }>({}),
-		links$: new BehaviorSubject<{ [s: string]: LinkModel }>({}),
-		zoom$: new BehaviorSubject(100),
-		offsetX$: new BehaviorSubject(0),
-		offsetY$: new BehaviorSubject(0),
-		gridSize$: new BehaviorSubject(0),
-		diagramEngine: this.diagramEngine
-	};
 
 	// TODO: support the following events for links and nodes
 	// removed, updated<positionChanged/dataChanged>, added
@@ -38,7 +31,7 @@ export class DiagramModel extends BaseEntity {
 	 * @returns Inserted Node
 	 */
 	addNode(node: NodeModel): NodeModel {
-		this.model.nodes$.next({ ...this.model.nodes$.value, [node.id]: node });
+		this.nodes$.next({ ...this.nodes$.value, [node.id]: node });
 		return node;
 	}
 
@@ -49,16 +42,16 @@ export class DiagramModel extends BaseEntity {
 		const nodeId: string = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
 
 		// TODO: delete all related links
-		const updNodes = { ...this.model.nodes$.value };
+		const updNodes = { ...this.nodes$.value };
 		delete updNodes[nodeId];
-		this.model.nodes$.next(updNodes);
+		this.nodes$.next(updNodes);
 	}
 
 	/**
 	 * Get nodes behaviour subject, use `.getValue()` for snapshot
 	 */
 	selectNodes(): BehaviorSubject<{ [s: string]: NodeModel }> {
-		return this.model.nodes$;
+		return this.nodes$;
 	}
 
 	/**
@@ -66,7 +59,7 @@ export class DiagramModel extends BaseEntity {
 	 * @returns Newly created link
 	 */
 	addLink(link: LinkModel): LinkModel {
-		this.model.links$.next({ ...this.model.links$.value, [link.id]: link });
+		this.links$.next({ ...this.links$.value, [link.id]: link });
 		return link;
 	}
 
@@ -76,65 +69,65 @@ export class DiagramModel extends BaseEntity {
 	deleteLink(linkOrId: LinkModel | string) {
 		const linkId: string = typeof linkOrId === 'string' ? linkOrId : linkOrId.id;
 
-		const updLinks = { ...this.model.links$.value };
+		const updLinks = { ...this.links$.value };
 		delete updLinks[linkId];
 
-		this.model.links$.next(updLinks);
+		this.links$.next(updLinks);
 	}
 
 	/**
 	 * Get links behaviour subject, use `.getValue()` for snapshot
 	 */
 	selectLinks(): BehaviorSubject<{ [s: string]: LinkModel }> {
-		return this.model.links$;
+		return this.links$;
 	}
 
 	/**
 	 * Serialize the diagram model
 	 * @returns diagram model as a string
 	 */
-	serialize(): string {
-		return JSON.stringify(this.model);
-	}
+	// serialize(): string {
+	// 	return JSON.stringify(this.model);
+	// }
 
 	/**
 	 * Load into the diagram model a serialized diagram
 	 */
-	deserialize(serializedModel: string) {
-		this.model = JSON.parse(serializedModel);
-	}
+	// deserialize(serializedModel: string) {
+	// 	this.model = JSON.parse(serializedModel);
+	// }
 
 	setOffset(x: number, y: number) {
-		this.model.offsetX$.next(x);
-		this.model.offsetY$.next(y);
+		this.offsetX$.next(x);
+		this.offsetY$.next(y);
 	}
 
 	setOffsetX(x: number) {
-		this.model.offsetX$.next(x);
+		this.offsetX$.next(x);
 	}
 
 	getOffsetX(): BehaviorSubject<number> {
-		return this.model.offsetX$;
+		return this.offsetX$;
 	}
 
 	setOffsetY(y: number) {
-		this.model.offsetY$.next(y);
+		this.offsetY$.next(y);
 	}
 
 	getOffsetY(): BehaviorSubject<number> {
-		return this.model.offsetY$;
+		return this.offsetY$;
 	}
 
 	setZoomLevel(z: number) {
-		this.model.zoom$.next(z);
+		this.zoom$.next(z);
 	}
 
 	getZoomLevel(): BehaviorSubject<number> {
-		return this.model.zoom$;
+		return this.zoom$;
 	}
 
 	getDiagramEngine(): DiagramEngine {
-		return this.model.diagramEngine;
+		return this.diagramEngine;
 	}
 
 	addAll(...models: BaseModel[]) {
