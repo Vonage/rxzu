@@ -68,8 +68,8 @@ export class NodeModel extends BaseModel<DiagramModel> {
 		return port;
 	}
 
-	getPort(name: string): PortModel {
-		return this.ports$.value[name];
+	getPort(id: string): PortModel {
+		return this.ports$.value[id];
 	}
 
 	selectPorts(): Observable<{ [s: string]: PortModel }> {

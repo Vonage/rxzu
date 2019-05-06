@@ -57,6 +57,15 @@ export class LinkModel extends BaseModel<DiagramModel> {
 		return this.points.indexOf(point);
 	}
 
+	getPointModel(id: string): PointModel | null {
+		for (const point of this.points) {
+			if (point.id === id) {
+				return point;
+			}
+		}
+		return null;
+	}
+
 	getPortForPoint(point: PointModel): PortModel {
 		if (this.sourcePort !== null && this.getFirstPoint().id === point.id) {
 			return this.sourcePort;

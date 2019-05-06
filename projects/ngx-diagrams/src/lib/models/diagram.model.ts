@@ -26,6 +26,14 @@ export class DiagramModel extends BaseEntity {
 	// TODO: support the following events for links and nodes
 	// removed, updated<positionChanged/dataChanged>, added
 
+	getNode(id: string): NodeModel | null {
+		return this.nodes$.getValue()[id];
+	}
+
+	getLink(id: string): LinkModel | null {
+		return this.links$.getValue()[id];
+	}
+
 	/**
 	 * Add a node to the diagram
 	 * @returns Inserted Node
