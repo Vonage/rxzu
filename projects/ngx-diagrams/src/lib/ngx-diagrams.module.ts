@@ -8,6 +8,7 @@ import { DefaultPortComponent } from './defaults/components/default-port/default
 	declarations: [NgxDiagramComponent, DefaultNodeComponent, DefaultPortComponent],
 	imports: [CommonModule],
 	providers: [],
-	exports: [NgxDiagramComponent]
+	exports: [NgxDiagramComponent],
+	entryComponents: [DefaultNodeComponent, DefaultPortComponent]
 })
 export class NgxDiagramsModule {}

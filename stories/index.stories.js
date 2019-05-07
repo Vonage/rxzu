@@ -21,15 +21,9 @@ storiesOf('Docs', module)
 storiesOf('Examples', module)
 	.addDecorator(
 		moduleMetadata({
-			imports: [NgxDiagramsModule],
-			entryComponents: [DefaultNodeComponent, DefaultPortComponent]
+			imports: [NgxDiagramsModule]
 		})
 	)
-	.add(
-		'simple',
-		() => ({
-			component: AppComponent
-		})
-		// ,
-		// { notes: { markdown: readme } }
-	);
+	.add('simple', () => ({
+		component: AppComponent
+	}));
