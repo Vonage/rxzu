@@ -27,12 +27,12 @@ export class NgxDiagramComponent implements OnInit {
 	@ViewChild('linksLayer', { read: ViewContainerRef }) linksLayer: ViewContainerRef;
 	@ViewChild('canvas', { read: ElementRef }) canvas: ElementRef;
 
-	nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
-	links$: BehaviorSubject<{ [s: string]: LinkModel }>;
-	action$: BehaviorSubject<BaseAction> = new BehaviorSubject(null);
-	offsetX$: Observable<number>;
-	offsetY$: Observable<number>;
-	zoomLevel$: Observable<number>;
+	private nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
+	private links$: BehaviorSubject<{ [s: string]: LinkModel }>;
+	private action$: BehaviorSubject<BaseAction> = new BehaviorSubject(null);
+	private offsetX$: Observable<number>;
+	private offsetY$: Observable<number>;
+	private zoomLevel$: Observable<number>;
 
 	private mouseUpListener = () => {};
 	private mouseMoveListener = () => {};
@@ -54,6 +54,16 @@ export class NgxDiagramComponent implements OnInit {
 					if (!node.painted) {
 						this.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);
 						node.painted = true;
+					}
+				});
+			});
+
+			this.links$.subscribe(links => {
+				Object.values(links).forEach(link => {
+					console.log(link);
+					if (!link.painted) {
+						this.diagramModel.getDiagramEngine().generateWidgetForLink(link, this.linksLayer);
+						link.painted = true;
 					}
 				});
 			});
@@ -191,10 +201,10 @@ export class NgxDiagramComponent implements OnInit {
 			let scrollDelta = this.inverseZoom ? -event.deltaY : event.deltaY;
 			// check if it is pinch gesture
 			if (event.ctrlKey && scrollDelta % 1 !== 0) {
-				/*Chrome and Firefox sends wheel event with deltaY that
-          have fractional part, also `ctrlKey` prop of the event is true
-          though ctrl isn't pressed
-        */
+				/* Chrome and Firefox sends wheel event with deltaY that
+				   have fractional part, also `ctrlKey` prop of the event is true
+				   though ctrl isn't pressed
+				*/
 				scrollDelta /= 3;
 			} else {
 				scrollDelta /= 60;

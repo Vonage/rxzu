@@ -4,6 +4,7 @@ import { DiagramEngine } from 'ngx-diagrams';
 import { NodeModel } from 'projects/ngx-diagrams/src/lib/models/node.model';
 import { DefaultNodeModel } from 'projects/ngx-diagrams/src/lib/defaults/models/default-node.model';
 import { DefaultPortModel } from 'projects/ngx-diagrams/src/lib/defaults/models/default-port.model';
+import { DefaultLinkModel } from 'projects/ngx-diagrams/src/lib/defaults/models/default-link.model';
 
 @Component({
 	selector: 'app-root',
@@ -33,6 +34,10 @@ export class AppComponent implements OnInit {
 		node2.updateDimensions(nodesDefaultDimensions);
 		node2.addPort(outPort);
 
+		const link1 = new DefaultLinkModel();
+		link1.setSourcePort(outPort);
+		link1.setTargetPort(inPort);
+
 		const node3 = new DefaultNodeModel();
 		node3.setPosition(200, 2000);
 		node3.updateDimensions(nodesDefaultDimensions);
@@ -41,7 +46,7 @@ export class AppComponent implements OnInit {
 		node4.setPosition(1200, 200);
 		node4.updateDimensions(nodesDefaultDimensions);
 
-		this.diagramModel.addAll(node1, node2, node3, node4);
+		this.diagramModel.addAll(node1, node2, node3, node4, link1);
 
 		this.diagramModel.getDiagramEngine().zoomToFit();
 	}

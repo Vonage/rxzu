@@ -32,6 +32,10 @@ export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 			ySub.unsubscribe();
 		});
 
+		node.onEntityDestroy().subscribe(e => {
+			componentRef.destroy();
+		});
+
 		// assign all passed properties to node initialization.
 		Object.entries(node).forEach(([key, value]) => {
 			componentRef.instance[key] = value;

@@ -10,6 +10,7 @@ import { LinkModel } from '../models/link.model';
 import { PortModel } from '../models/port.model';
 import { BehaviorSubject } from 'rxjs';
 import { take, delay, filter } from 'rxjs/operators';
+import { DefaultLinkFactory } from '../defaults/factories/default-link.factory';
 
 @Injectable({ providedIn: 'root' })
 export class DiagramEngine {
@@ -36,9 +37,9 @@ export class DiagramEngine {
 	registerDefaultFactories() {
 		this.registerNodeFactory(new DefaultNodeFactory(this.resolver));
 		this.registerPortFactory(new DefaultPortFactory(this.resolver));
+		this.registerLinkFactory(new DefaultLinkFactory(this.resolver));
 
 		// TODO: implement defaultLinkFactory
-		// this.registerLinkFactory(new DefaultLinkFactory())
 	}
 
 	//#region Factories
@@ -123,7 +124,7 @@ export class DiagramEngine {
 		if (!linkFactory) {
 			throw new Error(`Cannot find link factory for link: ${link.type}`);
 		}
-		return linkFactory.generateWidget(this, link, linksHost);
+		return linkFactory.generateWidget(link, linksHost);
 	}
 	//#endregion
 
