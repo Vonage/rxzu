@@ -13,7 +13,6 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
 	constructor(linkType: string = 'default', id?: string) {
 		super(linkType, id);
-		// TODO: handle default initial points!
 		this.points = [new PointModel(this, { x: 0, y: 0 }), new PointModel(this, { x: 0, y: 0 })];
 		this.extras = {};
 		this.sourcePort = null;
@@ -125,11 +124,6 @@ export class LinkModel extends BaseModel<DiagramModel> {
 	point(x: number, y: number): PointModel {
 		return this.addPoint(this.generatePoint(x, y));
 	}
-
-	// addLabel(label: LabelModel) {
-	//     label.parent = this;
-	//     this.labels.push(label);
-	// }
 
 	getPoints(): PointModel[] {
 		return this.points;

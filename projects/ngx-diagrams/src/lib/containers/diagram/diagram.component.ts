@@ -1,9 +1,20 @@
-import { Component, OnInit, Input, Renderer2, Output, EventEmitter, ViewChild, ViewContainerRef, ElementRef } from '@angular/core';
+import {
+	Component,
+	OnInit,
+	Input,
+	Renderer2,
+	Output,
+	EventEmitter,
+	ViewChild,
+	ViewContainerRef,
+	ElementRef,
+	AfterViewInit
+} from '@angular/core';
 import { DiagramModel } from '../../models/diagram.model';
 import { NodeModel } from '../../models/node.model';
 import { LinkModel } from '../../models/link.model';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { share } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
+import { share, filter } from 'rxjs/operators';
 import { BaseAction, MoveCanvasAction } from '../../actions';
 import { BaseModel } from '../../models/base.model';
 
@@ -12,7 +23,7 @@ import { BaseModel } from '../../models/base.model';
 	templateUrl: 'diagram.component.html',
 	styleUrls: ['diagram.component.scss']
 })
-export class NgxDiagramComponent implements OnInit {
+export class NgxDiagramComponent implements OnInit, AfterViewInit {
 	// tslint:disable-next-line:no-input-rename
 	@Input('model') diagramModel: DiagramModel;
 	@Input() allowCanvasZoon = true;
@@ -33,6 +44,7 @@ export class NgxDiagramComponent implements OnInit {
 	private offsetX$: Observable<number>;
 	private offsetY$: Observable<number>;
 	private zoomLevel$: Observable<number>;
+	private nodesRendered$: BehaviorSubject<boolean>;
 
 	private mouseUpListener = () => {};
 	private mouseMoveListener = () => {};
@@ -48,26 +60,48 @@ export class NgxDiagramComponent implements OnInit {
 			this.offsetX$ = this.diagramModel.getOffsetX().pipe(share());
 			this.offsetY$ = this.diagramModel.getOffsetY().pipe(share());
 			this.zoomLevel$ = this.diagramModel.getZoomLevel().pipe(share());
+			this.nodesRendered$ = new BehaviorSubject(false);
 
 			this.nodes$.subscribe(nodes => {
+				this.nodesRendered$.next(false);
 				Object.values(nodes).forEach(node => {
 					if (!node.painted) {
 						this.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);
 						node.painted = true;
 					}
 				});
+				this.nodesRendered$.next(true);
 			});
+		}
+	}
 
-			this.links$.subscribe(links => {
+	ngAfterViewInit() {
+		combineLatest(this.nodesRendered$, this.links$)
+			.pipe(filter(([nodesRendered, _]) => !!nodesRendered))
+			.subscribe(([_, links]) => {
 				Object.values(links).forEach(link => {
-					console.log(link);
 					if (!link.painted) {
+						if (link.getSourcePort() !== null) {
+							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getSourcePort());
+							link.getPoints()[0].updateLocation(portCenter);
+
+							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getSourcePort());
+							link.getSourcePort().updateCoords(portCoords);
+						}
+
+						if (link.getTargetPort() !== null) {
+							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getTargetPort());
+							link.getPoints()[link.getPoints().length - 1].updateLocation(portCenter);
+
+							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getTargetPort());
+							link.getTargetPort().updateCoords(portCoords);
+						}
+
 						this.diagramModel.getDiagramEngine().generateWidgetForLink(link, this.linksLayer);
 						link.painted = true;
 					}
 				});
 			});
-		}
 	}
 
 	/**
@@ -235,9 +269,6 @@ export class NgxDiagramComponent implements OnInit {
 				this.diagramModel.getOffsetX().getValue() - widthDiff * xFactor,
 				this.diagramModel.getOffsetY().getValue() - heightDiff * yFactor
 			);
-
-			// TODO: figure out on how to repaint things?
-			// diagramEngine.enableRepaintEntities([]);
 		}
 	}
 }

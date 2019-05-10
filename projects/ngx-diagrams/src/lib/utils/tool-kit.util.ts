@@ -21,7 +21,7 @@ export function generateLinePath(firstPoint: any, lastPoint: any): string {
 	return `M${firstPoint.x},${firstPoint.y} L ${lastPoint.x},${lastPoint.y}`;
 }
 
-export function generateCurvePath(firstPoint: any, lastPoint: any, curvy: number = 0): string {
+export function generateCurvePath(firstPoint: { x: number; y: number }, lastPoint: { x: number; y: number }, curvy: number = 0): string {
 	const isHorizontal = Math.abs(firstPoint.x - lastPoint.x) > Math.abs(firstPoint.y - lastPoint.y);
 	const curvyX = isHorizontal ? curvy : 0;
 	const curvyY = isHorizontal ? 0 : curvy;

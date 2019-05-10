@@ -2,7 +2,6 @@ import { AbstractLinkFactory } from '../../factories/link.factory';
 import { DefaultLinkComponent } from '../components/default-link/default-link.component';
 import { DefaultLinkModel } from '../models/default-link.model';
 import { ViewContainerRef, ComponentRef, ComponentFactoryResolver, ComponentFactory } from '@angular/core';
-import { DiagramEngine } from '../../services/engine.service';
 
 export class DefaultLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 	constructor(private resolver: ComponentFactoryResolver) {
@@ -16,22 +15,13 @@ export class DefaultLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 		const rootNode = (componentRef.hostView as any).rootNodes[0] as HTMLElement;
 
 		// // default style for node
-		// rootNode.style.position = 'absolute';
-		// rootNode.style.display = 'block';
+		rootNode.style.position = 'absolute';
+		rootNode.style.display = 'block';
 
 		// data attributes
 		rootNode.setAttribute('data-linkid', link.id);
 
-		// subscribe to node coordinates
-		// const xSub = node.selectX().subscribe(x => (rootNode.style.left = `${x}px`));
-		// const ySub = node.selectY().subscribe(y => (rootNode.style.top = `${y}px`));
-
-		// onDestroy unsubscribe from coordinates to prevent memory leaks!
-		// componentRef.onDestroy(() => {
-		// 	xSub.unsubscribe();
-		// 	ySub.unsubscribe();
-		// });
-
+		// on destroy make sure to destroy the componentRef
 		link.onEntityDestroy().subscribe(() => {
 			componentRef.destroy();
 		});
@@ -40,8 +30,6 @@ export class DefaultLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 		Object.entries(link).forEach(([key, value]) => {
 			componentRef.instance[key] = value;
 		});
-
-		// componentRef.instance.diagramEngine = diagramEngine;
 
 		return componentRef;
 	}

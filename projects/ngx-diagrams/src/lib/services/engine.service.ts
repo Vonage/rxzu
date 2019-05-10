@@ -131,15 +131,15 @@ export class DiagramEngine {
 	getNodeElement(node: NodeModel): Element {
 		const selector = this.canvas$.getValue().querySelector(`[data-nodeid="${node.id}"]`);
 		if (selector === null) {
-			throw new Error('Cannot find Node element with nodeID: [' + node.id + ']');
+			throw new Error('Cannot find Node element with node id: [' + node.id + ']');
 		}
 		return selector;
 	}
 
 	getNodePortElement(port: PortModel): any {
-		const selector = this.canvas$.getValue().querySelector(`[data-portid="${port.id}"][data-nodeid="${port.parent.id}"]`);
+		const selector = this.canvas$.getValue().querySelector(`[data-nodeid="${port.parent.id}"] [data-portid="${port.id}"]`);
 		if (selector === null) {
-			throw new Error('Cannot find Node Port element with nodeID: [' + port.parent.id + '] and port id: [' + port.id + ']');
+			throw new Error('Cannot find Node Port element with node id: [' + port.parent.id + '] and port id: [' + port.id + ']');
 		}
 		return selector;
 	}
