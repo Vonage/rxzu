@@ -1,4 +1,4 @@
-.default-port {
+:host {
 	position: absolute;
 	width: 10px;
 	height: 10px;
@@ -6,12 +6,15 @@
 	border: 1px solid violet;
 	background-color: lightgray;
 	margin: 10px 0;
+
 	&:hover {
-		background-color: mediumseagreen;
+		background-color: green;
 	}
+
 	&.out {
 		right: -5px;
 	}
+
 	&.in {
 		left: -5px;
 	}

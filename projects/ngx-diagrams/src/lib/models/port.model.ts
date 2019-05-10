@@ -32,6 +32,14 @@ export class PortModel extends BaseModel<NodeModel> {
 		return this.name;
 	}
 
+	selectX(): Observable<number> {
+		return this.x$.asObservable();
+	}
+
+	selectY(): Observable<number> {
+		return this.y$.asObservable();
+	}
+
 	getMaximumLinks(): number {
 		return this.maximumLinks;
 	}
@@ -82,4 +90,8 @@ export class PortModel extends BaseModel<NodeModel> {
 		}
 		return null;
 	}
+
+	// selectCoords() : Observable<number> {
+
+	// }
 }

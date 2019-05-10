@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DiagramModel } from 'projects/ngx-diagrams/src/lib/models/diagram.model';
 import { DiagramEngine } from 'ngx-diagrams';
-import { NodeModel } from 'projects/ngx-diagrams/src/lib/models/node.model';
 import { DefaultNodeModel } from 'projects/ngx-diagrams/src/lib/defaults/models/default-node.model';
 import { DefaultPortModel } from 'projects/ngx-diagrams/src/lib/defaults/models/default-port.model';
 import { DefaultLinkModel } from 'projects/ngx-diagrams/src/lib/defaults/models/default-link.model';
@@ -20,33 +19,42 @@ export class AppComponent implements OnInit {
 	ngOnInit() {
 		const nodesDefaultDimensions = { height: 200, width: 200 };
 		this.diagramEngine.registerDefaultFactories();
+
 		this.diagramModel = this.diagramEngine.createDiagram();
 
 		const node1 = new DefaultNodeModel();
-		const inPort = new DefaultPortModel(true, 'inport');
 		node1.setPosition(500, 300);
 		node1.updateDimensions(nodesDefaultDimensions);
-		node1.addPort(inPort);
+		const p1 = node1.addInPort('inport');
 
-		const outPort = new DefaultPortModel(false, 'outport');
 		const node2 = new DefaultNodeModel();
 		node2.setPosition(200, 200);
 		node2.updateDimensions(nodesDefaultDimensions);
-		node2.addPort(outPort);
+		const outPortN2 = node2.addOutPort('outport');
 
 		const link1 = new DefaultLinkModel();
-		link1.setSourcePort(outPort);
-		link1.setTargetPort(inPort);
+		link1.setSourcePort(outPortN2);
+		link1.setTargetPort(p1);
 
 		const node3 = new DefaultNodeModel();
-		node3.setPosition(200, 2000);
+		node3.setPosition(400, 600);
 		node3.updateDimensions(nodesDefaultDimensions);
+		const p3 = node3.addInPort('inport');
+
+		const link3 = new DefaultLinkModel();
+		link3.setSourcePort(outPortN2);
+		link3.setTargetPort(p3);
 
 		const node4 = new DefaultNodeModel();
 		node4.setPosition(1200, 200);
 		node4.updateDimensions(nodesDefaultDimensions);
+		const p4 = node4.addInPort('inport');
 
-		this.diagramModel.addAll(node1, node2, node3, node4, link1);
+		const link2 = new DefaultLinkModel();
+		link2.setSourcePort(outPortN2);
+		link2.setTargetPort(p4);
+
+		this.diagramModel.addAll(link1, node1, node2, node3, node4, link2, link3);
 
 		this.diagramModel.getDiagramEngine().zoomToFit();
 	}
