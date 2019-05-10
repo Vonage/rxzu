@@ -14,6 +14,9 @@ export class DefaultLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 		// attach coordinates and default positional behaviour to the generated component host
 		const rootNode = (componentRef.hostView as any).rootNodes[0] as HTMLElement;
 
+		// default style for link
+		rootNode.style.position = 'absolute';
+
 		// data attributes
 		rootNode.setAttribute('data-linkid', link.id);
 

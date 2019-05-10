@@ -23,7 +23,20 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 		const firstPY$ = this.getFirstPoint().selectY();
 
 		combineLatest(lastPX$, lastPY$, firstPX$, firstPY$).subscribe(([lastPX, lastPY, firstPX, firstPY]) => {
-			const path = generateCurvePath({ x: firstPX, y: firstPY }, { x: lastPX, y: lastPY }, this.curvyness);
+			const points = [{ x: firstPX, y: firstPY }, { x: lastPX, y: lastPY }];
+
+			const isHorizontal = Math.abs(firstPX - lastPX) > Math.abs(firstPY - lastPY);
+			const xOrY = isHorizontal ? 'x' : 'y';
+
+			// draw the smoothing
+			// if the points are too close, just draw a straight line
+			console.log(Math.abs(points[0][xOrY] - points[1][xOrY]) < 150);
+			let isStraight = false;
+			if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 150) {
+				isStraight = true;
+			}
+
+			const path = generateCurvePath({ x: firstPX, y: firstPY }, { x: lastPX, y: lastPY }, isStraight ? 0 : this.curvyness);
 			this.path$.next(path);
 			this.cdRef.detectChanges();
 		});

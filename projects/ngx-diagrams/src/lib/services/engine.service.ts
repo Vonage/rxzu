@@ -149,8 +149,6 @@ export class DiagramEngine {
 		const sourceRect = sourceElement.getBoundingClientRect();
 		const rel = this.getRelativePoint(sourceRect.left, sourceRect.top);
 
-		console.log(sourceElement, sourceRect, rel);
-
 		return {
 			x:
 				sourceElement.offsetWidth / 2 +

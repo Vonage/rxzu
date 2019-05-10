@@ -18,6 +18,8 @@ export class DefaultPortFactory extends AbstractPortFactory<DefaultPortModel> {
 		rootNode.setAttribute('data-portid', port.id);
 		rootNode.setAttribute('data-name', port.getName());
 
+		port.in ? rootNode.classList.add('in') : rootNode.classList.add('out');
+
 		// assign all passed properties to node initialization.
 		Object.entries(port).forEach(([key, value]) => {
 			componentRef.instance[key] = value;
