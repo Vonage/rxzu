@@ -131,7 +131,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
 	setPoints(points: PointModel[]) {
 		points.forEach(point => {
-			point.parent = this;
+			point.setParent(this);
 		});
 		this.points = points;
 	}
@@ -155,7 +155,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
 	}
 
 	addPoint<P extends PointModel>(pointModel: P, index = 1): P {
-		pointModel.parent = this;
+		pointModel.setParent(this);
 		this.points.splice(index, 0, pointModel);
 		return pointModel;
 	}

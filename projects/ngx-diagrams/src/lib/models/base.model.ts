@@ -24,21 +24,20 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 		this._type = type;
 	}
 
-	get locked(): boolean {
-		return this.parent.getLocked() || this.getLocked();
+	getLocked(): boolean {
+		return this.getParent().getLocked() || super.getLocked();
 	}
 
-	get parent(): X {
+	getParent(): X {
 		return this._parent.value;
 	}
 
-	set parent(parent: X) {
+	setParent(parent: X): void {
 		this._parent.next(parent);
 	}
 
-	// @ts-ignore
-	parentChanges(): Observable<ParentChangeEvent> {
-		this._parent$.pipe(map(p => createParentEvent<BaseModel>(this, p)));
+	parentChanges(): Observable<ParentChangeEvent<X>> {
+		return this._parent$.pipe(map(p => createParentEvent<X>(this, p)));
 	}
 
 	get painted(): boolean {

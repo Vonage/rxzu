@@ -10,20 +10,20 @@ export class PointModel extends BaseModel<LinkModel> {
 		super();
 		this.x$ = new BehaviorSubject(points.x);
 		this.y$ = new BehaviorSubject(points.y);
-		this.parent = link;
+		this.setParent(link);
 	}
 
 	isConnectedToPort() {
-		return this.parent.getPortForPoint(this) !== null;
+		return this.getParent().getPortForPoint(this) !== null;
 	}
 
 	getLink(): LinkModel {
-		return this.parent;
+		return this.getParent();
 	}
 
 	remove() {
-		if (this.parent) {
-			this.parent.removePoint(this);
+		if (this.getParent) {
+			this.getParent().removePoint(this);
 		}
 
 		super.remove();
