@@ -23,6 +23,10 @@ export class DefaultPortFactory extends AbstractPortFactory<DefaultPortModel> {
 			componentRef.instance[key] = value;
 		});
 
+		port.onEntityDestroy().subscribe(e => {
+			componentRef.destroy();
+		});
+
 		return componentRef;
 	}
 

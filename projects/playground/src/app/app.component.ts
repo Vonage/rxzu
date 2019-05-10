@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DiagramModel } from 'projects/ngx-diagrams/src/lib/models/diagram.model';
 import { DiagramEngine } from 'ngx-diagrams';
-import { NodeModel } from 'projects/ngx-diagrams/src/lib/models/node.model';
 import { DefaultNodeModel } from 'projects/ngx-diagrams/src/lib/defaults/models/default-node.model';
 import { DefaultPortModel } from 'projects/ngx-diagrams/src/lib/defaults/models/default-port.model';
 import { DefaultLinkModel } from 'projects/ngx-diagrams/src/lib/defaults/models/default-link.model';
@@ -20,6 +19,7 @@ export class AppComponent implements OnInit {
 	ngOnInit() {
 		const nodesDefaultDimensions = { height: 200, width: 200 };
 		this.diagramEngine.registerDefaultFactories();
+
 		this.diagramModel = this.diagramEngine.createDiagram();
 
 		const node1 = new DefaultNodeModel();

@@ -25,6 +25,7 @@ export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 		// subscribe to node coordinates
 		const xSub = node.selectX().subscribe(x => (rootNode.style.left = `${x}px`));
 		const ySub = node.selectY().subscribe(y => (rootNode.style.top = `${y}px`));
+		// const isSelected = node.selectionChanges().subscribe(e => (e.isSelected ? (rootNode.classList.add('selected') : (rootNode.classList.remove('selected'))));
 
 		// onDestroy unsubscribe from coordinates to prevent memory leaks!
 		componentRef.onDestroy(() => {

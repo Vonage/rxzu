@@ -9,6 +9,4 @@ export class DefaultNodeModel extends NodeModel {
 		this.name = name;
 		this.color = color;
 	}
-
-	// addInPort(label: string):
 }
