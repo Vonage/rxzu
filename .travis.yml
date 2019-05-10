@@ -15,18 +15,19 @@ jobs:
       name: "build lib"
       script: npm run build-lib
       deploy:
-        provider: releases
+      - provider: releases
         api_key: $GITHUB_TOKEN
         file: "dist/ngx-diagrams.zip"
         skip_cleanup: true
-          on:
-            tags: true
+        on:
+          tags: true
     - stage: "Release"
       if: branch = master
-      script: npm run build-storybook
-      script: npm run semantic-release
-        deploy:
-          provider: pages
+      script:
+        - npm run build-storybook
+        - npm run semantic-release
+      deploy:
+      - provider: pages
         skip-cleanup: true
         github-token: $GITHUB_TOKEN
         keep-history: true
