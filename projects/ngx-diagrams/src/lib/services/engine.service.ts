@@ -128,20 +128,20 @@ export class DiagramEngine {
 	}
 	//#endregion
 
-	getNodeElement(node: NodeModel): Element {
+	getNodeElement(node: NodeModel): HTMLElement {
 		const selector = this.canvas$.getValue().querySelector(`[data-nodeid="${node.id}"]`);
 		if (selector === null) {
 			throw new Error('Cannot find Node element with node id: [' + node.id + ']');
 		}
-		return selector;
+		return selector as HTMLElement;
 	}
 
-	getNodePortElement(port: PortModel): any {
+	getNodePortElement(port: PortModel): HTMLElement {
 		const selector = this.canvas$.getValue().querySelector(`[data-nodeid="${port.parent.id}"] [data-portid="${port.id}"]`);
 		if (selector === null) {
 			throw new Error('Cannot find Node Port element with node id: [' + port.parent.id + '] and port id: [' + port.id + ']');
 		}
-		return selector;
+		return selector as HTMLElement;
 	}
 
 	getPortCenter(port: PortModel) {
@@ -171,7 +171,7 @@ export class DiagramEngine {
 		height: number;
 	} {
 		const sourceElement = this.getNodePortElement(port);
-		const sourceRect = sourceElement.getBoundingClientRect();
+		const sourceRect = sourceElement.getBoundingClientRect() as DOMRect;
 		const canvasRect = this.canvas$.getValue().getBoundingClientRect() as ClientRect;
 
 		return {

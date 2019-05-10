@@ -8,7 +8,8 @@ import {
 	ViewChild,
 	ViewContainerRef,
 	ElementRef,
-	AfterViewInit
+	AfterViewInit,
+	ChangeDetectionStrategy
 } from '@angular/core';
 import { DiagramModel } from '../../models/diagram.model';
 import { NodeModel } from '../../models/node.model';
@@ -21,7 +22,8 @@ import { BaseModel } from '../../models/base.model';
 @Component({
 	selector: 'ngdx-diagram',
 	templateUrl: 'diagram.component.html',
-	styleUrls: ['diagram.component.scss']
+	styleUrls: ['diagram.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxDiagramComponent implements OnInit, AfterViewInit {
 	// tslint:disable-next-line:no-input-rename

@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { DefaultLinkModel } from '../../models/default-link.model';
 import { generateCurvePath } from '../../../utils/tool-kit.util';
 import { combineLatest, BehaviorSubject } from 'rxjs';
@@ -11,7 +11,7 @@ import { combineLatest, BehaviorSubject } from 'rxjs';
 export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewInit {
 	path$: BehaviorSubject<string> = new BehaviorSubject(null);
 
-	constructor() {
+	constructor(private cdRef: ChangeDetectorRef) {
 		super('ngdx-default-link');
 	}
 
@@ -25,6 +25,7 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 		combineLatest(lastPX$, lastPY$, firstPX$, firstPY$).subscribe(([lastPX, lastPY, firstPX, firstPY]) => {
 			const path = generateCurvePath({ x: firstPX, y: firstPY }, { x: lastPX, y: lastPY }, this.curvyness);
 			this.path$.next(path);
+			this.cdRef.detectChanges();
 		});
 	}
 }

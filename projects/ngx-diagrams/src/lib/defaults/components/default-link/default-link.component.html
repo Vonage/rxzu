@@ -1,4 +1,4 @@
-<svg>
+<svg [ngStyle]="{ overflow: 'visible', fill: 'none' }">
 	<g>
 		<path [attr.stroke-width]="width" [attr.stroke]="color" [attr.d]="path$ | async"></path>
 	</g>
