@@ -137,9 +137,9 @@ export class DiagramEngine {
 	}
 
 	getNodePortElement(port: PortModel): HTMLElement {
-		const selector = this.canvas$.getValue().querySelector(`[data-nodeid="${port.parent.id}"] [data-portid="${port.id}"]`);
+		const selector = this.canvas$.getValue().querySelector(`[data-nodeid="${port.getParent().id}"] [data-portid="${port.id}"]`);
 		if (selector === null) {
-			throw new Error('Cannot find Node Port element with node id: [' + port.parent.id + '] and port id: [' + port.id + ']');
+			throw new Error('Cannot find Node Port element with node id: [' + port.getParent().id + '] and port id: [' + port.id + ']');
 		}
 		return selector as HTMLElement;
 	}
