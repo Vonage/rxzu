@@ -16,8 +16,6 @@ jobs:
       name: "build lib"
       script:
         - npm run build-lib
-        # testing release
-        - npx semantic-release --ci false -b feature/move_nodes_on_canvas -d
       deploy:
       - provider: script
         skip_cleanup: true
