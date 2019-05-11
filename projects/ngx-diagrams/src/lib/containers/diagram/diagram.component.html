@@ -3,7 +3,14 @@
 	<div
 		class="ngdx-nodes-layer"
 		[ngStyle]="{
-			transform: 'translate(' + (offsetX$ | async) + 'px, ' + (offsetY$ | async) + 'px) scale(' + (zoomLevel$ | async) / 100.0 + ')'
+			transform:
+				'translate(' +
+				(diagramModel.getOffsetX() | async) +
+				'px, ' +
+				(diagramModel.getOffsetY() | async) +
+				'px) scale(' +
+				(diagramModel.getZoomLevel() | async) / 100.0 +
+				')'
 		}"
 	>
 		<ng-template #nodesLayer></ng-template>
@@ -13,7 +20,14 @@
 	<div
 		class="ngdx-links-layer"
 		[ngStyle]="{
-			transform: 'translate(' + (offsetX$ | async) + 'px, ' + (offsetY$ | async) + 'px) scale(' + (zoomLevel$ | async) / 100.0 + ')'
+			transform:
+				'translate(' +
+				(diagramModel.getOffsetX() | async) +
+				'px, ' +
+				(diagramModel.getOffsetY() | async) +
+				'px) scale(' +
+				(diagramModel.getZoomLevel() | async) / 100.0 +
+				')'
 		}"
 	>
 		<ng-template #linksLayer></ng-template>
