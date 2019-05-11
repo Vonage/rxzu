@@ -4,40 +4,36 @@ language: node_js
 node_js:
   - "8"
 
-install:
-  - npm ci
 cache: npm
 
 jobs:
   include:
-    - stage: lint
-      script: npm run lint-lib
-    - stage: build
-      script:
-        - npm run build-lib
-        - npm run build-storybook
-    - stage: release
-      if: branch = master
+    - stage: "Tests"
+      name: "unit tests"
       script: skip
+    - stage: "Build"
+      name: "build lib"
+      script: npm run build-lib
       deploy:
-        provider: script
+      - provider: releases
+        api_key: $GITHUB_TOKEN
+        file: "dist/ngx-diagrams.zip"
         skip_cleanup: true
-        env:
-          - GITHUB_TOKEN: $GITHUB_TOKEN
-          - NPM_TOKEN: $NPM_TOKEN
-        script: npm run semantic-release
-    - stage: deploy storybook
+        on:
+          tags: true
+    - stage: "Release"
       if: branch = master
-      script: skip
+      script:
+        - npm run build-storybook
+        - npm run semantic-release
       deploy:
-        provider: pages
+      - provider: pages
         skip-cleanup: true
         github-token: $GITHUB_TOKEN
         keep-history: true
         local-dir: dist/docs
-
-git:
-  depth: 3
+        on:
+          tags: true
 
 branches:
   except:

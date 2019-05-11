@@ -1,38 +1,60 @@
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 export class PointModel extends BaseModel<LinkModel> {
-	x: number;
-	y: number;
+	private x$: BehaviorSubject<number>;
+	private y$: BehaviorSubject<number>;
 
 	constructor(link: LinkModel, points: { x: number; y: number }) {
 		super();
-		this.x = points.x;
-		this.y = points.y;
-		this.parent = link;
+		this.x$ = new BehaviorSubject(points.x);
+		this.y$ = new BehaviorSubject(points.y);
+		this.setParent(link);
 	}
 
 	isConnectedToPort() {
-		return this.parent.getPortForPoint(this) !== null;
+		return this.getParent().getPortForPoint(this) !== null;
 	}
 
 	getLink(): LinkModel {
-		return this.parent;
+		return this.getParent();
 	}
 
 	remove() {
-		if (this.parent) {
-			this.parent.removePoint(this);
+		if (this.getParent) {
+			this.getParent().removePoint(this);
 		}
 
 		super.remove();
 	}
 
+	selectX(): Observable<number> {
+		return this.x$.asObservable();
+	}
+
 	getX(): number {
-		return this.x;
+		return this.x$.getValue();
+	}
+
+	selectY(): Observable<number> {
+		return this.y$.asObservable();
 	}
 
 	getY(): number {
-		return this.y;
+		return this.y$.getValue();
+	}
+
+	setX(x: number) {
+		this.x$.next(x);
+	}
+
+	setY(y: number) {
+		this.y$.next(y);
+	}
+
+	updateLocation(points: { x: number; y: number }) {
+		this.setX(points.x);
+		this.setY(points.y);
 	}
 }

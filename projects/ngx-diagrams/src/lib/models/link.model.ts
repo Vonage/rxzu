@@ -13,7 +13,6 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
 	constructor(linkType: string = 'default', id?: string) {
 		super(linkType, id);
-		// TODO: handle default initial points!
 		this.points = [new PointModel(this, { x: 0, y: 0 }), new PointModel(this, { x: 0, y: 0 })];
 		this.extras = {};
 		this.sourcePort = null;
@@ -55,6 +54,15 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
 	getPointIndex(point: PointModel) {
 		return this.points.indexOf(point);
+	}
+
+	getPointModel(id: string): PointModel | null {
+		for (const point of this.points) {
+			if (point.id === id) {
+				return point;
+			}
+		}
+		return null;
 	}
 
 	getPortForPoint(point: PointModel): PortModel {
@@ -117,18 +125,13 @@ export class LinkModel extends BaseModel<DiagramModel> {
 		return this.addPoint(this.generatePoint(x, y));
 	}
 
-	// addLabel(label: LabelModel) {
-	//     label.parent = this;
-	//     this.labels.push(label);
-	// }
-
 	getPoints(): PointModel[] {
 		return this.points;
 	}
 
 	setPoints(points: PointModel[]) {
 		points.forEach(point => {
-			point.parent = this;
+			point.setParent(this);
 		});
 		this.points = points;
 	}
@@ -152,7 +155,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
 	}
 
 	addPoint<P extends PointModel>(pointModel: P, index = 1): P {
-		pointModel.parent = this;
+		pointModel.setParent(this);
 		this.points.splice(index, 0, pointModel);
 		return pointModel;
 	}

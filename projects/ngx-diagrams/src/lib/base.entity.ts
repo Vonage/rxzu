@@ -20,16 +20,10 @@ export class BaseEntity {
 		return this._id;
 	}
 
-	public set id(id: string) {
-		this._id = id;
-	}
-
-	// TODO: revert back to get locked()
 	getLocked(): boolean {
 		return this._locked.value;
 	}
 
-	// TODO: revert back to set locked()
 	setLocked(locked: boolean = true) {
 		this._locked.next(locked);
 	}

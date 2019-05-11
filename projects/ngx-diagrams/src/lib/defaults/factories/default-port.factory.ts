@@ -11,25 +11,22 @@ export class DefaultPortFactory extends AbstractPortFactory<DefaultPortModel> {
 	generateWidget(port: DefaultPortModel, portsHost: ViewContainerRef): ComponentRef<DefaultPortComponent> {
 		const componentRef = portsHost.createComponent(this.getRecipe());
 
-		// // attach coordinates and default positional behaviour to the generated component host
-		// const rootNode = (componentRef.hostView as any).rootNodes[0] as HTMLElement;
+		// attach coordinates and default positional behaviour to the generated component host
+		const rootNode = (componentRef.hostView as any).rootNodes[0] as HTMLElement;
 
-		// rootNode.style.position = 'absolute';
-		// rootNode.style.display = 'block';
+		// data attributes
+		rootNode.setAttribute('data-portid', port.id);
+		rootNode.setAttribute('data-name', port.getName());
 
-		// // subscribe to node coordinates
-		// const xSub = node.selectX().subscribe(x => (rootNode.style.left = `${x}px`));
-		// const ySub = node.selectY().subscribe(y => (rootNode.style.top = `${y}px`));
-
-		// // onDestroy unsubscribe from coordinates to prevent memory leaks!
-		// componentRef.onDestroy(() => {
-		// 	xSub.unsubscribe();
-		// 	ySub.unsubscribe();
-		// });
+		port.in ? rootNode.classList.add('in') : rootNode.classList.add('out');
 
 		// assign all passed properties to node initialization.
 		Object.entries(port).forEach(([key, value]) => {
 			componentRef.instance[key] = value;
+		});
+
+		port.onEntityDestroy().subscribe(e => {
+			componentRef.destroy();
 		});
 
 		return componentRef;

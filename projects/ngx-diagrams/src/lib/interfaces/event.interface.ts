@@ -1,6 +1,7 @@
 import { UID } from '../utils/tool-kit.util';
 import { BaseEntity } from '../base.entity';
 
+// region events
 export interface BaseEvent<T extends BaseEntity> {
 	entity: T;
 	stopPropagation: () => any;
@@ -8,12 +9,14 @@ export interface BaseEvent<T extends BaseEntity> {
 	id: string;
 }
 export type LockEvent<T extends BaseEntity = BaseEntity> = BaseEvent<T> & { locked: boolean };
-export type ParentChangeEvent<T extends BaseEntity = BaseEntity, P extends BaseEntity = BaseEntity> = BaseEvent<T> & {
+export type ParentChangeEvent<P extends BaseEntity = BaseEntity, T extends BaseEntity = BaseEntity> = BaseEvent<T> & {
 	parent: P;
 };
 export type SelectionEvent<T extends BaseEntity = BaseEntity> = BaseEvent<T> & { isSelected: boolean };
 export type PaintedEvent<T extends BaseEntity = BaseEntity> = BaseEvent<T> & { isPainted: boolean };
+// endregion
 
+// region eventCreators
 export function createBaseEvent<T extends BaseEntity = BaseEntity>(thisArg: T): BaseEvent<T> {
 	return {
 		id: UID(),
@@ -28,10 +31,10 @@ export function createLockedEvent<T extends BaseEntity = BaseEntity>(thisArg: T,
 		locked
 	};
 }
-export function createParentEvent<T extends BaseEntity = BaseEntity, P extends BaseEntity = BaseEntity>(
+export function createParentEvent<P extends BaseEntity = BaseEntity, T extends BaseEntity = BaseEntity>(
 	thisArg: T,
 	parent: P
-): ParentChangeEvent<T, P> {
+): ParentChangeEvent<P, T> {
 	return {
 		...createBaseEvent<T>(this),
 		parent
@@ -49,3 +52,4 @@ export function createPaintedEvent<T extends BaseEntity = BaseEntity>(thisArg: T
 		isPainted: painted
 	};
 }
+// endregion

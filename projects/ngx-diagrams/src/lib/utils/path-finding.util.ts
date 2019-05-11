@@ -1,10 +1,8 @@
 // import * as PF from 'pathfinding';
-import { Injectable } from '@angular/core';
 // import { DiagramEngine } from '../services/engine.service';
 
 export const ROUTING_SCALING_FACTOR = 5;
 
-@Injectable()
 export class PathFinding {
 	// private pathFinderInstance;
 	// constructor(private diagramEngine: DiagramEngine) {

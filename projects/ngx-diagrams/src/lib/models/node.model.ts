@@ -59,17 +59,17 @@ export class NodeModel extends BaseModel<DiagramModel> {
 	}
 
 	/**
-	 * Assign a port to the node and set the node as its parent
+	 * Assign a port to the node and set the node as its getParent
 	 * @returns the inserted port
 	 */
 	addPort<T extends PortModel>(port: T): T {
-		port.parent = this;
+		port.setParent(this);
 		this.ports$.next({ ...this.ports$.value, [port.id]: port });
 		return port;
 	}
 
-	getPort(name: string): PortModel {
-		return this.ports$.value[name];
+	getPort(id: string): PortModel {
+		return this.ports$.value[id];
 	}
 
 	selectPorts(): Observable<{ [s: string]: PortModel }> {

@@ -15,17 +15,26 @@ export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 		// attach coordinates and default positional behaviour to the generated component host
 		const rootNode = (componentRef.hostView as any).rootNodes[0] as HTMLElement;
 
+		// default style for node
 		rootNode.style.position = 'absolute';
 		rootNode.style.display = 'block';
+
+		// data attributes
+		rootNode.setAttribute('data-nodeid', node.id);
 
 		// subscribe to node coordinates
 		const xSub = node.selectX().subscribe(x => (rootNode.style.left = `${x}px`));
 		const ySub = node.selectY().subscribe(y => (rootNode.style.top = `${y}px`));
 
-		// onDestroy unsubscribe from coordinates to prevent memory leaks!
-		componentRef.onDestroy(() => {
+		const isSelectedSub = node.selectionChanges().subscribe(e => {
+			e.isSelected ? rootNode.classList.add('selected') : rootNode.classList.remove('selected');
+		});
+
+		node.onEntityDestroy().subscribe(e => {
+			componentRef.destroy();
 			xSub.unsubscribe();
 			ySub.unsubscribe();
+			isSelectedSub.unsubscribe();
 		});
 
 		// assign all passed properties to node initialization.

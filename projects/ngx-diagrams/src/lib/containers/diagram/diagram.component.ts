@@ -1,19 +1,33 @@
-import { Component, OnInit, Input, Renderer2, Output, EventEmitter, ViewChild, ViewContainerRef } from '@angular/core';
+import {
+	Component,
+	OnInit,
+	Input,
+	Renderer2,
+	Output,
+	EventEmitter,
+	ViewChild,
+	ViewContainerRef,
+	ElementRef,
+	AfterViewInit,
+	ChangeDetectionStrategy
+} from '@angular/core';
 import { DiagramModel } from '../../models/diagram.model';
 import { NodeModel } from '../../models/node.model';
 import { LinkModel } from '../../models/link.model';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { mergeMap, share, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
+import { share, filter } from 'rxjs/operators';
 import { BaseAction, MoveCanvasAction } from '../../actions';
-import { filter } from 'minimatch';
+import { BaseModel } from '../../models/base.model';
 
 @Component({
 	selector: 'ngdx-diagram',
 	templateUrl: 'diagram.component.html',
-	styleUrls: ['diagram.component.scss']
+	styleUrls: ['diagram.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NgxDiagramComponent implements OnInit {
-	@Input() model: DiagramModel;
+export class NgxDiagramComponent implements OnInit, AfterViewInit {
+	// tslint:disable-next-line:no-input-rename
+	@Input('model') diagramModel: DiagramModel;
 	@Input() allowCanvasZoon = true;
 	@Input() allowCanvasTranslation = true;
 	@Input() inverseZoom = true;
@@ -24,13 +38,15 @@ export class NgxDiagramComponent implements OnInit {
 
 	@ViewChild('nodesLayer', { read: ViewContainerRef }) nodesLayer: ViewContainerRef;
 	@ViewChild('linksLayer', { read: ViewContainerRef }) linksLayer: ViewContainerRef;
+	@ViewChild('canvas', { read: ElementRef }) canvas: ElementRef;
 
-	nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
-	links$: BehaviorSubject<{ [s: string]: LinkModel }>;
-	action$: BehaviorSubject<BaseAction> = new BehaviorSubject(null);
-	offsetX$: Observable<number>;
-	offsetY$: Observable<number>;
-	zoomLevel$: Observable<number>;
+	private nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
+	private links$: BehaviorSubject<{ [s: string]: LinkModel }>;
+	private action$: BehaviorSubject<BaseAction> = new BehaviorSubject(null);
+	private offsetX$: Observable<number>;
+	private offsetY$: Observable<number>;
+	private zoomLevel$: Observable<number>;
+	private nodesRendered$: BehaviorSubject<boolean>;
 
 	private mouseUpListener = () => {};
 	private mouseMoveListener = () => {};
@@ -38,22 +54,56 @@ export class NgxDiagramComponent implements OnInit {
 	constructor(private renderer: Renderer2) {}
 
 	ngOnInit() {
-		if (this.model) {
-			this.nodes$ = this.model.selectNodes();
-			this.links$ = this.model.selectLinks();
-			this.offsetX$ = this.model.getOffsetX().pipe(share());
-			this.offsetY$ = this.model.getOffsetY().pipe(share());
-			this.zoomLevel$ = this.model.getZoomLevel().pipe(share());
+		if (this.diagramModel) {
+			this.diagramModel.getDiagramEngine().setCanvas(this.canvas.nativeElement);
+
+			this.nodes$ = this.diagramModel.selectNodes();
+			this.links$ = this.diagramModel.selectLinks();
+			this.offsetX$ = this.diagramModel.getOffsetX().pipe(share());
+			this.offsetY$ = this.diagramModel.getOffsetY().pipe(share());
+			this.zoomLevel$ = this.diagramModel.getZoomLevel().pipe(share());
+			this.nodesRendered$ = new BehaviorSubject(false);
 
 			this.nodes$.subscribe(nodes => {
+				this.nodesRendered$.next(false);
 				Object.values(nodes).forEach(node => {
 					if (!node.painted) {
-						this.model.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);
+						this.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);
 						node.painted = true;
 					}
 				});
+				this.nodesRendered$.next(true);
 			});
 		}
+	}
+
+	ngAfterViewInit() {
+		combineLatest(this.nodesRendered$, this.links$)
+			.pipe(filter(([nodesRendered, _]) => !!nodesRendered))
+			.subscribe(([_, links]) => {
+				Object.values(links).forEach(link => {
+					if (!link.painted) {
+						if (link.getSourcePort() !== null) {
+							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getSourcePort());
+							link.getPoints()[0].updateLocation(portCenter);
+
+							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getSourcePort());
+							link.getSourcePort().updateCoords(portCoords);
+						}
+
+						if (link.getTargetPort() !== null) {
+							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getTargetPort());
+							link.getPoints()[link.getPoints().length - 1].updateLocation(portCenter);
+
+							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getTargetPort());
+							link.getTargetPort().updateCoords(portCoords);
+						}
+
+						this.diagramModel.getDiagramEngine().generateWidgetForLink(link, this.linksLayer);
+						link.painted = true;
+					}
+				});
+			});
 	}
 
 	/**
@@ -86,14 +136,19 @@ export class NgxDiagramComponent implements OnInit {
 	onMouseUp = (event: MouseEvent) => {
 		this.mouseUpListener();
 		this.mouseMoveListener();
+		this.action$.next(null);
 	};
 
 	onMouseMove = (event: MouseEvent) => {
 		const action = this.action$.value;
 
+		if (action === null || action === undefined) {
+			return;
+		}
+
 		if (action instanceof MoveCanvasAction) {
 			if (this.allowCanvasTranslation) {
-				this.model.setOffset(
+				this.diagramModel.setOffset(
 					action.initialOffsetX + (event.clientX - action.mouseX),
 					action.initialOffsetY + (event.clientY - action.mouseY)
 				);
@@ -102,11 +157,48 @@ export class NgxDiagramComponent implements OnInit {
 		}
 	};
 
-	getMouseElement(event: MouseEvent): { model: any; element: Element } {
-		// iterate over all possible models
-		// port, point, link, node and return it and the element
-		// else return null.
+	getMouseElement(event: MouseEvent): { model: BaseModel; element: Element } {
+		const target = event.target as Element;
 
+		// is it a port?
+		let element = target.closest('[data-portid]');
+		if (element) {
+			// get the relevant node and return the port.
+			const nodeEl = target.closest('[data-nodeid]');
+			return {
+				model: this.diagramModel.getNode(nodeEl.getAttribute('data-nodeid')).getPort(element.getAttribute('data-portid')),
+				element
+			};
+		}
+
+		// look for a point
+		element = target.closest('[data-pointid]');
+		if (element) {
+			return {
+				model: this.diagramModel.getLink(element.getAttribute('data-linkid')).getPointModel(element.getAttribute('data-pointid')),
+				element
+			};
+		}
+
+		// look for a link
+		element = target.closest('[data-linkid]');
+		if (element) {
+			return {
+				model: this.diagramModel.getLink(element.getAttribute('data-linkid')),
+				element
+			};
+		}
+
+		// a node maybe
+		element = target.closest('[data-nodeid]');
+		if (element) {
+			return {
+				model: this.diagramModel.getNode(element.getAttribute('data-nodeid')),
+				element
+			};
+		}
+
+		// just the canvas
 		return null;
 	}
 
@@ -125,12 +217,13 @@ export class NgxDiagramComponent implements OnInit {
 			if (event.shiftKey) {
 				// initiate multiple selection selector
 			} else {
-				this.startFiringAction(new MoveCanvasAction(event.clientX, event.clientY, this.model));
+				this.startFiringAction(new MoveCanvasAction(event.clientX, event.clientY, this.diagramModel));
 			}
 		} else {
+			// console.log(selectedModel);
 		}
 
-		// create moveMove and mouseUp listeners
+		// create mouseMove and mouseUp listeners
 		this.mouseMoveListener = this.renderer.listen(document, 'mousemove', this.onMouseMove);
 		this.mouseUpListener = this.renderer.listen(document, 'mouseup', this.onMouseUp);
 	}
@@ -139,24 +232,24 @@ export class NgxDiagramComponent implements OnInit {
 		if (this.allowCanvasZoon) {
 			event.preventDefault();
 			event.stopPropagation();
-			const currentZoomLevel = this.model.getZoomLevel().getValue();
+			const currentZoomLevel = this.diagramModel.getZoomLevel().getValue();
 			const oldZoomFactor = currentZoomLevel / 100;
 			let scrollDelta = this.inverseZoom ? -event.deltaY : event.deltaY;
 			// check if it is pinch gesture
 			if (event.ctrlKey && scrollDelta % 1 !== 0) {
-				/*Chrome and Firefox sends wheel event with deltaY that
-          have fractional part, also `ctrlKey` prop of the event is true
-          though ctrl isn't pressed
-        */
+				/* Chrome and Firefox sends wheel event with deltaY that
+				   have fractional part, also `ctrlKey` prop of the event is true
+				   though ctrl isn't pressed
+				*/
 				scrollDelta /= 3;
 			} else {
 				scrollDelta /= 60;
 			}
 			if (currentZoomLevel + scrollDelta > 10) {
-				this.model.setZoomLevel(currentZoomLevel + scrollDelta);
+				this.diagramModel.setZoomLevel(currentZoomLevel + scrollDelta);
 			}
 
-			const zoomFactor = this.model.getZoomLevel().getValue() / 100;
+			const zoomFactor = this.diagramModel.getZoomLevel().getValue() / 100;
 
 			const boundingRect = (event.currentTarget as Element).getBoundingClientRect();
 			const clientWidth = boundingRect.width;
@@ -171,16 +264,13 @@ export class NgxDiagramComponent implements OnInit {
 			const clientY = event.clientY - boundingRect.top;
 
 			// compute width and height increment factor
-			const xFactor = (clientX - this.model.getOffsetX().getValue()) / oldZoomFactor / clientWidth;
-			const yFactor = (clientY - this.model.getOffsetY().getValue()) / oldZoomFactor / clientHeight;
+			const xFactor = (clientX - this.diagramModel.getOffsetX().getValue()) / oldZoomFactor / clientWidth;
+			const yFactor = (clientY - this.diagramModel.getOffsetY().getValue()) / oldZoomFactor / clientHeight;
 
-			this.model.setOffset(
-				this.model.getOffsetX().getValue() - widthDiff * xFactor,
-				this.model.getOffsetY().getValue() - heightDiff * yFactor
+			this.diagramModel.setOffset(
+				this.diagramModel.getOffsetX().getValue() - widthDiff * xFactor,
+				this.diagramModel.getOffsetY().getValue() - heightDiff * yFactor
 			);
-
-			// TODO: figure out on how to repaint things?
-			// diagramEngine.enableRepaintEntities([]);
 		}
 	}
 }
