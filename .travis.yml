@@ -8,24 +8,29 @@ cache: npm
 
 jobs:
   include:
-    - stage: "Tests"
-      name: "unit tests"
-      script: skip
+#    TODO: add tests and enable this stage
+#    - stage: "Tests"
+#      name: "unit tests"
+#      script: npm run test:unit
     - stage: "Build"
       name: "build lib"
       script: npm run build-lib
       deploy:
+      - provider: script
+        skip_cleanup: true
+        script: npm run semantic-release
+        on:
+          branch: master
       - provider: releases
         api_key: $GITHUB_TOKEN
         file: "dist/ngx-diagrams.zip"
         skip_cleanup: true
         on:
+          branch: master
           tags: true
     - stage: "Release"
       if: branch = master
-      script:
-        - npm run build-storybook
-        - npm run semantic-release
+      script: npm run build-storybook
       deploy:
       - provider: pages
         skip-cleanup: true
