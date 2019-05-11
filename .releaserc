@@ -1,49 +1,76 @@
 {
-	"pkgRoot": "dist/ngx-diagrams",
-	"branch": "master",
-	"plugins": [
-		[
-			"@semantic-release/commit-analyzer",
-			{
-				"parserOpts": {
-					"noteKeywords": [
-						"BREAKING CHANGE",
-						"BREAKING CHANGES",
-						"BREAKING"
-					]
-				}
-			}
-		],
-		[
-			"@semantic-release/release-notes-generator",
-			{
-				"parserOpts": {
-					"noteKeywords": [
-						"BREAKING CHANGE",
-						"BREAKING CHANGES",
-						"BREAKING"
-					]
-				}
-			}
-		],
-		"@semantic-release/changelog",
-		"@semantic-release/npm",
-		"@semantic-release/git"
-	],
-	"prepare": [
-		"@semantic-release/changelog",
-		"@semantic-release/npm",
-		[
-			"@semantic-release/git",
-			{
-				"assets": [
-					"dist/ngx-diagrams/**/*",
-					"dist/ngx-diagrams/package.json",
-					"dist/ngx-diagrams/CHANGELOG.md"
-				],
-				"message": "build(release): release <%= nextRelease.version %> - <%= new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %> [skip ci]\n\n<%= nextRelease.notes %>"
-			}
-		]
-	]
+  "branch": "master",
+  "plugins": [
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "parserOpts": {
+          "noteKeywords": [
+            "BREAKING CHANGE",
+            "BREAKING CHANGES",
+            "BREAKING"
+          ]
+        }
+      }
+    ],
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "parserOpts": {
+          "noteKeywords": [
+            "BREAKING CHANGE",
+            "BREAKING CHANGES",
+            "BREAKING"
+          ]
+        }
+      }
+    ],
+    "@semantic-release/changelog",
+    [
+      "@semantic-release/npm",
+      {
+        "npmPublish": false,
+        "pkgRoot": "dist/ngx-diagrams",
+        "tarballDir": "dist"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          "dist/*.tgz",
+          "dist/*.zip"
+        ]
+      }
+    ]
+  ],
+  "prepare": [
+    "@semantic-release/changelog",
+    "@semantic-release/npm",
+    [
+      "@semantic-release/npm",
+      {
+        "npmPublish": false,
+        "pkgRoot": "dist/ngx-diagrams",
+        "tarballDir": "dist"
+      }
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "npm run pack-zip"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "package.json",
+          "CHANGELOG.md",
+          "README.md"
+        ],
+        "message": "build(release): release <%= nextRelease.version %> - <%= new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %> [skip ci]\n\n<%= nextRelease.notes %>"
+      }
+    ]
+  ]
 }
-
