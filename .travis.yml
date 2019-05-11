@@ -14,20 +14,16 @@ jobs:
 #      script: npm run test:unit
     - stage: "Build"
       name: "build lib"
-      script: npm run build-lib
+      script:
+        - npm run build-lib
+        # testing release
+        - npx semantic-release --ci false -b feature/move_nodes_on_canvas -d
       deploy:
       - provider: script
         skip_cleanup: true
         script: npm run semantic-release
         on:
           branch: master
-      - provider: releases
-        api_key: $GITHUB_TOKEN
-        file: "dist/ngx-diagrams.zip"
-        skip_cleanup: true
-        on:
-          branch: master
-          tags: true
     - stage: "Release"
       if: branch = master
       script: npm run build-storybook

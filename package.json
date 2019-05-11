@@ -5,11 +5,12 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build --base-href /ngx-diagrams/ --prod",
-    "build-lib": "ng build ngx-diagrams && bestzip dist/ngx-diagrams.zip dist/ngx-diagrams/**/*",
+    "build-lib": "ng build ngx-diagrams",
     "test": "ng test",
     "lint": "ng lint",
     "lint-lib": "ng lint ngx-diagrams",
     "e2e": "ng e2e",
+    "pack-zip": "cd dist/ngx-diagrams && npx bestzip ../ngx-diagrams.zip * && cd ../../",
     "semantic-release": "semantic-release",
     "storybook": "start-storybook -s .storybook/static",
     "build-storybook": "build-storybook -c .storybook -o ./dist/docs .storybook/static"
@@ -44,6 +45,7 @@
     "@commitlint/config-conventional": "^7.5.0",
     "@semantic-release/changelog": "^3.0.2",
     "@semantic-release/commit-analyzer": "^6.1.0",
+    "@semantic-release/exec": "^3.3.2",
     "@semantic-release/git": "^7.0.8",
     "@semantic-release/npm": "^5.1.7",
     "@storybook/addon-notes": "^5.0.11",
@@ -79,9 +81,6 @@
   "config": {
     "commitizen": {
       "path": "node_modules/cz-customizable"
-    },
-    "cz-customizable": {
-      "config": ".commitizenrc"
     }
   }
 }
