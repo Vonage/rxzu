@@ -1,6 +1,6 @@
 {
   "name": "ngx-diagrams-workspace",
-  "version": "0.0.0-development",
+  "version": "1.3.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
