@@ -64,7 +64,7 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 		return this._selected$.pipe(map(s => createSelectionEvent(this, s)));
 	}
 
-	getSelectedEntities(): BaseModel<X>[] {
+	getSelectedEntities(): BaseModel[] {
 		return this._selected.value ? [this] : [];
 	}
 

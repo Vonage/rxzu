@@ -14,8 +14,8 @@ import {
 import { DiagramModel } from '../../models/diagram.model';
 import { NodeModel } from '../../models/node.model';
 import { LinkModel } from '../../models/link.model';
-import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
-import { share, filter } from 'rxjs/operators';
+import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { BaseAction, MoveCanvasAction, SelectingAction } from '../../actions';
 import { BaseModel } from '../../models/base.model';
 import { MoveItemsAction } from '../../actions/move-items.action';
@@ -406,7 +406,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 				this.diagramModel.clearSelection();
 			}
 		} else {
-			// its some or other element, probably want to move it
+			// its some other element, probably want to move it
 			if (!event.shiftKey && !selectedModel.model.selected) {
 				this.diagramModel.clearSelection();
 			}
