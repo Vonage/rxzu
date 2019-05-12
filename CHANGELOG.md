@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v1.3.0...v1.4.0) (2019-05-12)
+
+
+### Features
+
+* **multiple selection:** selection box, multiple entities selection ([ef6677a](https://github.com/DanielNetzer/ngx-diagrams/commit/ef6677a))
+
 # [1.3.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v1.2.0...v1.3.0) (2019-05-11)
 
 
