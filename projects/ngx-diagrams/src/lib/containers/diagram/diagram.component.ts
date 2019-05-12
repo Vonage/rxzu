@@ -16,8 +16,10 @@ import { NodeModel } from '../../models/node.model';
 import { LinkModel } from '../../models/link.model';
 import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
 import { share, filter } from 'rxjs/operators';
-import { BaseAction, MoveCanvasAction } from '../../actions';
+import { BaseAction, MoveCanvasAction, SelectingAction } from '../../actions';
 import { BaseModel } from '../../models/base.model';
+import { MoveItemsAction } from '../../actions/move-items.action';
+import { PointModel } from '../../models/point.model';
 
 @Component({
 	selector: 'ngdx-diagram',
@@ -40,13 +42,14 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 	@ViewChild('linksLayer', { read: ViewContainerRef }) linksLayer: ViewContainerRef;
 	@ViewChild('canvas', { read: ElementRef }) canvas: ElementRef;
 
-	private nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
-	private links$: BehaviorSubject<{ [s: string]: LinkModel }>;
+	private nodes$: Observable<{ [s: string]: NodeModel }>;
+	private links$: Observable<{ [s: string]: LinkModel }>;
 	private action$: BehaviorSubject<BaseAction> = new BehaviorSubject(null);
 	private offsetX$: Observable<number>;
 	private offsetY$: Observable<number>;
 	private zoomLevel$: Observable<number>;
 	private nodesRendered$: BehaviorSubject<boolean>;
+	private shouldDrawSelectionBox$: BehaviorSubject<boolean>;
 
 	private mouseUpListener = () => {};
 	private mouseMoveListener = () => {};
@@ -133,29 +136,15 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 		this.actionStartedFiring.emit(action);
 	}
 
-	onMouseUp = (event: MouseEvent) => {
-		this.mouseUpListener();
-		this.mouseMoveListener();
-		this.action$.next(null);
-	};
-
-	onMouseMove = (event: MouseEvent) => {
-		const action = this.action$.value;
-
-		if (action === null || action === undefined) {
-			return;
+	shouldDrawSelectionBox() {
+		const action = this.action$.getValue();
+		if (action instanceof SelectingAction) {
+			// get initial dimensions
+			action.getBoxDimensions();
+			return true;
 		}
-
-		if (action instanceof MoveCanvasAction) {
-			if (this.allowCanvasTranslation) {
-				this.diagramModel.setOffset(
-					action.initialOffsetX + (event.clientX - action.mouseX),
-					action.initialOffsetY + (event.clientY - action.mouseY)
-				);
-				this.fireAction();
-			}
-		}
-	};
+		return false;
+	}
 
 	getMouseElement(event: MouseEvent): { model: BaseModel; element: Element } {
 		const target = event.target as Element;
@@ -202,6 +191,83 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 		return null;
 	}
 
+	onMouseUp = (event: MouseEvent) => {
+		// TODO: handle mouse up events!
+		// https://github.com/projectstorm/react-diagrams/blob/master/src/widgets/DiagramWidget.tsx#L315-L403
+
+		const action = this.action$.getValue();
+
+		// are we going to connect a link to something?
+		if (action instanceof MoveItemsAction) {
+			const element = this.getMouseElement(event);
+			action.selectionModels.forEach(model => {
+				// only care about points connecting to things
+				if (!(model.model instanceof PointModel)) {
+					return;
+				}
+			});
+		}
+
+		this.mouseUpListener();
+		this.mouseMoveListener();
+		this.action$.next(null);
+	};
+
+	onMouseMove = (event: MouseEvent) => {
+		const action = this.action$.value;
+
+		if (action === null || action === undefined) {
+			return;
+		}
+
+		if (action instanceof SelectingAction) {
+			const relative = this.diagramModel.getDiagramEngine().getRelativePoint(event.clientX, event.clientY);
+
+			Object.values(this.diagramModel.getNodes()).forEach(node => {
+				if ((action as SelectingAction).containsElement(node.getX(), node.getY(), this.diagramModel)) {
+					node.selected = true;
+				}
+			});
+
+			Object.values(this.diagramModel.getLinks()).forEach(link => {
+				let allSelected = true;
+				link.getPoints().forEach(point => {
+					if ((action as SelectingAction).containsElement(point.getX(), point.getY(), this.diagramModel)) {
+						point.selected = true;
+					} else {
+						allSelected = false;
+					}
+				});
+
+				if (allSelected) {
+					link.selected = true;
+				}
+			});
+
+			action.mouseX2 = relative.x;
+			action.mouseY2 = relative.y;
+
+			this.fireAction();
+			this.action$.next(action);
+			return;
+		}
+
+		if (action instanceof MoveItemsAction) {
+			// TODO: handle moving of items around
+			// https://github.com/projectstorm/react-diagrams/blob/master/src/widgets/DiagramWidget.tsx#L244-L288
+		}
+
+		if (action instanceof MoveCanvasAction) {
+			if (this.allowCanvasTranslation) {
+				this.diagramModel.setOffset(
+					action.initialOffsetX + (event.clientX - action.mouseX),
+					action.initialOffsetY + (event.clientY - action.mouseY)
+				);
+				this.fireAction();
+			}
+		}
+	};
+
 	onMouseDown(event: MouseEvent) {
 		if (event.button === 3) {
 			return;
@@ -216,11 +282,14 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 			// multiple selection
 			if (event.shiftKey) {
 				// initiate multiple selection selector
+				const relative = this.diagramModel.getDiagramEngine().getRelativePoint(event.clientX, event.clientY);
+				this.startFiringAction(new SelectingAction(relative.x, relative.y));
 			} else {
+				// drag canvas action
+				this.diagramModel.clearSelection();
 				this.startFiringAction(new MoveCanvasAction(event.clientX, event.clientY, this.diagramModel));
 			}
 		} else {
-			// console.log(selectedModel);
 		}
 
 		// create mouseMove and mouseUp listeners

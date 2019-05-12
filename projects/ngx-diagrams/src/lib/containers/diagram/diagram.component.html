@@ -32,4 +32,16 @@
 	>
 		<ng-template #linksLayer></ng-template>
 	</div>
+
+	<!-- Selection Box -->
+	<div
+		*ngIf="shouldDrawSelectionBox() && action$ | async as action"
+		class="selector"
+		[ngStyle]="{
+			top: action.dimensions.top + 'px',
+			left: action.dimensions.left + 'px',
+			width: action.dimensions.width + 'px',
+			height: action.dimensions.height + 'px'
+		}"
+	></div>
 </div>

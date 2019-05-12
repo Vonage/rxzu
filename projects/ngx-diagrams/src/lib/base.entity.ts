@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { map, mapTo, takeUntil } from 'rxjs/operators';
 import { BaseEvent, createBaseEvent, createLockedEvent, LockEvent } from './interfaces/event.interface';
 
-export type BaseEntityType = 'node' | 'link' | 'port';
+export type BaseEntityType = 'node' | 'link' | 'port' | 'point';
 
 export class BaseEntity {
 	private _id: string;

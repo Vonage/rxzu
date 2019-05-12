@@ -11,6 +11,7 @@ import { PortModel } from '../models/port.model';
 import { BehaviorSubject } from 'rxjs';
 import { take, delay, filter } from 'rxjs/operators';
 import { DefaultLinkFactory } from '../defaults/factories/default-link.factory';
+import { BaseEntity } from '../base.entity';
 
 @Injectable({ providedIn: 'root' })
 export class DiagramEngine {
@@ -221,6 +222,18 @@ export class DiagramEngine {
 	getRelativePoint(x: number, y: number) {
 		const canvasRect = this.canvas$.getValue().getBoundingClientRect();
 		return { x: x - canvasRect.left, y: y - canvasRect.top };
+	}
+
+	getDiagramModel() {
+		return this.diagramModel;
+	}
+
+	isModelLocked(model: BaseEntity) {
+		if (this.diagramModel.getLocked()) {
+			return true;
+		}
+
+		return model.getLocked();
 	}
 
 	/**

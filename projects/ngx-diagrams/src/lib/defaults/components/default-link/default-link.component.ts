@@ -30,9 +30,8 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 
 			// draw the smoothing
 			// if the points are too close, just draw a straight line
-			console.log(Math.abs(points[0][xOrY] - points[1][xOrY]) < 150);
 			let isStraight = false;
-			if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 150) {
+			if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 50) {
 				isStraight = true;
 			}
 

@@ -50,6 +50,14 @@ export class NodeModel extends BaseModel<DiagramModel> {
 		this.y$.next(y);
 	}
 
+	getX() {
+		return this.x$.getValue();
+	}
+
+	getY() {
+		return this.y$.getValue();
+	}
+
 	selectX() {
 		return this.x$.asObservable();
 	}
