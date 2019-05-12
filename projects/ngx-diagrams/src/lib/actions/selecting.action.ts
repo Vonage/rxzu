@@ -33,14 +33,14 @@ export class SelectingAction extends BaseAction {
 	}
 
 	containsElement(x: number, y: number, diagramModel: DiagramModel): boolean {
-		const z = diagramModel.getZoomLevel().getValue() / 100.0;
+		const z = diagramModel.getZoomLevel() / 100.0;
 		const dimensions = this.getBoxDimensions();
 
 		return (
-			x * z + diagramModel.getOffsetX().getValue() > dimensions.left &&
-			x * z + diagramModel.getOffsetX().getValue() < dimensions.right &&
-			y * z + diagramModel.getOffsetY().getValue() > dimensions.top &&
-			y * z + diagramModel.getOffsetY().getValue() < dimensions.bottom
+			x * z + diagramModel.getOffsetX() > dimensions.left &&
+			x * z + diagramModel.getOffsetX() < dimensions.right &&
+			y * z + diagramModel.getOffsetY() > dimensions.top &&
+			y * z + diagramModel.getOffsetY() < dimensions.bottom
 		);
 	}
 }

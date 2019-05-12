@@ -125,24 +125,36 @@ export class DiagramModel extends BaseEntity {
 		this.offsetX$.next(x);
 	}
 
-	getOffsetX(): BehaviorSubject<number> {
-		return this.offsetX$;
+	getOffsetX(): number {
+		return this.offsetX$.getValue();
+	}
+
+	selectOffsetX(): Observable<number> {
+		return this.offsetX$.asObservable();
 	}
 
 	setOffsetY(y: number) {
 		this.offsetY$.next(y);
 	}
 
-	getOffsetY(): BehaviorSubject<number> {
-		return this.offsetY$;
+	getOffsetY(): number {
+		return this.offsetY$.getValue();
+	}
+
+	selectOffsetY(): Observable<number> {
+		return this.offsetY$.asObservable();
 	}
 
 	setZoomLevel(z: number) {
 		this.zoom$.next(z);
 	}
 
-	getZoomLevel(): BehaviorSubject<number> {
-		return this.zoom$;
+	getZoomLevel(): number {
+		return this.zoom$.getValue();
+	}
+
+	selectZoomLevel(): Observable<number> {
+		return this.zoom$.asObservable();
 	}
 
 	getDiagramEngine(): DiagramEngine {
@@ -156,6 +168,13 @@ export class DiagramModel extends BaseEntity {
 			}
 			element.selected = false;
 		});
+	}
+
+	getGridPosition(pos: number) {
+		if (this.gridSize$.getValue() === 0) {
+			return pos;
+		}
+		return this.gridSize$.getValue() * Math.floor((pos + this.gridSize$.getValue() / 2) / this.gridSize$.getValue());
 	}
 
 	getSelectedItems(...filters: BaseEntityType[]): BaseModel[] {

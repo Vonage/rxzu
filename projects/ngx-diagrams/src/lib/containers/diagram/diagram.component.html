@@ -5,11 +5,11 @@
 		[ngStyle]="{
 			transform:
 				'translate(' +
-				(diagramModel.getOffsetX() | async) +
+				(diagramModel.selectOffsetX() | async) +
 				'px, ' +
-				(diagramModel.getOffsetY() | async) +
+				(diagramModel.selectOffsetY() | async) +
 				'px) scale(' +
-				(diagramModel.getZoomLevel() | async) / 100.0 +
+				(diagramModel.selectZoomLevel() | async) / 100.0 +
 				')'
 		}"
 	>
@@ -22,11 +22,11 @@
 		[ngStyle]="{
 			transform:
 				'translate(' +
-				(diagramModel.getOffsetX() | async) +
+				(diagramModel.selectOffsetX() | async) +
 				'px, ' +
-				(diagramModel.getOffsetY() | async) +
+				(diagramModel.selectOffsetY() | async) +
 				'px) scale(' +
-				(diagramModel.getZoomLevel() | async) / 100.0 +
+				(diagramModel.selectZoomLevel() | async) / 100.0 +
 				')'
 		}"
 	>
@@ -35,7 +35,7 @@
 
 	<!-- Selection Box -->
 	<div
-		*ngIf="shouldDrawSelectionBox() && action$ | async as action"
+		*ngIf="shouldDrawSelectionBox() && selectAction() | async as action"
 		class="selector"
 		[ngStyle]="{
 			top: action.dimensions.top + 'px',

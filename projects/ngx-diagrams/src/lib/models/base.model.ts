@@ -24,10 +24,6 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 		this._type = type;
 	}
 
-	getLocked(): boolean {
-		return this.getParent().getLocked() || super.getLocked();
-	}
-
 	getParent(): X {
 		return this._parent.value;
 	}

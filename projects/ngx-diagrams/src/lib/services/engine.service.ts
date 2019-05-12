@@ -151,12 +151,8 @@ export class DiagramEngine {
 		const rel = this.getRelativePoint(sourceRect.left, sourceRect.top);
 
 		return {
-			x:
-				sourceElement.offsetWidth / 2 +
-				(rel.x - this.diagramModel.getOffsetX().getValue()) / (this.diagramModel.getZoomLevel().getValue() / 100.0),
-			y:
-				sourceElement.offsetHeight / 2 +
-				(rel.y - this.diagramModel.getOffsetY().getValue()) / (this.diagramModel.getZoomLevel().getValue() / 100.0)
+			x: sourceElement.offsetWidth / 2 + (rel.x - this.diagramModel.getOffsetX()) / (this.diagramModel.getZoomLevel() / 100.0),
+			y: sourceElement.offsetHeight / 2 + (rel.y - this.diagramModel.getOffsetY()) / (this.diagramModel.getZoomLevel() / 100.0)
 		};
 	}
 
@@ -176,11 +172,8 @@ export class DiagramEngine {
 		const canvasRect = this.canvas$.getValue().getBoundingClientRect() as ClientRect;
 
 		return {
-			x:
-				(sourceRect.x - this.diagramModel.getOffsetX().getValue()) / (this.diagramModel.getZoomLevel().getValue() / 100.0) -
-				canvasRect.left,
-			y:
-				(sourceRect.y - this.diagramModel.getOffsetY().getValue()) / (this.diagramModel.getZoomLevel().getValue() / 100.0) - canvasRect.top,
+			x: (sourceRect.x - this.diagramModel.getOffsetX()) / (this.diagramModel.getZoomLevel() / 100.0) - canvasRect.left,
+			y: (sourceRect.y - this.diagramModel.getOffsetY()) / (this.diagramModel.getZoomLevel() / 100.0) - canvasRect.top,
 			width: sourceRect.width,
 			height: sourceRect.height
 		};
@@ -214,8 +207,8 @@ export class DiagramEngine {
 	getRelativeMousePoint(event: MouseEvent): { x: number; y: number } {
 		const point = this.getRelativePoint(event.clientX, event.clientY);
 		return {
-			x: (point.x - this.diagramModel.getOffsetX().value) / (this.diagramModel.getZoomLevel().value / 100.0),
-			y: (point.y - this.diagramModel.getOffsetY().value) / (this.diagramModel.getZoomLevel().value / 100.0)
+			x: (point.x - this.diagramModel.getOffsetX()) / (this.diagramModel.getZoomLevel() / 100.0),
+			y: (point.y - this.diagramModel.getOffsetY()) / (this.diagramModel.getZoomLevel() / 100.0)
 		};
 	}
 
@@ -252,7 +245,7 @@ export class DiagramEngine {
 				const yFactor = canvas.clientHeight / canvas.scrollHeight;
 				const zoomFactor = xFactor < yFactor ? xFactor : yFactor;
 
-				this.diagramModel.setZoomLevel(this.diagramModel.getZoomLevel().value * (zoomFactor - additionalZoomFactor));
+				this.diagramModel.setZoomLevel(this.diagramModel.getZoomLevel() * (zoomFactor - additionalZoomFactor));
 				this.diagramModel.setOffset(0, 0);
 			});
 	}

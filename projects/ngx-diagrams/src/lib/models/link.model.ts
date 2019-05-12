@@ -47,6 +47,20 @@ export class LinkModel extends BaseModel<DiagramModel> {
 		super.remove();
 	}
 
+	doClone(lookupTable = {}, clone) {
+		clone.setPoints(
+			this.getPoints().map((point: PointModel) => {
+				return point.clone(lookupTable);
+			})
+		);
+		if (this.sourcePort) {
+			clone.setSourcePort(this.sourcePort.clone(lookupTable));
+		}
+		if (this.targetPort) {
+			clone.setTargetPort(this.targetPort.clone(lookupTable));
+		}
+	}
+
 	isLastPoint(point: PointModel) {
 		const index = this.getPointIndex(point);
 		return index === this.points.length - 1;
