@@ -1,18 +1,27 @@
 {
-  "name": "ngx-diagrams",
-  "peerDependencies": {
-    "@angular/common": ">= 6.0.0",
-    "@angular/core": ">= 6.0.0"
-  },
-  "keywords": [
-    "web",
-    "diagram",
-    "diagrams",
-    "angular",
-    "typescript",
-    "flowchart",
-    "links",
-    "nodes"
-  ],
-  "author": "DanielNetzer"
+	"name": "ngx-diagrams",
+	"peerDependencies": {
+		"lodash": ">= 4.0.0",
+		"@angular/common": ">= 6.0.0",
+		"@angular/core": ">= 6.0.0"
+	},
+	"keywords": [
+		"web",
+		"diagram",
+		"diagrams",
+		"angular",
+		"typescript",
+		"flowchart",
+		"links",
+		"nodes"
+	],
+	"author": "DanielNetzer",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/DanielNetzer/ngx-diagrams"
+	},
+	"devDependencies": {
+		"@types/lodash": "^4.14.126"
+	}
 }

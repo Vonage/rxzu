@@ -1,9 +1,12 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { NodeModel } from './node.model';
 import { LinkModel } from './link.model';
-import { BaseEntity } from '../base.entity';
+import { BaseEntity, BaseEntityType } from '../base.entity';
 import { DiagramEngine } from '../services/engine.service';
 import { BaseModel } from './base.model';
+import { uniq, flatMap } from 'lodash';
+import { PortModel } from './port.model';
+import { PointModel } from './point.model';
 
 export class DiagramModel extends BaseEntity {
 	links$: BehaviorSubject<{ [s: string]: LinkModel }>;
@@ -26,12 +29,20 @@ export class DiagramModel extends BaseEntity {
 	// TODO: support the following events for links and nodes
 	// removed, updated<positionChanged/dataChanged>, added
 
+	getNodes(): { [s: string]: NodeModel } {
+		return this.nodes$.getValue();
+	}
+
 	getNode(id: string): NodeModel | null {
 		return this.nodes$.getValue()[id];
 	}
 
 	getLink(id: string): LinkModel | null {
 		return this.links$.getValue()[id];
+	}
+
+	getLinks(): { [s: string]: LinkModel } {
+		return this.links$.getValue();
 	}
 
 	/**
@@ -58,8 +69,8 @@ export class DiagramModel extends BaseEntity {
 	/**
 	 * Get nodes behaviour subject, use `.getValue()` for snapshot
 	 */
-	selectNodes(): BehaviorSubject<{ [s: string]: NodeModel }> {
-		return this.nodes$;
+	selectNodes(): Observable<{ [s: string]: NodeModel }> {
+		return this.nodes$.asObservable();
 	}
 
 	/**
@@ -86,8 +97,8 @@ export class DiagramModel extends BaseEntity {
 	/**
 	 * Get links behaviour subject, use `.getValue()` for snapshot
 	 */
-	selectLinks(): BehaviorSubject<{ [s: string]: LinkModel }> {
-		return this.links$;
+	selectLinks(): Observable<{ [s: string]: LinkModel }> {
+		return this.links$.asObservable();
 	}
 
 	/**
@@ -114,28 +125,108 @@ export class DiagramModel extends BaseEntity {
 		this.offsetX$.next(x);
 	}
 
-	getOffsetX(): BehaviorSubject<number> {
-		return this.offsetX$;
+	getOffsetX(): number {
+		return this.offsetX$.getValue();
+	}
+
+	selectOffsetX(): Observable<number> {
+		return this.offsetX$.asObservable();
 	}
 
 	setOffsetY(y: number) {
 		this.offsetY$.next(y);
 	}
 
-	getOffsetY(): BehaviorSubject<number> {
-		return this.offsetY$;
+	getOffsetY(): number {
+		return this.offsetY$.getValue();
+	}
+
+	selectOffsetY(): Observable<number> {
+		return this.offsetY$.asObservable();
 	}
 
 	setZoomLevel(z: number) {
 		this.zoom$.next(z);
 	}
 
-	getZoomLevel(): BehaviorSubject<number> {
-		return this.zoom$;
+	getZoomLevel(): number {
+		return this.zoom$.getValue();
+	}
+
+	selectZoomLevel(): Observable<number> {
+		return this.zoom$.asObservable();
 	}
 
 	getDiagramEngine(): DiagramEngine {
 		return this.diagramEngine;
+	}
+
+	clearSelection(ignore: BaseModel | null = null) {
+		this.getSelectedItems().forEach(element => {
+			if (ignore && ignore.id === element.id) {
+				return;
+			}
+			element.selected = false;
+		});
+	}
+
+	getGridPosition(pos: number) {
+		if (this.gridSize$.getValue() === 0) {
+			return pos;
+		}
+		return this.gridSize$.getValue() * Math.floor((pos + this.gridSize$.getValue() / 2) / this.gridSize$.getValue());
+	}
+
+	getSelectedItems(...filters: BaseEntityType[]): BaseModel[] {
+		if (!Array.isArray(filters)) {
+			filters = [filters];
+		}
+		let items = [];
+
+		// run through nodes
+		items = items.concat(
+			flatMap(this.nodes$.getValue(), node => {
+				return node.getSelectedEntities();
+			})
+		);
+
+		// find all the links
+		items = items.concat(
+			flatMap(this.links$.getValue(), link => {
+				return link.getSelectedEntities();
+			})
+		);
+
+		// find all points
+		items = items.concat(
+			flatMap(this.links$.getValue(), link => {
+				return flatMap(link.getPoints(), point => {
+					return point.getSelectedEntities();
+				});
+			})
+		);
+
+		items = uniq(items);
+
+		if (filters.length > 0) {
+			items = uniq(items).filter((item: BaseModel) => {
+				if (filters.includes('node') && item instanceof NodeModel) {
+					return true;
+				}
+				if (filters.includes('link') && item instanceof LinkModel) {
+					return true;
+				}
+				if (filters.includes('port') && item instanceof PortModel) {
+					return true;
+				}
+				if (filters.includes('point') && item instanceof PointModel) {
+					return true;
+				}
+				return false;
+			});
+		}
+
+		return items;
 	}
 
 	addAll(...models: BaseModel[]) {

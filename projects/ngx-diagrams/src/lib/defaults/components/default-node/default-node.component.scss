@@ -1,12 +1,21 @@
-.default-node {
-	width: 100%;
-	border-radius: 10px;
-	transition: all 0.3s ease-in-out;
+:host {
+	&.selected {
+		.default-node {
+			background-color: white !important;
+			border-color: blue;
+		}
+	}
 
-	cursor: auto;
-	.title {
-		padding: 10px;
-		text-align: center;
-		border-bottom: 1px solid blue;
+	.default-node {
+		width: 100%;
+		border-radius: 10px;
+		transition: all 0.3s ease-in-out;
+
+		cursor: auto;
+		.title {
+			padding: 10px;
+			text-align: center;
+			border-bottom: 1px solid blue;
+		}
 	}
 }

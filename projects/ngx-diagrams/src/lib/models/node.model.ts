@@ -35,11 +35,36 @@ export class NodeModel extends BaseModel<DiagramModel> {
 	}
 
 	setPosition(x: number, y: number) {
-		// update ports position as well
-		// https://github.com/projectstorm/react-diagrams/blob/master/src/models/NodeModel.ts#L31-L44
+		const oldX = this.x$.getValue();
+		const oldY = this.y$.getValue();
+
+		Object.values(this.ports$.getValue()).forEach(port => {
+			Object.values(port.getLinks()).forEach(link => {
+				const point = link.getPointForPort(port);
+				point.setX(point.getX() + x - oldX);
+				point.setY(point.getY() + y - oldY);
+			});
+		});
 
 		this.x$.next(x);
 		this.y$.next(y);
+	}
+
+	getSelectedEntities() {
+		let entities = super.getSelectedEntities();
+
+		// add the points of each link that are selected here
+		if (this.selected) {
+			Object.values(this.ports$.getValue()).forEach(port => {
+				const links = Object.values(port.getLinks());
+				entities = entities.concat(
+					links.map(link => {
+						return link.getPointForPort(port);
+					})
+				);
+			});
+		}
+		return entities;
 	}
 
 	setX(x: number) {
@@ -48,6 +73,14 @@ export class NodeModel extends BaseModel<DiagramModel> {
 
 	setY(y: number) {
 		this.y$.next(y);
+	}
+
+	getX() {
+		return this.x$.getValue();
+	}
+
+	getY() {
+		return this.y$.getValue();
 	}
 
 	selectX() {

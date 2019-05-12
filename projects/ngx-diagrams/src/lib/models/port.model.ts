@@ -78,7 +78,7 @@ export class PortModel extends BaseModel<NodeModel> {
 	}
 
 	isLocked() {
-		// return super.getLocked() || this.get getParent().isLocked();
+		return super.getLocked();
 	}
 
 	public createLinkModel(): LinkModel | null {
@@ -90,8 +90,4 @@ export class PortModel extends BaseModel<NodeModel> {
 		}
 		return null;
 	}
-
-	// selectCoords() : Observable<number> {
-
-	// }
 }
