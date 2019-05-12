@@ -29,7 +29,6 @@
     [
       "@semantic-release/npm",
       {
-        "npmPublish": false,
         "pkgRoot": "dist/ngx-diagrams",
         "tarballDir": "dist"
       }
@@ -50,7 +49,6 @@
     [
       "@semantic-release/npm",
       {
-        "npmPublish": false,
         "pkgRoot": "dist/ngx-diagrams",
         "tarballDir": "dist"
       }
