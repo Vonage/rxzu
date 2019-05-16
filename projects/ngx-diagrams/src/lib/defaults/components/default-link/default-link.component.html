@@ -6,7 +6,7 @@
 			(mouseenter)="setSelected()"
 			[attr.stroke-width]="20"
 			[attr.stroke]="color"
-			[attr.stroke-linecap]="round"
+			[attr.stroke-linecap]="'round'"
 			[attr.data-linkid]="id"
 			[attr.stroke-opacity]="(selectSelected() | async) ? '0.1' : '0'"
 			[attr.d]="path$ | async"
