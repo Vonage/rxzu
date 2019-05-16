@@ -36,11 +36,11 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 		return this._parent$.pipe(map(p => createParentEvent<X>(this, p)));
 	}
 
-	get painted(): boolean {
+	getPainted(): boolean {
 		return this._painted.value;
 	}
 
-	set painted(painted: boolean) {
+	setPainted(painted: boolean = true) {
 		this._painted.next(painted);
 	}
 
@@ -48,15 +48,19 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 		return this._painted$.pipe(map(p => createPaintedEvent(this, p)));
 	}
 
-	get type(): string {
+	getType(): string {
 		return this._type;
 	}
 
-	get selected(): boolean {
+	getSelected(): boolean {
 		return this._selected.value;
 	}
 
-	set selected(selected: boolean) {
+	selectSelected(): Observable<boolean> {
+		return this._selected.asObservable();
+	}
+
+	setSelected(selected: boolean = true) {
 		this._selected.next(selected);
 	}
 

@@ -54,7 +54,7 @@ export class NodeModel extends BaseModel<DiagramModel> {
 		let entities = super.getSelectedEntities();
 
 		// add the points of each link that are selected here
-		if (this.selected) {
+		if (this.getSelected()) {
 			Object.values(this.ports$.getValue()).forEach(port => {
 				const links = Object.values(port.getLinks());
 				entities = entities.concat(

@@ -23,9 +23,9 @@ export class DefaultNodeComponent extends DefaultNodeModel implements OnInit {
 			)
 			.subscribe(ports => {
 				Object.values(ports).forEach(port => {
-					if (!port.painted) {
+					if (!port.getPainted()) {
 						this.generatePort(port);
-						port.painted = true;
+						port.setPainted();
 					}
 				});
 			});

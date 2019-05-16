@@ -61,13 +61,13 @@ export class DiagramEngine {
 	}
 
 	getFactoryForNode(node: NodeModel): AbstractNodeFactory | null {
-		return this.getNodeFactory(node.type);
+		return this.getNodeFactory(node.getType());
 	}
 
 	generateWidgetForNode(node: NodeModel, nodesHost: ViewContainerRef): ComponentRef<NodeModel> | null {
 		const nodeFactory = this.getFactoryForNode(node);
 		if (!nodeFactory) {
-			throw new Error(`Cannot find widget factory for node: ${node.type}`);
+			throw new Error(`Cannot find widget factory for node: ${node.getType()}`);
 		}
 		return nodeFactory.generateWidget(this, node, nodesHost);
 	}
@@ -89,13 +89,13 @@ export class DiagramEngine {
 	}
 
 	getFactoryForPort(port: PortModel): AbstractPortFactory | null {
-		return this.getPortFactory(port.type);
+		return this.getPortFactory(port.getType());
 	}
 
 	generateWidgetForPort(port: PortModel, portsHost: ViewContainerRef): ComponentRef<PortModel> | null {
 		const portFactory = this.getFactoryForPort(port);
 		if (!portFactory) {
-			throw new Error(`Cannot find widget factory for port: ${port.type}`);
+			throw new Error(`Cannot find widget factory for port: ${port.getType()}`);
 		}
 		return portFactory.generateWidget(port, portsHost);
 	}
@@ -117,13 +117,13 @@ export class DiagramEngine {
 	}
 
 	getFactoryForLink(link: LinkModel): AbstractLinkFactory | null {
-		return this.getLinkFactory(link.type);
+		return this.getLinkFactory(link.getType());
 	}
 
 	generateWidgetForLink(link: LinkModel, linksHost: ViewContainerRef): ComponentRef<LinkModel> | null {
 		const linkFactory = this.getFactoryForLink(link);
 		if (!linkFactory) {
-			throw new Error(`Cannot find link factory for link: ${link.type}`);
+			throw new Error(`Cannot find link factory for link: ${link.getType()}`);
 		}
 		return linkFactory.generateWidget(link, linksHost);
 	}

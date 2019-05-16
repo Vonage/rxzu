@@ -35,7 +35,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 	@Input() allowCanvasZoon = true;
 	@Input() allowCanvasTranslation = true;
 	@Input() inverseZoom = true;
-	@Input() allowLooseLinks = false;
+	@Input() allowLooseLinks = true;
 
 	@Output() actionStartedFiring: EventEmitter<BaseAction> = new EventEmitter();
 	@Output() actionStillFiring: EventEmitter<BaseAction> = new EventEmitter();
@@ -66,9 +66,9 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 			this.nodes$.subscribe(nodes => {
 				this.nodesRendered$.next(false);
 				Object.values(nodes).forEach(node => {
-					if (!node.painted) {
+					if (!node.getPainted()) {
 						this.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);
-						node.painted = true;
+						node.setPainted();
 					}
 				});
 				this.nodesRendered$.next(true);
@@ -81,7 +81,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 			.pipe(filter(([nodesRendered, _]) => !!nodesRendered))
 			.subscribe(([_, links]) => {
 				Object.values(links).forEach(link => {
-					if (!link.painted) {
+					if (!link.getPainted()) {
 						if (link.getSourcePort() !== null) {
 							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getSourcePort());
 							link.getPoints()[0].updateLocation(portCenter);
@@ -99,7 +99,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 						}
 
 						this.diagramModel.getDiagramEngine().generateWidgetForLink(link, this.linksLayer);
-						link.painted = true;
+						link.setPainted();
 					}
 				});
 			});
@@ -293,9 +293,9 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 
 			Object.values(this.diagramModel.getNodes()).forEach(node => {
 				if ((action as SelectingAction).containsElement(node.getX(), node.getY(), this.diagramModel)) {
-					node.selected = true;
+					node.setSelected();
 				} else {
-					node.selected = false;
+					node.setSelected(false);
 				}
 			});
 
@@ -303,15 +303,15 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 				let allSelected = true;
 				link.getPoints().forEach(point => {
 					if ((action as SelectingAction).containsElement(point.getX(), point.getY(), this.diagramModel)) {
-						point.selected = true;
+						point.setSelected();
 					} else {
-						point.selected = false;
+						point.setSelected(false);
 						allSelected = false;
 					}
 				});
 
 				if (allSelected) {
-					link.selected = true;
+					link.setSelected();
 				}
 			});
 
@@ -365,7 +365,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 		}
 
 		const selectedModel = this.getMouseElement(event);
-
+		console.log(selectedModel);
 		// canvas selected
 		if (selectedModel === null) {
 			// multiple selection
@@ -397,7 +397,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 					link.getLastPoint().updateLocation(relative);
 
 					this.diagramModel.clearSelection();
-					link.getLastPoint().selected = true;
+					link.getLastPoint().setSelected();
 					this.diagramModel.addLink(link);
 
 					this.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));
@@ -407,10 +407,10 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 			}
 		} else {
 			// its some other element, probably want to move it
-			if (!event.shiftKey && !selectedModel.model.selected) {
+			if (!event.shiftKey && !selectedModel.model.getSelected) {
 				this.diagramModel.clearSelection();
 			}
-			selectedModel.model.selected = true;
+			selectedModel.model.setSelected();
 
 			this.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));
 		}

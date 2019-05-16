@@ -2,6 +2,7 @@ import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
 import { PortModel } from './port.model';
 import { PointModel } from './point.model';
+import { Observable } from 'rxjs';
 
 export class LinkModel extends BaseModel<DiagramModel> {
 	// TODO: decide what should be reactive using RXJS

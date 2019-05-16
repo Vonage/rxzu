@@ -9,7 +9,6 @@
 		position: absolute;
 		background-color: rgba(0, 192, 255, 0.2);
 		border: solid 2px rgb(0, 192, 255);
-		z-index: 150;
 	}
 
 	.ngdx-nodes-layer {
@@ -22,7 +21,6 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
-		z-index: 100;
 	}
 
 	.ngdx-links-layer {
@@ -36,6 +34,5 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
-		z-index: 50;
 	}
 }

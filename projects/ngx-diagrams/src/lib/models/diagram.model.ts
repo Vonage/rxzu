@@ -166,7 +166,7 @@ export class DiagramModel extends BaseEntity {
 			if (ignore && ignore.id === element.id) {
 				return;
 			}
-			element.selected = false;
+			element.setSelected(false);
 		});
 	}
 
