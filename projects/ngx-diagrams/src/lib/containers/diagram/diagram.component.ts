@@ -364,8 +364,10 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 			return;
 		}
 
+		this.diagramModel.clearSelection();
+
 		const selectedModel = this.getMouseElement(event);
-		console.log(selectedModel);
+
 		// canvas selected
 		if (selectedModel === null) {
 			// multiple selection
