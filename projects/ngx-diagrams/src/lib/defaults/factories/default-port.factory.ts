@@ -1,10 +1,10 @@
 import { AbstractPortFactory } from '../../factories/port.factory';
 import { DefaultPortModel } from '../models/default-port.model';
-import { ViewContainerRef, ComponentRef, ComponentFactory, ComponentFactoryResolver } from '@angular/core';
+import { ViewContainerRef, ComponentRef, ComponentFactory, ComponentFactoryResolver, Renderer2 } from '@angular/core';
 import { DefaultPortComponent } from '../components/default-port/default-port.component';
 
 export class DefaultPortFactory extends AbstractPortFactory<DefaultPortModel> {
-	constructor(private resolver: ComponentFactoryResolver) {
+	constructor(private resolver: ComponentFactoryResolver, private renderer: Renderer2) {
 		super('default');
 	}
 
@@ -12,13 +12,13 @@ export class DefaultPortFactory extends AbstractPortFactory<DefaultPortModel> {
 		const componentRef = portsHost.createComponent(this.getRecipe());
 
 		// attach coordinates and default positional behaviour to the generated component host
-		const rootNode = (componentRef.hostView as any).rootNodes[0] as HTMLElement;
+		const rootNode = componentRef.location.nativeElement as HTMLElement;
 
 		// data attributes
-		rootNode.setAttribute('data-portid', port.id);
-		rootNode.setAttribute('data-name', port.getName());
+		this.renderer.setAttribute(rootNode, 'data-portid', port.id);
+		this.renderer.setAttribute(rootNode, 'data-name', port.getName());
 
-		port.in ? rootNode.classList.add('in') : rootNode.classList.add('out');
+		port.in ? this.renderer.addClass(rootNode, 'in') : this.renderer.addClass(rootNode, 'out');
 
 		// assign all passed properties to node initialization.
 		Object.entries(port).forEach(([key, value]) => {

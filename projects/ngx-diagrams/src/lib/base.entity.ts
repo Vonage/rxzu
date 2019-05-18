@@ -30,11 +30,11 @@ export class BaseEntity {
 	}
 
 	log(message: string, ...args: any): void {
-		_log(`${this._logPrefix} ${message}: `, ...args);
+		_log(`${this._logPrefix} ${message}: `, LOG_LEVEL.LOG, ...args);
 	}
 
 	withLog(message: string, ...args: any): any {
-		return _withLog(`${this._logPrefix} ${message}: `, ...args);
+		return _withLog(`${this._logPrefix} ${message}: `, LOG_LEVEL.LOG, ...args);
 	}
 
 	getLocked(): boolean {

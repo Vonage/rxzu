@@ -1,11 +1,11 @@
 import { DefaultNodeComponent } from '../components/default-node/default-node.component';
 import { AbstractNodeFactory } from '../../factories/node.factory';
-import { ComponentFactoryResolver, ViewContainerRef, ComponentRef, ComponentFactory } from '@angular/core';
+import { ComponentFactoryResolver, ViewContainerRef, ComponentRef, ComponentFactory, Renderer2 } from '@angular/core';
 import { DiagramEngine } from '../../services/engine.service.js';
 import { DefaultNodeModel } from '../models/default-node.model';
 
 export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
-	constructor(private resolver: ComponentFactoryResolver) {
+	constructor(private resolver: ComponentFactoryResolver, private renderer: Renderer2) {
 		super('default');
 	}
 
@@ -13,23 +13,23 @@ export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 		const componentRef = nodesHost.createComponent(this.getRecipe());
 
 		// attach coordinates and default positional behaviour to the generated component host
-		const rootNode = (componentRef.hostView as any).rootNodes[0] as HTMLElement;
+		const rootNode = componentRef.location.nativeElement;
 
 		// default style for node
-		rootNode.style.position = 'absolute';
-		rootNode.style.display = 'block';
+		this.renderer.setStyle(rootNode, 'position', 'absolute');
+		this.renderer.setStyle(rootNode, 'display', 'block');
 
 		// data attributes
-		rootNode.setAttribute('data-nodeid', node.id);
+		this.renderer.setAttribute(rootNode, 'data-nodeid', node.id);
 
 		// subscribe to node coordinates
 		node.selectCoords().subscribe(({ x, y }) => {
-			rootNode.style.left = `${x}px`;
-			rootNode.style.top = `${y}px`;
+			this.renderer.setStyle(rootNode, 'left', `${x}px`);
+			this.renderer.setStyle(rootNode, 'top', `${y}px`);
 		});
 
 		node.selectionChanges().subscribe(e => {
-			e.isSelected ? rootNode.classList.add('selected') : rootNode.classList.remove('selected');
+			e.isSelected ? this.renderer.addClass(rootNode, 'selected') : this.renderer.removeClass(rootNode, 'selected');
 		});
 
 		node.onEntityDestroy().subscribe(e => {
