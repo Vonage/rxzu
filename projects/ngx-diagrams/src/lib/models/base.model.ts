@@ -1,14 +1,7 @@
 import { BaseEntity } from '../base.entity';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import {
-	createPaintedEvent,
-	createParentEvent,
-	createSelectionEvent,
-	PaintedEvent,
-	ParentChangeEvent,
-	SelectionEvent
-} from '../interfaces/event.interface';
+import { map, takeUntil } from 'rxjs/operators';
+import { PaintedEvent, ParentChangeEvent, SelectionEvent } from '../interfaces/event.interface';
 
 export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 	private readonly _type: string;
@@ -19,13 +12,13 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 	private readonly _painted: BehaviorSubject<boolean> = new BehaviorSubject(false);
 	private readonly _painted$: Observable<boolean> = this._painted.asObservable();
 
-	constructor(type?: string, id?: string) {
-		super(id);
+	constructor(type?: string, id?: string, logPrefix = '[Base]') {
+		super(id, logPrefix);
 		this._type = type;
 	}
 
 	getParent(): X {
-		return this._parent.value;
+		return this._parent.getValue();
 	}
 
 	setParent(parent: X): void {
@@ -33,42 +26,52 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 	}
 
 	parentChanges(): Observable<ParentChangeEvent<X>> {
-		return this._parent$.pipe(map(p => createParentEvent<X>(this, p)));
+		return this._parent$.pipe(
+			takeUntil(this.onEntityDestroy()),
+			map(p => new ParentChangeEvent<X>(this, p))
+		);
 	}
 
-	get painted(): boolean {
-		return this._painted.value;
+	getPainted(): boolean {
+		return this._painted.getValue();
 	}
 
-	set painted(painted: boolean) {
+	setPainted(painted: boolean = true) {
 		this._painted.next(painted);
 	}
 
 	paintChanges(): Observable<PaintedEvent> {
-		return this._painted$.pipe(map(p => createPaintedEvent(this, p)));
+		return this._painted$.pipe(
+			takeUntil(this.onEntityDestroy()),
+			map(p => new PaintedEvent(this, p))
+		);
 	}
 
-	get type(): string {
+	getType(): string {
 		return this._type;
 	}
 
-	get selected(): boolean {
-		return this._selected.value;
+	getSelected(): boolean {
+		return this._selected.getValue();
 	}
 
-	set selected(selected: boolean) {
+	selectSelected(): Observable<boolean> {
+		return this._selected.asObservable();
+	}
+
+	setSelected(selected: boolean = true) {
 		this._selected.next(selected);
 	}
 
 	selectionChanges(): Observable<SelectionEvent> {
-		return this._selected$.pipe(map(s => createSelectionEvent(this, s)));
+		return this._selected$.pipe(
+			takeUntil(this.onEntityDestroy()),
+			map(s => new SelectionEvent(this, s)),
+			this.withLog('selectionChanges')
+		);
 	}
 
 	getSelectedEntities(): BaseModel[] {
 		return this._selected.value ? [this] : [];
-	}
-
-	public remove() {
-		this.destroy();
 	}
 }

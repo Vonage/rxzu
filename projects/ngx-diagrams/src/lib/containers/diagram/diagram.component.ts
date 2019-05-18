@@ -20,6 +20,7 @@ import { BaseAction, MoveCanvasAction, SelectingAction } from '../../actions';
 import { BaseModel } from '../../models/base.model';
 import { MoveItemsAction } from '../../actions/move-items.action';
 import { PointModel } from '../../models/point.model';
+import { Coordinates } from '../../interfaces/coords.interface';
 import { PortModel } from '../../models/port.model';
 import { some } from 'lodash';
 
@@ -35,7 +36,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 	@Input() allowCanvasZoon = true;
 	@Input() allowCanvasTranslation = true;
 	@Input() inverseZoom = true;
-	@Input() allowLooseLinks = false;
+	@Input() allowLooseLinks = true;
 
 	@Output() actionStartedFiring: EventEmitter<BaseAction> = new EventEmitter();
 	@Output() actionStillFiring: EventEmitter<BaseAction> = new EventEmitter();
@@ -66,9 +67,9 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 			this.nodes$.subscribe(nodes => {
 				this.nodesRendered$.next(false);
 				Object.values(nodes).forEach(node => {
-					if (!node.painted) {
+					if (!node.getPainted()) {
 						this.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);
-						node.painted = true;
+						node.setPainted();
 					}
 				});
 				this.nodesRendered$.next(true);
@@ -81,10 +82,10 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 			.pipe(filter(([nodesRendered, _]) => !!nodesRendered))
 			.subscribe(([_, links]) => {
 				Object.values(links).forEach(link => {
-					if (!link.painted) {
+					if (!link.getPainted()) {
 						if (link.getSourcePort() !== null) {
 							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getSourcePort());
-							link.getPoints()[0].updateLocation(portCenter);
+							link.getPoints()[0].setCoords(portCenter);
 
 							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getSourcePort());
 							link.getSourcePort().updateCoords(portCoords);
@@ -92,14 +93,14 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 
 						if (link.getTargetPort() !== null) {
 							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getTargetPort());
-							link.getPoints()[link.getPoints().length - 1].updateLocation(portCenter);
+							link.getPoints()[link.getPoints().length - 1].setCoords(portCenter);
 
 							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getTargetPort());
 							link.getTargetPort().updateCoords(portCoords);
 						}
 
 						this.diagramModel.getDiagramEngine().generateWidgetForLink(link, this.linksLayer);
-						link.painted = true;
+						link.setPainted();
 					}
 				});
 			});
@@ -216,7 +217,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 							newLink.removePointsBefore(newLink.getPoints()[link.getPointIndex(model.model)]);
 							link.removePointsAfter(model.model);
 							diagramEngine.getDiagramModel().addLink(newLink);
-							// if we are connecting to the same target or source, remove tweener points
+							// if we are connecting to the same target or source, destroy tweener points
 						} else if (link.getTargetPort() === element.model) {
 							link.removePointsAfter(model.model);
 						} else if (link.getSourcePort() === element.model) {
@@ -229,7 +230,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 				}
 			});
 
-			// check for / remove any loose links in any models which have been moved
+			// check for / destroy any loose links in any models which have been moved
 			if (!this.allowLooseLinks) {
 				action.selectionModels.forEach(model => {
 					// only care about points connecting to things
@@ -240,12 +241,12 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 					const selectedPoint: PointModel = model.model;
 					const link: LinkModel = selectedPoint.getLink();
 					if (link.getSourcePort() === null || link.getTargetPort() === null) {
-						link.remove();
+						link.destroy();
 					}
 				});
 			}
 
-			// remove any invalid links
+			// destroy any invalid links
 			action.selectionModels.forEach(model => {
 				// only care about points connecting to things
 				if (!(model.model instanceof PointModel)) {
@@ -258,7 +259,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 				if (sourcePort !== null && targetPort !== null) {
 					if (!sourcePort.canLinkToPort(targetPort)) {
 						// link not allowed
-						link.remove();
+						link.destroy();
 					} else if (
 						some(
 							Object.values(targetPort.getLinks()),
@@ -266,7 +267,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 						)
 					) {
 						// link is a duplicate
-						link.remove();
+						link.destroy();
 					}
 				}
 			});
@@ -282,7 +283,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 	};
 
 	onMouseMove = (event: MouseEvent) => {
-		const action = this.action$.value;
+		const action = this.action$.getValue();
 
 		if (action === null || action === undefined) {
 			return;
@@ -292,26 +293,26 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 			const relative = this.diagramModel.getDiagramEngine().getRelativePoint(event.clientX, event.clientY);
 
 			Object.values(this.diagramModel.getNodes()).forEach(node => {
-				if ((action as SelectingAction).containsElement(node.getX(), node.getY(), this.diagramModel)) {
-					node.selected = true;
+				if ((action as SelectingAction).containsElement(node.getCoords(), this.diagramModel)) {
+					node.setSelected();
 				} else {
-					node.selected = false;
+					node.setSelected(false);
 				}
 			});
 
 			Object.values(this.diagramModel.getLinks()).forEach(link => {
 				let allSelected = true;
 				link.getPoints().forEach(point => {
-					if ((action as SelectingAction).containsElement(point.getX(), point.getY(), this.diagramModel)) {
-						point.selected = true;
+					if ((action as SelectingAction).containsElement(point.getCoords(), this.diagramModel)) {
+						point.setSelected();
 					} else {
-						point.selected = false;
+						point.setSelected(false);
 						allSelected = false;
 					}
 				});
 
 				if (allSelected) {
-					link.selected = true;
+					link.setSelected();
 				}
 			});
 
@@ -322,15 +323,17 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 			this.action$.next(action);
 			return;
 		} else if (action instanceof MoveItemsAction) {
-			const amountX = event.clientX - action.mouseX;
-			const amountY = event.clientY - action.mouseY;
+			const coords: Coordinates = {
+				x: event.clientX - action.mouseX,
+				y: event.clientY - action.mouseY
+			};
 			const amountZoom = this.diagramModel.getZoomLevel() / 100;
 
 			action.selectionModels.forEach(model => {
 				// in this case we need to also work out the relative grid position
 				if (model.model instanceof NodeModel || (model.model instanceof PointModel && !model.model.isConnectedToPort())) {
-					model.model.setX(this.diagramModel.getGridPosition(model.initialX + amountX / amountZoom));
-					model.model.setY(this.diagramModel.getGridPosition(model.initialY + amountY / amountZoom));
+					const newCoords = { x: model.initialX + coords.x / amountZoom, y: model.initialY + coords.y / amountZoom };
+					model.model.setCoords(this.diagramModel.getGridPosition(newCoords));
 
 					if (model.model instanceof NodeModel) {
 						// update port coordinates as well
@@ -342,8 +345,8 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 				} else if (model.model instanceof PointModel) {
 					// we want points that are connected to ports, to not necessarily snap to grid
 					// this stuff needs to be pixel perfect, dont touch it
-					model.model.setX(model.initialX + this.diagramModel.getGridPosition(amountX / amountZoom));
-					model.model.setY(model.initialY + this.diagramModel.getGridPosition(amountY / amountZoom));
+					const newCoords = this.diagramModel.getGridPosition({ x: coords.x / amountZoom, y: coords.y / amountZoom });
+					model.model.setCoords({ x: model.initialX + newCoords.x, y: model.initialY + newCoords.y });
 				}
 			});
 
@@ -363,6 +366,8 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 		if (event.button === 3) {
 			return;
 		}
+
+		this.diagramModel.clearSelection();
 
 		const selectedModel = this.getMouseElement(event);
 
@@ -393,11 +398,11 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 					}
 					link.setTargetPort(null);
 
-					link.getFirstPoint().updateLocation(relative);
-					link.getLastPoint().updateLocation(relative);
+					link.getFirstPoint().setCoords(relative);
+					link.getLastPoint().setCoords(relative);
 
 					this.diagramModel.clearSelection();
-					link.getLastPoint().selected = true;
+					link.getLastPoint().setSelected();
 					this.diagramModel.addLink(link);
 
 					this.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));
@@ -407,10 +412,10 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 			}
 		} else {
 			// its some other element, probably want to move it
-			if (!event.shiftKey && !selectedModel.model.selected) {
+			if (!event.shiftKey && !selectedModel.model.getSelected) {
 				this.diagramModel.clearSelection();
 			}
-			selectedModel.model.selected = true;
+			selectedModel.model.setSelected();
 
 			this.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));
 		}

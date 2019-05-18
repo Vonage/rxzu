@@ -1,15 +1,17 @@
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { Coordinates } from '../interfaces/coords.interface';
+import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 
 export class PointModel extends BaseModel<LinkModel> {
-	private x$: BehaviorSubject<number>;
-	private y$: BehaviorSubject<number>;
+	private readonly _coords: BehaviorSubject<Coordinates>;
+	private readonly coords$: Observable<Coordinates>;
 
-	constructor(link: LinkModel, points: { x: number; y: number }) {
+	constructor(link: LinkModel, { x, y }: Coordinates) {
 		super();
-		this.x$ = new BehaviorSubject(points.x);
-		this.y$ = new BehaviorSubject(points.y);
+		this._coords = new BehaviorSubject<Coordinates>({ x, y });
+		this.coords$ = this._coords.asObservable();
 		this.setParent(link);
 	}
 
@@ -21,40 +23,35 @@ export class PointModel extends BaseModel<LinkModel> {
 		return this.getParent();
 	}
 
-	remove() {
+	destroy() {
 		if (this.getParent) {
 			this.getParent().removePoint(this);
 		}
 
-		super.remove();
+		super.destroy();
 	}
 
 	selectX(): Observable<number> {
-		return this.x$.asObservable();
-	}
-
-	getX(): number {
-		return this.x$.getValue();
+		return this.coords$.pipe(
+			takeUntil(this.onEntityDestroy()),
+			map(c => c.x),
+			distinctUntilChanged()
+		);
 	}
 
 	selectY(): Observable<number> {
-		return this.y$.asObservable();
+		return this.coords$.pipe(
+			takeUntil(this.onEntityDestroy()),
+			map(c => c.y),
+			distinctUntilChanged()
+		);
 	}
 
-	getY(): number {
-		return this.y$.getValue();
+	setCoords(newCoords: Partial<Coordinates>) {
+		this._coords.next({ ...this._coords.getValue(), ...newCoords });
 	}
 
-	setX(x: number) {
-		this.x$.next(x);
-	}
-
-	setY(y: number) {
-		this.y$.next(y);
-	}
-
-	updateLocation(points: { x: number; y: number }) {
-		this.setX(points.x);
-		this.setY(points.y);
+	getCoords(): Coordinates {
+		return this._coords.getValue();
 	}
 }

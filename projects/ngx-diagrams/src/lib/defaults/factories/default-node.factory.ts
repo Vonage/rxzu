@@ -32,9 +32,6 @@ export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 
 		node.onEntityDestroy().subscribe(e => {
 			componentRef.destroy();
-			xSub.unsubscribe();
-			ySub.unsubscribe();
-			isSelectedSub.unsubscribe();
 		});
 
 		// assign all passed properties to node initialization.

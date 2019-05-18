@@ -1,7 +1,8 @@
 import { Component, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { DefaultLinkModel } from '../../models/default-link.model';
 import { generateCurvePath } from '../../../utils/tool-kit.util';
-import { combineLatest, BehaviorSubject } from 'rxjs';
+import { combineLatest, BehaviorSubject, Observable } from 'rxjs';
+import { PointModel } from '../../../models/point.model';
 
 @Component({
 	selector: 'ngdx-default-link',
@@ -9,7 +10,9 @@ import { combineLatest, BehaviorSubject } from 'rxjs';
 	styleUrls: ['./default-link.component.scss']
 })
 export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewInit {
-	path$: BehaviorSubject<string> = new BehaviorSubject(null);
+	_path$: BehaviorSubject<string> = new BehaviorSubject(null);
+	path$: Observable<string> = this._path$.asObservable();
+	points$: BehaviorSubject<PointModel[]> = new BehaviorSubject([]);
 
 	constructor(private cdRef: ChangeDetectorRef) {
 		super('ngdx-default-link');
@@ -36,7 +39,16 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 			}
 
 			const path = generateCurvePath({ x: firstPX, y: firstPY }, { x: lastPX, y: lastPY }, isStraight ? 0 : this.curvyness);
-			this.path$.next(path);
+			this._path$.next(path);
+
+			if (!this.getTargetPort()) {
+				const danglingPoint = this.generatePoint(lastPX, lastPY);
+				this.points$.next([danglingPoint]);
+			}
+
+			// TODO: handle the multiple lines in between the points
+			// https://github.com/projectstorm/react-diagrams/blob/master/src/defaults/widgets/DefaultLinkWidget.tsx#L344-L371
+
 			this.cdRef.detectChanges();
 		});
 	}

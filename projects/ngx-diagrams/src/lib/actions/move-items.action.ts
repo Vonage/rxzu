@@ -20,10 +20,11 @@ export class MoveItemsAction extends BaseAction {
 		});
 
 		this.selectionModels = selectedItems.map((item: PointModel | NodeModel) => {
+			const { x: initialX, y: initialY } = item.getCoords();
 			return {
 				model: item,
-				initialX: item.getX(),
-				initialY: item.getY()
+				initialX,
+				initialY
 			};
 		});
 	}
