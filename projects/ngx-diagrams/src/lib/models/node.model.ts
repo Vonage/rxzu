@@ -2,7 +2,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { PortModel } from './port.model';
 import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
-import { Coordinates } from '../interfaces/coords.interface.js';
+import { Coords } from '../interfaces/coords.interface.js';
 import { DiagramEngine } from '../services/engine.service';
 import { distinctUntilChanged, map, pluck, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { Dimensions } from '../interfaces/dimensions.interface';
@@ -15,11 +15,11 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 
 	private readonly _extras: BehaviorSubject<{ [s: string]: any }>;
 	private readonly _ports: BehaviorSubject<{ [s: string]: P }>;
-	private readonly _coords: BehaviorSubject<Coordinates>;
+	private readonly _coords: BehaviorSubject<Coords>;
 	private readonly _dimensions: BehaviorSubject<Dimensions>;
 	private readonly extras$: Observable<{ [s: string]: any }>;
 	private readonly ports$: Observable<{ [s: string]: P }>;
-	private readonly coords$: Observable<Coordinates>;
+	private readonly coords$: Observable<Coords>;
 	private readonly dimensions$: Observable<Dimensions>;
 
 	constructor(
@@ -36,18 +36,18 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 		this._extras = new BehaviorSubject(extras);
 		this._ports = new BehaviorSubject({});
 		this._dimensions = new BehaviorSubject<Dimensions>({ width, height });
-		this._coords = new BehaviorSubject<Coordinates>({ x, y });
+		this._coords = new BehaviorSubject<Coords>({ x, y });
 		this.extras$ = this._extras.asObservable();
 		this.ports$ = this._ports.asObservable();
 		this.coords$ = this._coords.asObservable();
 		this.dimensions$ = this._dimensions.asObservable();
 	}
 
-	getCoords(): Coordinates {
+	getCoords(): Coords {
 		return this._coords.getValue();
 	}
 
-	setCoords({ x, y }: Coordinates) {
+	setCoords({ x, y }: Coords) {
 		const { x: oldX, y: oldY } = this.getCoords();
 
 		Object.values(this._ports.getValue()).forEach(port => {
@@ -82,13 +82,19 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 	}
 
 	// TODO: map to BaseEvent
-	coordsChanges(): Observable<Coordinates> {
+	coordsChanges(): Observable<Coords> {
 		return this.coords$.pipe(takeUntil(this.onEntityDestroy()));
 	}
 
-	selectX(): Observable<number> {
+	selectCoords(): Observable<Coords> {
 		return this.coords$.pipe(
 			takeUntil(this.onEntityDestroy()),
+			distinctUntilChanged()
+		);
+	}
+
+	selectX(): Observable<number> {
+		return this.selectCoords().pipe(
 			map(c => c.x),
 			this.withLog('selectX'),
 			distinctUntilChanged()
@@ -96,8 +102,7 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 	}
 
 	selectY(): Observable<number> {
-		return this.coords$.pipe(
-			takeUntil(this.onEntityDestroy()),
+		return this.selectCoords().pipe(
 			map(c => c.y),
 			this.withLog('selectY'),
 			distinctUntilChanged()

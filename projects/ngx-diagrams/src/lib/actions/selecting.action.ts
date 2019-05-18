@@ -1,6 +1,6 @@
 import { BaseAction } from './base.action';
 import { DiagramModel } from '../models/diagram.model';
-import { Coordinates } from '../interfaces/coords.interface.js';
+import { Coords } from '../interfaces/coords.interface.js';
 
 export class SelectingAction extends BaseAction {
 	mouseX2: number;
@@ -33,7 +33,7 @@ export class SelectingAction extends BaseAction {
 		return this.dimensions;
 	}
 
-	containsElement({ x, y }: Coordinates, diagramModel: DiagramModel): boolean {
+	containsElement({ x, y }: Coords, diagramModel: DiagramModel): boolean {
 		const z = diagramModel.getZoomLevel() / 100.0;
 		const dimensions = this.getBoxDimensions();
 

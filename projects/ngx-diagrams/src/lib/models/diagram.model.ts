@@ -7,7 +7,7 @@ import { BaseModel } from './base.model';
 import { uniq, flatMap } from 'lodash';
 import { PortModel } from './port.model';
 import { PointModel } from './point.model';
-import { Coordinates } from '../interfaces/coords.interface';
+import { Coords } from '../interfaces/coords.interface';
 import { ID } from '../utils/tool-kit.util';
 
 export class DiagramModel extends BaseEntity {
@@ -172,7 +172,7 @@ export class DiagramModel extends BaseEntity {
 		});
 	}
 
-	getGridPosition({ x, y }: Coordinates): Coordinates {
+	getGridPosition({ x, y }: Coords): Coords {
 		const gridSize = this.gridSize$.getValue();
 		if (gridSize === 0) {
 			return { x, y };

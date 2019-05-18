@@ -23,10 +23,12 @@ export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 		rootNode.setAttribute('data-nodeid', node.id);
 
 		// subscribe to node coordinates
-		const xSub = node.selectX().subscribe(x => (rootNode.style.left = `${x}px`));
-		const ySub = node.selectY().subscribe(y => (rootNode.style.top = `${y}px`));
+		node.selectCoords().subscribe(({ x, y }) => {
+			rootNode.style.left = `${x}px`;
+			rootNode.style.top = `${y}px`;
+		});
 
-		const isSelectedSub = node.selectionChanges().subscribe(e => {
+		node.selectionChanges().subscribe(e => {
 			e.isSelected ? rootNode.classList.add('selected') : rootNode.classList.remove('selected');
 		});
 

@@ -8,10 +8,11 @@
 
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { Coords } from '../interfaces/coords.interface';
 
-enum LOG_LEVEL {
-	'ERROR',
-	'LOG'
+export enum LOG_LEVEL {
+	'LOG',
+	'ERROR'
 }
 
 // @internal
@@ -114,7 +115,7 @@ export function generateLinePath(firstPoint: any, lastPoint: any): string {
 	return `M${firstPoint.x$},${firstPoint.y} L ${lastPoint.x$},${lastPoint.y}`;
 }
 
-export function generateCurvePath(firstPoint: { x: number; y: number }, lastPoint: { x: number; y: number }, curvy: number = 0): string {
+export function generateCurvePath(firstPoint: Coords, lastPoint: Coords, curvy: number = 0): string {
 	const isHorizontal = Math.abs(firstPoint.x - lastPoint.x) > Math.abs(firstPoint.y - lastPoint.y);
 	const curvyX = isHorizontal ? curvy : 0;
 	const curvyY = isHorizontal ? 0 : curvy;

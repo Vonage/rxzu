@@ -4,6 +4,7 @@ import { PortModel } from './port.model';
 import { PointModel } from './point.model';
 import { Observable } from 'rxjs';
 import { ID } from '../utils/tool-kit.util';
+import { Coords } from '../interfaces/coords.interface';
 
 export class LinkModel extends BaseModel<DiagramModel> {
 	// TODO: decide what should be reactive using RXJS
@@ -137,8 +138,8 @@ export class LinkModel extends BaseModel<DiagramModel> {
 		this.targetPort = port;
 	}
 
-	point(x: number, y: number): PointModel {
-		return this.addPoint(this.generatePoint(x, y));
+	point({ x, y }: Coords): PointModel {
+		return this.addPoint(this.generatePoint({ x, y }));
 	}
 
 	getPoints(): PointModel[] {
@@ -176,7 +177,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
 		return pointModel;
 	}
 
-	generatePoint(x: number = 0, y: number = 0): PointModel {
+	generatePoint({ x = 0, y = 0 }: Coords): PointModel {
 		return new PointModel(this, { x, y });
 	}
 }

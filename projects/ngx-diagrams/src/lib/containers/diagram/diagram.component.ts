@@ -20,7 +20,7 @@ import { BaseAction, MoveCanvasAction, SelectingAction } from '../../actions';
 import { BaseModel } from '../../models/base.model';
 import { MoveItemsAction } from '../../actions/move-items.action';
 import { PointModel } from '../../models/point.model';
-import { Coordinates } from '../../interfaces/coords.interface';
+import { Coords } from '../../interfaces/coords.interface';
 import { PortModel } from '../../models/port.model';
 import { some } from 'lodash';
 
@@ -323,7 +323,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 			this.action$.next(action);
 			return;
 		} else if (action instanceof MoveItemsAction) {
-			const coords: Coordinates = {
+			const coords: Coords = {
 				x: event.clientX - action.mouseX,
 				y: event.clientY - action.mouseY
 			};
