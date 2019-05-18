@@ -7,6 +7,8 @@ import { BaseModel } from './base.model';
 import { uniq, flatMap } from 'lodash';
 import { PortModel } from './port.model';
 import { PointModel } from './point.model';
+import { Coordinates } from '../interfaces/coords.interface';
+import { ID } from '../utils/tool-kit.util';
 
 export class DiagramModel extends BaseEntity {
 	links$: BehaviorSubject<{ [s: string]: LinkModel }>;
@@ -33,11 +35,11 @@ export class DiagramModel extends BaseEntity {
 		return this.nodes$.getValue();
 	}
 
-	getNode(id: string): NodeModel | null {
+	getNode(id: ID): NodeModel | null {
 		return this.nodes$.getValue()[id];
 	}
 
-	getLink(id: string): LinkModel | null {
+	getLink(id: ID): LinkModel | null {
 		return this.links$.getValue()[id];
 	}
 
@@ -58,11 +60,11 @@ export class DiagramModel extends BaseEntity {
 	 * Delete a node from the diagram
 	 */
 	deleteNode(nodeOrId: NodeModel | string): void {
-		const nodeId: string = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
+		const nodeID: ID = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
 
 		// TODO: delete all related links
 		const updNodes = { ...this.nodes$.value };
-		delete updNodes[nodeId];
+		delete updNodes[nodeID];
 		this.nodes$.next(updNodes);
 	}
 
@@ -86,10 +88,10 @@ export class DiagramModel extends BaseEntity {
 	 * Delete link
 	 */
 	deleteLink(linkOrId: LinkModel | string) {
-		const linkId: string = typeof linkOrId === 'string' ? linkOrId : linkOrId.id;
+		const linkID: ID = typeof linkOrId === 'string' ? linkOrId : linkOrId.id;
 
 		const updLinks = { ...this.links$.value };
-		delete updLinks[linkId];
+		delete updLinks[linkID];
 
 		this.links$.next(updLinks);
 	}
@@ -170,11 +172,15 @@ export class DiagramModel extends BaseEntity {
 		});
 	}
 
-	getGridPosition(pos: number) {
-		if (this.gridSize$.getValue() === 0) {
-			return pos;
+	getGridPosition({ x, y }: Coordinates): Coordinates {
+		const gridSize = this.gridSize$.getValue();
+		if (gridSize === 0) {
+			return { x, y };
 		}
-		return this.gridSize$.getValue() * Math.floor((pos + this.gridSize$.getValue() / 2) / this.gridSize$.getValue());
+		return {
+			x: gridSize * Math.floor((x + gridSize / 2) / gridSize),
+			y: gridSize * Math.floor((y + gridSize / 2) / gridSize)
+		};
 	}
 
 	getSelectedItems(...filters: BaseEntityType[]): BaseModel[] {

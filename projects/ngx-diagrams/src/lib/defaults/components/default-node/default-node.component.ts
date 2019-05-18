@@ -16,19 +16,14 @@ export class DefaultNodeComponent extends DefaultNodeModel implements OnInit {
 	}
 
 	ngOnInit() {
-		this.selectPorts()
-			.pipe(
-				distinctUntilChanged(),
-				takeUntil(this.onEntityDestroy())
-			)
-			.subscribe(ports => {
-				Object.values(ports).forEach(port => {
-					if (!port.getPainted()) {
-						this.generatePort(port);
-						port.setPainted();
-					}
-				});
+		this.selectPorts().subscribe(ports => {
+			ports.forEach(port => {
+				if (!port.getPainted()) {
+					this.generatePort(port);
+					port.setPainted();
+				}
 			});
+		});
 	}
 
 	generatePort(port: PortModel) {

@@ -3,6 +3,7 @@ import { DiagramModel } from './diagram.model';
 import { PortModel } from './port.model';
 import { PointModel } from './point.model';
 import { Observable } from 'rxjs';
+import { ID } from '../utils/tool-kit.util';
 
 export class LinkModel extends BaseModel<DiagramModel> {
 	// TODO: decide what should be reactive using RXJS
@@ -36,7 +37,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
 		this.extras = extras;
 	}
 
-	remove() {
+	destroy() {
 		if (this.sourcePort) {
 			this.sourcePort.removeLink(this);
 		}
@@ -45,7 +46,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
 			this.targetPort.removeLink(this);
 		}
 
-		super.remove();
+		super.destroy();
 	}
 
 	doClone(lookupTable = {}, clone) {
@@ -71,7 +72,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
 		return this.points.indexOf(point);
 	}
 
-	getPointModel(id: string): PointModel | null {
+	getPointModel(id: ID): PointModel | null {
 		for (const point of this.points) {
 			if (point.id === id) {
 				return point;
