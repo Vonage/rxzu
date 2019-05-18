@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v1.4.0...v1.5.0) (2019-05-18)
+
+
+### Features
+
+* **selection:** links, points selection ([ad6e1dd](https://github.com/DanielNetzer/ngx-diagrams/commit/ad6e1dd))
+
 # [1.4.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v1.3.0...v1.4.0) (2019-05-12)
 
 
