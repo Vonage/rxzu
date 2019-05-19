@@ -1,15 +1,17 @@
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { Coords } from '../interfaces/coords.interface';
+import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 
 export class PointModel extends BaseModel<LinkModel> {
-	private x$: BehaviorSubject<number>;
-	private y$: BehaviorSubject<number>;
+	private readonly _coords: BehaviorSubject<Coords>;
+	private readonly coords$: Observable<Coords>;
 
-	constructor(link: LinkModel, points: { x: number; y: number }) {
+	constructor(link: LinkModel, { x, y }: Coords) {
 		super();
-		this.x$ = new BehaviorSubject(points.x);
-		this.y$ = new BehaviorSubject(points.y);
+		this._coords = new BehaviorSubject<Coords>({ x, y });
+		this.coords$ = this._coords.asObservable();
 		this.setParent(link);
 	}
 
@@ -21,40 +23,40 @@ export class PointModel extends BaseModel<LinkModel> {
 		return this.getParent();
 	}
 
-	remove() {
+	destroy() {
 		if (this.getParent) {
 			this.getParent().removePoint(this);
 		}
 
-		super.remove();
+		super.destroy();
+	}
+
+	setCoords(newCoords: Partial<Coords>) {
+		this._coords.next({ ...this._coords.getValue(), ...newCoords });
+	}
+
+	selectCoords(): Observable<Coords> {
+		return this.coords$.pipe(
+			takeUntil(this.onEntityDestroy()),
+			distinctUntilChanged()
+		);
+	}
+
+	getCoords(): Coords {
+		return this._coords.getValue();
 	}
 
 	selectX(): Observable<number> {
-		return this.x$.asObservable();
-	}
-
-	getX(): number {
-		return this.x$.getValue();
+		return this.selectCoords().pipe(
+			map(c => c.x),
+			distinctUntilChanged()
+		);
 	}
 
 	selectY(): Observable<number> {
-		return this.y$.asObservable();
-	}
-
-	getY(): number {
-		return this.y$.getValue();
-	}
-
-	setX(x: number) {
-		this.x$.next(x);
-	}
-
-	setY(y: number) {
-		this.y$.next(y);
-	}
-
-	updateLocation(points: { x: number; y: number }) {
-		this.setX(points.x);
-		this.setY(points.y);
+		return this.selectCoords().pipe(
+			map(c => c.y),
+			distinctUntilChanged()
+		);
 	}
 }

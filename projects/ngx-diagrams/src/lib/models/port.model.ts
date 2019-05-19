@@ -49,7 +49,7 @@ export class PortModel extends BaseModel<NodeModel> {
 	}
 
 	removeLink(link: LinkModel) {
-		const links = this.links$.value;
+		const links = this.links$.getValue();
 		delete links[link.id];
 		this.links$.next({ ...links });
 	}
@@ -59,7 +59,7 @@ export class PortModel extends BaseModel<NodeModel> {
 	}
 
 	getLinks(): { [id: string]: LinkModel } {
-		return this.links$.value;
+		return this.links$.getValue();
 	}
 
 	selectLinks(): Observable<{ [id: string]: LinkModel }> {

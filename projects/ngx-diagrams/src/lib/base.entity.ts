@@ -1,31 +1,44 @@
-import { UID } from './utils/tool-kit.util';
+import { ID, log as _log, withLog as _withLog, UID, withLog } from './utils/tool-kit.util';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { map, mapTo, takeUntil } from 'rxjs/operators';
-import { BaseEvent, createBaseEvent, createLockedEvent, LockEvent } from './interfaces/event.interface';
+import { BaseEvent, LockEvent } from './interfaces/event.interface';
 
 export type BaseEntityType = 'node' | 'link' | 'port' | 'point';
 
 export class BaseEntity {
-	private _id: string;
+	private _id: ID;
+	/**
+	 * a prefix to make logs more easier
+	 */
+	private _logPrefix;
 	private _destroyed: Subject<void> = new Subject();
 	private _destroyed$: Observable<void> = this._destroyed.asObservable();
 	private _locked: BehaviorSubject<boolean> = new BehaviorSubject(false);
 	private _locked$: Observable<boolean> = this._locked.asObservable();
 
-	constructor(id?: string) {
+	constructor(id?: ID, logPrefix = '') {
 		this._id = id || UID();
+		this._logPrefix = `${logPrefix}`;
 	}
 
-	public get id(): string {
+	public get id(): ID {
 		return this._id;
 	}
 
-	public set id(id: string) {
+	public set id(id: ID) {
 		this._id = id;
 	}
 
+	log(message: string, ...args: any): void {
+		_log(`${this._logPrefix} ${message}: `, LOG_LEVEL.LOG, ...args);
+	}
+
+	withLog(message: string, ...args: any): any {
+		return _withLog(`${this._logPrefix} ${message}: `, LOG_LEVEL.LOG, ...args);
+	}
+
 	getLocked(): boolean {
-		return this._locked.value;
+		return this._locked.getValue();
 	}
 
 	setLocked(locked: boolean = true) {
@@ -52,17 +65,19 @@ export class BaseEntity {
 
 	public lockChanges(): Observable<LockEvent> {
 		return this._locked$.pipe(
-			takeUntil(this._destroyed$),
-			map(locked => createLockedEvent(this, locked))
+			takeUntil(this.onEntityDestroy()),
+			map(locked => new LockEvent(this, locked)),
+			this.withLog('lockChanges')
 		);
 	}
 
 	public destroy() {
+		this.log('entity destroyed');
 		this._destroyed.next();
 		this._destroyed.complete();
 	}
 
 	public onEntityDestroy(): Observable<BaseEvent<BaseEntity>> {
-		return this._destroyed$.pipe(mapTo(createBaseEvent(this)));
+		return this._destroyed$.pipe(mapTo(new BaseEvent(this)));
 	}
 }

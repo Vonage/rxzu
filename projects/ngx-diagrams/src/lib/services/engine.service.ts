@@ -1,4 +1,4 @@
-import { Injectable, ComponentFactoryResolver, ViewContainerRef, ComponentRef } from '@angular/core';
+import { Injectable, ComponentFactoryResolver, ViewContainerRef, ComponentRef, Renderer2, RendererFactory2 } from '@angular/core';
 import { AbstractNodeFactory } from '../factories/node.factory';
 import { DiagramModel } from '../models/diagram.model';
 import { DefaultNodeFactory } from '../defaults/factories/default-node.factory';
@@ -15,15 +15,16 @@ import { BaseEntity } from '../base.entity';
 
 @Injectable({ providedIn: 'root' })
 export class DiagramEngine {
-	diagramModel: DiagramModel;
-
+	private _renderer: Renderer2;
 	private nodeFactories: { [s: string]: AbstractNodeFactory };
 	private linkFactories: { [s: string]: AbstractLinkFactory };
 	private portFactories: { [s: string]: AbstractPortFactory };
-
 	private canvas$: BehaviorSubject<Element>;
 
-	constructor(private resolver: ComponentFactoryResolver) {
+	diagramModel: DiagramModel;
+
+	constructor(private resolver: ComponentFactoryResolver, private rendererFactory: RendererFactory2) {
+		this._renderer = rendererFactory.createRenderer(null, null);
 		this.nodeFactories = {};
 		this.linkFactories = {};
 		this.portFactories = {};
@@ -36,9 +37,9 @@ export class DiagramEngine {
 	}
 
 	registerDefaultFactories() {
-		this.registerNodeFactory(new DefaultNodeFactory(this.resolver));
-		this.registerPortFactory(new DefaultPortFactory(this.resolver));
-		this.registerLinkFactory(new DefaultLinkFactory(this.resolver));
+		this.registerNodeFactory(new DefaultNodeFactory(this.resolver, this._renderer));
+		this.registerPortFactory(new DefaultPortFactory(this.resolver, this._renderer));
+		this.registerLinkFactory(new DefaultLinkFactory(this.resolver, this._renderer));
 
 		// TODO: implement defaultLinkFactory
 	}

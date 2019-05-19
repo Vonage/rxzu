@@ -1,10 +1,10 @@
 import { AbstractLinkFactory } from '../../factories/link.factory';
 import { DefaultLinkComponent } from '../components/default-link/default-link.component';
 import { DefaultLinkModel } from '../models/default-link.model';
-import { ViewContainerRef, ComponentRef, ComponentFactoryResolver, ComponentFactory } from '@angular/core';
+import { ViewContainerRef, ComponentRef, ComponentFactoryResolver, ComponentFactory, Renderer2 } from '@angular/core';
 
 export class DefaultLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
-	constructor(private resolver: ComponentFactoryResolver) {
+	constructor(private resolver: ComponentFactoryResolver, private renderer: Renderer2) {
 		super('default');
 	}
 
@@ -12,13 +12,13 @@ export class DefaultLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 		const componentRef = linksHost.createComponent(this.getRecipe());
 
 		// attach coordinates and default positional behaviour to the generated component host
-		const rootNode = (componentRef.hostView as any).rootNodes[0] as HTMLElement;
+		const rootNode = componentRef.location.nativeElement;
 
 		// default style for link
-		rootNode.style.position = 'absolute';
+		this.renderer.setStyle(rootNode, 'position', 'absolute');
 
 		// data attributes
-		rootNode.setAttribute('data-linkid', link.id);
+		this.renderer.setAttribute(rootNode, 'data-linkid', link.id);
 
 		// on destroy make sure to destroy the componentRef
 		link.onEntityDestroy().subscribe(() => {

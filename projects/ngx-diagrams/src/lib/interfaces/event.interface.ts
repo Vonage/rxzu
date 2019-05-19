@@ -1,55 +1,52 @@
-import { UID } from '../utils/tool-kit.util';
+import { ID, UID } from '../utils/tool-kit.util';
 import { BaseEntity } from '../base.entity';
 
 // region events
-export interface BaseEvent<T extends BaseEntity> {
+export class BaseEvent<T extends BaseEntity> {
 	entity: T;
+	entityId: ID;
 	stopPropagation: () => any;
 	firing: boolean;
-	id: string;
-}
-export type LockEvent<T extends BaseEntity = BaseEntity> = BaseEvent<T> & { locked: boolean };
-export type ParentChangeEvent<P extends BaseEntity = BaseEntity, T extends BaseEntity = BaseEntity> = BaseEvent<T> & {
-	parent: P;
-};
-export type SelectionEvent<T extends BaseEntity = BaseEntity> = BaseEvent<T> & { isSelected: boolean };
-export type PaintedEvent<T extends BaseEntity = BaseEntity> = BaseEvent<T> & { isPainted: boolean };
-// endregion
+	id: ID;
 
-// region eventCreators
-export function createBaseEvent<T extends BaseEntity = BaseEntity>(thisArg: T): BaseEvent<T> {
-	return {
-		id: UID(),
-		entity: thisArg,
-		firing: true,
-		stopPropagation: () => (this.firing = false)
-	};
+	constructor(entity: T) {
+		this.id = UID();
+		this.entity = entity;
+		this.entityId = entity.id;
+		this.firing = true;
+		this.stopPropagation = () => (this.firing = false);
+	}
 }
-export function createLockedEvent<T extends BaseEntity = BaseEntity>(thisArg: T, locked: boolean = false): LockEvent<T> {
-	return {
-		...createBaseEvent(this),
-		locked
-	};
+export class LockEvent<T extends BaseEntity = BaseEntity> extends BaseEvent<T> {
+	locked: boolean;
+
+	constructor(entity: T, locked: boolean = false) {
+		super(entity);
+		this.locked = locked;
+	}
 }
-export function createParentEvent<P extends BaseEntity = BaseEntity, T extends BaseEntity = BaseEntity>(
-	thisArg: T,
-	parent: P
-): ParentChangeEvent<P, T> {
-	return {
-		...createBaseEvent<T>(this),
-		parent
-	};
+export class ParentChangeEvent<P extends BaseEntity = BaseEntity, T extends BaseEntity = BaseEntity> extends BaseEvent<T> {
+	parent: P;
+
+	constructor(entity: T, parent: P) {
+		super(entity);
+		this.parent = parent;
+	}
 }
-export function createSelectionEvent<T extends BaseEntity = BaseEntity>(thisArg: T, isSelected: boolean): SelectionEvent<T> {
-	return {
-		...createBaseEvent<T>(this),
-		isSelected
-	};
+export class SelectionEvent<T extends BaseEntity = BaseEntity> extends BaseEvent<T> {
+	isSelected: boolean;
+
+	constructor(entity: T, selected: boolean) {
+		super(entity);
+		this.isSelected = selected;
+	}
 }
-export function createPaintedEvent<T extends BaseEntity = BaseEntity>(thisArg: T, painted: boolean): PaintedEvent<T> {
-	return {
-		...createBaseEvent<T>(this),
-		isPainted: painted
-	};
+export class PaintedEvent<T extends BaseEntity = BaseEntity> extends BaseEvent<T> {
+	isPainted: boolean;
+
+	constructor(entity: T, painted: boolean = false) {
+		super(entity);
+		this.isPainted = painted;
+	}
 }
 // endregion

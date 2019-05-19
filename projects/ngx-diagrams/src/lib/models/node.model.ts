@@ -1,20 +1,26 @@
-import * as Toolkit from '../utils/tool-kit.util';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { PortModel } from './port.model';
 import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
+import { Coords } from '../interfaces/coords.interface.js';
 import { DiagramEngine } from '../services/engine.service';
+import { distinctUntilChanged, map, pluck, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { Dimensions } from '../interfaces/dimensions.interface';
+import { ID, mapToArray } from '../utils/tool-kit.util';
+import { SelectionEvent } from '../interfaces/event.interface';
 
-export class NodeModel extends BaseModel<DiagramModel> {
-	id: string;
+export class NodeModel<P extends PortModel = PortModel> extends BaseModel<DiagramModel> {
+	id: ID;
 	diagramEngine: DiagramEngine;
 
-	public readonly extras$: BehaviorSubject<{ [s: string]: any }>;
-	public readonly ports$: BehaviorSubject<{ [s: string]: PortModel }>;
-	public readonly x$: BehaviorSubject<number>;
-	public readonly y$: BehaviorSubject<number>;
-	public readonly width$: BehaviorSubject<number>;
-	public readonly height$: BehaviorSubject<number>;
+	private readonly _extras: BehaviorSubject<{ [s: string]: any }>;
+	private readonly _ports: BehaviorSubject<{ [s: string]: P }>;
+	private readonly _coords: BehaviorSubject<Coords>;
+	private readonly _dimensions: BehaviorSubject<Dimensions>;
+	private readonly extras$: Observable<{ [s: string]: any }>;
+	private readonly ports$: Observable<{ [s: string]: P }>;
+	private readonly coords$: Observable<Coords>;
+	private readonly dimensions$: Observable<Dimensions>;
 
 	constructor(
 		nodeType: string = 'default',
@@ -23,39 +29,45 @@ export class NodeModel extends BaseModel<DiagramModel> {
 		y: number = 0,
 		width: number = 0,
 		height: number = 0,
-		id?: string
+		id?: string,
+		logPrefix = '[Node]'
 	) {
-		super(nodeType, id);
-		this.x$ = new BehaviorSubject(x);
-		this.y$ = new BehaviorSubject(y);
-		this.extras$ = new BehaviorSubject(extras);
-		this.ports$ = new BehaviorSubject({});
-		this.width$ = new BehaviorSubject(width);
-		this.height$ = new BehaviorSubject(height);
+		super(nodeType, id, logPrefix);
+		this._extras = new BehaviorSubject(extras);
+		this._ports = new BehaviorSubject({});
+		this._dimensions = new BehaviorSubject<Dimensions>({ width, height });
+		this._coords = new BehaviorSubject<Coords>({ x, y });
+		this.extras$ = this._extras.asObservable();
+		this.ports$ = this._ports.asObservable();
+		this.coords$ = this._coords.asObservable();
+		this.dimensions$ = this._dimensions.asObservable();
 	}
 
-	setPosition(x: number, y: number) {
-		const oldX = this.x$.getValue();
-		const oldY = this.y$.getValue();
+	getCoords(): Coords {
+		return this._coords.getValue();
+	}
 
-		Object.values(this.ports$.getValue()).forEach(port => {
+	setCoords({ x, y }: Coords) {
+		const { x: oldX, y: oldY } = this.getCoords();
+
+		Object.values(this._ports.getValue()).forEach(port => {
 			Object.values(port.getLinks()).forEach(link => {
 				const point = link.getPointForPort(port);
-				point.setX(point.getX() + x - oldX);
-				point.setY(point.getY() + y - oldY);
+				const { x: pointX, y: pointY } = point.getCoords();
+				point.setCoords({ x: pointX + x - oldX, y: pointY + y - oldY });
 			});
 		});
 
-		this.x$.next(x);
-		this.y$.next(y);
+		this._coords.next({ x, y });
 	}
 
+	// TODO: override selectionChanges and replace this with it (convert to rx)
 	getSelectedEntities() {
 		let entities = super.getSelectedEntities();
 
 		// add the points of each link that are selected here
 		if (this.getSelected()) {
-			Object.values(this.ports$.getValue()).forEach(port => {
+			Object.values(this._ports.getValue()).forEach(port => {
 				const links = Object.values(port.getLinks());
 				entities = entities.concat(
 					links.map(link => {
@@ -64,74 +76,116 @@ export class NodeModel extends BaseModel<DiagramModel> {
 				);
 			});
 		}
+
+		this.log('selectedEntities', entities);
 		return entities;
 	}
 
-	setX(x: number) {
-		this.x$.next(x);
+	// TODO: map to BaseEvent
+	coordsChanges(): Observable<Coords> {
+		return this.coords$.pipe(takeUntil(this.onEntityDestroy()));
 	}
 
-	setY(y: number) {
-		this.y$.next(y);
+	selectCoords(): Observable<Coords> {
+		return this.coords$.pipe(
+			takeUntil(this.onEntityDestroy()),
+			distinctUntilChanged()
+		);
 	}
 
-	getX() {
-		return this.x$.getValue();
+	selectX(): Observable<number> {
+		return this.selectCoords().pipe(
+			map(c => c.x),
+			this.withLog('selectX'),
+			distinctUntilChanged()
+		);
 	}
 
-	getY() {
-		return this.y$.getValue();
-	}
-
-	selectX() {
-		return this.x$.asObservable();
-	}
-
-	selectY() {
-		return this.y$.asObservable();
+	selectY(): Observable<number> {
+		return this.selectCoords().pipe(
+			map(c => c.y),
+			this.withLog('selectY'),
+			distinctUntilChanged()
+		);
 	}
 
 	/**
 	 * Assign a port to the node and set the node as its getParent
 	 * @returns the inserted port
 	 */
-	addPort<T extends PortModel>(port: T): T {
+	addPort(port: P): P {
 		port.setParent(this);
-		this.ports$.next({ ...this.ports$.value, [port.id]: port });
+		this._ports.next({ ...this._ports.value, [port.id]: port });
 		return port;
 	}
 
-	getPort(id: string): PortModel {
-		return this.ports$.value[id];
+	getPort(id: ID): P {
+		return this._ports.value[id];
 	}
 
-	selectPorts(): Observable<{ [s: string]: PortModel }> {
-		return this.ports$.asObservable();
+	selectPorts(selector?: () => boolean | ID | ID[]): Observable<P[]> {
+		// TODO: implement selector
+		// TODO: create coerce func
+		return this.ports$.pipe(
+			takeUntil(this.onEntityDestroy()),
+			distinctUntilChanged(),
+			map(ports => mapToArray(ports)),
+			this.withLog('selectPorts')
+		);
 	}
 
-	getPorts(): { [s: string]: PortModel } {
-		return this.ports$.value;
+	getPorts(ids?: ID[]): { [s: string]: P | P[] } {
+		return this._ports.getValue();
 	}
 
-	getPortByID(id: string): PortModel | null {
-		const ports = this.ports$.value;
-		return Object.values(ports).find(port => port.id === id);
+	setDimensions({ width, height }: Dimensions) {
+		this._dimensions.next({ width, height });
 	}
 
-	updateDimensions({ width, height }: { width: number; height: number }) {
-		this.width$.next(width);
-		this.height$.next(height);
+	getDimensions(): Dimensions {
+		return this._dimensions.getValue();
 	}
 
-	selectExtras() {
-		return this.extras$;
+	// TODO: return BaseEvent extension
+	dimensionChanges(): Observable<Dimensions> {
+		return this.dimensions$.pipe(
+			takeUntil(this.onEntityDestroy()),
+			distinctUntilChanged(),
+			this.withLog('DimensionChanges')
+		);
 	}
 
-	getExtras() {
-		return this.extras$.value;
+	selectWidth(): Observable<number> {
+		return this.dimensions$.pipe(
+			takeUntil(this.onEntityDestroy()),
+			map(d => d.width),
+			distinctUntilChanged(),
+			this.withLog('selectWidth')
+		);
+	}
+
+	selectHeight(): Observable<number> {
+		return this.dimensions$.pipe(
+			takeUntil(this.onEntityDestroy()),
+			map(d => d.width),
+			distinctUntilChanged(),
+			this.withLog('selectHeight')
+		);
 	}
 
 	setExtras(extras: any) {
-		this.extras$.next(extras);
+		this._extras.next(extras);
+	}
+
+	getExtras() {
+		return this._extras.getValue();
+	}
+
+	selectExtras<E = any>(selector?: (extra: E) => E[keyof E] | string | string[]) {
+		// TODO: impl selector
+		return this.extras$.pipe(
+			takeUntil(this.onEntityDestroy()),
+			distinctUntilChanged()
+		);
 	}
 }

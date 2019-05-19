@@ -19,16 +19,13 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 	}
 
 	ngAfterViewInit() {
-		const lastPX$ = this.getLastPoint().selectX();
-		const lastPY$ = this.getLastPoint().selectY();
+		const firstPCoords$ = this.getFirstPoint().selectCoords();
+		const lastPCoords$ = this.getLastPoint().selectCoords();
 
-		const firstPX$ = this.getFirstPoint().selectX();
-		const firstPY$ = this.getFirstPoint().selectY();
+		combineLatest(firstPCoords$, lastPCoords$).subscribe(([firstPCoords, lastPCoords]) => {
+			const points = [firstPCoords, lastPCoords];
 
-		combineLatest(lastPX$, lastPY$, firstPX$, firstPY$).subscribe(([lastPX, lastPY, firstPX, firstPY]) => {
-			const points = [{ x: firstPX, y: firstPY }, { x: lastPX, y: lastPY }];
-
-			const isHorizontal = Math.abs(firstPX - lastPX) > Math.abs(firstPY - lastPY);
+			const isHorizontal = Math.abs(firstPCoords.x - lastPCoords.x) > Math.abs(firstPCoords.y - lastPCoords.y);
 			const xOrY = isHorizontal ? 'x' : 'y';
 
 			// draw the smoothing
@@ -38,11 +35,11 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 				isStraight = true;
 			}
 
-			const path = generateCurvePath({ x: firstPX, y: firstPY }, { x: lastPX, y: lastPY }, isStraight ? 0 : this.curvyness);
+			const path = generateCurvePath(firstPCoords, lastPCoords, isStraight ? 0 : this.curvyness);
 			this._path$.next(path);
 
 			if (!this.getTargetPort()) {
-				const danglingPoint = this.generatePoint(lastPX, lastPY);
+				const danglingPoint = this.generatePoint(lastPCoords);
 				this.points$.next([danglingPoint]);
 			}
 
