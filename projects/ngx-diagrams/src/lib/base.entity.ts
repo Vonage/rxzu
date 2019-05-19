@@ -1,4 +1,4 @@
-import { ID, log as _log, withLog as _withLog, UID, withLog } from './utils/tool-kit.util';
+import { ID, log as _log, withLog as _withLog, UID, withLog, LOG_LEVEL } from './utils/tool-kit.util';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { map, mapTo, takeUntil } from 'rxjs/operators';
 import { BaseEvent, LockEvent } from './interfaces/event.interface';

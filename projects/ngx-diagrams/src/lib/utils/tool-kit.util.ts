@@ -78,7 +78,7 @@ export function isFunction(val: any): val is (...args: any) => any {
 }
 
 // @internal
-export function isNil(v) {
+export function isNil(v: any) {
 	return v === null || v === undefined;
 }
 
