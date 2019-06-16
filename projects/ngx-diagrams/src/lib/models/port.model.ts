@@ -1,91 +1,61 @@
-import { BaseModel } from './base.model';
-import { NodeModel } from './node.model';
+import { BaseModel, BaseModelState } from './base.model';
 import { LinkModel } from './link.model';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Coords } from '../interfaces/coords.interface';
+import { Dimensions } from '../interfaces/dimensions.interface';
+import { ID } from '../interfaces/types';
 
-export class PortModel extends BaseModel<NodeModel> {
+export type PortModelState<S = any> = BaseModelState<S> & {
+	coords: Coords;
+	dimensions: Dimensions;
+	linkIds: ID[];
+	maxLinks: number;
+	io: 'in' | 'out';
+};
+
+const DEFAULT_STATE: PortModelState = {
+	coords: { x: 0, y: 0 },
+	dimensions: { width: 0, height: 0 },
+	linkIds: [],
+	maxLinks: null,
+	io: 'in'
+};
+
+export class PortModel<S = any> extends BaseModel<PortModelState<S>> {
 	private name: string;
-	private links$: BehaviorSubject<{ [id: string]: LinkModel }>;
-	private maximumLinks: number;
 
-	private x$: BehaviorSubject<number>;
-	private y$: BehaviorSubject<number>;
-	private width$: BehaviorSubject<number>;
-	private height$: BehaviorSubject<number>;
-
-	constructor(name: string, type?: string, id?: string, maximumLinks?: number) {
-		super(type, id);
+	constructor(name: string, type?: string, id?: string, initialState?: Partial<PortModelState<S>>) {
+		super(type, id, { ...DEFAULT_STATE, ...initialState });
 		this.name = name;
-		this.links$ = new BehaviorSubject({});
-		this.maximumLinks = maximumLinks;
-		this.x$ = new BehaviorSubject(0);
-		this.y$ = new BehaviorSubject(0);
-		this.height$ = new BehaviorSubject(0);
-		this.width$ = new BehaviorSubject(0);
-	}
-
-	getNode() {
-		return this.getParent;
 	}
 
 	getName() {
 		return this.name;
 	}
 
-	selectX(): Observable<number> {
-		return this.x$.asObservable();
+	removeLink(linkId: ID) {
+		const { linkIds } = this.get();
+		const idx = linkIds.indexOf(linkId);
+		this.update({ linkIds: linkIds.splice(idx, 1) } as Partial<PortModelState<S>>);
 	}
 
-	selectY(): Observable<number> {
-		return this.y$.asObservable();
-	}
-
-	getMaximumLinks(): number {
-		return this.maximumLinks;
-	}
-
-	setMaximumLinks(maximumLinks: number) {
-		this.maximumLinks = maximumLinks;
-	}
-
-	removeLink(link: LinkModel) {
-		const links = this.links$.getValue();
-		delete links[link.id];
-		this.links$.next({ ...links });
-	}
-
-	addLink(link: LinkModel) {
-		this.links$.next({ ...this.links$.value, [link.id]: link });
-	}
-
-	getLinks(): { [id: string]: LinkModel } {
-		return this.links$.getValue();
-	}
-
-	selectLinks(): Observable<{ [id: string]: LinkModel }> {
-		return this.links$.asObservable();
-	}
-
-	updateCoords({ x, y, width, height }: { x: number; y: number; width: number; height: number }) {
-		this.x$.next(x);
-		this.y$.next(y);
-		this.width$.next(width);
-		this.height$.next(height);
+	addLink(linkId: ID) {
+		this.update({ linkIds: [...this.get('linkIds'), linkId] } as Partial<PortModelState<S>>);
 	}
 
 	canLinkToPort(port: PortModel): boolean {
 		return true;
 	}
 
-	isLocked() {
-		return super.getLocked();
+	getLinkIds(): ID[] {
+		return this.get('linkIds');
 	}
 
 	public createLinkModel(): LinkModel | null {
-		const numberOfLinks: number = Object.keys(this.links$.getValue()).length;
-		if (this.maximumLinks === 1 && numberOfLinks >= 1) {
-			return Object.values(this.links$.getValue())[0][0];
-		} else if (numberOfLinks >= this.maximumLinks) {
+		const numberOfLinks = this.get('linkIds').length;
+		if (this.get('maxLinks') === 1 && numberOfLinks >= 1) {
+			// TODO: should be done in diagramModel as it is the parent of all links
+			// return Object.values(this.links$.getValue())[0][0];
+		} else if (numberOfLinks >= this.get('maxLinks')) {
 			return null;
 		}
 		return null;

@@ -2,31 +2,33 @@
 	<g>
 		<path [attr.stroke-width]="width" [attr.stroke]="color" [attr.d]="path$ | async"></path>
 		<path
-			(mouseleave)="setSelected(false)"
-			(mouseenter)="setSelected()"
+			(mouseleave)="setActive(false)"
+			(mouseenter)="setActive()"
 			[attr.stroke-width]="20"
 			[attr.stroke]="color"
 			[attr.stroke-linecap]="'round'"
 			[attr.data-linkid]="id"
-			[attr.stroke-opacity]="(selectSelected() | async) ? '0.1' : '0'"
+			[attr.stroke-opacity]="(onActiveChange() | async)?.active ? '0.1' : '0'"
 			[attr.d]="path$ | async"
 		></path>
 	</g>
 	<g *ngFor="let point of points$ | async as points">
-		<circle [attr.cx]="point.x$ | async" [attr.cy]="point.y$ | async" r="5" class="default-point" />
+		<ng-container *ngIf="point.select('coords') | async as coords">
+			<circle [attr.cx]="coords.x" [attr.cy]="coords.y" r="5" class="default-point" />
 
-		<circle
-			(mouseleave)="setSelected(false)"
-			(mouseenter)="setSelected()"
-			[attr.data-id]="point.id"
-			[attr.data-linkid]="id"
-			[attr.cx]="point.x$ | async"
-			[attr.cy]="point.y$ | async"
-			r="15"
-			[attr.opacity]="0"
-			class="default-point"
-			[ngClass]="{ 'default-point': true, selected: point.selectSelected() | async }"
-		/>
-		{{ point.selectSelected() | async }}
+			<circle
+				(mouseleave)="setActive(false)"
+				(mouseenter)="setActive()"
+				[attr.data-id]="point.id"
+				[attr.data-linkid]="id"
+				[attr.cx]="coords.x"
+				[attr.cy]="coords.y"
+				r="15"
+				[attr.opacity]="0"
+				class="default-point"
+				[ngClass]="{ 'default-point': true, selected: (point.onActiveChange() | async)?.active }"
+			/>
+		</ng-container>
+		{{ (point.onActiveChange() | async).entityId }}
 	</g>
 </svg>

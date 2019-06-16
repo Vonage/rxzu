@@ -5,9 +5,12 @@ export class MoveCanvasAction extends BaseAction {
 	initialOffsetX: number;
 	initialOffsetY: number;
 
-	constructor(mouseX: number, mouseY: number, diagramModel: DiagramModel) {
+	constructor(mouseX: number, mouseY: number, diagramModel: DiagramModel<any>) {
 		super(mouseX, mouseY);
-		this.initialOffsetX = diagramModel.getOffsetX();
-		this.initialOffsetY = diagramModel.getOffsetY();
+		const {
+			offset: { x: offsetX, y: offsetY }
+		} = diagramModel.get();
+		this.initialOffsetX = offsetX;
+		this.initialOffsetY = offsetY;
 	}
 }

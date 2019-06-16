@@ -12,7 +12,7 @@ export class MoveItemsAction extends BaseAction {
 	constructor(mouseX: number, mouseY: number, diagramEngine: DiagramEngine) {
 		super(mouseX, mouseY);
 		this.moved = false;
-		let selectedItems = diagramEngine.getDiagramModel().getSelectedItems();
+		let selectedItems = diagramEngine.getDiagramModel().getActiveItems();
 
 		// dont allow items which are locked to move and links which generate their position based on points.
 		selectedItems = selectedItems.filter(item => {
@@ -20,7 +20,7 @@ export class MoveItemsAction extends BaseAction {
 		});
 
 		this.selectionModels = selectedItems.map((item: PointModel | NodeModel) => {
-			const { x: initialX, y: initialY } = item.getCoords();
+			const { x: initialX, y: initialY } = item.get('coords');
 			return {
 				model: item,
 				initialX,

@@ -12,6 +12,8 @@ import { BehaviorSubject } from 'rxjs';
 import { take, delay, filter } from 'rxjs/operators';
 import { DefaultLinkFactory } from '../defaults/factories/default-link.factory';
 import { BaseEntity } from '../base.entity';
+import { Dimensions } from '../interfaces/dimensions.interface';
+import { Coords } from '../interfaces/coords.interface';
 
 @Injectable({ providedIn: 'root' })
 export class DiagramEngine {
@@ -139,42 +141,43 @@ export class DiagramEngine {
 	}
 
 	getNodePortElement(port: PortModel): HTMLElement {
-		const selector = this.canvas$.getValue().querySelector(`[data-nodeid="${port.getParent().id}"] [data-portid="${port.id}"]`);
+		const selector = this.canvas$.getValue().querySelector(`[data-nodeid="${port.getParentId()}"] [data-portid="${port.id}"]`);
 		if (selector === null) {
-			throw new Error('Cannot find Node Port element with node id: [' + port.getParent().id + '] and port id: [' + port.id + ']');
+			throw new Error(`Cannot find Node P element with node id: [${port.getParentId()}] and port id: [${port.id}]`);
 		}
 		return selector as HTMLElement;
 	}
 
-	getPortCenter(port: PortModel) {
+	getPortCenter(port: PortModel): Coords {
 		const sourceElement = this.getNodePortElement(port);
 		const sourceRect = sourceElement.getBoundingClientRect();
 		const rel = this.getRelativePoint(sourceRect.left, sourceRect.top);
+		const {
+			offset: { x: offsetX, y: offsetY },
+			zoom
+		} = this.diagramModel.get();
 
 		return {
-			x: sourceElement.offsetWidth / 2 + (rel.x - this.diagramModel.getOffsetX()) / (this.diagramModel.getZoomLevel() / 100.0),
-			y: sourceElement.offsetHeight / 2 + (rel.y - this.diagramModel.getOffsetY()) / (this.diagramModel.getZoomLevel() / 100.0)
+			x: sourceElement.offsetWidth / 2 + (rel.x - offsetX) / (zoom / 100.0),
+			y: sourceElement.offsetHeight / 2 + (rel.y - offsetY) / (zoom / 100.0)
 		};
 	}
 
 	/**
 	 * Calculate rectangular coordinates of the port passed in.
 	 */
-	getPortCoords(
-		port: PortModel
-	): {
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	} {
+	getPortCoords(port: PortModel): Coords & Dimensions {
 		const sourceElement = this.getNodePortElement(port);
 		const sourceRect = sourceElement.getBoundingClientRect() as DOMRect;
 		const canvasRect = this.canvas$.getValue().getBoundingClientRect() as ClientRect;
+		const {
+			offset: { x: offsetX, y: offsetY },
+			zoom
+		} = this.diagramModel.get();
 
 		return {
-			x: (sourceRect.x - this.diagramModel.getOffsetX()) / (this.diagramModel.getZoomLevel() / 100.0) - canvasRect.left,
-			y: (sourceRect.y - this.diagramModel.getOffsetY()) / (this.diagramModel.getZoomLevel() / 100.0) - canvasRect.top,
+			x: (sourceRect.x - offsetX) / (zoom / 100.0) - canvasRect.left,
+			y: (sourceRect.y - offsetY) / (zoom / 100.0) - canvasRect.top,
 			width: sourceRect.width,
 			height: sourceRect.height
 		};
@@ -182,9 +185,9 @@ export class DiagramEngine {
 
 	/**
 	 * Determine the width and height of the node passed in.
-	 * It currently assumes nodes have a rectangular shape, can be overriden for customised shapes.
+	 * It currently assumes ports have a rectangular shape, can be overriden for customised shapes.
 	 */
-	getNodeDimensions(node: NodeModel): { width: number; height: number } {
+	getNodeDimensions(node: NodeModel): Dimensions {
 		if (!this.canvas$.getValue()) {
 			return {
 				width: 0,
@@ -207,9 +210,14 @@ export class DiagramEngine {
 
 	getRelativeMousePoint(event: MouseEvent): { x: number; y: number } {
 		const point = this.getRelativePoint(event.clientX, event.clientY);
+		const {
+			offset: { x: offsetX, y: offsetY },
+			zoom
+		} = this.diagramModel.get();
+
 		return {
-			x: (point.x - this.diagramModel.getOffsetX()) / (this.diagramModel.getZoomLevel() / 100.0),
-			y: (point.y - this.diagramModel.getOffsetY()) / (this.diagramModel.getZoomLevel() / 100.0)
+			x: (point.x - offsetX) / (zoom / 100.0),
+			y: (point.y - offsetY) / (zoom / 100.0)
 		};
 	}
 
@@ -222,12 +230,12 @@ export class DiagramEngine {
 		return this.diagramModel;
 	}
 
-	isModelLocked(model: BaseEntity) {
-		if (this.diagramModel.getLocked()) {
+	isModelLocked(model: BaseEntity<any>) {
+		if (this.diagramModel.isLocked()) {
 			return true;
 		}
 
-		return model.getLocked();
+		return model.isLocked();
 	}
 
 	/**
@@ -246,8 +254,7 @@ export class DiagramEngine {
 				const yFactor = canvas.clientHeight / canvas.scrollHeight;
 				const zoomFactor = xFactor < yFactor ? xFactor : yFactor;
 
-				this.diagramModel.setZoomLevel(this.diagramModel.getZoomLevel() * (zoomFactor - additionalZoomFactor));
-				this.diagramModel.setOffset(0, 0);
+				this.diagramModel.update({ zoom: this.diagramModel.get('zoom') * (zoomFactor - additionalZoomFactor), offset: { x: 0, y: 0 } });
 			});
 	}
 }

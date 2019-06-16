@@ -15,8 +15,7 @@ export class DefaultPortModel extends PortModel {
 
 	link(port: PortModel): LinkModel {
 		const link = this.createLinkModel();
-		link.setSourcePort(this);
-		link.setTargetPort(port);
+		link.setPorts(this, port);
 		return link;
 	}
 

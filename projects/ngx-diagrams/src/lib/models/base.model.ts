@@ -1,77 +1,73 @@
-import { BaseEntity } from '../base.entity';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map, takeUntil } from 'rxjs/operators';
-import { PaintedEvent, ParentChangeEvent, SelectionEvent } from '../interfaces/event.interface';
+import { BaseEntity, EntityState } from '../base.entity';
+import { Observable } from 'rxjs';
+import { ID } from '../interfaces/types';
+import { map } from 'rxjs/operators';
+import { BaseEvent } from '../interfaces/event.interface';
+import { createEvent } from '../utils/tool-kit.util';
 
-export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
-	private readonly _type: string;
-	private readonly _parent: BehaviorSubject<X> = new BehaviorSubject(null);
-	private readonly _parent$: Observable<X> = this._parent.asObservable();
-	private readonly _selected: BehaviorSubject<boolean> = new BehaviorSubject(false);
-	private readonly _selected$: Observable<boolean> = this._selected.asObservable();
-	private readonly _painted: BehaviorSubject<boolean> = new BehaviorSubject(false);
-	private readonly _painted$: Observable<boolean> = this._painted.asObservable();
+export type BaseModelState<S = any> = EntityState<S> & {
+	parentId: ID;
+	active: boolean;
+	painted: boolean;
+	extras: any;
+};
 
-	constructor(type?: string, id?: string, logPrefix = '[Base]') {
-		super(id, logPrefix);
-		this._type = type;
+const DEFAULT_STATE: Partial<BaseModelState> = {
+	parentId: null,
+	active: false,
+	painted: false,
+	extras: null
+};
+
+export class BaseModel<S = any> extends BaseEntity<BaseModelState<S>> {
+	private readonly type: string;
+
+	constructor(type?: string, id?: string, initialState?: Partial<BaseModelState<S>>, logPrefix = '[Base]') {
+		super(id, { ...DEFAULT_STATE, ...initialState }, logPrefix);
+		this.type = type;
 	}
 
-	getParent(): X {
-		return this._parent.getValue();
+	setPainted(val = true): void {
+		this.update({ painted: val } as BaseModelState);
 	}
 
-	setParent(parent: X): void {
-		this._parent.next(parent);
+	setActive(val = true): void {
+		this.update({ active: val } as BaseModelState);
 	}
 
-	parentChanges(): Observable<ParentChangeEvent<X>> {
-		return this._parent$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			map(p => new ParentChangeEvent<X>(this, p))
-		);
+	isActive(): boolean {
+		return this.get('active');
 	}
 
-	getPainted(): boolean {
-		return this._painted.getValue();
-	}
-
-	setPainted(painted: boolean = true) {
-		this._painted.next(painted);
-	}
-
-	paintChanges(): Observable<PaintedEvent> {
-		return this._painted$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			map(p => new PaintedEvent(this, p))
-		);
+	isPainted(): boolean {
+		return this.get('painted');
 	}
 
 	getType(): string {
-		return this._type;
+		return this.type;
 	}
 
-	getSelected(): boolean {
-		return this._selected.getValue();
+	getActiveItems(): BaseEntity<any>[] {
+		return this.get('active') ? [this] : []; // TODO: find solution to unknown issue
 	}
 
-	selectSelected(): Observable<boolean> {
-		return this._selected.asObservable();
+	selectActiveItems(): Observable<BaseEntity<any>[]> {
+		return this.select('active').pipe(map(active => (active ? [this] : [])));
 	}
 
-	setSelected(selected: boolean = true) {
-		this._selected.next(selected);
+	getParentId(): ID {
+		return this.get('parentId');
 	}
 
-	selectionChanges(): Observable<SelectionEvent> {
-		return this._selected$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			map(s => new SelectionEvent(this, s)),
-			this.withLog('selectionChanges')
-		);
+	onPaintChange(): Observable<BaseEvent<{ painted: boolean }>> {
+		return this.select('painted').pipe(map(painted => createEvent(this.id, { painted })));
 	}
 
-	getSelectedEntities(): BaseModel[] {
-		return this._selected.value ? [this] : [];
+	onActiveChange(): Observable<BaseEvent<{ active: boolean }>> {
+		return this.select('active').pipe(map(active => createEvent(this.id, { active })));
+	}
+
+	onParentChange(): Observable<BaseEvent<{ parentId: ID }>> {
+		return this.select('parentId').pipe(map(parentId => createEvent(this.id, { parentId })));
 	}
 }

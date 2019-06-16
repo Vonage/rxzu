@@ -1,191 +1,99 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { PortModel } from './port.model';
-import { BaseModel } from './base.model';
+import { BaseModel, BaseModelState } from './base.model';
 import { DiagramModel } from './diagram.model';
 import { Coords } from '../interfaces/coords.interface.js';
 import { DiagramEngine } from '../services/engine.service';
-import { distinctUntilChanged, map, pluck, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { distinctUntilChanged, flatMap, map, mergeMap, pairwise, switchMap, takeUntil } from 'rxjs/operators';
 import { Dimensions } from '../interfaces/dimensions.interface';
-import { ID, mapToArray } from '../utils/tool-kit.util';
-import { SelectionEvent } from '../interfaces/event.interface';
+import { createEvent, mapToArray } from '../utils/tool-kit.util';
+import { ID, IDS } from '../interfaces/types';
+import { BaseEntity } from '../base.entity';
+import { BaseEvent } from '../interfaces/event.interface';
 
-export class NodeModel<P extends PortModel = PortModel> extends BaseModel<DiagramModel> {
+export type NodeModelState<S = any, P extends PortModel = PortModel> = BaseModelState<S> & {
+	ports: { [id: string]: P };
+	coords: Coords;
+	dimensions: Dimensions;
+};
+
+const DEFAULT_STATE: Partial<NodeModelState> = {
+	ports: {},
+	coords: { x: 0, y: 0 },
+	dimensions: { width: 0, height: 0 }
+};
+
+export class NodeModel<S = any, P extends PortModel = PortModel> extends BaseModel<NodeModelState<S, P>> {
 	id: ID;
 	diagramEngine: DiagramEngine;
 
-	private readonly _extras: BehaviorSubject<{ [s: string]: any }>;
-	private readonly _ports: BehaviorSubject<{ [s: string]: P }>;
-	private readonly _coords: BehaviorSubject<Coords>;
-	private readonly _dimensions: BehaviorSubject<Dimensions>;
-	private readonly extras$: Observable<{ [s: string]: any }>;
-	private readonly ports$: Observable<{ [s: string]: P }>;
-	private readonly coords$: Observable<Coords>;
-	private readonly dimensions$: Observable<Dimensions>;
-
-	constructor(
-		nodeType: string = 'default',
-		extras: { [s: string]: any } = {},
-		x: number = 0,
-		y: number = 0,
-		width: number = 0,
-		height: number = 0,
-		id?: string,
-		logPrefix = '[Node]'
-	) {
-		super(nodeType, id, logPrefix);
-		this._extras = new BehaviorSubject(extras);
-		this._ports = new BehaviorSubject({});
-		this._dimensions = new BehaviorSubject<Dimensions>({ width, height });
-		this._coords = new BehaviorSubject<Coords>({ x, y });
-		this.extras$ = this._extras.asObservable();
-		this.ports$ = this._ports.asObservable();
-		this.coords$ = this._coords.asObservable();
-		this.dimensions$ = this._dimensions.asObservable();
+	constructor(nodeType?: string, id?: string, initialState?: Partial<S>, logPrefix = '[Node]') {
+		super(nodeType, id, { ...DEFAULT_STATE, ...initialState }, logPrefix);
 	}
 
-	getCoords(): Coords {
-		return this._coords.getValue();
+	onInit(id?: string, initialState?, logPrefix = '[Node]') {
+		super.onInit(id, initialState, logPrefix);
+		this.registerActiveListener();
+	}
+
+	registerActiveListener(): void {
+		this.registerListener('active', active => mapToArray(this.get('ports')).forEach(p => p.update({ active })));
 	}
 
 	setCoords({ x, y }: Coords) {
-		const { x: oldX, y: oldY } = this.getCoords();
+		const {
+			coords: { x: oldX, y: oldY },
+			ports
+		} = this.get();
 
-		Object.values(this._ports.getValue()).forEach(port => {
-			Object.values(port.getLinks()).forEach(link => {
-				const point = link.getPointForPort(port);
-				const { x: pointX, y: pointY } = point.getCoords();
-				point.setCoords({ x: pointX + x - oldX, y: pointY + y - oldY });
-			});
-		});
+		// TODO: ports and links should be connected in diagram model
+		// Object.values(ports).forEach(port => {
+		// 	Object.values(port.get('links')).forEach(link => {
+		// 		const point = link.getPointForPort(port);
+		// 		const { x: pointX, y: pointY } = point.get('coords');
+		// 		point.update({ coords: { x: pointX + x - oldX, y: pointY + y - oldY }});
+		// 	});
+		// });
 
-		this._coords.next({ x, y });
+		this.update({ coords: { x, y } } as Partial<NodeModelState<S, P>>);
 	}
 
-	// TODO: override selectionChanges and replace this with it (convert to rx)
-	getSelectedEntities() {
-		let entities = super.getSelectedEntities();
+	selectActiveItems(): Observable<BaseEntity<any>[]> {
+		return combineLatest(
+			super.selectActiveItems(),
+			this.select(s => s.ports).pipe(
+				flatMap(ports => mapToArray(ports).map(p => p.selectActiveItems())),
+				flatMap(activeIds => activeIds)
+			)
+		).pipe(map(([active, activePorts]) => [...active, ...activePorts]));
+	}
 
-		// add the points of each link that are selected here
-		if (this.getSelected()) {
-			Object.values(this._ports.getValue()).forEach(port => {
-				const links = Object.values(port.getLinks());
-				entities = entities.concat(
-					links.map(link => {
-						return link.getPointForPort(port);
-					})
-				);
-			});
+	getActiveItems() {
+		// add the points of each link that are active here
+		if (this.isActive()) {
+			return [...super.getActiveItems(), ...this.getPorts().reduce((acc, port) => [...acc, ...port.getActiveItems()], [])];
 		}
 
-		this.log('selectedEntities', entities);
-		return entities;
+		return [];
 	}
 
-	// TODO: map to BaseEvent
-	coordsChanges(): Observable<Coords> {
-		return this.coords$.pipe(takeUntil(this.onEntityDestroy()));
+	selectPorts(id?: IDS): Observable<P[]> {
+		return this.selectByIds<P>(s => s.ports, id);
 	}
-
-	selectCoords(): Observable<Coords> {
-		return this.coords$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			distinctUntilChanged()
-		);
+	getPorts(id?: IDS): P[] {
+		return this.getByIds<P>(s => s.ports, id);
 	}
-
-	selectX(): Observable<number> {
-		return this.selectCoords().pipe(
-			map(c => c.x),
-			this.withLog('selectX'),
-			distinctUntilChanged()
-		);
-	}
-
-	selectY(): Observable<number> {
-		return this.selectCoords().pipe(
-			map(c => c.y),
-			this.withLog('selectY'),
-			distinctUntilChanged()
-		);
-	}
-
 	/**
 	 * Assign a port to the node and set the node as its getParent
 	 * @returns the inserted port
 	 */
 	addPort(port: P): P {
-		port.setParent(this);
-		this._ports.next({ ...this._ports.value, [port.id]: port });
+		port.update({ parentId: this.id });
+		this.update({ ports: { ...this.get('ports'), [port.id]: port } } as Partial<NodeModelState<S, P>>);
 		return port;
 	}
 
-	getPort(id: ID): P {
-		return this._ports.value[id];
-	}
-
-	selectPorts(selector?: () => boolean | ID | ID[]): Observable<P[]> {
-		// TODO: implement selector
-		// TODO: create coerce func
-		return this.ports$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			distinctUntilChanged(),
-			map(ports => mapToArray(ports)),
-			this.withLog('selectPorts')
-		);
-	}
-
-	getPorts(ids?: ID[]): { [s: string]: P | P[] } {
-		return this._ports.getValue();
-	}
-
-	setDimensions({ width, height }: Dimensions) {
-		this._dimensions.next({ width, height });
-	}
-
-	getDimensions(): Dimensions {
-		return this._dimensions.getValue();
-	}
-
-	// TODO: return BaseEvent extension
-	dimensionChanges(): Observable<Dimensions> {
-		return this.dimensions$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			distinctUntilChanged(),
-			this.withLog('DimensionChanges')
-		);
-	}
-
-	selectWidth(): Observable<number> {
-		return this.dimensions$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			map(d => d.width),
-			distinctUntilChanged(),
-			this.withLog('selectWidth')
-		);
-	}
-
-	selectHeight(): Observable<number> {
-		return this.dimensions$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			map(d => d.width),
-			distinctUntilChanged(),
-			this.withLog('selectHeight')
-		);
-	}
-
-	setExtras(extras: any) {
-		this._extras.next(extras);
-	}
-
-	getExtras() {
-		return this._extras.getValue();
-	}
-
-	selectExtras<E = any>(selector?: (extra: E) => E[keyof E] | string | string[]) {
-		// TODO: impl selector
-		return this.extras$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			distinctUntilChanged()
-		);
+	onDimensionChange(): Observable<BaseEvent<Dimensions>> {
+		return this.select('dimensions').pipe(map(dim => createEvent(this.id, { ...dim })));
 	}
 }

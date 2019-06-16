@@ -1,58 +1,66 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { NodeModel } from './node.model';
 import { LinkModel } from './link.model';
-import { BaseEntity, BaseEntityType } from '../base.entity';
+import { BaseEntity, EntityState } from '../base.entity';
 import { DiagramEngine } from '../services/engine.service';
 import { BaseModel } from './base.model';
-import { uniq, flatMap } from 'lodash';
+import { flatMap, uniq } from 'lodash';
 import { PortModel } from './port.model';
 import { PointModel } from './point.model';
 import { Coords } from '../interfaces/coords.interface';
-import { ID } from '../utils/tool-kit.util';
+import { BaseEntityType, ID, IDS } from '../interfaces/types';
+import { isArray, mapToArray } from '../utils/tool-kit.util';
 
-export class DiagramModel extends BaseEntity {
-	links$: BehaviorSubject<{ [s: string]: LinkModel }>;
-	nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
-	zoom$: BehaviorSubject<number>;
-	offsetX$: BehaviorSubject<number>;
-	offsetY$: BehaviorSubject<number>;
-	gridSize$: BehaviorSubject<number>;
+export type DiagramModelState<S = any, N extends NodeModel = NodeModel, L extends LinkModel = LinkModel> = EntityState<S> & {
+	nodes: { [id: string]: N };
+	links: { [id: string]: L };
+	zoom: number;
+	offset: Coords;
+	gridSize: number;
+};
 
-	constructor(private diagramEngine: DiagramEngine, id?: string) {
-		super(id);
-		this.nodes$ = new BehaviorSubject<{ [s: string]: NodeModel }>({});
-		this.links$ = new BehaviorSubject<{ [s: string]: LinkModel }>({});
-		this.zoom$ = new BehaviorSubject(100);
-		this.offsetX$ = new BehaviorSubject(0);
-		this.offsetY$ = new BehaviorSubject(0);
-		this.gridSize$ = new BehaviorSubject(0);
+const DEFAULT_STATE: DiagramModelState = {
+	nodes: {},
+	links: {},
+	zoom: 100,
+	offset: { x: 0, y: 0 },
+	gridSize: 0
+};
+export class DiagramModel<S = any, N extends NodeModel = NodeModel, L extends LinkModel = LinkModel> extends BaseEntity<
+	DiagramModelState<S, N, L>
+> {
+	constructor(private diagramEngine: DiagramEngine, id?: string, initialState?: Partial<DiagramModelState<S, N, L>>) {
+		super(id, { ...DEFAULT_STATE, ...initialState });
 	}
 
-	// TODO: support the following events for links and nodes
+	// TODO: support the following events for links and ports
 	// removed, updated<positionChanged/dataChanged>, added
 
-	getNodes(): { [s: string]: NodeModel } {
-		return this.nodes$.getValue();
+	selectNodes(id?: IDS): Observable<N[]> {
+		return this.selectByIds(s => s.nodes, id);
 	}
 
-	getNode(id: ID): NodeModel | null {
-		return this.nodes$.getValue()[id];
+	getNodes(id?: IDS): N[] {
+		return this.getByIds(s => s.nodes, id);
 	}
 
-	getLink(id: ID): LinkModel | null {
-		return this.links$.getValue()[id];
+	selectLinks(id?: IDS): Observable<L[]> {
+		return this.selectByIds(s => s.links, id);
 	}
 
-	getLinks(): { [s: string]: LinkModel } {
-		return this.links$.getValue();
+	getLinks(id?: IDS): L[] {
+		return this.getByIds(s => s.links, id); // TODO: remove unknown mark
 	}
 
+	getPortsForNodes(nodeIds?: IDS, portIds?: IDS): PortModel[] {
+		return this.getNodes(nodeIds).reduce((acc, n) => [...acc, ...n.getPorts(portIds)], []);
+	}
 	/**
 	 * Add a node to the diagram
 	 * @returns Inserted Node
 	 */
-	addNode(node: NodeModel): NodeModel {
-		this.nodes$.next({ ...this.nodes$.value, [node.id]: node });
+	addNode(node: N): N {
+		this.update({ nodes: { ...this.get('nodes'), [node.id]: node } } as Partial<DiagramModelState>);
 		return node;
 	}
 
@@ -63,24 +71,19 @@ export class DiagramModel extends BaseEntity {
 		const nodeID: ID = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
 
 		// TODO: delete all related links
-		const updNodes = { ...this.nodes$.value };
-		delete updNodes[nodeID];
-		this.nodes$.next(updNodes);
-	}
-
-	/**
-	 * Get nodes behaviour subject, use `.getValue()` for snapshot
-	 */
-	selectNodes(): Observable<{ [s: string]: NodeModel }> {
-		return this.nodes$.asObservable();
+		const { nodes } = this.get();
+		nodes[nodeID].destroy();
+		delete nodes[nodeID];
+		this.update({ nodes } as Partial<DiagramModelState>);
 	}
 
 	/**
 	 * Add link
 	 * @returns Newly created link
 	 */
-	addLink(link: LinkModel): LinkModel {
-		this.links$.next({ ...this.links$.value, [link.id]: link });
+	addLink(link: L): L {
+		link.update({ parentId: this.id });
+		this.update({ links: { ...this.get('links'), [link.id]: link } } as DiagramModelState);
 		return link;
 	}
 
@@ -90,19 +93,13 @@ export class DiagramModel extends BaseEntity {
 	deleteLink(linkOrId: LinkModel | string) {
 		const linkID: ID = typeof linkOrId === 'string' ? linkOrId : linkOrId.id;
 
-		const updLinks = { ...this.links$.value };
-		delete updLinks[linkID];
+		const { links, nodes } = this.get();
+		// TODO: remove link from port in node, find easier access to find the port
+		links[linkID].destroy();
+		delete links[linkID];
 
-		this.links$.next(updLinks);
+		this.update({ links } as DiagramModelState);
 	}
-
-	/**
-	 * Get links behaviour subject, use `.getValue()` for snapshot
-	 */
-	selectLinks(): Observable<{ [s: string]: LinkModel }> {
-		return this.links$.asObservable();
-	}
-
 	/**
 	 * Serialize the diagram model
 	 * @returns diagram model as a string
@@ -118,62 +115,21 @@ export class DiagramModel extends BaseEntity {
 	// 	this.model = JSON.parse(serializedModel);
 	// }
 
-	setOffset(x: number, y: number) {
-		this.offsetX$.next(x);
-		this.offsetY$.next(y);
-	}
-
-	setOffsetX(x: number) {
-		this.offsetX$.next(x);
-	}
-
-	getOffsetX(): number {
-		return this.offsetX$.getValue();
-	}
-
-	selectOffsetX(): Observable<number> {
-		return this.offsetX$.asObservable();
-	}
-
-	setOffsetY(y: number) {
-		this.offsetY$.next(y);
-	}
-
-	getOffsetY(): number {
-		return this.offsetY$.getValue();
-	}
-
-	selectOffsetY(): Observable<number> {
-		return this.offsetY$.asObservable();
-	}
-
-	setZoomLevel(z: number) {
-		this.zoom$.next(z);
-	}
-
-	getZoomLevel(): number {
-		return this.zoom$.getValue();
-	}
-
-	selectZoomLevel(): Observable<number> {
-		return this.zoom$.asObservable();
-	}
-
 	getDiagramEngine(): DiagramEngine {
 		return this.diagramEngine;
 	}
 
 	clearSelection(ignore: BaseModel | null = null) {
-		this.getSelectedItems().forEach(element => {
+		this.getActiveItems().forEach(element => {
 			if (ignore && ignore.id === element.id) {
 				return;
 			}
-			element.setSelected(false);
+			element.setActive(false);
 		});
 	}
 
 	getGridPosition({ x, y }: Coords): Coords {
-		const gridSize = this.gridSize$.getValue();
+		const { gridSize } = this.get();
 		if (gridSize === 0) {
 			return { x, y };
 		}
@@ -183,31 +139,31 @@ export class DiagramModel extends BaseEntity {
 		};
 	}
 
-	getSelectedItems(...filters: BaseEntityType[]): BaseModel[] {
-		if (!Array.isArray(filters)) {
+	getActiveItems(...filters: BaseEntityType[]): BaseModel[] {
+		if (!isArray(filters)) {
 			filters = [filters];
 		}
 		let items = [];
 
-		// run through nodes
+		// run through ports
 		items = items.concat(
-			flatMap(this.nodes$.getValue(), node => {
-				return node.getSelectedEntities();
+			flatMap(this.get('nodes'), node => {
+				return node.getActiveItems();
 			})
 		);
 
 		// find all the links
 		items = items.concat(
-			flatMap(this.links$.getValue(), link => {
-				return link.getSelectedEntities();
+			flatMap(this.get('links'), link => {
+				return link.getActiveItems();
 			})
 		);
 
 		// find all points
 		items = items.concat(
-			flatMap(this.links$.getValue(), link => {
-				return flatMap(link.getPoints(), point => {
-					return point.getSelectedEntities();
+			flatMap(this.get('links'), link => {
+				return flatMap(link.get('points'), point => {
+					return point.getActiveItems();
 				});
 			})
 		);
@@ -238,9 +194,9 @@ export class DiagramModel extends BaseEntity {
 	addAll(...models: BaseModel[]) {
 		models.forEach(model => {
 			if (model instanceof LinkModel) {
-				this.addLink(model);
+				this.addLink(model as L);
 			} else if (model instanceof NodeModel) {
-				this.addNode(model);
+				this.addNode(model as N);
 			}
 		});
 		return models;

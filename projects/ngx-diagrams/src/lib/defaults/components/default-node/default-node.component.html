@@ -1,8 +1,9 @@
 <div
+	*ngIf="dimensions$ | async as dimensions"
 	class="default-node"
 	[ngStyle]="{
-		'height.px': height$ | async,
-		'width.px': width$ | async,
+		'height.px': dimensions.height,
+		'width.px': dimensions.width,
 		'background-color': color
 	}"
 >

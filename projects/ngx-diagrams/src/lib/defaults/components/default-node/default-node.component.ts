@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { DefaultNodeModel } from '../../models/default-node.model';
 import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { PortModel } from '../../../models/port.model';
@@ -8,17 +8,17 @@ import { PortModel } from '../../../models/port.model';
 	templateUrl: './default-node.component.html',
 	styleUrls: ['./default-node.component.scss']
 })
-export class DefaultNodeComponent extends DefaultNodeModel implements OnInit {
+export class DefaultNodeComponent extends DefaultNodeModel implements AfterViewInit {
 	@ViewChild('portsLayer', { read: ViewContainerRef }) portsLayer: ViewContainerRef;
 
 	constructor() {
 		super('ngdx-default-node');
 	}
 
-	ngOnInit() {
+	ngAfterViewInit(): void {
 		this.selectPorts().subscribe(ports => {
 			ports.forEach(port => {
-				if (!port.getPainted()) {
+				if (!port.isPainted()) {
 					this.generatePort(port);
 					port.setPainted();
 				}

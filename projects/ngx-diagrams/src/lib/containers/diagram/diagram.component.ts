@@ -15,7 +15,7 @@ import { DiagramModel } from '../../models/diagram.model';
 import { NodeModel } from '../../models/node.model';
 import { LinkModel } from '../../models/link.model';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { BaseAction, MoveCanvasAction, SelectingAction } from '../../actions';
 import { BaseModel } from '../../models/base.model';
 import { MoveItemsAction } from '../../actions/move-items.action';
@@ -23,6 +23,7 @@ import { PointModel } from '../../models/point.model';
 import { Coords } from '../../interfaces/coords.interface';
 import { PortModel } from '../../models/port.model';
 import { some } from 'lodash';
+import { isNil } from '../../utils/tool-kit.util';
 
 @Component({
 	selector: 'ngdx-diagram',
@@ -46,8 +47,9 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 	@ViewChild('linksLayer', { read: ViewContainerRef }) linksLayer: ViewContainerRef;
 	@ViewChild('canvas', { read: ElementRef }) canvas: ElementRef;
 
-	private nodes$: Observable<{ [s: string]: NodeModel }>;
-	private links$: Observable<{ [s: string]: LinkModel }>;
+	private nodes$: Observable<NodeModel[]>;
+	private links$: Observable<LinkModel[]>;
+	private transformData$: Observable<string>;
 	private action$: BehaviorSubject<BaseAction> = new BehaviorSubject(null);
 	private nodesRendered$: BehaviorSubject<boolean>;
 
@@ -58,45 +60,52 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 
 	ngOnInit() {
 		if (this.diagramModel) {
+			this.transformData$ = this.diagramModel
+				.select(s => ({ offset: s.offset, zoom: s.zoom }))
+				.pipe(map(s => `transform: translate(${s.offset.x}px, ${s.offset.y}px) scale((${s.zoom / 100.0})`));
 			this.diagramModel.getDiagramEngine().setCanvas(this.canvas.nativeElement);
 
 			this.nodes$ = this.diagramModel.selectNodes();
 			this.links$ = this.diagramModel.selectLinks();
 			this.nodesRendered$ = new BehaviorSubject(false);
-
-			this.nodes$.subscribe(nodes => {
-				this.nodesRendered$.next(false);
-				Object.values(nodes).forEach(node => {
-					if (!node.getPainted()) {
-						this.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);
-						node.setPainted();
-					}
-				});
-				this.nodesRendered$.next(true);
-			});
 		}
 	}
 
 	ngAfterViewInit() {
+		this.nodes$.subscribe(nodes => {
+			this.nodesRendered$.next(false);
+			nodes.forEach(node => {
+				if (!node.isPainted()) {
+					this.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);
+					node.setPainted();
+				}
+			});
+			this.nodesRendered$.next(true);
+		});
+		// Paint links, TODO: move to diagramModel.
 		combineLatest(this.nodesRendered$, this.links$)
 			.pipe(filter(([nodesRendered, _]) => !!nodesRendered))
 			.subscribe(([_, links]) => {
-				Object.values(links).forEach(link => {
-					if (!link.getPainted()) {
-						if (link.getSourcePort() !== null) {
-							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getSourcePort());
-							link.getPoints()[0].setCoords(portCenter);
+				links.forEach(link => {
+					if (!link.isPainted()) {
+						const sourcePortInfo = link.getSourcePortInfo();
+						const targetPortInfo = link.getSourcePortInfo();
+						if (sourcePortInfo) {
+							const sourcePort = this.diagramModel.getPortsForNodes(sourcePortInfo.parentId, sourcePortInfo.id)[0];
+							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(sourcePort);
+							link.getPoints()[0].update({ coords: portCenter });
 
-							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getSourcePort());
-							link.getSourcePort().updateCoords(portCoords);
+							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(sourcePort);
+							sourcePort.update({ coords: portCoords });
 						}
 
-						if (link.getTargetPort() !== null) {
-							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getTargetPort());
-							link.getPoints()[link.getPoints().length - 1].setCoords(portCenter);
+						if (targetPortInfo) {
+							const targetPort = this.diagramModel.getPortsForNodes(targetPortInfo.parentId, targetPortInfo.id)[0];
+							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(targetPort);
+							link.getLastPoint().update({ coords: portCenter });
 
-							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getTargetPort());
-							link.getTargetPort().updateCoords(portCoords);
+							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(targetPort);
+							targetPort.update({ coords: portCoords });
 						}
 
 						this.diagramModel.getDiagramEngine().generateWidgetForLink(link, this.linksLayer);
@@ -155,7 +164,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 			// get the relevant node and return the port.
 			const nodeEl = target.closest('[data-nodeid]');
 			return {
-				model: this.diagramModel.getNode(nodeEl.getAttribute('data-nodeid')).getPort(element.getAttribute('data-portid')),
+				model: this.diagramModel.getNodes(nodeEl.getAttribute('data-nodeid'))[0].getPorts(element.getAttribute('data-portid'))[0],
 				element
 			};
 		}
@@ -164,7 +173,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 		element = target.closest('[data-pointid]');
 		if (element) {
 			return {
-				model: this.diagramModel.getLink(element.getAttribute('data-linkid')).getPointModel(element.getAttribute('data-pointid')),
+				model: this.diagramModel.getLinks(element.getAttribute('data-linkid'))[0].getPointModel(element.getAttribute('data-pointid')),
 				element
 			};
 		}
@@ -173,7 +182,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 		element = target.closest('[data-linkid]');
 		if (element) {
 			return {
-				model: this.diagramModel.getLink(element.getAttribute('data-linkid')),
+				model: this.diagramModel.getLinks(element.getAttribute('data-linkid'))[0],
 				element
 			};
 		}
@@ -182,7 +191,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 		element = target.closest('[data-nodeid]');
 		if (element) {
 			return {
-				model: this.diagramModel.getNode(element.getAttribute('data-nodeid')),
+				model: this.diagramModel.getNodes(element.getAttribute('data-nodeid'))[0],
 				element
 			};
 		}
@@ -204,27 +213,27 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 					return;
 				}
 				if (element && element.model instanceof PortModel && !diagramEngine.isModelLocked(element.model)) {
-					const link = model.model.getLink();
-					if (link.getTargetPort() !== null) {
+					const link = this.diagramModel.getLinks(model.model.getLinkId())[0];
+					const targetPortInfo = link.getTargetPortInfo();
+					const sourcePortInfo = link.getSourcePortInfo();
+					if (targetPortInfo) {
 						// if this was a valid link already and we are adding a node in the middle, create 2 links from the original
-						if (link.getTargetPort() !== element.model && link.getSourcePort() !== element.model) {
-							const targetPort = link.getTargetPort();
+						if (targetPortInfo.id !== element.model.id && sourcePortInfo.id !== element.model.id) {
+							const targetPort = this.diagramModel.getPortsForNodes(targetPortInfo.parentId, targetPortInfo.id)[0];
 							const newLink = link.clone({});
-							newLink.setSourcePort(element.model);
-							newLink.setTargetPort(targetPort);
-							link.setTargetPort(element.model);
-							targetPort.removeLink(link);
+							newLink.setPorts(element.model, targetPort);
+							link.setPorts(element.model);
 							newLink.removePointsBefore(newLink.getPoints()[link.getPointIndex(model.model)]);
 							link.removePointsAfter(model.model);
 							diagramEngine.getDiagramModel().addLink(newLink);
-							// if we are connecting to the same target or source, destroy tweener points
-						} else if (link.getTargetPort() === element.model) {
+							// if we are connecting to the same targetId or sourceId, destroy tweener points
+						} else if (targetPortInfo.id === element.model.id) {
 							link.removePointsAfter(model.model);
-						} else if (link.getSourcePort() === element.model) {
+						} else if (sourcePortInfo.id === element.model.id) {
 							link.removePointsBefore(model.model);
 						}
 					} else {
-						link.setTargetPort(element.model);
+						link.setPorts(element.model);
 					}
 					// delete this.props.diagramEngine.linksThatHaveInitiallyRendered[link.getID()];
 				}
@@ -239,8 +248,8 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 					}
 
 					const selectedPoint: PointModel = model.model;
-					const link: LinkModel = selectedPoint.getLink();
-					if (link.getSourcePort() === null || link.getTargetPort() === null) {
+					const link: LinkModel = this.diagramModel.getLinks(selectedPoint.getLinkId())[0];
+					if (isNil(link.getSourcePortInfo()) || isNil(link.getTargetPortInfo())) {
 						link.destroy();
 					}
 				});
@@ -253,17 +262,19 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 					return;
 				}
 
-				const link: LinkModel = model.model.getLink();
-				const sourcePort: PortModel = link.getSourcePort();
-				const targetPort: PortModel = link.getTargetPort();
-				if (sourcePort !== null && targetPort !== null) {
+				const link: LinkModel = this.diagramModel.getLinks(model.model.getLinkId())[0];
+				const sourcePortInfo = link.getSourcePortInfo();
+				const targetPortInfo = link.getTargetPortInfo();
+				if (!isNil(sourcePortInfo) && !isNil(targetPortInfo)) {
+					const sourcePort = this.diagramModel.getPortsForNodes(sourcePortInfo.parentId, sourcePortInfo.id)[0];
+					const targetPort = this.diagramModel.getPortsForNodes(targetPortInfo.parentId, targetPortInfo.id)[0];
 					if (!sourcePort.canLinkToPort(targetPort)) {
 						// link not allowed
 						link.destroy();
 					} else if (
 						some(
-							Object.values(targetPort.getLinks()),
-							(l: LinkModel) => l !== link && (l.getSourcePort() === sourcePort || l.getTargetPort() === sourcePort)
+							this.diagramModel.getLinks(targetPort.getLinkIds()),
+							(l: LinkModel) => l !== link && (l.hasPort(sourcePort, 'out') || l.hasPort(sourcePort, 'in'))
 						)
 					) {
 						// link is a duplicate
@@ -292,27 +303,27 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 		if (action instanceof SelectingAction) {
 			const relative = this.diagramModel.getDiagramEngine().getRelativePoint(event.clientX, event.clientY);
 
-			Object.values(this.diagramModel.getNodes()).forEach(node => {
-				if ((action as SelectingAction).containsElement(node.getCoords(), this.diagramModel)) {
-					node.setSelected();
+			this.diagramModel.getNodes().forEach(node => {
+				if ((action as SelectingAction).containsElement(node.get('coords'), this.diagramModel)) {
+					node.setActive();
 				} else {
-					node.setSelected(false);
+					node.setActive(false);
 				}
 			});
 
-			Object.values(this.diagramModel.getLinks()).forEach(link => {
+			this.diagramModel.getLinks().forEach(link => {
 				let allSelected = true;
-				link.getPoints().forEach(point => {
-					if ((action as SelectingAction).containsElement(point.getCoords(), this.diagramModel)) {
-						point.setSelected();
+				link.get('points').forEach(point => {
+					if ((action as SelectingAction).containsElement(point.get('coords'), this.diagramModel)) {
+						point.setActive();
 					} else {
-						point.setSelected(false);
+						point.setActive(false);
 						allSelected = false;
 					}
 				});
 
 				if (allSelected) {
-					link.setSelected();
+					link.setActive();
 				}
 			});
 
@@ -327,36 +338,37 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 				x: event.clientX - action.mouseX,
 				y: event.clientY - action.mouseY
 			};
-			const amountZoom = this.diagramModel.getZoomLevel() / 100;
+			const amountZoom = this.diagramModel.get('zoom') / 100;
 
 			action.selectionModels.forEach(model => {
 				// in this case we need to also work out the relative grid position
 				if (model.model instanceof NodeModel || (model.model instanceof PointModel && !model.model.isConnectedToPort())) {
 					const newCoords = { x: model.initialX + coords.x / amountZoom, y: model.initialY + coords.y / amountZoom };
-					model.model.setCoords(this.diagramModel.getGridPosition(newCoords));
+					model.model.update({ coords: this.diagramModel.getGridPosition(newCoords) });
 
 					if (model.model instanceof NodeModel) {
 						// update port coordinates as well
-						Object.values(model.model.getPorts()).forEach(port => {
-							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(port);
-							port.updateCoords(portCoords);
+						model.model.getPorts().forEach(port => {
+							port.update({ coords: this.diagramModel.getDiagramEngine().getPortCoords(port) });
 						});
 					}
 				} else if (model.model instanceof PointModel) {
 					// we want points that are connected to ports, to not necessarily snap to grid
 					// this stuff needs to be pixel perfect, dont touch it
 					const newCoords = this.diagramModel.getGridPosition({ x: coords.x / amountZoom, y: coords.y / amountZoom });
-					model.model.setCoords({ x: model.initialX + newCoords.x, y: model.initialY + newCoords.y });
+					model.model.update({ coords: { x: model.initialX + newCoords.x, y: model.initialY + newCoords.y } });
 				}
 			});
 
 			this.fireAction();
 		} else if (action instanceof MoveCanvasAction) {
 			if (this.allowCanvasTranslation) {
-				this.diagramModel.setOffset(
-					action.initialOffsetX + (event.clientX - action.mouseX),
-					action.initialOffsetY + (event.clientY - action.mouseY)
-				);
+				this.diagramModel.update({
+					offset: {
+						x: action.initialOffsetX + (event.clientX - action.mouseX),
+						y: action.initialOffsetY + (event.clientY - action.mouseY)
+					}
+				});
 				this.fireAction();
 			}
 		}
@@ -371,7 +383,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 
 		const selectedModel = this.getMouseElement(event);
 
-		// canvas selected
+		// canvas active
 		if (selectedModel === null) {
 			// multiple selection
 			if (event.shiftKey) {
@@ -389,20 +401,18 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 				const relative = this.diagramModel.getDiagramEngine().getRelativeMousePoint(event);
 				const sourcePort = selectedModel.model;
 				const link = sourcePort.createLinkModel();
-				link.setSourcePort(sourcePort);
+				link.setPorts(sourcePort);
 
 				if (link) {
 					link.removeMiddlePoints();
-					if (link.getSourcePort() !== sourcePort) {
-						link.setSourcePort(sourcePort);
+					if (!link.getPortIds('out').includes(sourcePort.id)) {
+						link.setPorts(sourcePort);
 					}
-					link.setTargetPort(null);
-
-					link.getFirstPoint().setCoords(relative);
-					link.getLastPoint().setCoords(relative);
+					link.getFirstPoint().update({ coords: relative });
+					link.getLastPoint().update({ coords: relative });
 
 					this.diagramModel.clearSelection();
-					link.getLastPoint().setSelected();
+					link.getLastPoint().setActive();
 					this.diagramModel.addLink(link);
 
 					this.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));
@@ -412,10 +422,10 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 			}
 		} else {
 			// its some other element, probably want to move it
-			if (!event.shiftKey && !selectedModel.model.getSelected) {
+			if (!event.shiftKey && !selectedModel.model.isActive()) {
 				this.diagramModel.clearSelection();
 			}
-			selectedModel.model.setSelected();
+			selectedModel.model.setActive();
 
 			this.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));
 		}
@@ -429,7 +439,10 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 		if (this.allowCanvasZoon) {
 			event.preventDefault();
 			event.stopPropagation();
-			const currentZoomLevel = this.diagramModel.getZoomLevel();
+			const {
+				zoom: currentZoomLevel,
+				offset: { x: offsetX, y: offsetY }
+			} = this.diagramModel.get();
 			const oldZoomFactor = currentZoomLevel / 100;
 			let scrollDelta = this.inverseZoom ? -event.deltaY : event.deltaY;
 			// check if it is pinch gesture
@@ -443,10 +456,10 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 				scrollDelta /= 60;
 			}
 			if (currentZoomLevel + scrollDelta > 10) {
-				this.diagramModel.setZoomLevel(currentZoomLevel + scrollDelta);
+				this.diagramModel.update({ zoom: currentZoomLevel + scrollDelta });
 			}
 
-			const zoomFactor = this.diagramModel.getZoomLevel() / 100;
+			const zoomFactor = (currentZoomLevel + scrollDelta) / 100;
 
 			const boundingRect = (event.currentTarget as Element).getBoundingClientRect();
 			const clientWidth = boundingRect.width;
@@ -461,13 +474,15 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 			const clientY = event.clientY - boundingRect.top;
 
 			// compute width and height increment factor
-			const xFactor = (clientX - this.diagramModel.getOffsetX()) / oldZoomFactor / clientWidth;
-			const yFactor = (clientY - this.diagramModel.getOffsetY()) / oldZoomFactor / clientHeight;
+			const xFactor = (clientX - offsetX) / oldZoomFactor / clientWidth;
+			const yFactor = (clientY - offsetY) / oldZoomFactor / clientHeight;
 
-			this.diagramModel.setOffset(
-				this.diagramModel.getOffsetX() - widthDiff * xFactor,
-				this.diagramModel.getOffsetY() - heightDiff * yFactor
-			);
+			this.diagramModel.update({
+				offset: {
+					x: offsetX - widthDiff * xFactor,
+					y: offsetY - heightDiff * yFactor
+				}
+			});
 		}
 	}
 }

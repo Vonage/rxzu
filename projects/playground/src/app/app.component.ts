@@ -24,35 +24,32 @@ export class AppComponent implements OnInit {
 
 		const node1 = new DefaultNodeModel();
 		node1.setCoords({ x: 500, y: 300 });
-		node1.setDimensions(nodesDefaultDimensions);
+		node1.update({ dimensions: nodesDefaultDimensions });
 		const p1 = node1.addInPort('inport');
 
 		const node2 = new DefaultNodeModel();
 		node2.setCoords({ x: 200, y: 200 });
-		node2.setDimensions(nodesDefaultDimensions);
+		node2.update({ update: nodesDefaultDimensions });
 		const outPortN2 = node2.addOutPort('outport');
 
 		const link1 = new DefaultLinkModel();
-		link1.setSourcePort(outPortN2);
-		link1.setTargetPort(p1);
+		link1.setPorts(outPortN2, p1);
 
 		const node3 = new DefaultNodeModel();
 		node3.setCoords({ x: 400, y: 600 });
-		node3.setDimensions(nodesDefaultDimensions);
+		node3.update({ dimensions: nodesDefaultDimensions });
 		const p3 = node3.addInPort('inport');
 
 		const link3 = new DefaultLinkModel();
-		link3.setSourcePort(outPortN2);
-		link3.setTargetPort(p3);
+		link3.setPorts(outPortN2, p3);
 
 		const node4 = new DefaultNodeModel();
 		node4.setCoords({ x: 1200, y: 200 });
-		node4.setDimensions(nodesDefaultDimensions);
+		node4.update({ dimensions: nodesDefaultDimensions });
 		const p4 = node4.addInPort('inport');
 
 		const link2 = new DefaultLinkModel();
-		link2.setSourcePort(outPortN2);
-		link2.setTargetPort(p4);
+		link2.setPorts(outPortN2, p4);
 
 		this.diagramModel.addAll(link1, node1, node2, node3, node4, link2, link3);
 

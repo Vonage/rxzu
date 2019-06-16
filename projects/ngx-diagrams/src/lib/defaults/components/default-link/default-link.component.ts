@@ -19,8 +19,8 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 	}
 
 	ngAfterViewInit() {
-		const firstPCoords$ = this.getFirstPoint().selectCoords();
-		const lastPCoords$ = this.getLastPoint().selectCoords();
+		const firstPCoords$ = this.getFirstPoint().select('coords');
+		const lastPCoords$ = this.getLastPoint().select('coords');
 
 		combineLatest(firstPCoords$, lastPCoords$).subscribe(([firstPCoords, lastPCoords]) => {
 			const points = [firstPCoords, lastPCoords];
@@ -38,7 +38,7 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 			const path = generateCurvePath(firstPCoords, lastPCoords, isStraight ? 0 : this.curvyness);
 			this._path$.next(path);
 
-			if (!this.getTargetPort()) {
+			if (!this.getTargetPortInfo()) {
 				const danglingPoint = this.generatePoint(lastPCoords);
 				this.points$.next([danglingPoint]);
 			}

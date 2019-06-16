@@ -21,7 +21,7 @@ export class DefaultLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 		this.renderer.setAttribute(rootNode, 'data-linkid', link.id);
 
 		// on destroy make sure to destroy the componentRef
-		link.onEntityDestroy().subscribe(() => {
+		link.onDestroy().subscribe(() => {
 			componentRef.destroy();
 		});
 

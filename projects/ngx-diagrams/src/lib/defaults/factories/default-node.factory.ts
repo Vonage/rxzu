@@ -23,16 +23,16 @@ export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 		this.renderer.setAttribute(rootNode, 'data-nodeid', node.id);
 
 		// subscribe to node coordinates
-		node.selectCoords().subscribe(({ x, y }) => {
+		node.select('coords').subscribe(({ x, y }) => {
 			this.renderer.setStyle(rootNode, 'left', `${x}px`);
 			this.renderer.setStyle(rootNode, 'top', `${y}px`);
 		});
 
-		node.selectionChanges().subscribe(e => {
-			e.isSelected ? this.renderer.addClass(rootNode, 'selected') : this.renderer.removeClass(rootNode, 'selected');
+		node.onActiveChange().subscribe(e => {
+			e.active ? this.renderer.addClass(rootNode, 'active') : this.renderer.removeClass(rootNode, 'active');
 		});
 
-		node.onEntityDestroy().subscribe(e => {
+		node.onDestroy().subscribe(e => {
 			componentRef.destroy();
 		});
 

@@ -1,47 +1,25 @@
 <div class="ngdx-diagram" #canvas (mousedown)="onMouseDown($event)" (wheel)="onMouseWheel($event)">
-	<!-- Nodes Layer -->
-	<div
-		class="ngdx-nodes-layer"
-		[ngStyle]="{
-			transform:
-				'translate(' +
-				(diagramModel.selectOffsetX() | async) +
-				'px, ' +
-				(diagramModel.selectOffsetY() | async) +
-				'px) scale(' +
-				(diagramModel.selectZoomLevel() | async) / 100.0 +
-				')'
-		}"
-	>
-		<ng-template #nodesLayer></ng-template>
-	</div>
+	<ng-container *ngIf="transformData$ | async as transform">
+		<!-- Nodes Layer -->
+		<div class="ngdx-nodes-layer" [ngStyle]="{ transform: transform }">
+			<ng-template #nodesLayer></ng-template>
+		</div>
 
-	<!-- Links Layer -->
-	<div
-		class="ngdx-links-layer"
-		[ngStyle]="{
-			transform:
-				'translate(' +
-				(diagramModel.selectOffsetX() | async) +
-				'px, ' +
-				(diagramModel.selectOffsetY() | async) +
-				'px) scale(' +
-				(diagramModel.selectZoomLevel() | async) / 100.0 +
-				')'
-		}"
-	>
-		<ng-template #linksLayer></ng-template>
-	</div>
+		<!-- Links Layer -->
+		<div class="ngdx-links-layer" [ngStyle]="{ transform: transform }">
+			<ng-template #linksLayer></ng-template>
+		</div>
 
-	<!-- Selection Box -->
-	<div
-		*ngIf="shouldDrawSelectionBox() && selectAction() | async as action"
-		class="selector"
-		[ngStyle]="{
-			top: action.dimensions.top + 'px',
-			left: action.dimensions.left + 'px',
-			width: action.dimensions.width + 'px',
-			height: action.dimensions.height + 'px'
-		}"
-	></div>
+		<!-- Selection Box -->
+		<div
+			*ngIf="shouldDrawSelectionBox() && action$ | async as action"
+			class="selector"
+			[ngStyle]="{
+				top: action.dimensions.top + 'px',
+				left: action.dimensions.left + 'px',
+				width: action.dimensions.width + 'px',
+				height: action.dimensions.height + 'px'
+			}"
+		></div>
+	</ng-container>
 </div>

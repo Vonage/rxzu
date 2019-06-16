@@ -9,6 +9,8 @@
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Coords } from '../interfaces/coords.interface';
+import { ExcludeOptionalState, ID, IDS, UpdateStateCallback } from '../interfaces/types';
+import { BaseEvent, EventOptions } from '../interfaces/event.interface';
 
 export enum LOG_LEVEL {
 	'LOG',
@@ -52,8 +54,6 @@ export function withLog(message: string, level: LOG_LEVEL = LOG_LEVEL.LOG, ...ar
 	return <T>(source: Observable<T>) => (isDev() ? source.pipe(tap(val => log(message, level, val, ...args))) : source);
 }
 
-export type ID = string;
-
 /**
  * Generates a unique ID
  */
@@ -65,6 +65,17 @@ export function UID(): ID {
 	});
 }
 
+export function createEvent<E = any>(entityId: ID, events?: E, options?: ExcludeOptionalState<EventOptions>): BaseEvent<E> {
+	return {
+		id: UID(),
+		entityId,
+		firing: true,
+		stopPropagation: () => (this.firing = false),
+		...options,
+		...events
+	};
+}
+
 export function isArray<T>(val: any): val is T[] {
 	return Array.isArray(val);
 }
@@ -73,8 +84,34 @@ export function isString(val: any): val is string {
 	return typeof val === 'string';
 }
 
-export function isFunction(val: any): val is (...args: any) => any {
+export function isKeyOf<T>(val: any, obj: any): val is keyof T {
+	return isString(val) && obj[val] !== undefined;
+}
+
+export function isFunction(val: any): val is (...args) => any {
 	return typeof val === 'function';
+}
+
+export function isObject<T>(val: any): val is T {
+	return typeof val === 'object';
+}
+
+export function coordsEqual({ x: x1, y: y1 }: Coords, { x: x2, y: y2 }: Coords): boolean {
+	return x1 === x2 && y1 === y2;
+}
+
+export function arrayCoerece<T>(val: T | T[]): T[] {
+	return [].concat(val);
+}
+
+export function projectorCoerce<P, R extends Partial<P> = P>(project?: UpdateStateCallback<P, R> | keyof P): (state: Readonly<P>) => R {
+	if (isFunction(project)) {
+		return project;
+	} else if (isString(project)) {
+		return state => (state[project] as unknown) as R; // TODO: remove as unknown
+	} else {
+		return state => state as R;
+	}
 }
 
 // @internal
@@ -89,11 +126,15 @@ export function coerceArray<T>(value: T | T[]): T[] {
 	return Array.isArray(value) ? value : [value];
 }
 
-export function mapToArray<T>(map: { [key: string]: T }): T[] {
+export function mapToArray<T>(map: { [key: string]: T }, withKey?: boolean): Array<T & { id: ID }> {
 	const result = [];
 	for (const key in map) {
 		if (!isNil(map[key])) {
-			result.push(map[key]);
+			if (withKey) {
+				result.push({ id: key, ...map[key] });
+			} else {
+				result.push(map[key]);
+			}
 		}
 	}
 

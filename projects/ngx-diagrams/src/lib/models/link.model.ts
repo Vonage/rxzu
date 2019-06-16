@@ -1,25 +1,26 @@
-import { BaseModel } from './base.model';
+import { BaseModel, BaseModelState } from './base.model';
 import { DiagramModel } from './diagram.model';
 import { PortModel } from './port.model';
 import { PointModel } from './point.model';
-import { Observable } from 'rxjs';
-import { ID } from '../utils/tool-kit.util';
+import { ID, IDS } from '../interfaces/types';
 import { Coords } from '../interfaces/coords.interface';
+import { mapToArray } from '../utils/tool-kit.util';
 
-export class LinkModel extends BaseModel<DiagramModel> {
-	// TODO: decide what should be reactive using RXJS
+export interface LinkModelState<S = any, P extends PointModel = PointModel> {
+	ports: { [id: string]: { parentId: ID; io: 'in' | 'out' } };
+	points: P[];
+}
+
+const DEFAULT_STATE: Partial<LinkModelState> = {
+	ports: {},
+	points: []
+};
+
+export class LinkModel<S = any, P extends PointModel = PointModel> extends BaseModel<LinkModelState<S, P>> {
 	private name: string;
-	private sourcePort: PortModel | null;
-	private targetPort: PortModel | null;
-	private points: PointModel[];
-	private extras: any;
 
-	constructor(linkType: string = 'default', id?: string) {
-		super(linkType, id);
-		this.points = [new PointModel(this, { x: 0, y: 0 }), new PointModel(this, { x: 0, y: 0 })];
-		this.extras = {};
-		this.sourcePort = null;
-		this.targetPort = null;
+	constructor(linkType: string, id?: string, initialState?: Partial<S>, logPrefix = '[Link]') {
+		super(linkType, id, { ...DEFAULT_STATE, ...initialState, points: [new PointModel(), new PointModel()] }, logPrefix);
 	}
 
 	setName(name: string) {
@@ -30,51 +31,43 @@ export class LinkModel extends BaseModel<DiagramModel> {
 		return this.name;
 	}
 
-	getExtras(): any {
-		return this.extras;
-	}
-
-	setExtras(extras: any) {
-		this.extras = extras;
-	}
-
-	destroy() {
-		if (this.sourcePort) {
-			this.sourcePort.removeLink(this);
-		}
-
-		if (this.targetPort) {
-			this.targetPort.removeLink(this);
-		}
-
-		super.destroy();
-	}
-
 	doClone(lookupTable = {}, clone) {
-		clone.setPoints(
-			this.getPoints().map((point: PointModel) => {
-				return point.clone(lookupTable);
-			})
-		);
-		if (this.sourcePort) {
-			clone.setSourcePort(this.sourcePort.clone(lookupTable));
-		}
-		if (this.targetPort) {
-			clone.setTargetPort(this.targetPort.clone(lookupTable));
-		}
+		const { points } = this.get();
+		clone.update({ points: points.map((point: PointModel) => point.clone(lookupTable)) });
 	}
 
-	isLastPoint(point: PointModel) {
+	getPorts(io: 'in' | 'out'): { id: ID; parentId: ID; io: 'in' | 'out' }[] {
+		return mapToArray(this.get('ports'), true).filter(val => val.io === io);
+	}
+
+	getPortIds(io: 'in' | 'out'): ID[] {
+		return this.getPorts(io).map(p => p.id);
+	}
+
+	hasPort(port: PortModel, io: 'in' | 'out'): boolean {
+		const { ports } = this.get();
+		return ports[port.id] && ports[port.id].io === io;
+	}
+
+	getSourcePortInfo(): { id: ID; parentId: ID } | null {
+		return this.getPorts('out')[0];
+	}
+
+	getTargetPortInfo(): { id: ID; parentId: ID } | null {
+		return this.getPorts('in')[0];
+	}
+
+	isLastPoint(point: P) {
 		const index = this.getPointIndex(point);
-		return index === this.points.length - 1;
+		return index === this.get(s => s.points).length - 1;
 	}
 
-	getPointIndex(point: PointModel) {
-		return this.points.indexOf(point);
+	getPointIndex(point: P) {
+		return this.get(s => s.points).indexOf(point);
 	}
 
-	getPointModel(id: ID): PointModel | null {
-		for (const point of this.points) {
+	getPointModel(id: ID): P | null {
+		for (const point of this.get(s => s.points)) {
 			if (point.id === id) {
 				return point;
 			}
@@ -82,102 +75,82 @@ export class LinkModel extends BaseModel<DiagramModel> {
 		return null;
 	}
 
-	getPortForPoint(point: PointModel): PortModel {
-		if (this.sourcePort !== null && this.getFirstPoint().id === point.id) {
-			return this.sourcePort;
-		}
-		if (this.targetPort !== null && this.getLastPoint().id === point.id) {
-			return this.targetPort;
-		}
-		return null;
-	}
-
-	getPointForPort(port: PortModel): PointModel {
-		if (this.sourcePort !== null && this.sourcePort.id === port.id) {
-			return this.getFirstPoint();
-		}
-		if (this.targetPort !== null && this.targetPort.id === port.id) {
-			return this.getLastPoint();
-		}
-		return null;
-	}
-
 	getFirstPoint(): PointModel {
-		return this.points[0];
+		return this.get(s => s.points)[0];
 	}
 
 	getLastPoint(): PointModel {
-		return this.points[this.points.length - 1];
+		const { points } = this.get();
+		return points[points.length - 1];
 	}
 
-	setSourcePort(port: PortModel) {
-		if (port !== null) {
-			port.addLink(this);
-		}
-		if (this.sourcePort !== null) {
-			this.sourcePort.removeLink(this);
-		}
-		this.sourcePort = port;
+	setPorts(...newPorts: PortModel[]): void {
+		const { ports } = this.get();
+		newPorts.forEach(port => {
+			if (ports[port.id] !== null) {
+				port.removeLink(this.id);
+				delete ports[port.id];
+			} else {
+				const sourceOrTarget = this.getPorts(port.get('io'))[0];
+				if (sourceOrTarget) {
+					delete ports[sourceOrTarget.id];
+				}
+				port.addLink(this.id);
+				ports[port.id] = { parentId: port.getParentId(), io: port.get('io') };
+			}
+		});
+
+		this.update({ ports } as Partial<LinkModelState<S, P>>);
 	}
 
-	getSourcePort(): PortModel {
-		return this.sourcePort;
-	}
-
-	getTargetPort(): PortModel {
-		return this.targetPort;
-	}
-
-	setTargetPort(port: PortModel) {
-		if (port !== null) {
-			port.addLink(this);
-		}
-		if (this.targetPort !== null) {
-			this.targetPort.removeLink(this);
-		}
-		this.targetPort = port;
-	}
-
-	point({ x, y }: Coords): PointModel {
+	point({ x, y }: Coords): P {
 		return this.addPoint(this.generatePoint({ x, y }));
 	}
 
-	getPoints(): PointModel[] {
-		return this.points;
+	getPoints(): P[] {
+		return this.get('points');
 	}
 
-	setPoints(points: PointModel[]) {
+	setPoints(...points: P[]) {
 		points.forEach(point => {
-			point.setParent(this);
+			point.update({});
 		});
-		this.points = points;
+		this.update({ points } as Partial<LinkModelState<S, P>>);
 	}
 
-	removePoint(pointModel: PointModel) {
-		this.points.splice(this.getPointIndex(pointModel), 1);
+	removePoint(pointModel: P) {
+		const points = this.get('points');
+		points.splice(this.getPointIndex(pointModel), 1);
+		this.update({ points } as Partial<LinkModelState<S, P>>);
 	}
 
-	removePointsBefore(pointModel: PointModel) {
-		this.points.splice(0, this.getPointIndex(pointModel));
+	removePointsBefore(pointModel: P) {
+		const points = this.get('points');
+		points.splice(0, this.getPointIndex(pointModel));
+		this.update({ points } as Partial<LinkModelState<S, P>>);
 	}
 
-	removePointsAfter(pointModel: PointModel) {
-		this.points.splice(this.getPointIndex(pointModel) + 1);
+	removePointsAfter(pointModel: P) {
+		const points = this.get('points');
+		points.splice(this.getPointIndex(pointModel) + 1);
+		this.update({ points } as Partial<LinkModelState<S, P>>);
 	}
 
 	removeMiddlePoints() {
-		if (this.points.length > 2) {
-			this.points.splice(0, this.points.length - 2);
+		const points = this.get('points');
+		if (points.length > 2) {
+			points.splice(0, points.length - 2);
 		}
 	}
 
-	addPoint<P extends PointModel>(pointModel: P, index = 1): P {
-		pointModel.setParent(this);
-		this.points.splice(index, 0, pointModel);
+	addPoint(pointModel: P, index = 1): P {
+		const points = this.get('points');
+		points.splice(index, 0, pointModel);
+		this.update({ points } as Partial<LinkModelState<S, P>>);
 		return pointModel;
 	}
 
-	generatePoint({ x = 0, y = 0 }: Coords): PointModel {
-		return new PointModel(this, { x, y });
+	generatePoint({ x = 0, y = 0 }: Coords): P {
+		return new PointModel({ coords: { x, y }, parentId: this.id }) as P;
 	}
 }
