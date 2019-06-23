@@ -1,6 +1,6 @@
 {
   "name": "ngx-diagrams-workspace",
-  "version": "2.0.1",
+  "version": "0.0.0-development",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -69,7 +69,7 @@
     "ng-packagr": "^4.2.0",
     "prettier": "^1.17.0",
     "protractor": "~5.4.0",
-    "semantic-release": "^15.13.12",
+    "semantic-release": "^15.13.16",
     "ts-node": "~7.0.0",
     "tsickle": ">=0.34.0",
     "tslib": "^1.9.0",
