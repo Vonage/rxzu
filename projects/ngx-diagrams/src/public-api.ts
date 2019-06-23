@@ -1,5 +1,5 @@
 /*
- * Public API Surface of ngx-diagrams library
+ * Public API Surface of ngx-diagrams library, test
  */
 
 export * from './lib/containers/diagram/diagram.component';
