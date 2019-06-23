@@ -1,3 +1,10 @@
+## [2.0.3](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.0.2...v2.0.3) (2019-06-23)
+
+
+### Bug Fixes
+
+* **public api:** fixed exposed public apis ([9861bda](https://github.com/DanielNetzer/ngx-diagrams/commit/9861bda))
+
 ## [2.0.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.0.1...v2.0.2) (2019-06-23)
 
 
