@@ -1,3 +1,11 @@
+## [2.0.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.0.1...v2.0.2) (2019-06-23)
+
+
+### Bug Fixes
+
+* **ci:** fixed issue with ci ([ff380d6](https://github.com/DanielNetzer/ngx-diagrams/commit/ff380d6))
+* **package lock:** updated package lock ([fb0d604](https://github.com/DanielNetzer/ngx-diagrams/commit/fb0d604))
+
 ## [2.0.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.0.0...v2.0.1) (2019-06-23)
 
 
