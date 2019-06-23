@@ -1,3 +1,22 @@
+# [2.0.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v1.5.0...v2.0.0) (2019-06-23)
+
+
+### Bug Fixes
+
+* **base entity:** removed unused import ([24a366b](https://github.com/DanielNetzer/ngx-diagrams/commit/24a366b))
+* **default-factories:** use renderer2 instead direct DOM ([c10970d](https://github.com/DanielNetzer/ngx-diagrams/commit/c10970d))
+* **layers overlapping:** layers wont overlap each ([045cffb](https://github.com/DanielNetzer/ngx-diagrams/commit/045cffb))
+
+
+### Features
+
+* **rxstate:** move all library and engine to rx style [WIP] ([24d2b03](https://github.com/DanielNetzer/ngx-diagrams/commit/24d2b03))
+
+
+### BREAKING CHANGES
+
+* **rxstate:** CHANGES
+
 # [1.5.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v1.4.0...v1.5.0) (2019-05-18)
 
 
