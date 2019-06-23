@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.0.0...v2.0.1) (2019-06-23)
+
+
+### Bug Fixes
+
+* **public api:** exporting all required modules ([69a80de](https://github.com/DanielNetzer/ngx-diagrams/commit/69a80de))
+
 # [2.0.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v1.5.0...v2.0.0) (2019-06-23)
 
 
