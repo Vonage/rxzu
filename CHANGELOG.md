@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.1.1...v2.2.0) (2019-06-24)
+
+
+### Features
+
+* **ports:** support for different types of ports ([9c9af1e](https://github.com/DanielNetzer/ngx-diagrams/commit/9c9af1e))
+
 ## [2.1.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.1.0...v2.1.1) (2019-06-24)
 
 
