@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.1.0...v2.1.1) (2019-06-24)
+
+
+### Bug Fixes
+
+* **util:** exporting utils ([eed447d](https://github.com/DanielNetzer/ngx-diagrams/commit/eed447d))
+
 # [2.1.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.0.4...v2.1.0) (2019-06-24)
 
 
