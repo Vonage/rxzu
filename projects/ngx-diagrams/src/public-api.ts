@@ -10,3 +10,4 @@ export * from './lib/models';
 export * from './lib/interfaces';
 export * from './lib/factories';
 export * from './lib/actions';
+export * from './lib/utils';
