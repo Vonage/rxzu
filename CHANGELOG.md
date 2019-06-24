@@ -1,3 +1,10 @@
+## [2.0.4](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.0.3...v2.0.4) (2019-06-24)
+
+
+### Bug Fixes
+
+* **main module:** declared all components inside self ([80a55b3](https://github.com/DanielNetzer/ngx-diagrams/commit/80a55b3))
+
 ## [2.0.3](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.0.2...v2.0.3) (2019-06-23)
 
 
