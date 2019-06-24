@@ -1,3 +1,15 @@
+# [2.1.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.0.4...v2.1.0) (2019-06-24)
+
+
+### Bug Fixes
+
+* **storybook:** imports are now from the library and not the dist ([9a487cf](https://github.com/DanielNetzer/ngx-diagrams/commit/9a487cf))
+
+
+### Features
+
+* **exports:** exporting all relevant apis ([0d24b42](https://github.com/DanielNetzer/ngx-diagrams/commit/0d24b42))
+
 ## [2.0.4](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.0.3...v2.0.4) (2019-06-24)
 
 
