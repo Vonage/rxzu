@@ -1,8 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DiagramModel } from 'dist/ngx-diagrams';
-import { DefaultNodeModel } from 'dist/ngx-diagrams';
-import { DefaultLinkModel } from 'dist/ngx-diagrams';
-import { DiagramEngine } from 'dist/ngx-diagrams';
+import { DiagramEngine, DefaultLinkModel, DiagramModel, DefaultNodeModel } from 'ngx-diagrams';
 
 @Component({
 	selector: 'app-root',
