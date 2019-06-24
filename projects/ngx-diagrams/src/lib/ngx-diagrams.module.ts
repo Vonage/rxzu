@@ -6,10 +6,10 @@ import { DefaultPortComponent } from './defaults/components/default-port/default
 import { DefaultLinkComponent } from './defaults/components/default-link/default-link.component';
 
 @NgModule({
-	declarations: [NgxDiagramComponent, DefaultNodeComponent, DefaultPortComponent, DefaultLinkComponent],
+	declarations: [NgxDiagramComponent, DefaultLinkComponent, DefaultNodeComponent, DefaultPortComponent],
 	imports: [CommonModule],
 	providers: [],
 	exports: [NgxDiagramComponent],
-	entryComponents: [DefaultNodeComponent, DefaultPortComponent, DefaultLinkComponent]
+	entryComponents: [DefaultLinkComponent, DefaultNodeComponent, DefaultPortComponent]
 })
 export class NgxDiagramsModule {}

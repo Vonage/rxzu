@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { DiagramModel } from 'projects/ngx-diagrams/src/lib/models/diagram.model';
-import { DiagramEngine } from 'ngx-diagrams';
-import { DefaultNodeModel } from 'projects/ngx-diagrams/src/lib/defaults/models/default-node.model';
-import { DefaultPortModel } from 'projects/ngx-diagrams/src/lib/defaults/models/default-port.model';
-import { DefaultLinkModel } from 'projects/ngx-diagrams/src/lib/defaults/models/default-link.model';
+import { DiagramModel } from 'dist/ngx-diagrams';
+import { DefaultNodeModel } from 'dist/ngx-diagrams';
+import { DefaultLinkModel } from 'dist/ngx-diagrams';
+import { DiagramEngine } from 'dist/ngx-diagrams';
 
 @Component({
 	selector: 'app-root',

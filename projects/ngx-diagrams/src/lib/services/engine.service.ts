@@ -12,8 +12,9 @@ import { BehaviorSubject } from 'rxjs';
 import { take, delay, filter } from 'rxjs/operators';
 import { DefaultLinkFactory } from '../defaults/factories/default-link.factory';
 import { BaseEntity } from '../base.entity';
+import { NgxDiagramsModule } from '../ngx-diagrams.module';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: NgxDiagramsModule })
 export class DiagramEngine {
 	private _renderer: Renderer2;
 	private nodeFactories: { [s: string]: AbstractNodeFactory };
@@ -24,7 +25,7 @@ export class DiagramEngine {
 	diagramModel: DiagramModel;
 
 	constructor(private resolver: ComponentFactoryResolver, private rendererFactory: RendererFactory2) {
-		this._renderer = rendererFactory.createRenderer(null, null);
+		this._renderer = this.rendererFactory.createRenderer(null, null);
 		this.nodeFactories = {};
 		this.linkFactories = {};
 		this.portFactories = {};
@@ -241,7 +242,7 @@ export class DiagramEngine {
 				take(1),
 				delay(0)
 			)
-			.subscribe(canvas => {
+			.subscribe((canvas: HTMLElement) => {
 				const xFactor = canvas.clientWidth / canvas.scrollWidth;
 				const yFactor = canvas.clientHeight / canvas.scrollHeight;
 				const zoomFactor = xFactor < yFactor ? xFactor : yFactor;
