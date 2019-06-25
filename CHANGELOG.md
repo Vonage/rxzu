@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.2.0...v2.3.0) (2019-06-25)
+
+
+### Features
+
+* **default node:** support for custom ID ([ddd8b92](https://github.com/DanielNetzer/ngx-diagrams/commit/ddd8b92))
+
 # [2.2.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.1.1...v2.2.0) (2019-06-24)
 
 
