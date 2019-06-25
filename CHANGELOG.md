@@ -1,3 +1,10 @@
+# [2.5.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.4.0...v2.5.0) (2019-06-25)
+
+
+### Features
+
+* **default port:** custom ids ([6e7772a](https://github.com/DanielNetzer/ngx-diagrams/commit/6e7772a))
+
 # [2.4.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.3.0...v2.4.0) (2019-06-25)
 
 
