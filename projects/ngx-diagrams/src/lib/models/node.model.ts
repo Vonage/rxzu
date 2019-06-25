@@ -24,12 +24,12 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 
 	constructor(
 		nodeType: string = 'default',
+		id?: string,
 		extras: { [s: string]: any } = {},
 		x: number = 0,
 		y: number = 0,
 		width: number = 0,
 		height: number = 0,
-		id?: string,
 		logPrefix = '[Node]'
 	) {
 		super(nodeType, id, logPrefix);

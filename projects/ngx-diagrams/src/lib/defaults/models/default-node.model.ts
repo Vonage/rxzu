@@ -8,8 +8,8 @@ export class DefaultNodeModel extends NodeModel {
 	height$: Observable<number>;
 	width$: Observable<number>;
 
-	constructor(name: string = 'Untitled', color: string = 'rgb(0, 192, 255)') {
-		super('default');
+	constructor(name: string = 'Untitled', type: string = 'default', color: string = 'rgb(0, 192, 255)') {
+		super(type);
 		this.name = name;
 		this.color = color;
 		this.height$ = this.selectHeight();

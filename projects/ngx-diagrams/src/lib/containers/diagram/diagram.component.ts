@@ -56,6 +56,8 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 
 	constructor(private renderer: Renderer2) {}
 
+	// TODO: handle destruction of container, resseting all observables to avoid memory leaks!
+
 	ngOnInit() {
 		if (this.diagramModel) {
 			this.diagramModel.getDiagramEngine().setCanvas(this.canvas.nativeElement);

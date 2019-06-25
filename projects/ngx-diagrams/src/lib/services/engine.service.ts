@@ -41,8 +41,6 @@ export class DiagramEngine {
 		this.registerNodeFactory(new DefaultNodeFactory(this.resolver, this._renderer));
 		this.registerPortFactory(new DefaultPortFactory(this.resolver, this._renderer));
 		this.registerLinkFactory(new DefaultLinkFactory(this.resolver, this._renderer));
-
-		// TODO: implement defaultLinkFactory
 	}
 
 	//#region Factories
@@ -230,6 +228,8 @@ export class DiagramEngine {
 
 		return model.getLocked();
 	}
+
+	// TODO: support destruction of the current diagram model.
 
 	/**
 	 * fit the canvas zoom levels to the elements contained.
