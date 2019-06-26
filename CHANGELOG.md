@@ -1,3 +1,10 @@
+## [2.5.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.5.0...v2.5.1) (2019-06-26)
+
+
+### Bug Fixes
+
+* **change detection:** on widget created run change detection ref check ([05f1eec](https://github.com/DanielNetzer/ngx-diagrams/commit/05f1eec))
+
 # [2.5.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.4.0...v2.5.0) (2019-06-25)
 
 
