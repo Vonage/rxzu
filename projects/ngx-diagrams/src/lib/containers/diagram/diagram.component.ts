@@ -9,7 +9,8 @@ import {
 	ViewContainerRef,
 	ElementRef,
 	AfterViewInit,
-	ChangeDetectionStrategy
+	ChangeDetectionStrategy,
+	ChangeDetectorRef
 } from '@angular/core';
 import { DiagramModel } from '../../models/diagram.model';
 import { NodeModel } from '../../models/node.model';
@@ -54,10 +55,9 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 	private mouseUpListener = () => {};
 	private mouseMoveListener = () => {};
 
-	constructor(private renderer: Renderer2) {}
+	constructor(private renderer: Renderer2, private cdRef: ChangeDetectorRef) {}
 
 	// TODO: handle destruction of container, resseting all observables to avoid memory leaks!
-
 	ngOnInit() {
 		if (this.diagramModel) {
 			this.diagramModel.getDiagramEngine().setCanvas(this.canvas.nativeElement);
@@ -72,6 +72,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 					if (!node.getPainted()) {
 						this.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);
 						node.setPainted();
+						this.cdRef.detectChanges();
 					}
 				});
 				this.nodesRendered$.next(true);
@@ -103,6 +104,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 
 						this.diagramModel.getDiagramEngine().generateWidgetForLink(link, this.linksLayer);
 						link.setPainted();
+						this.cdRef.detectChanges();
 					}
 				});
 			});
