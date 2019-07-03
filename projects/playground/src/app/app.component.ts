@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DiagramEngine, DefaultLinkModel, DiagramModel, DefaultNodeModel } from 'ngx-diagrams';
+import { DiagramEngine, DefaultLinkModel, DiagramModel, DefaultNodeModel, DefaultLabelModel } from 'ngx-diagrams';
 
 @Component({
 	selector: 'app-root',
@@ -40,6 +40,9 @@ export class AppComponent implements OnInit {
 		const link3 = new DefaultLinkModel();
 		link3.setSourcePort(outPortN2);
 		link3.setTargetPort(p3);
+
+		const label1 = new DefaultLabelModel('LABEL!');
+		link3.setLabel(label1);
 
 		const node4 = new DefaultNodeModel();
 		node4.setCoords({ x: 1200, y: 200 });

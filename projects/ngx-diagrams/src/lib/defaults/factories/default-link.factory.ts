@@ -2,13 +2,14 @@ import { AbstractLinkFactory } from '../../factories/link.factory';
 import { DefaultLinkComponent } from '../components/default-link/default-link.component';
 import { DefaultLinkModel } from '../models/default-link.model';
 import { ViewContainerRef, ComponentRef, ComponentFactoryResolver, ComponentFactory, Renderer2 } from '@angular/core';
+import { DiagramEngine } from '../../services/engine.service';
 
 export class DefaultLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 	constructor(private resolver: ComponentFactoryResolver, private renderer: Renderer2) {
 		super('default');
 	}
 
-	generateWidget(link: DefaultLinkModel, linksHost: ViewContainerRef): ComponentRef<DefaultLinkComponent> {
+	generateWidget(diagramEngine: DiagramEngine, link: DefaultLinkModel, linksHost: ViewContainerRef): ComponentRef<DefaultLinkComponent> {
 		const componentRef = linksHost.createComponent(this.getRecipe());
 
 		// attach coordinates and default positional behaviour to the generated component host
@@ -16,6 +17,7 @@ export class DefaultLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 
 		// default style for link
 		this.renderer.setStyle(rootNode, 'position', 'absolute');
+		this.renderer.addClass(rootNode, 'label');
 
 		// data attributes
 		this.renderer.setAttribute(rootNode, 'data-linkid', link.id);
@@ -29,6 +31,8 @@ export class DefaultLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 		Object.entries(link).forEach(([key, value]) => {
 			componentRef.instance[key] = value;
 		});
+
+		componentRef.instance.diagramEngine = diagramEngine;
 
 		return componentRef;
 	}

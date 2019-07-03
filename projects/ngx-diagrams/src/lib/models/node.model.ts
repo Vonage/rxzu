@@ -4,10 +4,9 @@ import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
 import { Coords } from '../interfaces/coords.interface.js';
 import { DiagramEngine } from '../services/engine.service';
-import { distinctUntilChanged, map, pluck, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 import { Dimensions } from '../interfaces/dimensions.interface';
 import { ID, mapToArray } from '../utils/tool-kit.util';
-import { SelectionEvent } from '../interfaces/event.interface';
 
 export class NodeModel<P extends PortModel = PortModel> extends BaseModel<DiagramModel> {
 	id: ID;

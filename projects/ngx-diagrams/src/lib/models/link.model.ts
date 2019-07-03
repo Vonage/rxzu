@@ -2,17 +2,23 @@ import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
 import { PortModel } from './port.model';
 import { PointModel } from './point.model';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ID } from '../utils/tool-kit.util';
 import { Coords } from '../interfaces/coords.interface';
+import { LabelModel } from './label.model';
+import { DiagramEngine } from '../services/engine.service';
 
 export class LinkModel extends BaseModel<DiagramModel> {
+	diagramEngine: DiagramEngine;
+
 	// TODO: decide what should be reactive using RXJS
 	private name: string;
 	private sourcePort: PortModel | null;
 	private targetPort: PortModel | null;
 	private points: PointModel[];
 	private extras: any;
+
+	private readonly label: BehaviorSubject<LabelModel> = new BehaviorSubject(null);
 
 	constructor(linkType: string = 'default', id?: string) {
 		super(linkType, id);
@@ -151,6 +157,31 @@ export class LinkModel extends BaseModel<DiagramModel> {
 			point.setParent(this);
 		});
 		this.points = points;
+	}
+
+	setLabel(label: LabelModel) {
+		label.setParent(this);
+		this.label.next(label);
+		label.setPainted();
+	}
+
+	selectLabel(): Observable<LabelModel | null> {
+		return this.label.asObservable();
+	}
+
+	getLabel(): LabelModel {
+		return this.label.getValue();
+	}
+
+	resetLabel() {
+		const currentLabel = this.label.getValue();
+
+		if (currentLabel) {
+			currentLabel.setParent(null);
+			currentLabel.setPainted(false);
+		}
+
+		this.label.next(null);
 	}
 
 	removePoint(pointModel: PointModel) {

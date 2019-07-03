@@ -13,11 +13,15 @@ import { take, delay, filter } from 'rxjs/operators';
 import { DefaultLinkFactory } from '../defaults/factories/default-link.factory';
 import { BaseEntity } from '../base.entity';
 import { NgxDiagramsModule } from '../ngx-diagrams.module';
+import { AbstractLabelFactory } from '../factories/label.factory';
+import { LabelModel } from '../models/label.model';
+import { DefaultLabelFactory } from '../defaults/factories/default-label.factory';
 
 @Injectable({ providedIn: NgxDiagramsModule })
 export class DiagramEngine {
 	private _renderer: Renderer2;
 	private nodeFactories: { [s: string]: AbstractNodeFactory };
+	private labelFactories: { [s: string]: AbstractLabelFactory };
 	private linkFactories: { [s: string]: AbstractLinkFactory };
 	private portFactories: { [s: string]: AbstractPortFactory };
 	private canvas$: BehaviorSubject<Element>;
@@ -29,6 +33,7 @@ export class DiagramEngine {
 		this.nodeFactories = {};
 		this.linkFactories = {};
 		this.portFactories = {};
+		this.labelFactories = {};
 		this.canvas$ = new BehaviorSubject<Element>(null);
 	}
 
@@ -41,9 +46,38 @@ export class DiagramEngine {
 		this.registerNodeFactory(new DefaultNodeFactory(this.resolver, this._renderer));
 		this.registerPortFactory(new DefaultPortFactory(this.resolver, this._renderer));
 		this.registerLinkFactory(new DefaultLinkFactory(this.resolver, this._renderer));
+		this.registerLabelFactory(new DefaultLabelFactory(this.resolver, this._renderer));
 	}
 
 	//#region Factories
+	// LABELS
+	registerLabelFactory(labelFactory: AbstractLabelFactory) {
+		this.labelFactories[labelFactory.type] = labelFactory;
+	}
+
+	getLabelFactories(): { [s: string]: AbstractLabelFactory } {
+		return this.labelFactories;
+	}
+
+	getLabelFactory(type: string): AbstractLabelFactory {
+		if (this.labelFactories[type]) {
+			return this.labelFactories[type];
+		}
+		throw new Error(`cannot find factory for node of type: [${type}]`);
+	}
+
+	getFactoryForLabel(label: LabelModel): AbstractLabelFactory | null {
+		return this.getLabelFactory(label.getType());
+	}
+
+	generateWidgetForLabel(label: LabelModel, labelHost: ViewContainerRef): ComponentRef<LabelModel> | null {
+		const labelFactory = this.getFactoryForLabel(label);
+		if (!labelFactory) {
+			throw new Error(`Cannot find widget factory for node: ${label.getType()}`);
+		}
+		return labelFactory.generateWidget(label, labelHost);
+	}
+
 	// NODES
 	registerNodeFactory(nodeFactory: AbstractNodeFactory) {
 		this.nodeFactories[nodeFactory.type] = nodeFactory;
@@ -125,7 +159,7 @@ export class DiagramEngine {
 		if (!linkFactory) {
 			throw new Error(`Cannot find link factory for link: ${link.getType()}`);
 		}
-		return linkFactory.generateWidget(link, linksHost);
+		return linkFactory.generateWidget(this, link, linksHost);
 	}
 	//#endregion
 

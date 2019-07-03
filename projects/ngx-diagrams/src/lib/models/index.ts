@@ -5,3 +5,4 @@ export * from './move-selection.model';
 export * from './node.model';
 export * from './point.model';
 export * from './port.model';
+export * from './label.model';

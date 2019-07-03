@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { DefaultNodeModel } from '../../models/default-node.model';
-import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { PortModel } from '../../../models/port.model';
 
 @Component({
