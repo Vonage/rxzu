@@ -1,3 +1,10 @@
+# [2.6.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.5.1...v2.6.0) (2019-07-04)
+
+
+### Features
+
+* **labels:** links can now have a label ([4359cb5](https://github.com/DanielNetzer/ngx-diagrams/commit/4359cb5))
+
 ## [2.5.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.5.0...v2.5.1) (2019-06-26)
 
 
