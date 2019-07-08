@@ -1,3 +1,15 @@
+## [2.6.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.6.0...v2.6.1) (2019-07-08)
+
+
+### Bug Fixes
+
+* **security:** updated packages to remove security issues ([6643aa5](https://github.com/DanielNetzer/ngx-diagrams/commit/6643aa5))
+
+
+### Performance Improvements
+
+* **default components:** exported as individual modules ([2a4bff6](https://github.com/DanielNetzer/ngx-diagrams/commit/2a4bff6))
+
 # [2.6.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.5.1...v2.6.0) (2019-07-04)
 
 
