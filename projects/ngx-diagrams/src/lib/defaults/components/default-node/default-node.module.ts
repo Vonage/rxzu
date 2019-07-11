@@ -6,7 +6,7 @@ import { DefaultNodeComponent } from './default-node.component';
 	declarations: [DefaultNodeComponent],
 	imports: [CommonModule],
 	providers: [],
-	exports: [],
+	exports: [DefaultNodeComponent],
 	entryComponents: [DefaultNodeComponent]
 })
 export class DefaultNodeModule {}

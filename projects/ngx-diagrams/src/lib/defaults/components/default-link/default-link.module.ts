@@ -6,7 +6,7 @@ import { DefaultLinkComponent } from './default-link.component';
 	declarations: [DefaultLinkComponent],
 	imports: [CommonModule],
 	providers: [],
-	exports: [],
+	exports: [DefaultLinkComponent],
 	entryComponents: [DefaultLinkComponent]
 })
 export class DefaultLinkModule {}

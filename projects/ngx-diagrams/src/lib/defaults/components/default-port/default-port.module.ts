@@ -6,7 +6,7 @@ import { DefaultPortComponent } from './default-port.component';
 	declarations: [DefaultPortComponent],
 	imports: [CommonModule],
 	providers: [],
-	exports: [],
+	exports: [DefaultPortComponent],
 	entryComponents: [DefaultPortComponent]
 })
 export class DefaultPortModule {}

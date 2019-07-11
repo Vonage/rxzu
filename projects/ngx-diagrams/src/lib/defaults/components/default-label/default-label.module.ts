@@ -6,7 +6,7 @@ import { DefaultLabelComponent } from './default-label.component';
 	declarations: [DefaultLabelComponent],
 	imports: [CommonModule],
 	providers: [],
-	exports: [],
+	exports: [DefaultLabelComponent],
 	entryComponents: [DefaultLabelComponent]
 })
 export class DefaultLabelModule {}
