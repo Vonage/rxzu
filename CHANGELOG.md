@@ -1,3 +1,10 @@
+## [2.6.3](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.6.2...v2.6.3) (2019-07-11)
+
+
+### Bug Fixes
+
+* **defauls:** changed exports to point to index file ([c3032e0](https://github.com/DanielNetzer/ngx-diagrams/commit/c3032e0))
+
 ## [2.6.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.6.1...v2.6.2) (2019-07-11)
 
 
