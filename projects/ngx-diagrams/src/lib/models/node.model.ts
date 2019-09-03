@@ -20,9 +20,11 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 	private readonly ports$: Observable<{ [s: string]: P }>;
 	private readonly coords$: Observable<Coords>;
 	private readonly dimensions$: Observable<Dimensions>;
+	private readonly linkType: string;
 
 	constructor(
 		nodeType: string = 'default',
+		linkType: string = 'default',
 		id?: string,
 		extras: { [s: string]: any } = {},
 		x: number = 0,
@@ -40,6 +42,7 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 		this.ports$ = this._ports.asObservable();
 		this.coords$ = this._coords.asObservable();
 		this.dimensions$ = this._dimensions.asObservable();
+		this.linkType = linkType;
 	}
 
 	getCoords(): Coords {

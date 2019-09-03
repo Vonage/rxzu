@@ -5,12 +5,21 @@ import { DefaultLinkModel } from './default-link.model';
 export class DefaultPortModel extends PortModel {
 	in: boolean;
 	label: string;
+	linkType: string;
 	links: { [id: string]: any };
 
-	constructor(isInput: boolean = true, name: string = 'port', type: string = 'default', id?: string, label: string = null) {
+	constructor(
+		isInput: boolean = true,
+		name: string = 'port',
+		type: string = 'default',
+		id?: string,
+		label: string = null,
+		linkType: string = 'default'
+	) {
 		super(name, type, id);
 		this.in = isInput;
 		this.label = label || name;
+		this.linkType = linkType;
 	}
 
 	link(port: PortModel): LinkModel {
@@ -29,6 +38,6 @@ export class DefaultPortModel extends PortModel {
 
 	createLinkModel(): LinkModel {
 		const link = super.createLinkModel();
-		return link || new DefaultLinkModel();
+		return link || new DefaultLinkModel(this.linkType);
 	}
 }

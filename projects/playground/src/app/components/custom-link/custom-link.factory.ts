@@ -1,15 +1,13 @@
-import { AbstractLinkFactory } from '../../factories/link.factory';
-import { DefaultLinkComponent } from '../components/default-link/default-link.component';
-import { DefaultLinkModel } from '../models/default-link.model';
 import { ViewContainerRef, ComponentRef, ComponentFactoryResolver, ComponentFactory, Renderer2 } from '@angular/core';
-import { DiagramEngine } from '../../services/engine.service';
+import { CustomLinkComponent } from './custom-link.component';
+import { AbstractLinkFactory, DefaultLinkModel, DiagramEngine } from 'ngx-diagrams';
 
-export class DefaultLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
+export class CustomLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 	constructor(private resolver: ComponentFactoryResolver, private renderer: Renderer2) {
-		super('default');
+		super('custom');
 	}
 
-	generateWidget(diagramEngine: DiagramEngine, link: DefaultLinkModel, linksHost: ViewContainerRef): ComponentRef<DefaultLinkComponent> {
+	generateWidget(diagramEngine: DiagramEngine, link: DefaultLinkModel, linksHost: ViewContainerRef): ComponentRef<CustomLinkComponent> {
 		const componentRef = linksHost.createComponent(this.getRecipe());
 
 		// attach coordinates and default positional behaviour to the generated component host
@@ -17,7 +15,6 @@ export class DefaultLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 
 		// default style for link
 		this.renderer.setStyle(rootNode, 'position', 'absolute');
-		this.renderer.addClass(rootNode, 'label');
 
 		// data attributes
 		this.renderer.setAttribute(rootNode, 'data-linkid', link.id);
@@ -27,21 +24,19 @@ export class DefaultLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 			componentRef.destroy();
 		});
 
-		// assign all passed properties to link initialization.
+		// assign all passed properties to node initialization.
 		Object.entries(link).forEach(([key, value]) => {
 			componentRef.instance[key] = value;
 		});
-
 		componentRef.instance.diagramEngine = diagramEngine;
-
 		return componentRef;
 	}
 
-	getRecipe(): ComponentFactory<DefaultLinkComponent> {
-		return this.resolver.resolveComponentFactory(DefaultLinkComponent);
+	getRecipe(): ComponentFactory<CustomLinkComponent> {
+		return this.resolver.resolveComponentFactory(CustomLinkComponent);
 	}
 
 	getNewInstance() {
-		return new DefaultLinkModel();
+		return new DefaultLinkModel('intent-link');
 	}
 }

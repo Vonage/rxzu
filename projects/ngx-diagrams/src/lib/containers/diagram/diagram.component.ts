@@ -10,13 +10,14 @@ import {
 	ElementRef,
 	AfterViewInit,
 	ChangeDetectionStrategy,
-	ChangeDetectorRef
+	ChangeDetectorRef,
+	OnDestroy
 } from '@angular/core';
 import { DiagramModel } from '../../models/diagram.model';
 import { NodeModel } from '../../models/node.model';
 import { LinkModel } from '../../models/link.model';
-import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { BehaviorSubject, Observable, combineLatest, ReplaySubject } from 'rxjs';
+import { filter, takeUntil } from 'rxjs/operators';
 import { BaseAction, MoveCanvasAction, SelectingAction } from '../../actions';
 import { BaseModel } from '../../models/base.model';
 import { MoveItemsAction } from '../../actions/move-items.action';
@@ -31,7 +32,7 @@ import { some } from 'lodash';
 	styleUrls: ['diagram.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NgxDiagramComponent implements OnInit, AfterViewInit {
+export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	// tslint:disable-next-line:no-input-rename
 	@Input('model') diagramModel: DiagramModel;
 	@Input() allowCanvasZoon = true;
@@ -51,6 +52,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 	private links$: Observable<{ [s: string]: LinkModel }>;
 	private action$: BehaviorSubject<BaseAction> = new BehaviorSubject(null);
 	private nodesRendered$: BehaviorSubject<boolean>;
+	private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
 	private mouseUpListener = () => {};
 	private mouseMoveListener = () => {};
@@ -66,7 +68,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 			this.links$ = this.diagramModel.selectLinks();
 			this.nodesRendered$ = new BehaviorSubject(false);
 
-			this.nodes$.subscribe(nodes => {
+			this.nodes$.pipe(takeUntil(this.destroyed$)).subscribe(nodes => {
 				this.nodesRendered$.next(false);
 				Object.values(nodes).forEach(node => {
 					if (!node.getPainted()) {
@@ -80,9 +82,17 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 		}
 	}
 
+	ngOnDestroy() {
+		this.destroyed$.next(true);
+		this.destroyed$.complete();
+	}
+
 	ngAfterViewInit() {
 		combineLatest(this.nodesRendered$, this.links$)
-			.pipe(filter(([nodesRendered, _]) => !!nodesRendered))
+			.pipe(
+				takeUntil(this.destroyed$),
+				filter(([nodesRendered, _]) => !!nodesRendered)
+			)
 			.subscribe(([_, links]) => {
 				Object.values(links).forEach(link => {
 					if (!link.getPainted()) {
@@ -393,6 +403,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit {
 				const relative = this.diagramModel.getDiagramEngine().getRelativeMousePoint(event);
 				const sourcePort = selectedModel.model;
 				const link = sourcePort.createLinkModel();
+
 				link.setSourcePort(sourcePort);
 
 				if (link) {

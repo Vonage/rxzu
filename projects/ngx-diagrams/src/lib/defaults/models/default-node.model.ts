@@ -16,14 +16,14 @@ export class DefaultNodeModel extends NodeModel {
 		this.width$ = this.selectWidth();
 	}
 
-	addInPort(name: string, type: string = 'default', id?: string) {
-		const port = new DefaultPortModel(true, name, type, id);
+	addInPort({ name, type = 'default', id, linkType = 'default' }: { name: string; type?: string; id?: string; linkType?: string }) {
+		const port = new DefaultPortModel(true, name, type, id, null, linkType);
 		this.addPort(port);
 		return port;
 	}
 
-	addOutPort(name: string, type: string = 'default', id?: string) {
-		const port = new DefaultPortModel(false, name, type, id);
+	addOutPort({ name, type = 'default', id, linkType = 'default' }: { name: string; type?: string; id?: string; linkType?: string }) {
+		const port = new DefaultPortModel(false, name, type, id, null, linkType);
 		this.addPort(port);
 		return port;
 	}
