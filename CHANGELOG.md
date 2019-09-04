@@ -1,3 +1,10 @@
+## [2.6.4](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.6.3...v2.6.4) (2019-09-03)
+
+
+### Bug Fixes
+
+* **custom links:** outport can now define their links type per port ([68d0b95](https://github.com/DanielNetzer/ngx-diagrams/commit/68d0b95)), closes [#10](https://github.com/DanielNetzer/ngx-diagrams/issues/10) [#11](https://github.com/DanielNetzer/ngx-diagrams/issues/11)
+
 ## [2.6.3](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.6.2...v2.6.3) (2019-07-11)
 
 
