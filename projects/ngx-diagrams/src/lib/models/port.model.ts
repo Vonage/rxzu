@@ -7,13 +7,14 @@ export class PortModel extends BaseModel<NodeModel> {
 	private name: string;
 	private links$: BehaviorSubject<{ [id: string]: LinkModel }>;
 	private maximumLinks: number;
+	private linkType: string;
 
 	private x$: BehaviorSubject<number>;
 	private y$: BehaviorSubject<number>;
 	private width$: BehaviorSubject<number>;
 	private height$: BehaviorSubject<number>;
 
-	constructor(name: string, type?: string, id?: string, maximumLinks?: number) {
+	constructor(name: string, type?: string, id?: string, maximumLinks?: number, linkType?: string) {
 		super(type, id);
 		this.name = name;
 		this.links$ = new BehaviorSubject({});
@@ -22,6 +23,7 @@ export class PortModel extends BaseModel<NodeModel> {
 		this.y$ = new BehaviorSubject(0);
 		this.height$ = new BehaviorSubject(0);
 		this.width$ = new BehaviorSubject(0);
+		this.linkType = linkType;
 	}
 
 	getNode() {
@@ -46,6 +48,14 @@ export class PortModel extends BaseModel<NodeModel> {
 
 	setMaximumLinks(maximumLinks: number) {
 		this.maximumLinks = maximumLinks;
+	}
+
+	getLinkType() {
+		return this.linkType;
+	}
+
+	setLinkType(type: string) {
+		this.linkType = type;
 	}
 
 	removeLink(link: LinkModel) {

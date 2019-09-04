@@ -8,7 +8,7 @@ import { PortModel } from '../../../models/port.model';
 	styleUrls: ['./default-node.component.scss']
 })
 export class DefaultNodeComponent extends DefaultNodeModel implements OnInit {
-	@ViewChild('portsLayer', { read: ViewContainerRef }) portsLayer: ViewContainerRef;
+	@ViewChild('portsLayer', { read: ViewContainerRef, static: true }) portsLayer: ViewContainerRef;
 
 	constructor() {
 		super('ngdx-default-node');

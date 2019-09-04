@@ -32,7 +32,7 @@ export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 			e.isSelected ? this.renderer.addClass(rootNode, 'selected') : this.renderer.removeClass(rootNode, 'selected');
 		});
 
-		node.onEntityDestroy().subscribe(e => {
+		node.onEntityDestroy().subscribe((/** e */) => {
 			componentRef.destroy();
 		});
 

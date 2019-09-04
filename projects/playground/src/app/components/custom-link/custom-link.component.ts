@@ -9,7 +9,7 @@ import { filter } from 'rxjs/operators';
 	styleUrls: ['./custom-link.component.scss']
 })
 export class CustomLinkComponent extends DefaultLinkModel implements AfterViewInit {
-	@ViewChild('labelLayer', { read: ViewContainerRef }) labelLayer: ViewContainerRef;
+	@ViewChild('labelLayer', { read: ViewContainerRef, static: true }) labelLayer: ViewContainerRef;
 
 	_path$: BehaviorSubject<string> = new BehaviorSubject(null);
 	path$: Observable<string> = this._path$.asObservable();

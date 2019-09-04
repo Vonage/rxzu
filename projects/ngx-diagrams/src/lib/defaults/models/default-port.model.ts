@@ -5,7 +5,6 @@ import { DefaultLinkModel } from './default-link.model';
 export class DefaultPortModel extends PortModel {
 	in: boolean;
 	label: string;
-	linkType: string;
 	links: { [id: string]: any };
 
 	constructor(
@@ -16,10 +15,9 @@ export class DefaultPortModel extends PortModel {
 		label: string = null,
 		linkType: string = 'default'
 	) {
-		super(name, type, id);
+		super(name, type, id, null, linkType);
 		this.in = isInput;
 		this.label = label || name;
-		this.linkType = linkType;
 	}
 
 	link(port: PortModel): LinkModel {
@@ -38,6 +36,6 @@ export class DefaultPortModel extends PortModel {
 
 	createLinkModel(): LinkModel {
 		const link = super.createLinkModel();
-		return link || new DefaultLinkModel(this.linkType);
+		return link || new DefaultLinkModel(this.getLinkType());
 	}
 }

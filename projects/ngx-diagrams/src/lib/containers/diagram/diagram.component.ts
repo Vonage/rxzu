@@ -44,9 +44,9 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	@Output() actionStillFiring: EventEmitter<BaseAction> = new EventEmitter();
 	@Output() actionStoppedFiring: EventEmitter<BaseAction> = new EventEmitter();
 
-	@ViewChild('nodesLayer', { read: ViewContainerRef }) nodesLayer: ViewContainerRef;
-	@ViewChild('linksLayer', { read: ViewContainerRef }) linksLayer: ViewContainerRef;
-	@ViewChild('canvas', { read: ElementRef }) canvas: ElementRef;
+	@ViewChild('nodesLayer', { read: ViewContainerRef, static: true }) nodesLayer: ViewContainerRef;
+	@ViewChild('linksLayer', { read: ViewContainerRef, static: true }) linksLayer: ViewContainerRef;
+	@ViewChild('canvas', { read: ElementRef, static: true }) canvas: ElementRef;
 
 	private nodes$: Observable<{ [s: string]: NodeModel }>;
 	private links$: Observable<{ [s: string]: LinkModel }>;

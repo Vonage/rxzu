@@ -4,7 +4,7 @@ import { generateCurvePath } from '../../../utils/tool-kit.util';
 import { combineLatest, BehaviorSubject, Observable } from 'rxjs';
 import { PointModel } from '../../../models/point.model';
 import { LabelModel } from '../../../models/label.model';
-import { filter, tap } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 import { Coords } from '../../../interfaces';
 
 @Component({
@@ -13,7 +13,7 @@ import { Coords } from '../../../interfaces';
 	styleUrls: ['./default-link.component.scss']
 })
 export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewInit {
-	@ViewChild('labelLayer', { read: ViewContainerRef }) labelLayer: ViewContainerRef;
+	@ViewChild('labelLayer', { read: ViewContainerRef, static: true }) labelLayer: ViewContainerRef;
 
 	_path$: BehaviorSubject<string> = new BehaviorSubject(null);
 	path$: Observable<string> = this._path$.asObservable();

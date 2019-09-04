@@ -45,6 +45,7 @@ export class BaseEntity {
 		this._locked.next(locked);
 	}
 
+	// tslint:disable-next-line
 	doClone(lookupTable: { [s: string]: any } = {}, clone: any) {
 		/*noop*/
 	}

@@ -35,7 +35,7 @@ export function isDev(): boolean {
 }
 
 // @internal
-export function log<T>(message: string, level: LOG_LEVEL = LOG_LEVEL.LOG, ...args: any[]): void {
+export function log(message: string, level: LOG_LEVEL = LOG_LEVEL.LOG, ...args: any[]): void {
 	if (isDev() && __LOG__ === level) {
 		if (__LOG__ === LOG_LEVEL.ERROR) {
 			console.error(message, ...args);

@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
 		const node1 = new DefaultNodeModel();
 		node1.setCoords({ x: 500, y: 300 });
 		node1.setDimensions(nodesDefaultDimensions);
-		const p1 = node1.addInPort({ name: 'inport', linkType: 'custom' });
+		node1.addInPort({ name: 'inport', linkType: 'custom' });
 
 		const node2 = new DefaultNodeModel();
 		node2.setCoords({ x: 200, y: 200 });
