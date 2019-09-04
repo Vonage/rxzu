@@ -1,3 +1,10 @@
+# [2.7.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.6.4...v2.7.0) (2019-09-04)
+
+
+### Features
+
+* **auto arrange:** dagre based auto arrange engine ([4e6263a](https://github.com/DanielNetzer/ngx-diagrams/commit/4e6263a))
+
 ## [2.6.4](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.6.3...v2.6.4) (2019-09-03)
 
 

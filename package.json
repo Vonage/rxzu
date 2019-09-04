@@ -1,6 +1,6 @@
 {
   "name": "ngx-diagrams-workspace",
-  "version": "2.6.4",
+  "version": "2.7.0",
   "author": {
     "email": "daniel.netzer7@gmail.com",
     "name": "Daniel Netzer"
@@ -36,7 +36,7 @@
     "core-js": "^2.5.4",
     "ngx-markdown": "^8.1.0",
     "rxjs": "~6.5.3",
-		"dagre": "^0.8.4",
+    "dagre": "^0.8.4",
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
@@ -59,8 +59,8 @@
     "@types/jasmine": "~3.4.0",
     "@types/jasminewd2": "~2.0.6",
     "@types/node": "~12.7.4",
-		"@types/lodash": "^4.14.138",
-		"@types/dagre" :"^0.7.42",
+    "@types/lodash": "^4.14.138",
+    "@types/dagre": "^0.7.42",
     "babel-loader": "^8.0.5",
     "codelyzer": "~5.1.0",
     "cz-customizable": "^6.2.0",
