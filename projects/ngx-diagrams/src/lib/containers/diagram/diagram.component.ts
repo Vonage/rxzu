@@ -88,7 +88,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	ngAfterViewInit() {
-		combineLatest(this.nodesRendered$, this.links$)
+		combineLatest([this.nodesRendered$, this.links$])
 			.pipe(
 				takeUntil(this.destroyed$),
 				filter(([nodesRendered, _]) => !!nodesRendered)
