@@ -31,6 +31,7 @@
     "core-js": "^2.5.4",
     "ngx-markdown": "^7.1.5",
     "rxjs": "~6.3.3",
+		"dagre": "^0.8.4",
     "zone.js": "~0.8.26"
   },
   "devDependencies": {
@@ -53,6 +54,8 @@
     "@types/jasmine": "~2.8.8",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
+		"@types/lodash": "^4.14.126",
+		"@types/dagre" :"^0.7.42",
     "babel-loader": "^8.0.5",
     "codelyzer": "~4.5.0",
     "cz-customizable": "^6.0.0",

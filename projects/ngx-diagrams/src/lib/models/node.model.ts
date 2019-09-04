@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, interval, ReplaySubject } from 'rxjs';
 import { PortModel } from './port.model';
 import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
@@ -61,6 +61,46 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 		});
 
 		this._coords.next({ x, y });
+	}
+
+	transitionToCoords({ x, y }: Coords) {
+		// const transitionCompleted = new ReplaySubject(1);
+		// let { x: oldX, y: oldY } = this.getCoords();
+		// console.log(x, y, oldX, oldY);
+		// interval(0)
+		// 	.pipe(takeUntil(transitionCompleted))
+		// 	.subscribe(
+		// 		() => {
+		// 			if (oldX < x) {
+		// 				oldX++;
+		// 			} else if (oldX > x) {
+		// 				oldX--;
+		// 			}
+		// 			if (y > oldY) {
+		// 				oldY++;
+		// 			} else if (y < oldY) {
+		// 				oldY--;
+		// 			}
+		// 			Object.values(this._ports.getValue()).forEach(port => {
+		// 				Object.values(port.getLinks()).forEach(link => {
+		// 					const point = link.getPointForPort(port);
+		// 					const { x: pointX, y: pointY } = point.getCoords();
+		// 					point.setCoords({ x: pointX + x - oldX, y: pointY + y - oldY });
+		// 				});
+		// 			});
+		// 			this._coords.next({ x: oldX, y: oldY });
+		// 			if (x === oldX && y === oldY) {
+		// 				transitionCompleted.next(true);
+		// 				transitionCompleted.complete();
+		// 			}
+		// 		},
+		// 		err => {
+		// 			console.error(err);
+		// 		},
+		// 		() => {
+		// 			console.log('finished transition');
+		// 		}
+		// 	);
 	}
 
 	// TODO: override selectionChanges and replace this with it (convert to rx)
@@ -155,6 +195,14 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 			distinctUntilChanged(),
 			this.withLog('DimensionChanges')
 		);
+	}
+
+	getHeight(): number {
+		return this._dimensions.getValue().height;
+	}
+
+	getWidth(): number {
+		return this._dimensions.getValue().width;
 	}
 
 	selectWidth(): Observable<number> {

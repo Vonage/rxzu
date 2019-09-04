@@ -1,5 +1,5 @@
 import { Component, OnInit, ComponentFactoryResolver, Renderer2 } from '@angular/core';
-import { DiagramEngine, DefaultLinkModel, DiagramModel, DefaultNodeModel, DefaultLabelModel } from 'ngx-diagrams';
+import { DiagramEngine, DefaultLinkModel, DiagramModel, DefaultNodeModel, DefaultLabelModel, DagreEngine } from 'ngx-diagrams';
 import { CustomLinkFactory } from './components/custom-link/custom-link.factory';
 
 @Component({
@@ -11,7 +11,12 @@ export class AppComponent implements OnInit {
 	title = 'playground';
 	diagramModel: DiagramModel;
 
-	constructor(private diagramEngine: DiagramEngine, private resolver: ComponentFactoryResolver, private renderer: Renderer2) {}
+	constructor(
+		private diagramEngine: DiagramEngine,
+		private resolver: ComponentFactoryResolver,
+		private renderer: Renderer2,
+		private dagreEngine: DagreEngine
+	) {}
 
 	ngOnInit() {
 		const nodesDefaultDimensions = { height: 200, width: 200 };
@@ -54,5 +59,9 @@ export class AppComponent implements OnInit {
 		this.diagramModel.addAll(node1, node2, node3, node4, link2, link3);
 
 		this.diagramModel.getDiagramEngine().zoomToFit();
+	}
+
+	redistribute() {
+		this.dagreEngine.redistribute(this.diagramModel, { includeLinks: true, graph: { rankdir: 'LR' } });
 	}
 }

@@ -263,7 +263,10 @@ export class DiagramEngine {
 		return model.getLocked();
 	}
 
-	// TODO: support destruction of the current diagram model.
+	/**
+	 * auto arrange the graph
+	 */
+	autoArrange() {}
 
 	/**
 	 * fit the canvas zoom levels to the elements contained.

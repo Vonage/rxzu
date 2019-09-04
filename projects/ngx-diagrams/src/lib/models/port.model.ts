@@ -25,7 +25,7 @@ export class PortModel extends BaseModel<NodeModel> {
 	}
 
 	getNode() {
-		return this.getParent;
+		return this.getParent();
 	}
 
 	getName() {
