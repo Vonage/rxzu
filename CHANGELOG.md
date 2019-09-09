@@ -1,3 +1,10 @@
+## [2.7.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.7.0...v2.7.1) (2019-09-09)
+
+
+### Bug Fixes
+
+* **selection:** multiple selection ([49ab712](https://github.com/DanielNetzer/ngx-diagrams/commit/49ab712)), closes [#12](https://github.com/DanielNetzer/ngx-diagrams/issues/12)
+
 # [2.7.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.6.4...v2.7.0) (2019-09-04)
 
 
