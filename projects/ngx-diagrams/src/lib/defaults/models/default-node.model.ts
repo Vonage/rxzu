@@ -17,13 +17,13 @@ export class DefaultNodeModel extends NodeModel {
 	}
 
 	addInPort({ name, type = 'default', id, linkType = 'default' }: { name: string; type?: string; id?: string; linkType?: string }) {
-		const port = new DefaultPortModel(true, name, type, id, null, linkType);
+		const port = new DefaultPortModel({ isInput: true, name, type, id, label: null, linkType });
 		this.addPort(port);
 		return port;
 	}
 
 	addOutPort({ name, type = 'default', id, linkType = 'default' }: { name: string; type?: string; id?: string; linkType?: string }) {
-		const port = new DefaultPortModel(false, name, type, id, null, linkType);
+		const port = new DefaultPortModel({ isInput: false, name, type, id, label: null, linkType });
 		this.addPort(port);
 		return port;
 	}

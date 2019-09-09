@@ -2,19 +2,28 @@ import { PortModel } from '../../models/port.model';
 import { LinkModel } from '../../models/link.model';
 import { DefaultLinkModel } from './default-link.model';
 
+export interface DefaultPortModelConfig {
+	id?: string;
+	isInput?: boolean;
+	name?: string;
+	type?: string;
+	label?: string;
+	linkType?: string;
+}
+
 export class DefaultPortModel extends PortModel {
 	in: boolean;
 	label: string;
 	links: { [id: string]: any };
 
-	constructor(
-		isInput: boolean = true,
-		name: string = 'port',
-		type: string = 'default',
-		id?: string,
-		label: string = null,
-		linkType: string = 'default'
-	) {
+	constructor({
+		isInput = true,
+		name = 'port',
+		type = 'default',
+		id = null,
+		label = null,
+		linkType = 'default'
+	}: DefaultPortModelConfig = {}) {
 		super(name, type, id, null, linkType);
 		this.in = isInput;
 		this.label = label || name;

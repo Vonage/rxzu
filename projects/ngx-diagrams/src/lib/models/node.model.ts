@@ -60,6 +60,7 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 		this._coords.next({ x, y });
 	}
 
+	// TODO: implement better transition on auto arrange!
 	transitionToCoords({ x, y }: Coords) {
 		// const transitionCompleted = new ReplaySubject(1);
 		// let { x: oldX, y: oldY } = this.getCoords();

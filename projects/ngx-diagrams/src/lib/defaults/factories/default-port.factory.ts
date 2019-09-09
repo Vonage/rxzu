@@ -37,6 +37,6 @@ export class DefaultPortFactory extends AbstractPortFactory<DefaultPortModel> {
 	}
 
 	getNewInstance(initialConfig?: any): DefaultPortModel {
-		return new DefaultPortModel(true, 'unknown', ...initialConfig);
+		return new DefaultPortModel({ isInput: true, name: 'unknown', ...initialConfig });
 	}
 }
