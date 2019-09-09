@@ -1,4 +1,9 @@
-<ngdx-diagram class="demo-diagram" [model]="diagramModel" [allowLooseLinks]="false"></ngdx-diagram>
+<ngdx-diagram
+	class="demo-diagram"
+	[model]="diagramModel"
+	[allowLooseLinks]="false"
+	(actionStartedFiring)="onActionStarted($event)"
+></ngdx-diagram>
 <div class="actions">
 	<button (click)="redistribute()">AUTO ARRANGE!</button>
 </div>

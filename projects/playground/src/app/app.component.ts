@@ -1,5 +1,13 @@
 import { Component, OnInit, ComponentFactoryResolver, Renderer2 } from '@angular/core';
-import { DiagramEngine, DefaultLinkModel, DiagramModel, DefaultNodeModel, DefaultLabelModel, DagreEngine } from 'ngx-diagrams';
+import {
+	DiagramEngine,
+	DefaultLinkModel,
+	DiagramModel,
+	DefaultNodeModel,
+	DefaultLabelModel,
+	DagreEngine,
+	LinkConnectedToPortAction
+} from 'ngx-diagrams';
 import { CustomLinkFactory } from './components/custom-link/custom-link.factory';
 
 @Component({
@@ -63,5 +71,13 @@ export class AppComponent implements OnInit {
 
 	redistribute() {
 		this.dagreEngine.redistribute(this.diagramModel, { includeLinks: true, graph: { rankdir: 'LR' } });
+	}
+
+	onActionStarted(action: any) {
+		if (action instanceof LinkConnectedToPortAction) {
+			console.log(action);
+			console.log(action.getInPortNode());
+			console.log(action.getOutPortNode());
+		}
 	}
 }

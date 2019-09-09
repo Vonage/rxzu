@@ -18,7 +18,7 @@ import { NodeModel } from '../../models/node.model';
 import { LinkModel } from '../../models/link.model';
 import { BehaviorSubject, Observable, combineLatest, ReplaySubject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
-import { BaseAction, MoveCanvasAction, SelectingAction } from '../../actions';
+import { BaseAction, MoveCanvasAction, SelectingAction, LinkConnectedToPortAction } from '../../actions';
 import { BaseModel } from '../../models/base.model';
 import { MoveItemsAction } from '../../actions/move-items.action';
 import { PointModel } from '../../models/point.model';
@@ -283,6 +283,9 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 						// link is a duplicate
 						link.destroy();
 					}
+
+					// link is valid, fire the event
+					this.startFiringAction(new LinkConnectedToPortAction(event.clientX, event.clientY, sourcePort, targetPort));
 				}
 			});
 
