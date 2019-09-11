@@ -239,8 +239,13 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 						}
 					} else {
 						link.setTargetPort(element.model);
-						// link is valid, fire the event
-						this.startFiringAction(new LinkConnectedToPortAction(event.clientX, event.clientY, link.getSourcePort(), link.getTargetPort()));
+						const targetPort = link.getTargetPort();
+						const srcPort = link.getSourcePort();
+
+						if (targetPort.id !== srcPort.id) {
+							// link is valid, fire the event
+							this.startFiringAction(new LinkConnectedToPortAction(event.clientX, event.clientY, srcPort, targetPort));
+						}
 					}
 				}
 			});
@@ -412,6 +417,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 					}
 					link.setTargetPort(null);
 
+					console.log(relative);
 					link.getFirstPoint().setCoords(relative);
 					link.getLastPoint().setCoords(relative);
 

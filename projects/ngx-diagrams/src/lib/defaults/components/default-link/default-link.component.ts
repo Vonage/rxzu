@@ -74,6 +74,8 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 				this.diagramEngine.generateWidgetForLabel(label, this.labelLayer);
 				this.cdRef.detectChanges();
 			});
+
+		this.points$.subscribe(console.log);
 	}
 
 	calcLabelIncline(firstPoint: Coords, secondPoint: Coords): number {

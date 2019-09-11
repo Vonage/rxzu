@@ -15,16 +15,16 @@
 			[attr.d]="path$ | async"
 		></path>
 	</g>
-	<g *ngFor="let point of points$ | async as points">
-		<circle [attr.cx]="point.x$ | async" [attr.cy]="point.y$ | async" r="5" class="default-point" />
+	<g *ngFor="let point of points$ | async">
+		<circle [attr.cx]="(point.coords$ | async).x" [attr.cy]="(point.coords$ | async).y" r="5" class="default-point" />
 
 		<circle
 			(mouseleave)="setSelected(false)"
 			(mouseenter)="setSelected()"
 			[attr.data-id]="point.id"
 			[attr.data-linkid]="id"
-			[attr.cx]="point.x$ | async"
-			[attr.cy]="point.y$ | async"
+			[attr.cx]="(point.coords$ | async).x"
+			[attr.cy]="(point.coords$ | async).y"
 			r="15"
 			[attr.opacity]="0"
 			class="default-point"
