@@ -1,3 +1,10 @@
+# [2.8.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.7.1...v2.8.0) (2019-09-09)
+
+
+### Features
+
+* **actions:** on link connected between two ports ([55f492e](https://github.com/DanielNetzer/ngx-diagrams/commit/55f492e))
+
 ## [2.7.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.7.0...v2.7.1) (2019-09-09)
 
 
