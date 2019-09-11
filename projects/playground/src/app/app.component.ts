@@ -75,9 +75,9 @@ export class AppComponent implements OnInit {
 
 	onActionStarted(action: any) {
 		if (action instanceof LinkConnectedToPortAction) {
-			console.log(action);
-			console.log(action.getInPortNode());
-			console.log(action.getOutPortNode());
+			// console.log(action);
+			// console.log(action.getInPortNode());
+			// console.log(action.getOutPortNode());
 		}
 	}
 }

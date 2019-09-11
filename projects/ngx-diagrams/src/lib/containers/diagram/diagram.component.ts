@@ -417,7 +417,6 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 					}
 					link.setTargetPort(null);
 
-					console.log(relative);
 					link.getFirstPoint().setCoords(relative);
 					link.getLastPoint().setCoords(relative);
 
