@@ -1,3 +1,10 @@
+## [2.8.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.8.0...v2.8.1) (2019-09-11)
+
+
+### Bug Fixes
+
+* **actions:** link connection action now trigger when link is valid ([60d413e](https://github.com/DanielNetzer/ngx-diagrams/commit/60d413e))
+
 # [2.8.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.7.1...v2.8.0) (2019-09-09)
 
 
