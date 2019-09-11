@@ -239,8 +239,9 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 						}
 					} else {
 						link.setTargetPort(element.model);
+						// link is valid, fire the event
+						this.startFiringAction(new LinkConnectedToPortAction(event.clientX, event.clientY, link.getSourcePort(), link.getTargetPort()));
 					}
-					// delete this.props.diagramEngine.linksThatHaveInitiallyRendered[link.getID()];
 				}
 			});
 
@@ -283,9 +284,6 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 						// link is a duplicate
 						link.destroy();
 					}
-
-					// link is valid, fire the event
-					this.startFiringAction(new LinkConnectedToPortAction(event.clientX, event.clientY, sourcePort, targetPort));
 				}
 			});
 
