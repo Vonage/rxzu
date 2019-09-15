@@ -1,3 +1,12 @@
+## [2.8.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.8.1...v2.8.2) (2019-09-15)
+
+
+### Bug Fixes
+
+* **defaults:** default link coords binding ([1f54ccd](https://github.com/DanielNetzer/ngx-diagrams/commit/1f54ccd))
+* **links:** maximum links ([554e76e](https://github.com/DanielNetzer/ngx-diagrams/commit/554e76e))
+* **points:** bad coords observable for points ([1936d62](https://github.com/DanielNetzer/ngx-diagrams/commit/1936d62)), closes [#13](https://github.com/DanielNetzer/ngx-diagrams/issues/13)
+
 ## [2.8.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.8.0...v2.8.1) (2019-09-11)
 
 
