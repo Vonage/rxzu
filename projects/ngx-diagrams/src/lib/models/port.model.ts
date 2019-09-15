@@ -94,8 +94,13 @@ export class PortModel extends BaseModel<NodeModel> {
 	public createLinkModel(): LinkModel | null {
 		const numberOfLinks: number = Object.keys(this.links$.getValue()).length;
 		if (this.maximumLinks === 1 && numberOfLinks >= 1) {
-			return Object.values(this.links$.getValue())[0][0];
+			const linkToRemove = Object.values(this.links$.getValue())[0];
+			linkToRemove.destroy();
+			return null;
 		} else if (numberOfLinks >= this.maximumLinks) {
+			// for the moment we will remove the first link by default
+			const linkToRemove = Object.values(this.links$.getValue())[0];
+			linkToRemove.destroy();
 			return null;
 		}
 		return null;

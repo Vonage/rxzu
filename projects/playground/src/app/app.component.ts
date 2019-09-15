@@ -1,13 +1,5 @@
 import { Component, OnInit, ComponentFactoryResolver, Renderer2 } from '@angular/core';
-import {
-	DiagramEngine,
-	DefaultLinkModel,
-	DiagramModel,
-	DefaultNodeModel,
-	DefaultLabelModel,
-	DagreEngine,
-	LinkConnectedToPortAction
-} from 'ngx-diagrams';
+import { DiagramEngine, DefaultLinkModel, DiagramModel, DefaultNodeModel, DagreEngine, LinkConnectedToPortAction } from 'ngx-diagrams';
 import { CustomLinkFactory } from './components/custom-link/custom-link.factory';
 
 @Component({
@@ -42,18 +34,14 @@ export class AppComponent implements OnInit {
 		node2.setCoords({ x: 200, y: 200 });
 		node2.setDimensions(nodesDefaultDimensions);
 		const outPortN2 = node2.addOutPort({ name: 'outport' });
+		outPortN2.setMaximumLinks(2);
 
 		const node3 = new DefaultNodeModel();
 		node3.setCoords({ x: 400, y: 600 });
 		node3.setDimensions(nodesDefaultDimensions);
-		const p3 = node3.addInPort({ name: 'inport', linkType: 'custom' });
+		node3.addInPort({ name: 'inport', linkType: 'custom' });
 
-		const link3 = new DefaultLinkModel();
-		link3.setSourcePort(outPortN2);
-		link3.setTargetPort(p3);
-
-		const label1 = new DefaultLabelModel('LABEL!');
-		link3.setLabel(label1);
+		// const label1 = new DefaultLabelModel('LABEL!');
 
 		const node4 = new DefaultNodeModel();
 		node4.setCoords({ x: 1200, y: 200 });
@@ -64,7 +52,7 @@ export class AppComponent implements OnInit {
 		link2.setSourcePort(outPortN2);
 		link2.setTargetPort(p4);
 
-		this.diagramModel.addAll(node1, node2, node3, node4, link2, link3);
+		this.diagramModel.addAll(node1, node2, node3, node4, link2);
 
 		this.diagramModel.getDiagramEngine().zoomToFit();
 	}
