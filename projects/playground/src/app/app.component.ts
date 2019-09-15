@@ -1,5 +1,5 @@
 import { Component, OnInit, ComponentFactoryResolver, Renderer2 } from '@angular/core';
-import { DiagramEngine, DefaultLinkModel, DiagramModel, DefaultNodeModel, DagreEngine, LinkConnectedToPortAction } from 'ngx-diagrams';
+import { DiagramEngine, DefaultLinkModel, DiagramModel, DefaultNodeModel, DagreEngine, LinkCreatedAction } from 'ngx-diagrams';
 import { CustomLinkFactory } from './components/custom-link/custom-link.factory';
 
 @Component({
@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
 		node2.setCoords({ x: 200, y: 200 });
 		node2.setDimensions(nodesDefaultDimensions);
 		const outPortN2 = node2.addOutPort({ name: 'outport' });
-		outPortN2.setMaximumLinks(2);
+		outPortN2.setMaximumLinks(1);
 
 		const node3 = new DefaultNodeModel();
 		node3.setCoords({ x: 400, y: 600 });
@@ -62,7 +62,7 @@ export class AppComponent implements OnInit {
 	}
 
 	onActionStarted(action: any) {
-		if (action instanceof LinkConnectedToPortAction) {
+		if (action instanceof LinkCreatedAction) {
 			// console.log(action);
 			// console.log(action.getInPortNode());
 			// console.log(action.getOutPortNode());
