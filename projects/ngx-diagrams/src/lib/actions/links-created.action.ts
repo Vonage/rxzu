@@ -3,23 +3,24 @@ import { PortModel } from '../models/port.model';
 import { NodeModel } from '../models/node.model';
 import { LinkModel } from '../models';
 
+// TODO: refactor into entity-created.action, and fire every time a new entity is created!
 export class LinkCreatedAction extends BaseAction {
-	outPort: PortModel;
-	inPort: PortModel;
+	sourcePort: PortModel;
+	targetPort: PortModel;
 	link: LinkModel;
 
 	constructor(mouseX: number, mouseY: number, link: LinkModel) {
 		super(mouseX, mouseY);
-		this.outPort = link.getSourcePort();
-		this.inPort = link.getTargetPort();
+		this.sourcePort = link.getSourcePort();
+		this.targetPort = link.getTargetPort();
 		this.link = link;
 	}
 
 	getOutPortNode(): NodeModel {
-		return this.outPort.getParent();
+		return this.sourcePort.getParent();
 	}
 
 	getInPortNode(): NodeModel {
-		return this.inPort.getParent();
+		return this.targetPort.getParent();
 	}
 }
