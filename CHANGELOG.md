@@ -1,3 +1,10 @@
+## [2.8.3](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.8.2...v2.8.3) (2019-09-16)
+
+
+### Bug Fixes
+
+* **actions:** links created action ([f031475](https://github.com/DanielNetzer/ngx-diagrams/commit/f031475))
+
 ## [2.8.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.8.1...v2.8.2) (2019-09-15)
 
 
