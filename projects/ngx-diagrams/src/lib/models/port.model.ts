@@ -42,6 +42,14 @@ export class PortModel extends BaseModel<NodeModel> {
 		return this.y$.asObservable();
 	}
 
+	getY() {
+		return this.y$.getValue();
+	}
+
+	getX() {
+		return this.x$.getValue();
+	}
+
 	getMaximumLinks(): number {
 		return this.maximumLinks;
 	}

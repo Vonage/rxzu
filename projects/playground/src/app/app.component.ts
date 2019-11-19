@@ -1,5 +1,13 @@
 import { Component, OnInit, ComponentFactoryResolver, Renderer2 } from '@angular/core';
-import { DiagramEngine, DefaultLinkModel, DiagramModel, DefaultNodeModel, DagreEngine, LinkCreatedAction } from 'ngx-diagrams';
+import {
+	DiagramEngine,
+	DefaultLinkModel,
+	DiagramModel,
+	DefaultNodeModel,
+	DagreEngine,
+	LinkCreatedAction,
+	MoveItemsAction
+} from 'ngx-diagrams';
 import { CustomLinkFactory } from './components/custom-link/custom-link.factory';
 
 @Component({
@@ -62,8 +70,8 @@ export class AppComponent implements OnInit {
 	}
 
 	onActionStarted(action: any) {
-		if (action instanceof LinkCreatedAction) {
-			// console.log(action);
+		if (action instanceof MoveItemsAction) {
+			console.log(action);
 			// console.log(action.getInPortNode());
 			// console.log(action.getOutPortNode());
 		}
