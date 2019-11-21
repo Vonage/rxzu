@@ -50,6 +50,14 @@ export class PortModel extends BaseModel<NodeModel> {
 		return this.x$.getValue();
 	}
 
+	getHeight() {
+		return this.height$.getValue();
+	}
+
+	getWidth() {
+		return this.width$.getValue();
+	}
+
 	getMaximumLinks(): number {
 		return this.maximumLinks;
 	}
