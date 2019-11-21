@@ -1,3 +1,10 @@
+# [2.9.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.8.3...v2.9.0) (2019-11-21)
+
+
+### Features
+
+* **port:** get x,y coords ([5162334](https://github.com/DanielNetzer/ngx-diagrams/commit/5162334b1005b3a557e3363d414148c5e2bb3a13))
+
 ## [2.8.3](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.8.2...v2.8.3) (2019-09-16)
 
 
