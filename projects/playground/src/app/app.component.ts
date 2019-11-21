@@ -1,13 +1,5 @@
 import { Component, OnInit, ComponentFactoryResolver, Renderer2 } from '@angular/core';
-import {
-	DiagramEngine,
-	DefaultLinkModel,
-	DiagramModel,
-	DefaultNodeModel,
-	DagreEngine,
-	LinkCreatedAction,
-	MoveItemsAction
-} from 'ngx-diagrams';
+import { DiagramEngine, DefaultLinkModel, DiagramModel, DefaultNodeModel, DagreEngine, MoveItemsAction } from 'ngx-diagrams';
 import { CustomLinkFactory } from './components/custom-link/custom-link.factory';
 
 @Component({
