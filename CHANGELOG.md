@@ -1,3 +1,10 @@
+# [2.10.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.9.0...v2.10.0) (2019-11-21)
+
+
+### Features
+
+* **port:** added getters and setters for width and height ([ba2c6c5](https://github.com/DanielNetzer/ngx-diagrams/commit/ba2c6c581bd3f5a586dd44bb286f6a5c7351f1a4))
+
 # [2.9.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.8.3...v2.9.0) (2019-11-21)
 
 
