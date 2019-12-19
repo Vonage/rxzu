@@ -3,6 +3,7 @@ import { LinkModel } from './link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Coords } from '../interfaces/coords.interface';
 import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
+import { DestroyOptions } from '../base.entity';
 
 export class PointModel extends BaseModel<LinkModel> {
 	private readonly _coords: BehaviorSubject<Coords>;
@@ -23,12 +24,12 @@ export class PointModel extends BaseModel<LinkModel> {
 		return this.getParent();
 	}
 
-	destroy() {
+	destroy(options?: DestroyOptions) {
 		if (this.getParent) {
 			this.getParent().removePoint(this);
 		}
 
-		super.destroy();
+		super.destroy(options);
 	}
 
 	setCoords(newCoords: Partial<Coords>) {
@@ -36,10 +37,7 @@ export class PointModel extends BaseModel<LinkModel> {
 	}
 
 	selectCoords(): Observable<Coords> {
-		return this.coords$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			distinctUntilChanged()
-		);
+		return this.coords$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged());
 	}
 
 	getCoords(): Coords {

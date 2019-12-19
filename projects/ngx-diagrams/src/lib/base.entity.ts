@@ -5,14 +5,19 @@ import { BaseEvent, LockEvent } from './interfaces/event.interface';
 
 export type BaseEntityType = 'node' | 'link' | 'port' | 'point';
 
+export interface DestroyOptions {
+	propagate?: boolean;
+	emit?: boolean;
+}
+
 export class BaseEntity {
 	private _id: ID;
 	/**
 	 * a prefix to make logs more easier
 	 */
-	private _logPrefix;
-	private _destroyed: Subject<void> = new Subject();
-	private _destroyed$: Observable<void> = this._destroyed.asObservable();
+	private _logPrefix: string;
+	private _destroyed: Subject<DestroyOptions> = new Subject();
+	private _destroyed$: Observable<DestroyOptions> = this._destroyed.asObservable();
 	private _locked: BehaviorSubject<boolean> = new BehaviorSubject(false);
 	private _locked$: Observable<boolean> = this._locked.asObservable();
 
@@ -72,9 +77,9 @@ export class BaseEntity {
 		);
 	}
 
-	public destroy() {
+	public destroy(options?: DestroyOptions) {
 		this.log('entity destroyed');
-		this._destroyed.next();
+		this._destroyed.next(options);
 		this._destroyed.complete();
 	}
 
