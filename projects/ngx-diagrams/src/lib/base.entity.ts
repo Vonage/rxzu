@@ -1,14 +1,9 @@
 import { ID, log as _log, withLog as _withLog, UID, LOG_LEVEL } from './utils/tool-kit.util';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { map, mapTo, takeUntil, filter } from 'rxjs/operators';
-import { BaseEvent, LockEvent } from './interfaces/event.interface';
+import { BaseEvent, LockEvent, DestroyOptions } from './interfaces/event.interface';
 
 export type BaseEntityType = 'node' | 'link' | 'port' | 'point';
-
-export interface DestroyOptions {
-	propagate?: boolean;
-	emit?: boolean;
-}
 
 export class BaseEntity {
 	private _id: ID;

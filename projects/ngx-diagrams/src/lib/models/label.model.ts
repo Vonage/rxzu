@@ -3,7 +3,7 @@ import { LinkModel } from './link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Coords } from '../interfaces/coords.interface';
 import { takeUntil, distinctUntilChanged } from 'rxjs/operators';
-import { DestroyOptions } from '../base.entity';
+import { DestroyOptions } from '../interfaces';
 
 export class LabelModel extends BaseModel<LinkModel> {
 	private readonly _coords: BehaviorSubject<Coords>;

@@ -7,7 +7,7 @@ import { ID } from '../utils/tool-kit.util';
 import { Coords } from '../interfaces/coords.interface';
 import { LabelModel } from './label.model';
 import { DiagramEngine } from '../services/engine.service';
-import { DestroyOptions } from '../base.entity';
+import { DestroyOptions } from '../interfaces';
 
 export class LinkModel extends BaseModel<DiagramModel> {
 	diagramEngine: DiagramEngine;
