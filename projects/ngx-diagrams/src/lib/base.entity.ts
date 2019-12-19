@@ -6,7 +6,8 @@ import { BaseEvent, LockEvent } from './interfaces/event.interface';
 export type BaseEntityType = 'node' | 'link' | 'port' | 'point';
 
 export interface DestroyOptions {
-	propagate: boolean;
+	propagate?: boolean;
+	emit?: boolean;
 }
 
 export class BaseEntity {
@@ -76,7 +77,7 @@ export class BaseEntity {
 		);
 	}
 
-	public destroy(options?: { propagate: boolean }) {
+	public destroy(options?: DestroyOptions) {
 		this.log('entity destroyed');
 		this._destroyed.next(options);
 		this._destroyed.complete();
