@@ -1,3 +1,11 @@
+# [2.11.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.10.0...v2.11.0) (2019-12-19)
+
+
+### Features
+
+* **destroy options:** allowing to pass options to destroy method ([06373bf](https://github.com/DanielNetzer/ngx-diagrams/commit/06373bf193f8fcf42b4156bdb651dae42698ec85))
+* **destroy-options:** emit property ([16a4a2e](https://github.com/DanielNetzer/ngx-diagrams/commit/16a4a2e7585b680aff81fb70bfae29cba55a8bad))
+
 # [2.10.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.9.0...v2.10.0) (2019-11-21)
 
 ### Features
