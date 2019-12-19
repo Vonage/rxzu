@@ -1,3 +1,10 @@
+## [2.11.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.11.1...v2.11.2) (2019-12-19)
+
+
+### Bug Fixes
+
+* **on entity destroyed:** reverted the filtering ([2b92467](https://github.com/DanielNetzer/ngx-diagrams/commit/2b92467c29907c489b958abef84e47c1470a5265))
+
 ## [2.11.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.11.0...v2.11.1) (2019-12-19)
 
 
