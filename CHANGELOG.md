@@ -1,3 +1,10 @@
+## [2.11.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.11.0...v2.11.1) (2019-12-19)
+
+
+### Performance Improvements
+
+* **destroy options:** moved interface to a their right place ([c032bd5](https://github.com/DanielNetzer/ngx-diagrams/commit/c032bd5e0829d734ed125dd4c4d093a391a54132))
+
 # [2.11.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.10.0...v2.11.0) (2019-12-19)
 
 
