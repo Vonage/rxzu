@@ -16,7 +16,7 @@ export class BaseEvent<T extends BaseEntity> {
 		this.entityId = entity.id;
 		this.firing = true;
 		this.stopPropagation = () => (this.firing = false);
-		this.propogate = options.propagate;
+		this.propogate = options ? options.propagate : null;
 	}
 }
 export class LockEvent<T extends BaseEntity = BaseEntity> extends BaseEvent<T> {
