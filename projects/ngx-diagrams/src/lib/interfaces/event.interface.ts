@@ -8,13 +8,15 @@ export class BaseEvent<T extends BaseEntity> {
 	stopPropagation: () => any;
 	firing: boolean;
 	id: ID;
+	propogate: boolean;
 
-	constructor(entity: T) {
+	constructor(entity: T, options?: any) {
 		this.id = UID();
 		this.entity = entity;
 		this.entityId = entity.id;
 		this.firing = true;
 		this.stopPropagation = () => (this.firing = false);
+		this.propogate = options.propagate;
 	}
 }
 export class LockEvent<T extends BaseEntity = BaseEntity> extends BaseEvent<T> {

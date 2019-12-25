@@ -1,6 +1,6 @@
 import { ID, log as _log, withLog as _withLog, UID, LOG_LEVEL } from './utils/tool-kit.util';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { map, mapTo, takeUntil, filter } from 'rxjs/operators';
+import { map, takeUntil, filter } from 'rxjs/operators';
 import { BaseEvent, LockEvent, DestroyOptions } from './interfaces/event.interface';
 
 export type BaseEntityType = 'node' | 'link' | 'port' | 'point';
@@ -87,7 +87,7 @@ export class BaseEntity {
 	public onEntityDestroy(): Observable<BaseEvent<BaseEntity>> {
 		return this._destroyed$.pipe(
 			filter(opts => opts.emit),
-			mapTo(new BaseEvent(this))
+			map(opts => new BaseEvent(this, opts))
 		);
 	}
 }
