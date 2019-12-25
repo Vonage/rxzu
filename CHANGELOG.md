@@ -1,3 +1,10 @@
+# [2.13.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.12.1...v2.13.0) (2019-12-25)
+
+
+### Features
+
+* **node model:** remove, update, add ports ([e334267](https://github.com/DanielNetzer/ngx-diagrams/commit/e3342674a5aad82d2e5e4c0839a989c2d371abb0))
+
 ## [2.12.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.12.0...v2.12.1) (2019-12-25)
 
 
