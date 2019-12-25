@@ -1,3 +1,10 @@
+# [2.12.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.11.2...v2.12.0) (2019-12-25)
+
+
+### Features
+
+* **base entity:** passing options to constructor ([5cd07d9](https://github.com/DanielNetzer/ngx-diagrams/commit/5cd07d956528d4a26c708ab45ae8b933ad76ebda))
+
 ## [2.11.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.11.1...v2.11.2) (2019-12-19)
 
 
