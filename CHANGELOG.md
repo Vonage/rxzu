@@ -1,3 +1,10 @@
+## [2.12.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.12.0...v2.12.1) (2019-12-25)
+
+
+### Bug Fixes
+
+* **base event:** null reference in options for event ([8a69a51](https://github.com/DanielNetzer/ngx-diagrams/commit/8a69a51f16a172514030c20f2c628fd5aec31206))
+
 # [2.12.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.11.2...v2.12.0) (2019-12-25)
 
 
