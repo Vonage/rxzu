@@ -2,6 +2,7 @@ import { BaseModel } from './base.model';
 import { NodeModel } from './node.model';
 import { LinkModel } from './link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { DestroyOptions } from '../interfaces';
 
 export class PortModel extends BaseModel<NodeModel> {
 	private name: string;
@@ -107,16 +108,28 @@ export class PortModel extends BaseModel<NodeModel> {
 		return super.getLocked();
 	}
 
+	destroy(options?: DestroyOptions) {
+		super.destroy(options);
+
+		Object.values(this.getLinks()).forEach(link => {
+			link.destroy();
+		});
+	}
+
 	public createLinkModel(): LinkModel | null {
 		const numberOfLinks: number = Object.keys(this.links$.getValue()).length;
 		if (this.maximumLinks === 1 && numberOfLinks >= 1) {
 			const linkToRemove = Object.values(this.links$.getValue())[0];
-			linkToRemove.destroy();
+			if (linkToRemove) {
+				linkToRemove.destroy();
+			}
 			return null;
 		} else if (numberOfLinks >= this.maximumLinks) {
 			// for the moment we will remove the first link by default
 			const linkToRemove = Object.values(this.links$.getValue())[0];
-			linkToRemove.destroy();
+			if (linkToRemove) {
+				linkToRemove.destroy();
+			}
 			return null;
 		}
 		return null;

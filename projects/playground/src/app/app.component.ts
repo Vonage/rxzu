@@ -30,10 +30,13 @@ export class AppComponent implements OnInit {
 		node1.setDimensions(nodesDefaultDimensions);
 		node1.addInPort({ name: 'inport', linkType: 'custom' });
 
-		const node2 = new DefaultNodeModel();
+		const node2 = new DefaultNodeModel('node2', 'default', 'node2');
 		node2.setCoords({ x: 200, y: 200 });
 		node2.setDimensions(nodesDefaultDimensions);
 		const outPortN2 = node2.addOutPort({ name: 'outport' });
+		const outPortN3 = node2.addOutPort({ name: 'outpor1' });
+
+		outPortN3.setMaximumLinks(1);
 		outPortN2.setMaximumLinks(1);
 
 		const node3 = new DefaultNodeModel();
@@ -63,9 +66,20 @@ export class AppComponent implements OnInit {
 
 	onActionStarted(action: any) {
 		if (action instanceof MoveItemsAction) {
-			console.log(action);
+			// console.log(action);
 			// console.log(action.getInPortNode());
 			// console.log(action.getOutPortNode());
 		}
+	}
+
+	addPort() {
+		const node2 = this.diagramModel.getNode('node2') as DefaultNodeModel;
+		node2.addOutPort({ name: 'outport4', id: 'test' });
+	}
+
+	removePort() {
+		const node2 = this.diagramModel.getNode('node2') as DefaultNodeModel;
+		const portToRemove = node2.getPort('test');
+		node2.removePort(portToRemove);
 	}
 }

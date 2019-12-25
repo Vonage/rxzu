@@ -127,10 +127,7 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 	}
 
 	selectCoords(): Observable<Coords> {
-		return this.coords$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			distinctUntilChanged()
-		);
+		return this.coords$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged());
 	}
 
 	selectX(): Observable<number> {
@@ -155,8 +152,19 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 	 */
 	addPort(port: P): P {
 		port.setParent(this);
-		this._ports.next({ ...this._ports.value, [port.id]: port });
+		this._ports.next({ ...this._ports.getValue(), [port.id]: port });
 		return port;
+	}
+
+	removePort(port: P): string {
+		const updatedPorts = this._ports.getValue();
+
+		delete updatedPorts[port.id];
+		this._ports.next({ ...updatedPorts });
+
+		port.destroy();
+
+		return port.id;
 	}
 
 	getPort(id: ID): P {
@@ -188,11 +196,7 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 
 	// TODO: return BaseEvent extension
 	dimensionChanges(): Observable<Dimensions> {
-		return this.dimensions$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			distinctUntilChanged(),
-			this.withLog('DimensionChanges')
-		);
+		return this.dimensions$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), this.withLog('DimensionChanges'));
 	}
 
 	getHeight(): number {
@@ -231,9 +235,6 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 
 	selectExtras<E = any>(selector?: (extra: E) => E[keyof E] | string | string[]) {
 		// TODO: impl selector
-		return this.extras$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			distinctUntilChanged()
-		);
+		return this.extras$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged());
 	}
 }

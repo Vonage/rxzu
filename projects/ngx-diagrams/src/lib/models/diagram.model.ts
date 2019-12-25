@@ -30,7 +30,6 @@ export class DiagramModel extends BaseEntity {
 
 	// TODO: support the following events for links and nodes
 	// removed, updated<positionChanged/dataChanged>, added
-
 	getNodes(): { [s: string]: NodeModel } {
 		return this.nodes$.getValue();
 	}
