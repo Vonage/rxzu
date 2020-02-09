@@ -2,7 +2,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { PortModel } from './port.model';
 import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
-import { Coords } from '../interfaces/coords.interface.js';
+import { Coords } from '../interfaces/coords.interface';
 import { DiagramEngine } from '../services/engine.service';
 import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 import { Dimensions } from '../interfaces/dimensions.interface';
