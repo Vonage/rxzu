@@ -1,6 +1,6 @@
 import { BaseAction } from './base.action';
 import { DiagramModel } from '../models/diagram.model';
-import { Coords } from '../interfaces/coords.interface.js';
+import { Coords } from '../interfaces/coords.interface';
 
 export class SelectingAction extends BaseAction {
 	mouseX2: number;
