@@ -1,3 +1,10 @@
+## [2.13.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.13.1...v2.13.2) (2020-02-09)
+
+
+### Bug Fixes
+
+* **imports:** coords interface import ([7b649a7](https://github.com/DanielNetzer/ngx-diagrams/commit/7b649a7e69ad7b570d05cfe9f12842fe43098f00))
+
 ## [2.13.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.13.0...v2.13.1) (2020-02-09)
 
 
