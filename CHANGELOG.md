@@ -1,3 +1,10 @@
+## [2.13.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.13.0...v2.13.1) (2020-02-09)
+
+
+### Bug Fixes
+
+* **imports:** bad imports naming ([014f17a](https://github.com/DanielNetzer/ngx-diagrams/commit/014f17a4f3dbd8e4b166e072a67918a46c9760c3))
+
 # [2.13.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.12.1...v2.13.0) (2019-12-25)
 
 
