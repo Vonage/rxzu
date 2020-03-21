@@ -36,6 +36,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "outputPath": "dist/playground",
             "index": "projects/playground/src/index.html",
             "main": "projects/playground/src/main.ts",
@@ -45,7 +46,9 @@
               "projects/playground/src/favicon.ico",
               "projects/playground/src/assets"
             ],
-            "styles": ["projects/playground/src/styles.scss"],
+            "styles": [
+              "projects/playground/src/styles.scss"
+            ],
             "scripts": [],
             "es5BrowserSupport": true
           },
@@ -71,6 +74,10 @@
                   "type": "initial",
                   "maximumWarning": "2mb",
                   "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
                 }
               ]
             }
@@ -100,7 +107,9 @@
             "polyfills": "projects/playground/src/polyfills.ts",
             "tsConfig": "projects/playground/tsconfig.spec.json",
             "karmaConfig": "projects/playground/karma.conf.js",
-            "styles": ["projects/playground/src/styles.scss"],
+            "styles": [
+              "projects/playground/src/styles.scss"
+            ],
             "scripts": [],
             "assets": [
               "projects/playground/src/favicon.ico",
@@ -115,7 +124,9 @@
               "projects/playground/tsconfig.app.json",
               "projects/playground/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -155,6 +166,11 @@
           "options": {
             "tsConfig": "projects/ngx-diagrams/tsconfig.lib.json",
             "project": "projects/ngx-diagrams/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-diagrams/tsconfig.lib.prod.json"
+            }
           }
         },
         "test": {
@@ -172,11 +188,16 @@
               "projects/ngx-diagrams/tsconfig.lib.json",
               "projects/ngx-diagrams/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
     }
   },
-  "defaultProject": "playground"
+  "defaultProject": "playground",
+  "cli": {
+    "analytics": "5c1508b8-b700-41c8-bb2c-f01e746ccb20"
+  }
 }
