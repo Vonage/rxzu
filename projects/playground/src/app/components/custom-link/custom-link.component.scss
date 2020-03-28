@@ -19,12 +19,6 @@
 		}
 	}
 
-	path {
-		fill: none;
-		pointer-events: all;
-		stroke: red;
-	}
-
 	&.path-selected {
 		stroke: rgb(0, 192, 255) !important;
 		stroke-dasharray: 10, 2;

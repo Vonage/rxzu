@@ -64,6 +64,17 @@ export class AppComponent implements OnInit {
 		this.dagreEngine.redistribute(this.diagramModel, { includeLinks: true, graph: { rankdir: 'LR' } });
 	}
 
+	changeLinkColor() {
+		const allLinks = this.diagramModel.getLinks();
+		for (const linkId in allLinks) {
+			if (allLinks.hasOwnProperty(linkId)) {
+				const link = allLinks[linkId] as DefaultLinkModel;
+				console.log(link);
+				link.setColor('green');
+			}
+		}
+	}
+
 	onActionStarted(action: any) {
 		if (action instanceof MoveItemsAction) {
 			// console.log(action);
