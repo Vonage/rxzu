@@ -8,14 +8,14 @@ cache: npm
 
 jobs:
   include:
-		- stage: "Test"
-			name: "Security test"
-			script:
-				- npm i -g snyk
-				- snyk --help
-				- snyk auth $SNYK_TOKEN
-				- snyk test
-				- snyk monitor
+    - stage: "Test"
+      name: "Security test"
+      script:
+        - npm i -g snyk
+        - snyk --help
+        - snyk auth $SNYK_TOKEN
+        - snyk test
+        - snyk monitor
     - stage: "Build"
       name: "build lib"
       script:
