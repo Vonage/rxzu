@@ -10,7 +10,7 @@
 		"ng": "ng",
 		"start": "ng serve",
 		"build": "ng build --base-href /ngx-diagrams/ --prod",
-		"build-lib": "ng build ngx-diagrams",
+		"build-lib": "ng build ngx-diagrams --prod",
 		"test": "ng test",
 		"lint": "ng lint",
 		"lint-lib": "ng lint ngx-diagrams",

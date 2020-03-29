@@ -25,6 +25,7 @@ import { PointModel } from '../../models/point.model';
 import { Coords } from '../../interfaces/coords.interface';
 import { PortModel } from '../../models/port.model';
 import { some } from 'lodash';
+import { LooseLinkDestroyed } from '../../actions/loose-link-destroyed.action';
 
 @Component({
 	selector: 'ngdx-diagram',
@@ -262,6 +263,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 					const link: LinkModel = selectedPoint.getLink();
 					if (link.getSourcePort() === null || link.getTargetPort() === null) {
 						link.destroy();
+						this.startFiringAction(new LooseLinkDestroyed(event.clientX, event.clientY, link));
 					}
 				});
 			}
