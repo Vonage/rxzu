@@ -24,7 +24,7 @@ jobs:
       - provider: script
         script: npm run semantic-release
         on:
-					branch: master
+          branch: master
     - stage: "Release"
       if: branch = master
       script: npm run build-storybook
