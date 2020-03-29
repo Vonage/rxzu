@@ -1,3 +1,11 @@
+# [2.14.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.13.2...v2.14.0) (2020-03-29)
+
+
+### Features
+
+* **actions:** loose link destroyed action ([4b47147](https://github.com/DanielNetzer/ngx-diagrams/commit/4b47147e07f9a152e36b3848f425f0d633513a44))
+* **colors:** links colors are now subscribable ([face093](https://github.com/DanielNetzer/ngx-diagrams/commit/face093b405cfa1d575b5da4abe1e4ce96b81e0c))
+
 ## [2.13.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.13.1...v2.13.2) (2020-02-09)
 
 
