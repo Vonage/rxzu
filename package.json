@@ -16,7 +16,7 @@
 		"lint-lib": "ng lint ngx-diagrams",
 		"e2e": "ng e2e",
 		"pack-zip": "cd dist/ngx-diagrams && npx bestzip ../ngx-diagrams.zip * && cd ../../",
-		"semantic-release": "semantic-release",
+		"semantic-release": "npx semantic-release",
 		"storybook": "start-storybook -s .storybook/static",
 		"build-storybook": "build-storybook -c .storybook -o ./dist/docs .storybook/static"
 	},
