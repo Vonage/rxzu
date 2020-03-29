@@ -21,8 +21,8 @@ jobs:
       script:
         - npm run build-lib
       deploy:
-			- provider: script
-			  skip_cleanup: true
+      - provider: script
+        skip_cleanup: true
         script: npm run semantic-release
         on:
           branch: master
@@ -30,8 +30,8 @@ jobs:
       if: branch = master
       script: npm run build-storybook
       deploy:
-			- provider: pages
-			  skip_cleanup: true
+      - provider: pages
+        skip_cleanup: true
         token: $GH_TOKEN
         keep_history: true
         local_dir: dist/docs
