@@ -407,7 +407,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			}
 		} else if (selectedModel.model instanceof PortModel) {
 			// its a port element, we want to drag a link
-			if (!this.diagramModel.getDiagramEngine().isModelLocked(selectedModel.model)) {
+			if (!this.diagramModel.getDiagramEngine().isModelLocked(selectedModel.model) && selectedModel.model.getCanCreateLinks()) {
 				const relative = this.diagramModel.getDiagramEngine().getRelativeMousePoint(event);
 				const sourcePort = selectedModel.model;
 				const link = sourcePort.createLinkModel();

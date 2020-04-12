@@ -14,6 +14,7 @@ export class PortModel extends BaseModel<NodeModel> {
 	private y$: BehaviorSubject<number>;
 	private width$: BehaviorSubject<number>;
 	private height$: BehaviorSubject<number>;
+	private canCreateLinks$: BehaviorSubject<boolean>;
 
 	constructor(name: string, type?: string, id?: string, maximumLinks?: number, linkType?: string) {
 		super(type, id);
@@ -24,6 +25,7 @@ export class PortModel extends BaseModel<NodeModel> {
 		this.y$ = new BehaviorSubject(0);
 		this.height$ = new BehaviorSubject(0);
 		this.width$ = new BehaviorSubject(0);
+		this.canCreateLinks$ = new BehaviorSubject(true);
 		this.linkType = linkType;
 	}
 
@@ -33,6 +35,18 @@ export class PortModel extends BaseModel<NodeModel> {
 
 	getName() {
 		return this.name;
+	}
+
+	getCanCreateLinks() {
+		return this.canCreateLinks$.getValue();
+	}
+
+	selectCanCreateLinks() {
+		return this.canCreateLinks$.asObservable();
+	}
+
+	setCanCreateLinks(value: boolean) {
+		this.canCreateLinks$.next(value);
 	}
 
 	selectX(): Observable<number> {

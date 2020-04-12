@@ -27,6 +27,10 @@ export class DefaultPortModel extends PortModel {
 		super(name, type, id, null, linkType);
 		this.in = isInput;
 		this.label = label || name;
+
+		if (this.in) {
+			this.setCanCreateLinks(false);
+		}
 	}
 
 	link(port: PortModel): LinkModel {
