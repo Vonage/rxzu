@@ -1,3 +1,10 @@
+# [2.15.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.14.0...v2.15.0) (2020-04-12)
+
+
+### Features
+
+* **actions:** invalid link destroyed action dispatched ([d942119](https://github.com/DanielNetzer/ngx-diagrams/commit/d942119f5fe59045ed01191559ad79c994c90ca4))
+
 # [2.14.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.13.2...v2.14.0) (2020-03-29)
 
 
