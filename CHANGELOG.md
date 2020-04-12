@@ -1,3 +1,10 @@
+# [2.16.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.15.0...v2.16.0) (2020-04-12)
+
+
+### Features
+
+* **links:** canCreateLinks property on ports ([73eba4b](https://github.com/DanielNetzer/ngx-diagrams/commit/73eba4b334c5cab50ad00f49754f94124b4d090e))
+
 # [2.15.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.14.0...v2.15.0) (2020-04-12)
 
 
