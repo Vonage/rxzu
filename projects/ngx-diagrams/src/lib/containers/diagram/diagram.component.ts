@@ -18,7 +18,7 @@ import { NodeModel } from '../../models/node.model';
 import { LinkModel } from '../../models/link.model';
 import { BehaviorSubject, Observable, combineLatest, ReplaySubject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
-import { BaseAction, MoveCanvasAction, SelectingAction, LinkCreatedAction } from '../../actions';
+import { BaseAction, MoveCanvasAction, SelectingAction, LinkCreatedAction, InvalidLinkDestroyed } from '../../actions';
 import { BaseModel } from '../../models/base.model';
 import { MoveItemsAction } from '../../actions/move-items.action';
 import { PointModel } from '../../models/point.model';
@@ -209,7 +209,6 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	onMouseUp = (event: MouseEvent) => {
 		const diagramEngine = this.diagramModel.getDiagramEngine();
 		const action = this.action$.getValue();
-
 		// are we going to connect a link to something?
 		if (action instanceof MoveItemsAction) {
 			const element = this.getMouseElement(event);
@@ -278,16 +277,19 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 				const link: LinkModel = model.model.getLink();
 				const sourcePort: PortModel = link.getSourcePort();
 				const targetPort: PortModel = link.getTargetPort();
+
 				if (sourcePort !== null && targetPort !== null) {
 					if (!sourcePort.canLinkToPort(targetPort)) {
 						// link not allowed
 						link.destroy();
+						this.startFiringAction(new InvalidLinkDestroyed(event.clientX, event.clientY, link));
 					} else if (
 						some(
 							Object.values(targetPort.getLinks()),
 							(l: LinkModel) => l !== link && (l.getSourcePort() === sourcePort || l.getTargetPort() === sourcePort)
 						)
 					) {
+						console.log('DESTROY HERE');
 						// link is a duplicate
 						link.destroy();
 					}
