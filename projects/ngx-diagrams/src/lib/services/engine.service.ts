@@ -273,19 +273,22 @@ export class DiagramEngine {
 	 * @param additionalZoomFactor allow for further zooming out to make sure edges doesn't cut
 	 */
 	zoomToFit(additionalZoomFactor: number = 0.005) {
-		this.canvas$
-			.pipe(
-				filter(Boolean),
-				take(1),
-				delay(0)
-			)
-			.subscribe((canvas: HTMLElement) => {
-				const xFactor = canvas.clientWidth / canvas.scrollWidth;
-				const yFactor = canvas.clientHeight / canvas.scrollHeight;
-				const zoomFactor = xFactor < yFactor ? xFactor : yFactor;
+		this.canvas$.pipe(filter(Boolean), take(1), delay(0)).subscribe((canvas: HTMLElement) => {
+			const xFactor = canvas.clientWidth / canvas.scrollWidth;
+			const yFactor = canvas.clientHeight / canvas.scrollHeight;
+			const zoomFactor = xFactor < yFactor ? xFactor : yFactor;
 
-				this.diagramModel.setZoomLevel(this.diagramModel.getZoomLevel() * (zoomFactor - additionalZoomFactor));
-				this.diagramModel.setOffset(0, 0);
-			});
+			let newZoomLvl = this.diagramModel.getZoomLevel() * (zoomFactor - additionalZoomFactor);
+			const maxZoomOut = this.diagramModel.getMaxZoomOut();
+
+			if (maxZoomOut && newZoomLvl > maxZoomOut) {
+				newZoomLvl = maxZoomOut;
+			}
+
+			this.diagramModel.setZoomLevel(newZoomLvl);
+
+			// TODO: either block the canvas movement on 0,0 or detect the top left furthest element and set the offest to its edges
+			this.diagramModel.setOffset(0, 0);
+		});
 	}
 }

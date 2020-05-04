@@ -1,5 +1,5 @@
 import { Component, OnInit, ComponentFactoryResolver, Renderer2 } from '@angular/core';
-import { DiagramEngine, DefaultLinkModel, DiagramModel, DefaultNodeModel, DagreEngine, MoveItemsAction } from 'ngx-diagrams';
+import { DiagramEngine, DefaultLinkModel, DiagramModel, DefaultNodeModel, DagreEngine, MoveItemsAction, BaseAction } from 'ngx-diagrams';
 import { CustomLinkFactory } from './components/custom-link/custom-link.factory';
 
 @Component({
@@ -74,8 +74,12 @@ export class AppComponent implements OnInit {
 			}
 		}
 	}
+	// deserializeModel() {
+	// 	const jsonModel = this.diagramModel.serialize();
+	// 	console.log(jsonModel);
+	// }
 
-	onActionStarted(action: any) {
+	onActionStarted(action: BaseAction) {
 		if (action instanceof MoveItemsAction) {
 			// console.log(action);
 			// console.log(action.getInPortNode());

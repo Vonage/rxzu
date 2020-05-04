@@ -472,11 +472,6 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 
 			if (currentZoomLevel + scrollDelta > 10) {
 				const newZoomLvl = currentZoomLevel + scrollDelta;
-				// check if zoom levels exceeded defined boundaries
-				if ((this.maxZoomIn && newZoomLvl > this.maxZoomIn) || (this.maxZoomOut && newZoomLvl < this.maxZoomOut)) {
-					return;
-				}
-
 				this.diagramModel.setZoomLevel(newZoomLvl);
 			}
 

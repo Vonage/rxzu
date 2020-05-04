@@ -17,6 +17,8 @@ export class DiagramModel extends BaseEntity {
 	offsetX$: BehaviorSubject<number>;
 	offsetY$: BehaviorSubject<number>;
 	gridSize$: BehaviorSubject<number>;
+	maxZoomOut$: BehaviorSubject<number>;
+	maxZoomIn$: BehaviorSubject<number>;
 
 	constructor(private diagramEngine: DiagramEngine, id?: string) {
 		super(id);
@@ -26,6 +28,8 @@ export class DiagramModel extends BaseEntity {
 		this.offsetX$ = new BehaviorSubject(0);
 		this.offsetY$ = new BehaviorSubject(0);
 		this.gridSize$ = new BehaviorSubject(0);
+		this.maxZoomIn$ = new BehaviorSubject(null);
+		this.maxZoomOut$ = new BehaviorSubject(null);
 	}
 
 	// TODO: support the following events for links and nodes
@@ -102,20 +106,39 @@ export class DiagramModel extends BaseEntity {
 		return this.links$.asObservable();
 	}
 
-	/**
-	 * Serialize the diagram model
-	 * @returns diagram model as a string
-	 */
+	// /**
+	//  * Serialize the diagram model
+	//  * @returns diagram model as a string
+	//  */
 	// serialize(): string {
-	// 	return JSON.stringify(this.model);
+	// 	const model = this.nodes$.getValue();
+	// 	console.log(model);
+	// 	return JSON.stringify(model);
 	// }
 
-	/**
-	 * Load into the diagram model a serialized diagram
-	 */
+	// /**
+	//  * Load into the diagram model a serialized diagram
+	//  */
 	// deserialize(serializedModel: string) {
-	// 	this.model = JSON.parse(serializedModel);
+	// 	const model = JSON.parse(serializedModel);
+	// 	console.log(model);
 	// }
+
+	setMaxZoomOut(maxZoomOut: number) {
+		this.maxZoomOut$.next(maxZoomOut);
+	}
+
+	setMaxZoomIn(maxZoomIn: number) {
+		this.maxZoomIn$.next(maxZoomIn);
+	}
+
+	getMaxZoomOut() {
+		return this.maxZoomOut$.getValue();
+	}
+
+	getMaxZoomIn() {
+		return this.maxZoomIn$.getValue();
+	}
 
 	setOffset(x: number, y: number) {
 		this.offsetX$.next(x);
@@ -147,6 +170,13 @@ export class DiagramModel extends BaseEntity {
 	}
 
 	setZoomLevel(z: number) {
+		const maxZoomIn = this.maxZoomIn$.getValue();
+		const maxZoomOut = this.maxZoomOut$.getValue();
+		// check if zoom levels exceeded defined boundaries
+		if ((maxZoomIn && z > maxZoomIn) || (maxZoomOut && z < maxZoomOut)) {
+			return;
+		}
+
 		this.zoom$.next(z);
 	}
 
