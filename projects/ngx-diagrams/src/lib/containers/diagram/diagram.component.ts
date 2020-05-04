@@ -40,6 +40,8 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	@Input() allowCanvasTranslation = true;
 	@Input() inverseZoom = true;
 	@Input() allowLooseLinks = true;
+	@Input() maxZoomOut: number = null;
+	@Input() maxZoomIn: number = null;
 
 	@Output() actionStartedFiring: EventEmitter<BaseAction> = new EventEmitter();
 	@Output() actionStillFiring: EventEmitter<BaseAction> = new EventEmitter();
@@ -149,7 +151,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	selectAction() {
-		return this.action$;
+		return this.action$ as BehaviorSubject<SelectingAction>;
 	}
 
 	shouldDrawSelectionBox() {
@@ -453,8 +455,10 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			event.preventDefault();
 			event.stopPropagation();
 			const currentZoomLevel = this.diagramModel.getZoomLevel();
+
 			const oldZoomFactor = currentZoomLevel / 100;
 			let scrollDelta = this.inverseZoom ? -event.deltaY : event.deltaY;
+
 			// check if it is pinch gesture
 			if (event.ctrlKey && scrollDelta % 1 !== 0) {
 				/* Chrome and Firefox sends wheel event with deltaY that
@@ -465,11 +469,19 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			} else {
 				scrollDelta /= 60;
 			}
+
 			if (currentZoomLevel + scrollDelta > 10) {
-				this.diagramModel.setZoomLevel(currentZoomLevel + scrollDelta);
+				const newZoomLvl = currentZoomLevel + scrollDelta;
+				// check if zoom levels exceeded defined boundaries
+				if ((this.maxZoomIn && newZoomLvl > this.maxZoomIn) || (this.maxZoomOut && newZoomLvl < this.maxZoomOut)) {
+					return;
+				}
+
+				this.diagramModel.setZoomLevel(newZoomLvl);
 			}
 
-			const zoomFactor = this.diagramModel.getZoomLevel() / 100;
+			const updatedZoomLvl = this.diagramModel.getZoomLevel();
+			const zoomFactor = updatedZoomLvl / 100;
 
 			const boundingRect = (event.currentTarget as Element).getBoundingClientRect();
 			const clientWidth = boundingRect.width;
@@ -478,8 +490,8 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			// compute difference between rect before and after scroll
 			const widthDiff = clientWidth * zoomFactor - clientWidth * oldZoomFactor;
 			const heightDiff = clientHeight * zoomFactor - clientHeight * oldZoomFactor;
-			// compute mouse coords relative to canvas
 
+			// compute mouse coords relative to canvas
 			const clientX = event.clientX - boundingRect.left;
 			const clientY = event.clientY - boundingRect.top;
 
@@ -487,10 +499,10 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			const xFactor = (clientX - this.diagramModel.getOffsetX()) / oldZoomFactor / clientWidth;
 			const yFactor = (clientY - this.diagramModel.getOffsetY()) / oldZoomFactor / clientHeight;
 
-			this.diagramModel.setOffset(
-				this.diagramModel.getOffsetX() - widthDiff * xFactor,
-				this.diagramModel.getOffsetY() - heightDiff * yFactor
-			);
+			const updatedXOffset = this.diagramModel.getOffsetX() - widthDiff * xFactor;
+			const updatedYOffset = this.diagramModel.getOffsetY() - heightDiff * yFactor;
+
+			this.diagramModel.setOffset(updatedXOffset, updatedYOffset);
 		}
 	}
 }
