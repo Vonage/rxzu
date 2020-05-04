@@ -1,3 +1,21 @@
+# [2.17.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.16.0...v2.17.0) (2020-05-04)
+
+
+### Bug Fixes
+
+* package.json, package-lock.json & .snyk to reduce vulnerabilities ([71edd1e](https://github.com/DanielNetzer/ngx-diagrams/commit/71edd1e051ad2270536a6bb8edaf06abf8be0177))
+* package.json, package-lock.json & .snyk to reduce vulnerabilities ([8f4613d](https://github.com/DanielNetzer/ngx-diagrams/commit/8f4613d2ca2ec7ac2ff967e601be2939bfe0f726))
+* package.json, package-lock.json & .snyk to reduce vulnerabilities ([4da388b](https://github.com/DanielNetzer/ngx-diagrams/commit/4da388b98f39e5d44212dc9684a386ed1c64159c))
+* upgrade multiple dependencies with Snyk ([35e5380](https://github.com/DanielNetzer/ngx-diagrams/commit/35e5380bc92b86a20e36dd3c7c4f26c9c43a28f3))
+* upgrade rxjs from 6.5.4 to 6.5.5 ([59483a1](https://github.com/DanielNetzer/ngx-diagrams/commit/59483a16d26af5f633f7dc804a6d39cee711f898))
+* upgrade rxjs from 6.5.4 to 6.5.5 ([275b457](https://github.com/DanielNetzer/ngx-diagrams/commit/275b4575cf383322c315dc3b1c24d298d48f0313))
+* **deps:** updated all deps to address vuln ([e2323d1](https://github.com/DanielNetzer/ngx-diagrams/commit/e2323d1d25dfb8f15f6f9a88b1eff8b8f8159b6a))
+
+
+### Features
+
+* **zoom:** min and max zoom levels properties ([f8470cb](https://github.com/DanielNetzer/ngx-diagrams/commit/f8470cbe8ba55a8421ed9af4cfb2fa52aa9fc721))
+
 # [2.16.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.15.0...v2.16.0) (2020-04-12)
 
 
