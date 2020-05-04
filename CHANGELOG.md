@@ -1,3 +1,10 @@
+# [2.18.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.17.0...v2.18.0) (2020-05-04)
+
+
+### Features
+
+* **zoom to fit:** taking under consideration min/max zoom ([2adc18d](https://github.com/DanielNetzer/ngx-diagrams/commit/2adc18db3747323823acf3b28cfd98abcf24e8eb))
+
 # [2.17.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.16.0...v2.17.0) (2020-05-04)
 
 
