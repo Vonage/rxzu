@@ -71,6 +71,9 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			this.links$ = this.diagramModel.selectLinks();
 			this.nodesRendered$ = new BehaviorSubject(false);
 
+			this.diagramModel.setMaxZoomIn(this.maxZoomIn);
+			this.diagramModel.setMaxZoomOut(this.maxZoomOut);
+
 			this.nodes$.pipe(takeUntil(this.destroyed$)).subscribe(nodes => {
 				this.nodesRendered$.next(false);
 				Object.values(nodes).forEach(node => {

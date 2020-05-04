@@ -281,7 +281,7 @@ export class DiagramEngine {
 			let newZoomLvl = this.diagramModel.getZoomLevel() * (zoomFactor - additionalZoomFactor);
 			const maxZoomOut = this.diagramModel.getMaxZoomOut();
 
-			if (maxZoomOut && newZoomLvl > maxZoomOut) {
+			if (maxZoomOut && newZoomLvl < maxZoomOut) {
 				newZoomLvl = maxZoomOut;
 			}
 

@@ -172,6 +172,7 @@ export class DiagramModel extends BaseEntity {
 	setZoomLevel(z: number) {
 		const maxZoomIn = this.maxZoomIn$.getValue();
 		const maxZoomOut = this.maxZoomOut$.getValue();
+
 		// check if zoom levels exceeded defined boundaries
 		if ((maxZoomIn && z > maxZoomIn) || (maxZoomOut && z < maxZoomOut)) {
 			return;

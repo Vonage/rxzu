@@ -1,5 +1,7 @@
 <ngdx-diagram
 	class="demo-diagram"
+	[maxZoomIn]="160"
+	[maxZoomOut]="120"
 	[model]="diagramModel"
 	[allowLooseLinks]="false"
 	(actionStartedFiring)="onActionStarted($event)"
@@ -9,5 +11,4 @@
 	<button (click)="addPort()">ADD PORT!</button>
 	<button (click)="changeLinkColor()">CHANGE LINKS COLOR</button>
 	<button (click)="removePort()">REMOVE PORT!</button>
-	<!-- <button (click)="deserializeModel()">DESERIALIZE</button> -->
 </div>
