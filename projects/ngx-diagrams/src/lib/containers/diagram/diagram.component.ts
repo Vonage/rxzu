@@ -247,7 +247,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 						const targetPort = link.getTargetPort();
 						const srcPort = link.getSourcePort();
 
-						if (targetPort.id !== srcPort.id) {
+						if (targetPort.id !== srcPort.id && srcPort.canLinkToPort(targetPort)) {
 							// link is valid, fire the event
 							this.startFiringAction(new LinkCreatedAction(event.clientX, event.clientY, link));
 						}
@@ -294,7 +294,6 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 							(l: LinkModel) => l !== link && (l.getSourcePort() === sourcePort || l.getTargetPort() === sourcePort)
 						)
 					) {
-						console.log('DESTROY HERE');
 						// link is a duplicate
 						link.destroy();
 					}
