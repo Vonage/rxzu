@@ -1,3 +1,10 @@
+## [2.18.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.0...v2.18.1) (2020-05-04)
+
+
+### Bug Fixes
+
+* **zoom:** fixed issue with zoom to fit ([62777c7](https://github.com/DanielNetzer/ngx-diagrams/commit/62777c7a98a84152e77f5e9fc10d9bf47be82839))
+
 # [2.18.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.17.0...v2.18.0) (2020-05-04)
 
 
