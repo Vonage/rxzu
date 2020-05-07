@@ -1,3 +1,10 @@
+## [2.18.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.1...v2.18.2) (2020-05-07)
+
+
+### Bug Fixes
+
+* **links:** new links wont be created if canLinkToPort fail ([2a1ea0f](https://github.com/DanielNetzer/ngx-diagrams/commit/2a1ea0fba7b6ded4197b6de5f18187b6c0dee16e))
+
 ## [2.18.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.0...v2.18.1) (2020-05-04)
 
 
