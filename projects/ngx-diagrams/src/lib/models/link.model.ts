@@ -205,11 +205,17 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
 	addPoint<P extends PointModel>(pointModel: P, index = 1): P {
 		pointModel.setParent(this);
+		pointModel.setLocked(this.getLocked());
 		this.points.splice(index, 0, pointModel);
 		return pointModel;
 	}
 
 	generatePoint({ x = 0, y = 0 }: Coords): PointModel {
 		return new PointModel(this, { x, y });
+	}
+
+	setLocked(locked: boolean = true) {
+		super.setLocked(locked);
+		this.points.forEach(point => point.setLocked(locked));
 	}
 }
