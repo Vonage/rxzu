@@ -1,3 +1,10 @@
+## [2.18.4](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.3...v2.18.4) (2020-06-02)
+
+
+### Bug Fixes
+
+* **link model:** lock child points when locking link ([c07cf37](https://github.com/DanielNetzer/ngx-diagrams/commit/c07cf374b906240a3d1368cf1639c2c78c09c2d5))
+
 ## [2.18.3](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.2...v2.18.3) (2020-06-02)
 
 
