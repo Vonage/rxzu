@@ -1,3 +1,11 @@
+## [2.18.3](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.2...v2.18.3) (2020-06-02)
+
+
+### Bug Fixes
+
+* upgrade multiple dependencies with Snyk ([55fd568](https://github.com/DanielNetzer/ngx-diagrams/commit/55fd568e9d20a719b9308ea15eb9288b69346ded))
+* upgrade multiple dependencies with Snyk ([b62f06b](https://github.com/DanielNetzer/ngx-diagrams/commit/b62f06bd15724d2fc118d250d429d0e320cbfd6a))
+
 ## [2.18.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.1...v2.18.2) (2020-05-07)
 
 
