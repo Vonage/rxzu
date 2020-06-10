@@ -1,3 +1,10 @@
+## [2.18.5](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.4...v2.18.5) (2020-06-10)
+
+
+### Bug Fixes
+
+* upgrade ngx-markdown from 9.0.0 to 9.1.0 ([bc89e53](https://github.com/DanielNetzer/ngx-diagrams/commit/bc89e53ed6a238f817812e3b03d8549217d8bc2f))
+
 ## [2.18.4](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.3...v2.18.4) (2020-06-02)
 
 
