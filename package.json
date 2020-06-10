@@ -39,7 +39,7 @@
   "ngx-markdown": "^9.1.0",
   "rxjs": "~6.5.5",
   "tslib": "^1.11.2",
-  "snyk": "^1.319.0",
+  "snyk": "^1.323.1",
   "zone.js": "~0.10.2"
  },
  "devDependencies": {
