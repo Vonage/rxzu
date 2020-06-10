@@ -1,3 +1,14 @@
+## [2.18.6](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.5...v2.18.6) (2020-06-10)
+
+
+### Bug Fixes
+
+* upgrade multiple dependencies with Snyk ([6b502d8](https://github.com/DanielNetzer/ngx-diagrams/commit/6b502d85fec81eb886d75a66d02928e5db2b6779))
+* upgrade snyk from 1.317.0 to 1.319.0 ([5e12d4a](https://github.com/DanielNetzer/ngx-diagrams/commit/5e12d4a31f897bed7080fc8c313e8a8ec2fc4bbb))
+* upgrade snyk from 1.317.0 to 1.319.0 ([a81d4aa](https://github.com/DanielNetzer/ngx-diagrams/commit/a81d4aacc0a3a30e92411909db030c99b28d4a87))
+* upgrade tslib from 1.11.1 to 1.11.2 ([48dbaf7](https://github.com/DanielNetzer/ngx-diagrams/commit/48dbaf7956c4e5173f0f97e0e6a627bf8de23034))
+* upgrade tslib from 1.11.1 to 1.11.2 ([98c84ca](https://github.com/DanielNetzer/ngx-diagrams/commit/98c84caadfd54a74ab224f720bf3a188848191bf))
+
 ## [2.18.5](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.4...v2.18.5) (2020-06-10)
 
 
