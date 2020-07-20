@@ -73,6 +73,7 @@ export class AppComponent implements OnInit {
 			}
 		}
 	}
+
 	// deserializeModel() {
 	// 	const jsonModel = this.diagramModel.serialize();
 	// 	console.log(jsonModel);
