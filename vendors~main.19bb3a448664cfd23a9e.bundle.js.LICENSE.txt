@@ -75,13 +75,7 @@ PERFORMANCE OF THIS SOFTWARE.
  */
 
 /**
- * @license Angular v9.1.4
- * (c) 2010-2020 Google LLC. https://angular.io/
- * License: MIT
- */
-
-/**
- * @license Angular v9.1.6
+ * @license Angular v9.1.12
  * (c) 2010-2020 Google LLC. https://angular.io/
  * License: MIT
  */
@@ -127,3 +121,7 @@ PERFORMANCE OF THIS SOFTWARE.
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+
+//! stable.js 0.1.8, https://github.com/Two-Screen/stable
+
+//! © 2018 Angry Bytes and contributors. MIT licensed.
