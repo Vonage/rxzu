@@ -11,7 +11,7 @@ import {
 	AfterViewInit,
 	ChangeDetectionStrategy,
 	ChangeDetectorRef,
-	OnDestroy
+	OnDestroy,
 } from '@angular/core';
 import { DiagramModel } from '../../models/diagram.model';
 import { NodeModel } from '../../models/node.model';
@@ -24,14 +24,13 @@ import { MoveItemsAction } from '../../actions/move-items.action';
 import { PointModel } from '../../models/point.model';
 import { Coords } from '../../interfaces/coords.interface';
 import { PortModel } from '../../models/port.model';
-import { some } from 'lodash';
 import { LooseLinkDestroyed } from '../../actions/loose-link-destroyed.action';
 
 @Component({
 	selector: 'ngdx-diagram',
 	templateUrl: 'diagram.component.html',
 	styleUrls: ['diagram.component.scss'],
-	changeDetection: ChangeDetectionStrategy.OnPush
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	// tslint:disable-next-line:no-input-rename
@@ -176,7 +175,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			const nodeEl = target.closest('[data-nodeid]');
 			return {
 				model: this.diagramModel.getNode(nodeEl.getAttribute('data-nodeid')).getPort(element.getAttribute('data-portid')),
-				element
+				element,
 			};
 		}
 
@@ -185,7 +184,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 		if (element) {
 			return {
 				model: this.diagramModel.getLink(element.getAttribute('data-linkid')).getPointModel(element.getAttribute('data-pointid')),
-				element
+				element,
 			};
 		}
 
@@ -194,7 +193,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 		if (element) {
 			return {
 				model: this.diagramModel.getLink(element.getAttribute('data-linkid')),
-				element
+				element,
 			};
 		}
 
@@ -203,7 +202,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 		if (element) {
 			return {
 				model: this.diagramModel.getNode(element.getAttribute('data-nodeid')),
-				element
+				element,
 			};
 		}
 
@@ -289,8 +288,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 						link.destroy();
 						this.startFiringAction(new InvalidLinkDestroyed(event.clientX, event.clientY, link));
 					} else if (
-						some(
-							Object.values(targetPort.getLinks()),
+						Object.values(targetPort.getLinks()).some(
 							(l: LinkModel) => l !== link && (l.getSourcePort() === sourcePort || l.getTargetPort() === sourcePort)
 						)
 					) {
@@ -353,7 +351,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 		} else if (action instanceof MoveItemsAction) {
 			const coords: Coords = {
 				x: event.clientX - action.mouseX,
-				y: event.clientY - action.mouseY
+				y: event.clientY - action.mouseY,
 			};
 			const amountZoom = this.diagramModel.getZoomLevel() / 100;
 

@@ -4,7 +4,6 @@ import { LinkModel } from './link.model';
 import { BaseEntity, BaseEntityType } from '../base.entity';
 import { DiagramEngine } from '../services/engine.service';
 import { BaseModel } from './base.model';
-import { uniq, flatMap } from 'lodash';
 import { PortModel } from './port.model';
 import { PointModel } from './point.model';
 import { Coords } from '../interfaces/coords.interface';
@@ -209,7 +208,7 @@ export class DiagramModel extends BaseEntity {
 		}
 		return {
 			x: gridSize * Math.floor((x + gridSize / 2) / gridSize),
-			y: gridSize * Math.floor((y + gridSize / 2) / gridSize)
+			y: gridSize * Math.floor((y + gridSize / 2) / gridSize),
 		};
 	}
 
@@ -217,35 +216,25 @@ export class DiagramModel extends BaseEntity {
 		if (!Array.isArray(filters)) {
 			filters = [filters];
 		}
-		let items = [];
+		let items: BaseModel[] = [];
 
 		// run through nodes
-		items = items.concat(
-			flatMap(this.nodes$.getValue(), node => {
-				return node.getSelectedEntities();
-			})
-		);
+		items = items.concat(Object.values(this.nodes$.getValue()).flatMap(node => node.getSelectedEntities()));
 
 		// find all the links
-		items = items.concat(
-			flatMap(this.links$.getValue(), link => {
-				return link.getSelectedEntities();
-			})
-		);
+		items = items.concat(Object.values(this.links$.getValue()).flatMap(link => link.getSelectedEntities()));
 
 		// find all points
 		items = items.concat(
-			flatMap(this.links$.getValue(), link => {
-				return flatMap(link.getPoints(), point => {
-					return point.getSelectedEntities();
-				});
+			Object.values(this.links$.getValue()).flatMap(link => {
+				return link.getPoints().flatMap(point => point.getSelectedEntities());
 			})
 		);
 
-		items = uniq(items);
+		items = [...new Set(items)];
 
 		if (filters.length > 0) {
-			items = uniq(items).filter((item: BaseModel) => {
+			items = items.filter((item: BaseModel) => {
 				if (filters.includes('node') && item instanceof NodeModel) {
 					return true;
 				}
