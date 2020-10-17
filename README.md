@@ -1,4 +1,4 @@
-# ngx-diagrams (WIP)
+# NGX-Diagrams
 
 ---
 
@@ -35,7 +35,7 @@ import { NgxDiagramsModule } from 'ngx-diagrams';
 	declarations: [AppComponent],
 	imports: [BrowserModule, NgxDiagramsModule],
 	providers: [],
-	bootstrap: [AppComponent]
+	bootstrap: [AppComponent],
 })
 export class AppModule {}
 ```
