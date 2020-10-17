@@ -11,4 +11,4 @@ export * from './lib/interfaces';
 export * from './lib/factories';
 export * from './lib/actions';
 export * from './lib/utils';
-export { DagreEngine, DagreEngineOptions } from './lib/services/dagre-engine.service';
+export * from './lib/services/dagre-engine.service';

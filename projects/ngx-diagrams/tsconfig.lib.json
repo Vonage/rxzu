@@ -10,11 +10,13 @@
     "inlineSources": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "importHelpers": true,
+		"importHelpers": true,
+		"downlevelIteration": true,
     "types": [],
     "lib": [
       "dom",
-      "es2018"
+			"es2018",
+			"es2019"
     ]
   },
   "angularCompilerOptions": {

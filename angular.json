@@ -48,9 +48,9 @@
             ],
             "styles": [
               "projects/playground/src/styles.scss"
-            ],
-            "scripts": [],
-            "es5BrowserSupport": true
+						],
+						"allowedCommonJsDependencies": ["dagre"],
+            "scripts": []
           },
           "configurations": {
             "production": {
