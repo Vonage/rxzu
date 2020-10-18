@@ -1,4 +1,4 @@
-![NGX-Diagrams](https://i.postimg.cc/mrZH51BT/icon.png)
+## NGX-Diagrams <img src="https://i.postimg.cc/mrZH51BT/icon.png" width="50">
 
 > Light Weight, Modular, Typed Diagram Engine for Angular
 
