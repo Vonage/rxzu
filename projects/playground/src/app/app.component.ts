@@ -5,11 +5,17 @@ import { CustomLinkFactory } from './components/custom-link/custom-link.factory'
 @Component({
 	selector: 'app-root',
 	templateUrl: './app.component.html',
-	styleUrls: ['./app.component.scss']
+	styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
 	title = 'playground';
 	diagramModel: DiagramModel;
+
+	nodeHeight: 200;
+	nodeWidth: 200;
+
+	maxZoomOut: 160;
+	maxZoomIn: 120;
 
 	constructor(
 		private diagramEngine: DiagramEngine,
@@ -19,7 +25,7 @@ export class AppComponent implements OnInit {
 	) {}
 
 	ngOnInit() {
-		const nodesDefaultDimensions = { height: 200, width: 200 };
+		const nodesDefaultDimensions = { height: this.nodeHeight, width: this.nodeWidth };
 		this.diagramEngine.registerDefaultFactories();
 		this.diagramEngine.registerLinkFactory(new CustomLinkFactory(this.resolver, this.renderer));
 

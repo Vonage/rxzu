@@ -1,56 +1,23 @@
-# NGX-Diagrams
+![NGX-Diagrams](https://i.postimg.cc/mrZH51BT/icon.png)
+
+> Light Weight, Modular, Typed Diagram Engine for Angular
+
+Near zero dependency and a complete customizable diagram engine makes NGX-Diagrams the perfect fit to any project.
 
 ---
 
-[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+[![Downloads](https://img.shields.io/npm/dt/ngx-diagrams?style=flat-square)]()
 [![Build Status](https://travis-ci.com/DanielNetzer/ngx-diagrams.svg?branch=master)](https://travis-ci.com/DanielNetzer/ngx-diagrams)
 [![Known Vulnerabilities](https://snyk.io/test/github/DanielNetzer/ngx-diagrams/badge.svg)](https://snyk.io/test/github/DanielNetzer/ngx-diagrams)
-[![Gitter](https://badges.gitter.im/ngx-diagrams/community.svg)](https://gitter.im/ngx-diagrams/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![commitizen](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg?style=flat-square)]()
+[![PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)]()
+[![coc-badge](https://img.shields.io/badge/codeof-conduct-ff69b4.svg?style=flat-square)]()
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
+[![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-**_Light weight, modular, typed diagram engine for angular inspired by react-storm-diagrams._**
+NGX-Diagrams is a diagrams engine system, built on top of Angular and RxJS, which takes the idea of graphic visualization to the next level in terms of performance, rendering optimization and customizability.
 
-Check out our [stories](https://danielnetzer.github.io/ngx-diagrams)
+NGX-Digrams encourages creativity. It allows you the ability to create any kind of node, link, label or even a custom entity and gives powerful tools with a moderate learning curve, suitable for both experienced and inexperienced developers alike.
 
-# Getting Started
-
----
-
-### Installation
-
-```bash
-npm i ngx-diagrams
-```
-
-### Setup
-
-- Import the library module.
-
-`app.module.ts`
-
-```javascript
-import { NgxDiagramsModule } from 'ngx-diagrams';
-
-@NgModule({
-	declarations: [AppComponent],
-	imports: [BrowserModule, NgxDiagramsModule],
-	providers: [],
-	bootstrap: [AppComponent],
-})
-export class AppModule {}
-```
-
-- instantiate new DiagramModel in the component you want to add the diagram canvas (e.g. app.component.ts), and start adding nodes, links, ports and work with the diagram.
-
-  `app.component.ts`
-
-```javascript
- diagramModel = new DiagramModel();
-
-  constructor() { }
-
-  ngOnInit() {
-    const newNode = this.diagramModel.addNode('test', 200, 300);
-    newNode.addPort('test', 'out');
-  }
-```
+- 🤓 Learn about it on our [storybook](https://danielnetzer.github.io/ngx-diagrams)
+- 🍄 Join NGX-Diagrams [Gitter](https://gitter.im/ngx-diagrams/community) room
