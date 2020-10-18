@@ -1,4 +1,4 @@
-## NGX-Diagrams <img src="https://i.postimg.cc/mrZH51BT/icon.png" width="50">
+## NGX-Diagrams <img src="https://i.postimg.cc/mrZH51BT/icon.png" width="100">
 
 > Light Weight, Modular, Typed Diagram Engine for Angular
 
@@ -15,9 +15,9 @@ Near zero dependency and a complete customizable diagram engine makes NGX-Diagra
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-NGX-Diagrams is a diagrams engine system, built on top of Angular and RxJS, which takes the idea of graphic visualization to the next level in terms of performance, rendering optimization and customizability.
+NGX-Diagrams is a diagrams engine system, built on top of Angular and RxJS, which takes the idea of graphic visualization to the next level in terms of performance, rendering optimization, and customizability.
 
-NGX-Digrams encourages creativity. It allows you the ability to create any kind of node, link, label or even a custom entity and gives powerful tools with a moderate learning curve, suitable for both experienced and inexperienced developers alike.
+NGX-Digrams encourages creativity. It allows you to create any node, link, label, or even a custom entity and provide powerful tools with a moderate learning curve, suitable for both experienced and inexperienced developers alike.
 
-- 🤓 Learn about it on our [storybook](https://danielnetzer.github.io/ngx-diagrams)
+- 🤓 Learn about it on our [Storybook](https://danielnetzer.github.io/ngx-diagrams)
 - 🍄 Join NGX-Diagrams [Gitter](https://gitter.im/ngx-diagrams/community) room

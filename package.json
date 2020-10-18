@@ -20,7 +20,7 @@
     "build-storybook": "npm run docs:json && build-storybook",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect",
-    "docs:json": "compodoc -p ./tsconfig.json -e json -d .",
+    "docs:json": "compodoc -p ./projects/ngx-diagrams/tsconfig.lib.prod.json -e json -d .",
     "storybook": "npm run docs:json && start-storybook -p 6006"
   },
   "repository": {
@@ -37,7 +37,6 @@
     "@angular/router": "~10.1.6",
     "core-js": "^3.6.5",
     "dagre": "^0.8.5",
-    "ngx-markdown": "^10.1.1",
     "rxjs": "~6.6.3",
     "tslib": "^2.0.3",
     "snyk": "^1.414.1",

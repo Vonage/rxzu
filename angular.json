@@ -196,7 +196,7 @@
       }
     }
   },
-  "defaultProject": "playground",
+  "defaultProject": "ngx-diagrams",
   "cli": {
     "analytics": "5c1508b8-b700-41c8-bb2c-f01e746ccb20"
   }
