@@ -26,7 +26,7 @@ export class TemplateDiagramComponent implements OnInit, OnChanges {
 		node1.setDimensions(nodesDefaultDimensions);
 		node1.addInPort({ name: 'inport', linkType: 'custom' });
 
-		const node2 = new DefaultNodeModel('node2', 'default', 'node2');
+		const node2 = new DefaultNodeModel();
 		node2.setCoords({ x: 200, y: 200 });
 		node2.setDimensions(nodesDefaultDimensions);
 		const outPortN2 = node2.addOutPort({ name: 'outport' });
@@ -56,10 +56,21 @@ export class TemplateDiagramComponent implements OnInit, OnChanges {
 
 	ngOnChanges(e: SimpleChanges) {
 		console.log(e);
+
+		if (this.diagramModel) {
+			if (e.nodeHeight) {
+				Object.values(this.diagramModel.getNodes()).forEach(node => {
+					node.setHeight(e.nodeHeight.currentValue);
+				});
+			}
+
+			if (e.nodeWidth) {
+			}
+		}
 	}
 
 	onActionStarted(e: BaseAction) {
-		console.log(e);
+		// console.log(e);
 	}
 
 	changeLinkColor() {
