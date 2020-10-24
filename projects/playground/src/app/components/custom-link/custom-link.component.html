@@ -1,7 +1,7 @@
 <!-- Label Host -->
 <ng-template #labelLayer></ng-template>
 
-<svg class="intent-link">
+<svg class="custom-link">
 	<g>
 		<path [attr.stroke-width]="width" [attr.stroke]="color" [attr.d]="path$ | async"></path>
 		<path
@@ -16,15 +16,15 @@
 		></path>
 	</g>
 	<g *ngFor="let point of points$ | async">
-		<circle [attr.cx]="(point.coords$ | async).x" [attr.cy]="(point.coords$ | async).y" r="5" class="default-point" />
+		<circle [attr.cx]="(point.selectCoords() | async).x" [attr.cy]="(point.selectCoords() | async).y" r="5" class="default-point" />
 
 		<circle
 			(mouseleave)="setSelected(false)"
 			(mouseenter)="setSelected()"
 			[attr.data-id]="point.id"
 			[attr.data-linkid]="id"
-			[attr.cx]="(point.coords$ | async).x"
-			[attr.cy]="(point.coords$ | async).y"
+			[attr.cx]="(point.selectCoords() | async).x"
+			[attr.cy]="(point.selectCoords() | async).y"
 			r="15"
 			[attr.opacity]="0"
 			class="default-point"

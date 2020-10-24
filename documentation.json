@@ -29,10 +29,10 @@
         },
         {
             "name": "DagreEngineOptions",
-            "id": "interface-DagreEngineOptions-397f390d51387d712c80c9a2193e0e0b",
-            "file": "projects/ngx-diagrams/src/lib/services/dagre-engine.service.ts",
+            "id": "interface-DagreEngineOptions-3fd39313e4e137fa0889cce425edf4cd",
+            "file": "projects/ngx-diagrams/src/lib/plugins/dagre-engine.plugin.ts",
             "type": "interface",
-            "sourceCode": "import { Injectable } from '@angular/core';\nimport { DiagramModel, PointModel } from '../models';\nimport * as dagre from 'dagre';\nimport { GraphLabel, NodeConfig, EdgeConfig } from 'dagre';\n\nexport interface DagreEngineOptions {\n\tgraph?: GraphLabel;\n\tlayout?: GraphLabel & NodeConfig & EdgeConfig;\n\t/**\n\t * Will also layout links\n\t */\n\tincludeLinks?: boolean;\n}\n\n@Injectable()\nexport class DagreEngine {\n\tconstructor() {}\n\n\tredistribute(model: DiagramModel, options: DagreEngineOptions = {}): void {\n\t\tconst g = new dagre.graphlib.Graph({ multigraph: true });\n\n\t\tg.setGraph(options.graph || {});\n\n\t\tg.setDefaultEdgeLabel(() => {\n\t\t\treturn {};\n\t\t});\n\n\t\tconst processedlinks: { [id: string]: boolean } = {};\n\n\t\t// set nodes\n\t\tObject.values(model.getNodes()).forEach(node => {\n\t\t\tg.setNode(node.id, { width: node.getWidth(), height: node.getHeight() });\n\t\t});\n\n\t\tObject.values(model.getLinks()).forEach(link => {\n\t\t\t// set edges\n\t\t\tif (link.getSourcePort() && link.getTargetPort()) {\n\t\t\t\tprocessedlinks[link.id] = true;\n\t\t\t\tg.setEdge({\n\t\t\t\t\tv: link.getSourcePort().getNode().id,\n\t\t\t\t\tw: link.getTargetPort().getNode().id,\n\t\t\t\t\tname: link.id\n\t\t\t\t});\n\t\t\t}\n\t\t});\n\n\t\t// layout the graph\n\t\tdagre.layout(g, options.layout);\n\n\t\tg.nodes().forEach(v => {\n\t\t\tconst { x, y } = g.node(v);\n\t\t\tmodel.getNode(v).setCoords({ x, y });\n\t\t});\n\n\t\t// also include links?\n\t\tif (options.includeLinks) {\n\t\t\tg.edges().forEach(e => {\n\t\t\t\tconst edge = g.edge(e);\n\t\t\t\tconst link = model.getLink(e.name);\n\n\t\t\t\tconst points = [link.getFirstPoint()];\n\t\t\t\tfor (let i = 1; i < edge.points.length - 2; i++) {\n\t\t\t\t\tpoints.push(new PointModel(link, { x: edge.points[i].x, y: edge.points[i].y }));\n\t\t\t\t}\n\t\t\t\tlink.setPoints(points.concat(link.getLastPoint()));\n\t\t\t});\n\t\t}\n\t}\n}\n",
+            "sourceCode": "import { Injectable } from '@angular/core';\nimport { DiagramModel, PointModel } from '../models';\nimport * as dagre from 'dagre';\nimport { GraphLabel, NodeConfig, EdgeConfig } from 'dagre';\n\nexport interface DagreEngineOptions {\n\tgraph?: GraphLabel;\n\tlayout?: GraphLabel & NodeConfig & EdgeConfig;\n\t/**\n\t * Will also layout links\n\t */\n\tincludeLinks?: boolean;\n}\n\n@Injectable()\nexport class DagreEngine {\n\tg: dagre.graphlib.Graph;\n\tconstructor() {\n\t\ttry {\n\t\t\tthis.g = new dagre.graphlib.Graph({ multigraph: true });\n\t\t} catch (error) {\n\t\t\tconsole.warn(\"`dagre` packages isn't installed, please install it before using the DagreEngine plugin\");\n\t\t}\n\t}\n\n\tredistribute(model: DiagramModel, options: DagreEngineOptions = {}): void {\n\t\tthis.g.setGraph(options.graph || {});\n\n\t\tthis.g.setDefaultEdgeLabel(() => {\n\t\t\treturn {};\n\t\t});\n\n\t\tconst processedlinks: { [id: string]: boolean } = {};\n\n\t\t// set nodes\n\t\tObject.values(model.getNodes()).forEach(node => {\n\t\t\tthis.g.setNode(node.id, { width: node.getWidth(), height: node.getHeight() });\n\t\t});\n\n\t\tObject.values(model.getLinks()).forEach(link => {\n\t\t\t// set edges\n\t\t\tif (link.getSourcePort() && link.getTargetPort()) {\n\t\t\t\tprocessedlinks[link.id] = true;\n\t\t\t\tthis.g.setEdge({\n\t\t\t\t\tv: link.getSourcePort().getNode().id,\n\t\t\t\t\tw: link.getTargetPort().getNode().id,\n\t\t\t\t\tname: link.id,\n\t\t\t\t});\n\t\t\t}\n\t\t});\n\n\t\t// layout the graph\n\t\tdagre.layout(this.g, options.layout);\n\n\t\tthis.g.nodes().forEach(v => {\n\t\t\tconst { x, y } = this.g.node(v);\n\t\t\tmodel.getNode(v).setCoords({ x, y });\n\t\t});\n\n\t\t// also include links?\n\t\tif (options.includeLinks) {\n\t\t\tthis.g.edges().forEach(e => {\n\t\t\t\tconst edge = this.g.edge(e);\n\t\t\t\tconst link = model.getLink(e.name);\n\n\t\t\t\tconst points = [link.getFirstPoint()];\n\t\t\t\tfor (let i = 1; i < edge.points.length - 2; i++) {\n\t\t\t\t\tpoints.push(new PointModel(link, { x: edge.points[i].x, y: edge.points[i].y }));\n\t\t\t\t}\n\t\t\t\tlink.setPoints(points.concat(link.getLastPoint()));\n\t\t\t});\n\t\t}\n\t}\n}\n",
             "properties": [
                 {
                     "name": "graph",
@@ -203,9 +203,17 @@
     "injectables": [
         {
             "name": "DagreEngine",
-            "id": "injectable-DagreEngine-397f390d51387d712c80c9a2193e0e0b",
-            "file": "projects/ngx-diagrams/src/lib/services/dagre-engine.service.ts",
-            "properties": [],
+            "id": "injectable-DagreEngine-3fd39313e4e137fa0889cce425edf4cd",
+            "file": "projects/ngx-diagrams/src/lib/plugins/dagre-engine.plugin.ts",
+            "properties": [
+                {
+                    "name": "g",
+                    "type": "dagre.graphlib.Graph",
+                    "optional": false,
+                    "description": "",
+                    "line": 17
+                }
+            ],
             "methods": [
                 {
                     "name": "redistribute",
@@ -223,7 +231,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 19,
+                    "line": 26,
                     "jsdoctags": [
                         {
                             "name": "model",
@@ -244,12 +252,12 @@
                 }
             ],
             "description": "",
-            "sourceCode": "import { Injectable } from '@angular/core';\nimport { DiagramModel, PointModel } from '../models';\nimport * as dagre from 'dagre';\nimport { GraphLabel, NodeConfig, EdgeConfig } from 'dagre';\n\nexport interface DagreEngineOptions {\n\tgraph?: GraphLabel;\n\tlayout?: GraphLabel & NodeConfig & EdgeConfig;\n\t/**\n\t * Will also layout links\n\t */\n\tincludeLinks?: boolean;\n}\n\n@Injectable()\nexport class DagreEngine {\n\tconstructor() {}\n\n\tredistribute(model: DiagramModel, options: DagreEngineOptions = {}): void {\n\t\tconst g = new dagre.graphlib.Graph({ multigraph: true });\n\n\t\tg.setGraph(options.graph || {});\n\n\t\tg.setDefaultEdgeLabel(() => {\n\t\t\treturn {};\n\t\t});\n\n\t\tconst processedlinks: { [id: string]: boolean } = {};\n\n\t\t// set nodes\n\t\tObject.values(model.getNodes()).forEach(node => {\n\t\t\tg.setNode(node.id, { width: node.getWidth(), height: node.getHeight() });\n\t\t});\n\n\t\tObject.values(model.getLinks()).forEach(link => {\n\t\t\t// set edges\n\t\t\tif (link.getSourcePort() && link.getTargetPort()) {\n\t\t\t\tprocessedlinks[link.id] = true;\n\t\t\t\tg.setEdge({\n\t\t\t\t\tv: link.getSourcePort().getNode().id,\n\t\t\t\t\tw: link.getTargetPort().getNode().id,\n\t\t\t\t\tname: link.id\n\t\t\t\t});\n\t\t\t}\n\t\t});\n\n\t\t// layout the graph\n\t\tdagre.layout(g, options.layout);\n\n\t\tg.nodes().forEach(v => {\n\t\t\tconst { x, y } = g.node(v);\n\t\t\tmodel.getNode(v).setCoords({ x, y });\n\t\t});\n\n\t\t// also include links?\n\t\tif (options.includeLinks) {\n\t\t\tg.edges().forEach(e => {\n\t\t\t\tconst edge = g.edge(e);\n\t\t\t\tconst link = model.getLink(e.name);\n\n\t\t\t\tconst points = [link.getFirstPoint()];\n\t\t\t\tfor (let i = 1; i < edge.points.length - 2; i++) {\n\t\t\t\t\tpoints.push(new PointModel(link, { x: edge.points[i].x, y: edge.points[i].y }));\n\t\t\t\t}\n\t\t\t\tlink.setPoints(points.concat(link.getLastPoint()));\n\t\t\t});\n\t\t}\n\t}\n}\n",
+            "sourceCode": "import { Injectable } from '@angular/core';\nimport { DiagramModel, PointModel } from '../models';\nimport * as dagre from 'dagre';\nimport { GraphLabel, NodeConfig, EdgeConfig } from 'dagre';\n\nexport interface DagreEngineOptions {\n\tgraph?: GraphLabel;\n\tlayout?: GraphLabel & NodeConfig & EdgeConfig;\n\t/**\n\t * Will also layout links\n\t */\n\tincludeLinks?: boolean;\n}\n\n@Injectable()\nexport class DagreEngine {\n\tg: dagre.graphlib.Graph;\n\tconstructor() {\n\t\ttry {\n\t\t\tthis.g = new dagre.graphlib.Graph({ multigraph: true });\n\t\t} catch (error) {\n\t\t\tconsole.warn(\"`dagre` packages isn't installed, please install it before using the DagreEngine plugin\");\n\t\t}\n\t}\n\n\tredistribute(model: DiagramModel, options: DagreEngineOptions = {}): void {\n\t\tthis.g.setGraph(options.graph || {});\n\n\t\tthis.g.setDefaultEdgeLabel(() => {\n\t\t\treturn {};\n\t\t});\n\n\t\tconst processedlinks: { [id: string]: boolean } = {};\n\n\t\t// set nodes\n\t\tObject.values(model.getNodes()).forEach(node => {\n\t\t\tthis.g.setNode(node.id, { width: node.getWidth(), height: node.getHeight() });\n\t\t});\n\n\t\tObject.values(model.getLinks()).forEach(link => {\n\t\t\t// set edges\n\t\t\tif (link.getSourcePort() && link.getTargetPort()) {\n\t\t\t\tprocessedlinks[link.id] = true;\n\t\t\t\tthis.g.setEdge({\n\t\t\t\t\tv: link.getSourcePort().getNode().id,\n\t\t\t\t\tw: link.getTargetPort().getNode().id,\n\t\t\t\t\tname: link.id,\n\t\t\t\t});\n\t\t\t}\n\t\t});\n\n\t\t// layout the graph\n\t\tdagre.layout(this.g, options.layout);\n\n\t\tthis.g.nodes().forEach(v => {\n\t\t\tconst { x, y } = this.g.node(v);\n\t\t\tmodel.getNode(v).setCoords({ x, y });\n\t\t});\n\n\t\t// also include links?\n\t\tif (options.includeLinks) {\n\t\t\tthis.g.edges().forEach(e => {\n\t\t\t\tconst edge = this.g.edge(e);\n\t\t\t\tconst link = model.getLink(e.name);\n\n\t\t\t\tconst points = [link.getFirstPoint()];\n\t\t\t\tfor (let i = 1; i < edge.points.length - 2; i++) {\n\t\t\t\t\tpoints.push(new PointModel(link, { x: edge.points[i].x, y: edge.points[i].y }));\n\t\t\t\t}\n\t\t\t\tlink.setPoints(points.concat(link.getLastPoint()));\n\t\t\t});\n\t\t}\n\t}\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
                 "args": [],
-                "line": 16
+                "line": 17
             },
             "type": "injectable"
         },
@@ -8349,7 +8357,7 @@
                     "type": "BehaviorSubject<Coords>",
                     "optional": false,
                     "description": "",
-                    "line": 17,
+                    "line": 16,
                     "modifierKind": [
                         112,
                         132
@@ -8363,7 +8371,7 @@
                     "type": "BehaviorSubject<Dimensions>",
                     "optional": false,
                     "description": "",
-                    "line": 18,
+                    "line": 17,
                     "modifierKind": [
                         112,
                         132
@@ -8377,7 +8385,7 @@
                     "type": "BehaviorSubject<literal type>",
                     "optional": false,
                     "description": "",
-                    "line": 15,
+                    "line": 14,
                     "modifierKind": [
                         112,
                         132
@@ -8391,7 +8399,7 @@
                     "type": "BehaviorSubject<literal type>",
                     "optional": false,
                     "description": "",
-                    "line": 16,
+                    "line": 15,
                     "modifierKind": [
                         112,
                         132
@@ -8405,7 +8413,7 @@
                     "type": "Observable<Coords>",
                     "optional": false,
                     "description": "",
-                    "line": 21,
+                    "line": 20,
                     "modifierKind": [
                         112,
                         132
@@ -8419,7 +8427,7 @@
                     "type": "DiagramEngine",
                     "optional": false,
                     "description": "",
-                    "line": 13,
+                    "line": 12,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -8429,7 +8437,7 @@
                     "type": "Observable<Dimensions>",
                     "optional": false,
                     "description": "",
-                    "line": 22,
+                    "line": 21,
                     "modifierKind": [
                         112,
                         132
@@ -8443,7 +8451,7 @@
                     "type": "Observable<literal type>",
                     "optional": false,
                     "description": "",
-                    "line": 19,
+                    "line": 18,
                     "modifierKind": [
                         112,
                         132
@@ -8453,21 +8461,11 @@
                     }
                 },
                 {
-                    "name": "id",
-                    "type": "ID",
-                    "optional": false,
-                    "description": "",
-                    "line": 12,
-                    "inheritance": {
-                        "file": "NodeModel"
-                    }
-                },
-                {
                     "name": "ports$",
                     "type": "Observable<literal type>",
                     "optional": false,
                     "description": "",
-                    "line": 20,
+                    "line": 19,
                     "modifierKind": [
                         112,
                         132
@@ -9065,7 +9063,7 @@
                     "optional": false,
                     "returnType": "P",
                     "typeParameters": [],
-                    "line": 153,
+                    "line": 152,
                     "description": "<p>Assign a port to the node and set the node as its getParent</p>\n",
                     "jsdoctags": [
                         {
@@ -9077,8 +9075,8 @@
                         },
                         {
                             "tagName": {
-                                "pos": 4564,
-                                "end": 4571,
+                                "pos": 4555,
+                                "end": 4562,
                                 "flags": 0,
                                 "escapedText": "returns"
                             },
@@ -9095,7 +9093,7 @@
                     "optional": false,
                     "returnType": "Observable<Coords>",
                     "typeParameters": [],
-                    "line": 125,
+                    "line": 124,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -9106,7 +9104,7 @@
                     "optional": false,
                     "returnType": "Observable<Dimensions>",
                     "typeParameters": [],
-                    "line": 198,
+                    "line": 197,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -9117,7 +9115,7 @@
                     "optional": false,
                     "returnType": "Coords",
                     "typeParameters": [],
-                    "line": 45,
+                    "line": 44,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -9128,7 +9126,7 @@
                     "optional": false,
                     "returnType": "Dimensions",
                     "typeParameters": [],
-                    "line": 193,
+                    "line": 192,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -9139,7 +9137,7 @@
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 232,
+                    "line": 239,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -9150,7 +9148,7 @@
                     "optional": false,
                     "returnType": "number",
                     "typeParameters": [],
-                    "line": 202,
+                    "line": 201,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -9166,7 +9164,7 @@
                     "optional": false,
                     "returnType": "P",
                     "typeParameters": [],
-                    "line": 170,
+                    "line": 169,
                     "jsdoctags": [
                         {
                             "name": "id",
@@ -9192,7 +9190,7 @@
                     "optional": false,
                     "returnType": "literal type",
                     "typeParameters": [],
-                    "line": 185,
+                    "line": 184,
                     "jsdoctags": [
                         {
                             "name": "ids",
@@ -9213,7 +9211,7 @@
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 105,
+                    "line": 104,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -9224,7 +9222,7 @@
                     "optional": false,
                     "returnType": "number",
                     "typeParameters": [],
-                    "line": 206,
+                    "line": 209,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -9240,7 +9238,7 @@
                     "optional": false,
                     "returnType": "string",
                     "typeParameters": [],
-                    "line": 159,
+                    "line": 158,
                     "jsdoctags": [
                         {
                             "name": "port",
@@ -9260,7 +9258,7 @@
                     "optional": false,
                     "returnType": "Observable<Coords>",
                     "typeParameters": [],
-                    "line": 129,
+                    "line": 128,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -9285,7 +9283,7 @@
                     "typeParameters": [
                         "E"
                     ],
-                    "line": 236,
+                    "line": 243,
                     "jsdoctags": [
                         {
                             "name": "selector",
@@ -9312,7 +9310,7 @@
                     "optional": false,
                     "returnType": "Observable<number>",
                     "typeParameters": [],
-                    "line": 219,
+                    "line": 226,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -9330,7 +9328,7 @@
                     "optional": false,
                     "returnType": "Observable<P[]>",
                     "typeParameters": [],
-                    "line": 174,
+                    "line": 173,
                     "jsdoctags": [
                         {
                             "name": "selector",
@@ -9352,7 +9350,7 @@
                     "optional": false,
                     "returnType": "Observable<number>",
                     "typeParameters": [],
-                    "line": 210,
+                    "line": 217,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -9363,7 +9361,7 @@
                     "optional": false,
                     "returnType": "Observable<number>",
                     "typeParameters": [],
-                    "line": 133,
+                    "line": 132,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -9374,7 +9372,7 @@
                     "optional": false,
                     "returnType": "Observable<number>",
                     "typeParameters": [],
-                    "line": 141,
+                    "line": 140,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -9389,7 +9387,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 49,
+                    "line": 48,
                     "jsdoctags": [
                         {
                             "type": "Coords",
@@ -9412,7 +9410,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 189,
+                    "line": 188,
                     "jsdoctags": [
                         {
                             "type": "Dimensions",
@@ -9436,11 +9434,61 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 228,
+                    "line": 235,
                     "jsdoctags": [
                         {
                             "name": "extras",
                             "type": "any",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ],
+                    "inheritance": {
+                        "file": "NodeModel"
+                    }
+                },
+                {
+                    "name": "setHeight",
+                    "args": [
+                        {
+                            "name": "height",
+                            "type": "number"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "any",
+                    "typeParameters": [],
+                    "line": 205,
+                    "jsdoctags": [
+                        {
+                            "name": "height",
+                            "type": "number",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ],
+                    "inheritance": {
+                        "file": "NodeModel"
+                    }
+                },
+                {
+                    "name": "setWidth",
+                    "args": [
+                        {
+                            "name": "width",
+                            "type": "number"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "any",
+                    "typeParameters": [],
+                    "line": 213,
+                    "jsdoctags": [
+                        {
+                            "name": "width",
+                            "type": "number",
                             "tagName": {
                                 "text": "param"
                             }
@@ -9460,7 +9508,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 64,
+                    "line": 63,
                     "jsdoctags": [
                         {
                             "type": "Coords",
@@ -17756,10 +17804,10 @@
         },
         {
             "name": "NodeModel",
-            "id": "class-NodeModel-ffa7350118ffc3607b81ff2c27867841",
+            "id": "class-NodeModel-b178be2f488ad6c7ebbe96913caee4da",
             "file": "projects/ngx-diagrams/src/lib/models/node.model.ts",
             "type": "class",
-            "sourceCode": "import { BehaviorSubject, Observable } from 'rxjs';\nimport { PortModel } from './port.model';\nimport { BaseModel } from './base.model';\nimport { DiagramModel } from './diagram.model';\nimport { Coords } from '../interfaces/coords.interface';\nimport { DiagramEngine } from '../services/engine.service';\nimport { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';\nimport { Dimensions } from '../interfaces/dimensions.interface';\nimport { ID, mapToArray } from '../utils/tool-kit.util';\n\nexport class NodeModel<P extends PortModel = PortModel> extends BaseModel<DiagramModel> {\n\tid: ID;\n\tdiagramEngine: DiagramEngine;\n\n\tprivate readonly _extras: BehaviorSubject<{ [s: string]: any }>;\n\tprivate readonly _ports: BehaviorSubject<{ [s: string]: P }>;\n\tprivate readonly _coords: BehaviorSubject<Coords>;\n\tprivate readonly _dimensions: BehaviorSubject<Dimensions>;\n\tprivate readonly extras$: Observable<{ [s: string]: any }>;\n\tprivate readonly ports$: Observable<{ [s: string]: P }>;\n\tprivate readonly coords$: Observable<Coords>;\n\tprivate readonly dimensions$: Observable<Dimensions>;\n\n\tconstructor(\n\t\tnodeType: string = 'default',\n\t\tid?: string,\n\t\textras: { [s: string]: any } = {},\n\t\tx: number = 0,\n\t\ty: number = 0,\n\t\twidth: number = 0,\n\t\theight: number = 0,\n\t\tlogPrefix = '[Node]'\n\t) {\n\t\tsuper(nodeType, id, logPrefix);\n\t\tthis._extras = new BehaviorSubject(extras);\n\t\tthis._ports = new BehaviorSubject({});\n\t\tthis._dimensions = new BehaviorSubject<Dimensions>({ width, height });\n\t\tthis._coords = new BehaviorSubject<Coords>({ x, y });\n\t\tthis.extras$ = this._extras.asObservable();\n\t\tthis.ports$ = this._ports.asObservable();\n\t\tthis.coords$ = this._coords.asObservable();\n\t\tthis.dimensions$ = this._dimensions.asObservable();\n\t}\n\n\tgetCoords(): Coords {\n\t\treturn this._coords.getValue();\n\t}\n\n\tsetCoords({ x, y }: Coords) {\n\t\tconst { x: oldX, y: oldY } = this.getCoords();\n\n\t\tObject.values(this._ports.getValue()).forEach(port => {\n\t\t\tObject.values(port.getLinks()).forEach(link => {\n\t\t\t\tconst point = link.getPointForPort(port);\n\t\t\t\tconst { x: pointX, y: pointY } = point.getCoords();\n\t\t\t\tpoint.setCoords({ x: pointX + x - oldX, y: pointY + y - oldY });\n\t\t\t});\n\t\t});\n\n\t\tthis._coords.next({ x, y });\n\t}\n\n\t// TODO: implement better transition on auto arrange!\n\ttransitionToCoords({ x, y }: Coords) {\n\t\t// const transitionCompleted = new ReplaySubject(1);\n\t\t// let { x: oldX, y: oldY } = this.getCoords();\n\t\t// console.log(x, y, oldX, oldY);\n\t\t// interval(0)\n\t\t// \t.pipe(takeUntil(transitionCompleted))\n\t\t// \t.subscribe(\n\t\t// \t\t() => {\n\t\t// \t\t\tif (oldX < x) {\n\t\t// \t\t\t\toldX++;\n\t\t// \t\t\t} else if (oldX > x) {\n\t\t// \t\t\t\toldX--;\n\t\t// \t\t\t}\n\t\t// \t\t\tif (y > oldY) {\n\t\t// \t\t\t\toldY++;\n\t\t// \t\t\t} else if (y < oldY) {\n\t\t// \t\t\t\toldY--;\n\t\t// \t\t\t}\n\t\t// \t\t\tObject.values(this._ports.getValue()).forEach(port => {\n\t\t// \t\t\t\tObject.values(port.getLinks()).forEach(link => {\n\t\t// \t\t\t\t\tconst point = link.getPointForPort(port);\n\t\t// \t\t\t\t\tconst { x: pointX, y: pointY } = point.getCoords();\n\t\t// \t\t\t\t\tpoint.setCoords({ x: pointX + x - oldX, y: pointY + y - oldY });\n\t\t// \t\t\t\t});\n\t\t// \t\t\t});\n\t\t// \t\t\tthis._coords.next({ x: oldX, y: oldY });\n\t\t// \t\t\tif (x === oldX && y === oldY) {\n\t\t// \t\t\t\ttransitionCompleted.next(true);\n\t\t// \t\t\t\ttransitionCompleted.complete();\n\t\t// \t\t\t}\n\t\t// \t\t},\n\t\t// \t\terr => {\n\t\t// \t\t\tconsole.error(err);\n\t\t// \t\t},\n\t\t// \t\t() => {\n\t\t// \t\t\tconsole.log('finished transition');\n\t\t// \t\t}\n\t\t// \t);\n\t}\n\n\t// TODO: override selectionChanges and replace this with it (convert to rx)\n\tgetSelectedEntities() {\n\t\tlet entities = super.getSelectedEntities();\n\n\t\t// add the points of each link that are selected here\n\t\tif (this.getSelected()) {\n\t\t\tObject.values(this._ports.getValue()).forEach(port => {\n\t\t\t\tconst links = Object.values(port.getLinks());\n\t\t\t\tentities = entities.concat(\n\t\t\t\t\tlinks.map(link => {\n\t\t\t\t\t\treturn link.getPointForPort(port);\n\t\t\t\t\t})\n\t\t\t\t);\n\t\t\t});\n\t\t}\n\n\t\tthis.log('selectedEntities', entities);\n\t\treturn entities;\n\t}\n\n\t// TODO: map to BaseEvent\n\tcoordsChanges(): Observable<Coords> {\n\t\treturn this.coords$.pipe(takeUntil(this.onEntityDestroy()));\n\t}\n\n\tselectCoords(): Observable<Coords> {\n\t\treturn this.coords$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged());\n\t}\n\n\tselectX(): Observable<number> {\n\t\treturn this.selectCoords().pipe(\n\t\t\tmap(c => c.x),\n\t\t\tthis.withLog('selectX'),\n\t\t\tdistinctUntilChanged()\n\t\t);\n\t}\n\n\tselectY(): Observable<number> {\n\t\treturn this.selectCoords().pipe(\n\t\t\tmap(c => c.y),\n\t\t\tthis.withLog('selectY'),\n\t\t\tdistinctUntilChanged()\n\t\t);\n\t}\n\n\t/**\n\t * Assign a port to the node and set the node as its getParent\n\t * @returns the inserted port\n\t */\n\taddPort(port: P): P {\n\t\tport.setParent(this);\n\t\tthis._ports.next({ ...this._ports.getValue(), [port.id]: port });\n\t\treturn port;\n\t}\n\n\tremovePort(port: P): string {\n\t\tconst updatedPorts = this._ports.getValue();\n\n\t\tdelete updatedPorts[port.id];\n\t\tthis._ports.next({ ...updatedPorts });\n\n\t\tport.destroy();\n\n\t\treturn port.id;\n\t}\n\n\tgetPort(id: ID): P {\n\t\treturn this._ports.value[id];\n\t}\n\n\tselectPorts(selector?: () => boolean | ID | ID[]): Observable<P[]> {\n\t\t// TODO: implement selector\n\t\t// TODO: create coerce func\n\t\treturn this.ports$.pipe(\n\t\t\ttakeUntil(this.onEntityDestroy()),\n\t\t\tdistinctUntilChanged(),\n\t\t\tmap(ports => mapToArray(ports)),\n\t\t\tthis.withLog('selectPorts')\n\t\t);\n\t}\n\n\tgetPorts(ids?: ID[]): { [s: string]: P | P[] } {\n\t\treturn this._ports.getValue();\n\t}\n\n\tsetDimensions({ width, height }: Dimensions) {\n\t\tthis._dimensions.next({ width, height });\n\t}\n\n\tgetDimensions(): Dimensions {\n\t\treturn this._dimensions.getValue();\n\t}\n\n\t// TODO: return BaseEvent extension\n\tdimensionChanges(): Observable<Dimensions> {\n\t\treturn this.dimensions$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), this.withLog('DimensionChanges'));\n\t}\n\n\tgetHeight(): number {\n\t\treturn this._dimensions.getValue().height;\n\t}\n\n\tgetWidth(): number {\n\t\treturn this._dimensions.getValue().width;\n\t}\n\n\tselectWidth(): Observable<number> {\n\t\treturn this.dimensions$.pipe(\n\t\t\ttakeUntil(this.onEntityDestroy()),\n\t\t\tmap(d => d.width),\n\t\t\tdistinctUntilChanged(),\n\t\t\tthis.withLog('selectWidth')\n\t\t);\n\t}\n\n\tselectHeight(): Observable<number> {\n\t\treturn this.dimensions$.pipe(\n\t\t\ttakeUntil(this.onEntityDestroy()),\n\t\t\tmap(d => d.width),\n\t\t\tdistinctUntilChanged(),\n\t\t\tthis.withLog('selectHeight')\n\t\t);\n\t}\n\n\tsetExtras(extras: any) {\n\t\tthis._extras.next(extras);\n\t}\n\n\tgetExtras() {\n\t\treturn this._extras.getValue();\n\t}\n\n\tselectExtras<E = any>(selector?: (extra: E) => E[keyof E] | string | string[]) {\n\t\t// TODO: impl selector\n\t\treturn this.extras$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged());\n\t}\n}\n",
+            "sourceCode": "import { BehaviorSubject, Observable } from 'rxjs';\nimport { PortModel } from './port.model';\nimport { BaseModel } from './base.model';\nimport { DiagramModel } from './diagram.model';\nimport { Coords } from '../interfaces/coords.interface';\nimport { DiagramEngine } from '../services/engine.service';\nimport { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';\nimport { Dimensions } from '../interfaces/dimensions.interface';\nimport { ID, mapToArray } from '../utils/tool-kit.util';\n\nexport class NodeModel<P extends PortModel = PortModel> extends BaseModel<DiagramModel> {\n\tdiagramEngine: DiagramEngine;\n\n\tprivate readonly _extras: BehaviorSubject<{ [s: string]: any }>;\n\tprivate readonly _ports: BehaviorSubject<{ [s: string]: P }>;\n\tprivate readonly _coords: BehaviorSubject<Coords>;\n\tprivate readonly _dimensions: BehaviorSubject<Dimensions>;\n\tprivate readonly extras$: Observable<{ [s: string]: any }>;\n\tprivate readonly ports$: Observable<{ [s: string]: P }>;\n\tprivate readonly coords$: Observable<Coords>;\n\tprivate readonly dimensions$: Observable<Dimensions>;\n\n\tconstructor(\n\t\tnodeType: string = 'default',\n\t\tid?: string,\n\t\textras: { [s: string]: any } = {},\n\t\tx: number = 0,\n\t\ty: number = 0,\n\t\twidth: number = 0,\n\t\theight: number = 0,\n\t\tlogPrefix = '[Node]'\n\t) {\n\t\tsuper(nodeType, id, logPrefix);\n\t\tthis._extras = new BehaviorSubject(extras);\n\t\tthis._ports = new BehaviorSubject({});\n\t\tthis._dimensions = new BehaviorSubject<Dimensions>({ width, height });\n\t\tthis._coords = new BehaviorSubject<Coords>({ x, y });\n\t\tthis.extras$ = this._extras.asObservable();\n\t\tthis.ports$ = this._ports.asObservable();\n\t\tthis.coords$ = this._coords.asObservable();\n\t\tthis.dimensions$ = this._dimensions.asObservable();\n\t}\n\n\tgetCoords(): Coords {\n\t\treturn this._coords.getValue();\n\t}\n\n\tsetCoords({ x, y }: Coords) {\n\t\tconst { x: oldX, y: oldY } = this.getCoords();\n\n\t\tObject.values(this._ports.getValue()).forEach(port => {\n\t\t\tObject.values(port.getLinks()).forEach(link => {\n\t\t\t\tconst point = link.getPointForPort(port);\n\t\t\t\tconst { x: pointX, y: pointY } = point.getCoords();\n\t\t\t\tpoint.setCoords({ x: pointX + x - oldX, y: pointY + y - oldY });\n\t\t\t});\n\t\t});\n\n\t\tthis._coords.next({ x, y });\n\t}\n\n\t// TODO: implement better transition on auto arrange!\n\ttransitionToCoords({ x, y }: Coords) {\n\t\t// const transitionCompleted = new ReplaySubject(1);\n\t\t// let { x: oldX, y: oldY } = this.getCoords();\n\t\t// console.log(x, y, oldX, oldY);\n\t\t// interval(0)\n\t\t// \t.pipe(takeUntil(transitionCompleted))\n\t\t// \t.subscribe(\n\t\t// \t\t() => {\n\t\t// \t\t\tif (oldX < x) {\n\t\t// \t\t\t\toldX++;\n\t\t// \t\t\t} else if (oldX > x) {\n\t\t// \t\t\t\toldX--;\n\t\t// \t\t\t}\n\t\t// \t\t\tif (y > oldY) {\n\t\t// \t\t\t\toldY++;\n\t\t// \t\t\t} else if (y < oldY) {\n\t\t// \t\t\t\toldY--;\n\t\t// \t\t\t}\n\t\t// \t\t\tObject.values(this._ports.getValue()).forEach(port => {\n\t\t// \t\t\t\tObject.values(port.getLinks()).forEach(link => {\n\t\t// \t\t\t\t\tconst point = link.getPointForPort(port);\n\t\t// \t\t\t\t\tconst { x: pointX, y: pointY } = point.getCoords();\n\t\t// \t\t\t\t\tpoint.setCoords({ x: pointX + x - oldX, y: pointY + y - oldY });\n\t\t// \t\t\t\t});\n\t\t// \t\t\t});\n\t\t// \t\t\tthis._coords.next({ x: oldX, y: oldY });\n\t\t// \t\t\tif (x === oldX && y === oldY) {\n\t\t// \t\t\t\ttransitionCompleted.next(true);\n\t\t// \t\t\t\ttransitionCompleted.complete();\n\t\t// \t\t\t}\n\t\t// \t\t},\n\t\t// \t\terr => {\n\t\t// \t\t\tconsole.error(err);\n\t\t// \t\t},\n\t\t// \t\t() => {\n\t\t// \t\t\tconsole.log('finished transition');\n\t\t// \t\t}\n\t\t// \t);\n\t}\n\n\t// TODO: override selectionChanges and replace this with it (convert to rx)\n\tgetSelectedEntities() {\n\t\tlet entities = super.getSelectedEntities();\n\n\t\t// add the points of each link that are selected here\n\t\tif (this.getSelected()) {\n\t\t\tObject.values(this._ports.getValue()).forEach(port => {\n\t\t\t\tconst links = Object.values(port.getLinks());\n\t\t\t\tentities = entities.concat(\n\t\t\t\t\tlinks.map(link => {\n\t\t\t\t\t\treturn link.getPointForPort(port);\n\t\t\t\t\t})\n\t\t\t\t);\n\t\t\t});\n\t\t}\n\n\t\tthis.log('selectedEntities', entities);\n\t\treturn entities;\n\t}\n\n\t// TODO: map to BaseEvent\n\tcoordsChanges(): Observable<Coords> {\n\t\treturn this.coords$.pipe(takeUntil(this.onEntityDestroy()));\n\t}\n\n\tselectCoords(): Observable<Coords> {\n\t\treturn this.coords$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged());\n\t}\n\n\tselectX(): Observable<number> {\n\t\treturn this.selectCoords().pipe(\n\t\t\tmap(c => c.x),\n\t\t\tthis.withLog('selectX'),\n\t\t\tdistinctUntilChanged()\n\t\t);\n\t}\n\n\tselectY(): Observable<number> {\n\t\treturn this.selectCoords().pipe(\n\t\t\tmap(c => c.y),\n\t\t\tthis.withLog('selectY'),\n\t\t\tdistinctUntilChanged()\n\t\t);\n\t}\n\n\t/**\n\t * Assign a port to the node and set the node as its getParent\n\t * @returns the inserted port\n\t */\n\taddPort(port: P): P {\n\t\tport.setParent(this);\n\t\tthis._ports.next({ ...this._ports.getValue(), [port.id]: port });\n\t\treturn port;\n\t}\n\n\tremovePort(port: P): string {\n\t\tconst updatedPorts = this._ports.getValue();\n\n\t\tdelete updatedPorts[port.id];\n\t\tthis._ports.next({ ...updatedPorts });\n\n\t\tport.destroy();\n\n\t\treturn port.id;\n\t}\n\n\tgetPort(id: ID): P {\n\t\treturn this._ports.value[id];\n\t}\n\n\tselectPorts(selector?: () => boolean | ID | ID[]): Observable<P[]> {\n\t\t// TODO: implement selector\n\t\t// TODO: create coerce func\n\t\treturn this.ports$.pipe(\n\t\t\ttakeUntil(this.onEntityDestroy()),\n\t\t\tdistinctUntilChanged(),\n\t\t\tmap(ports => mapToArray(ports)),\n\t\t\tthis.withLog('selectPorts')\n\t\t);\n\t}\n\n\tgetPorts(ids?: ID[]): { [s: string]: P | P[] } {\n\t\treturn this._ports.getValue();\n\t}\n\n\tsetDimensions({ width, height }: Dimensions) {\n\t\tthis._dimensions.next({ width, height });\n\t}\n\n\tgetDimensions(): Dimensions {\n\t\treturn this._dimensions.getValue();\n\t}\n\n\t// TODO: return BaseEvent extension\n\tdimensionChanges(): Observable<Dimensions> {\n\t\treturn this.dimensions$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), this.withLog('DimensionChanges'));\n\t}\n\n\tgetHeight(): number {\n\t\treturn this._dimensions.getValue().height;\n\t}\n\n\tsetHeight(height: number) {\n\t\treturn this._dimensions.next({ width: this.getWidth(), height });\n\t}\n\n\tgetWidth(): number {\n\t\treturn this._dimensions.getValue().width;\n\t}\n\n\tsetWidth(width: number) {\n\t\treturn this._dimensions.next({ width, height: this.getHeight() });\n\t}\n\n\tselectWidth(): Observable<number> {\n\t\treturn this.dimensions$.pipe(\n\t\t\ttakeUntil(this.onEntityDestroy()),\n\t\t\tmap(d => d.width),\n\t\t\tdistinctUntilChanged(),\n\t\t\tthis.withLog('selectWidth')\n\t\t);\n\t}\n\n\tselectHeight(): Observable<number> {\n\t\treturn this.dimensions$.pipe(\n\t\t\ttakeUntil(this.onEntityDestroy()),\n\t\t\tmap(d => d.height),\n\t\t\tdistinctUntilChanged(),\n\t\t\tthis.withLog('selectHeight')\n\t\t);\n\t}\n\n\tsetExtras(extras: any) {\n\t\tthis._extras.next(extras);\n\t}\n\n\tgetExtras() {\n\t\treturn this._extras.getValue();\n\t}\n\n\tselectExtras<E = any>(selector?: (extra: E) => E[keyof E] | string | string[]) {\n\t\t// TODO: impl selector\n\t\treturn this.extras$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged());\n\t}\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -17805,7 +17853,7 @@
                         "defaultValue": "'[Node]'"
                     }
                 ],
-                "line": 22,
+                "line": 21,
                 "jsdoctags": [
                     {
                         "name": "nodeType",
@@ -17879,7 +17927,7 @@
                     "type": "BehaviorSubject<Coords>",
                     "optional": false,
                     "description": "",
-                    "line": 17,
+                    "line": 16,
                     "modifierKind": [
                         112,
                         132
@@ -17890,7 +17938,7 @@
                     "type": "BehaviorSubject<Dimensions>",
                     "optional": false,
                     "description": "",
-                    "line": 18,
+                    "line": 17,
                     "modifierKind": [
                         112,
                         132
@@ -17901,7 +17949,7 @@
                     "type": "BehaviorSubject<literal type>",
                     "optional": false,
                     "description": "",
-                    "line": 15,
+                    "line": 14,
                     "modifierKind": [
                         112,
                         132
@@ -17912,7 +17960,7 @@
                     "type": "BehaviorSubject<literal type>",
                     "optional": false,
                     "description": "",
-                    "line": 16,
+                    "line": 15,
                     "modifierKind": [
                         112,
                         132
@@ -17923,7 +17971,7 @@
                     "type": "Observable<Coords>",
                     "optional": false,
                     "description": "",
-                    "line": 21,
+                    "line": 20,
                     "modifierKind": [
                         112,
                         132
@@ -17934,14 +17982,14 @@
                     "type": "DiagramEngine",
                     "optional": false,
                     "description": "",
-                    "line": 13
+                    "line": 12
                 },
                 {
                     "name": "dimensions$",
                     "type": "Observable<Dimensions>",
                     "optional": false,
                     "description": "",
-                    "line": 22,
+                    "line": 21,
                     "modifierKind": [
                         112,
                         132
@@ -17952,25 +18000,18 @@
                     "type": "Observable<literal type>",
                     "optional": false,
                     "description": "",
-                    "line": 19,
+                    "line": 18,
                     "modifierKind": [
                         112,
                         132
                     ]
                 },
                 {
-                    "name": "id",
-                    "type": "ID",
-                    "optional": false,
-                    "description": "",
-                    "line": 12
-                },
-                {
                     "name": "ports$",
                     "type": "Observable<literal type>",
                     "optional": false,
                     "description": "",
-                    "line": 20,
+                    "line": 19,
                     "modifierKind": [
                         112,
                         132
@@ -18257,7 +18298,7 @@
                     "optional": false,
                     "returnType": "P",
                     "typeParameters": [],
-                    "line": 153,
+                    "line": 152,
                     "description": "<p>Assign a port to the node and set the node as its getParent</p>\n",
                     "jsdoctags": [
                         {
@@ -18269,8 +18310,8 @@
                         },
                         {
                             "tagName": {
-                                "pos": 4564,
-                                "end": 4571,
+                                "pos": 4555,
+                                "end": 4562,
                                 "flags": 0,
                                 "escapedText": "returns"
                             },
@@ -18284,7 +18325,7 @@
                     "optional": false,
                     "returnType": "Observable<Coords>",
                     "typeParameters": [],
-                    "line": 125
+                    "line": 124
                 },
                 {
                     "name": "dimensionChanges",
@@ -18292,7 +18333,7 @@
                     "optional": false,
                     "returnType": "Observable<Dimensions>",
                     "typeParameters": [],
-                    "line": 198
+                    "line": 197
                 },
                 {
                     "name": "getCoords",
@@ -18300,7 +18341,7 @@
                     "optional": false,
                     "returnType": "Coords",
                     "typeParameters": [],
-                    "line": 45
+                    "line": 44
                 },
                 {
                     "name": "getDimensions",
@@ -18308,7 +18349,7 @@
                     "optional": false,
                     "returnType": "Dimensions",
                     "typeParameters": [],
-                    "line": 193
+                    "line": 192
                 },
                 {
                     "name": "getExtras",
@@ -18316,7 +18357,7 @@
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 232
+                    "line": 239
                 },
                 {
                     "name": "getHeight",
@@ -18324,7 +18365,7 @@
                     "optional": false,
                     "returnType": "number",
                     "typeParameters": [],
-                    "line": 202
+                    "line": 201
                 },
                 {
                     "name": "getPort",
@@ -18337,7 +18378,7 @@
                     "optional": false,
                     "returnType": "P",
                     "typeParameters": [],
-                    "line": 170,
+                    "line": 169,
                     "jsdoctags": [
                         {
                             "name": "id",
@@ -18360,7 +18401,7 @@
                     "optional": false,
                     "returnType": "literal type",
                     "typeParameters": [],
-                    "line": 185,
+                    "line": 184,
                     "jsdoctags": [
                         {
                             "name": "ids",
@@ -18378,7 +18419,7 @@
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 105
+                    "line": 104
                 },
                 {
                     "name": "getWidth",
@@ -18386,7 +18427,7 @@
                     "optional": false,
                     "returnType": "number",
                     "typeParameters": [],
-                    "line": 206
+                    "line": 209
                 },
                 {
                     "name": "removePort",
@@ -18399,7 +18440,7 @@
                     "optional": false,
                     "returnType": "string",
                     "typeParameters": [],
-                    "line": 159,
+                    "line": 158,
                     "jsdoctags": [
                         {
                             "name": "port",
@@ -18416,7 +18457,7 @@
                     "optional": false,
                     "returnType": "Observable<Coords>",
                     "typeParameters": [],
-                    "line": 129
+                    "line": 128
                 },
                 {
                     "name": "selectExtras",
@@ -18438,7 +18479,7 @@
                     "typeParameters": [
                         "E"
                     ],
-                    "line": 236,
+                    "line": 243,
                     "jsdoctags": [
                         {
                             "name": "selector",
@@ -18462,7 +18503,7 @@
                     "optional": false,
                     "returnType": "Observable<number>",
                     "typeParameters": [],
-                    "line": 219
+                    "line": 226
                 },
                 {
                     "name": "selectPorts",
@@ -18477,7 +18518,7 @@
                     "optional": false,
                     "returnType": "Observable<P[]>",
                     "typeParameters": [],
-                    "line": 174,
+                    "line": 173,
                     "jsdoctags": [
                         {
                             "name": "selector",
@@ -18496,7 +18537,7 @@
                     "optional": false,
                     "returnType": "Observable<number>",
                     "typeParameters": [],
-                    "line": 210
+                    "line": 217
                 },
                 {
                     "name": "selectX",
@@ -18504,7 +18545,7 @@
                     "optional": false,
                     "returnType": "Observable<number>",
                     "typeParameters": [],
-                    "line": 133
+                    "line": 132
                 },
                 {
                     "name": "selectY",
@@ -18512,7 +18553,7 @@
                     "optional": false,
                     "returnType": "Observable<number>",
                     "typeParameters": [],
-                    "line": 141
+                    "line": 140
                 },
                 {
                     "name": "setCoords",
@@ -18524,7 +18565,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 49,
+                    "line": 48,
                     "jsdoctags": [
                         {
                             "type": "Coords",
@@ -18544,7 +18585,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 189,
+                    "line": 188,
                     "jsdoctags": [
                         {
                             "type": "Dimensions",
@@ -18565,11 +18606,55 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 228,
+                    "line": 235,
                     "jsdoctags": [
                         {
                             "name": "extras",
                             "type": "any",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "setHeight",
+                    "args": [
+                        {
+                            "name": "height",
+                            "type": "number"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "any",
+                    "typeParameters": [],
+                    "line": 205,
+                    "jsdoctags": [
+                        {
+                            "name": "height",
+                            "type": "number",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "setWidth",
+                    "args": [
+                        {
+                            "name": "width",
+                            "type": "number"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "any",
+                    "typeParameters": [],
+                    "line": 213,
+                    "jsdoctags": [
+                        {
+                            "name": "width",
+                            "type": "number",
                             "tagName": {
                                 "text": "param"
                             }
@@ -18586,7 +18671,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 64,
+                    "line": 63,
                     "jsdoctags": [
                         {
                             "type": "Coords",
@@ -24747,7 +24832,7 @@
         },
         {
             "name": "DefaultNodeComponent",
-            "id": "component-DefaultNodeComponent-5bc55c70a8acaa1beb7fad245e952350",
+            "id": "component-DefaultNodeComponent-7e3f20b01a579f84095c037d2c0b757e",
             "file": "projects/ngx-diagrams/src/lib/defaults/components/default-node/default-node.component.ts",
             "encapsulation": [],
             "entryComponents": [],
@@ -24824,7 +24909,7 @@
                     "type": "BehaviorSubject<Coords>",
                     "optional": false,
                     "description": "",
-                    "line": 17,
+                    "line": 16,
                     "modifierKind": [
                         112,
                         132
@@ -24838,7 +24923,7 @@
                     "type": "BehaviorSubject<Dimensions>",
                     "optional": false,
                     "description": "",
-                    "line": 18,
+                    "line": 17,
                     "modifierKind": [
                         112,
                         132
@@ -24852,7 +24937,7 @@
                     "type": "BehaviorSubject<literal type>",
                     "optional": false,
                     "description": "",
-                    "line": 15,
+                    "line": 14,
                     "modifierKind": [
                         112,
                         132
@@ -24866,7 +24951,7 @@
                     "type": "BehaviorSubject<literal type>",
                     "optional": false,
                     "description": "",
-                    "line": 16,
+                    "line": 15,
                     "modifierKind": [
                         112,
                         132
@@ -24880,7 +24965,7 @@
                     "type": "Observable<Coords>",
                     "optional": false,
                     "description": "",
-                    "line": 21,
+                    "line": 20,
                     "modifierKind": [
                         112,
                         132
@@ -24894,7 +24979,7 @@
                     "type": "DiagramEngine",
                     "optional": false,
                     "description": "",
-                    "line": 13,
+                    "line": 12,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -24904,7 +24989,7 @@
                     "type": "Observable<Dimensions>",
                     "optional": false,
                     "description": "",
-                    "line": 22,
+                    "line": 21,
                     "modifierKind": [
                         112,
                         132
@@ -24918,7 +25003,7 @@
                     "type": "Observable<literal type>",
                     "optional": false,
                     "description": "",
-                    "line": 19,
+                    "line": 18,
                     "modifierKind": [
                         112,
                         132
@@ -24928,21 +25013,11 @@
                     }
                 },
                 {
-                    "name": "id",
-                    "type": "ID",
-                    "optional": false,
-                    "description": "",
-                    "line": 12,
-                    "inheritance": {
-                        "file": "NodeModel"
-                    }
-                },
-                {
                     "name": "ports$",
                     "type": "Observable<literal type>",
                     "optional": false,
                     "description": "",
-                    "line": 20,
+                    "line": 19,
                     "modifierKind": [
                         112,
                         132
@@ -25226,7 +25301,7 @@
                     "optional": false,
                     "returnType": "P",
                     "typeParameters": [],
-                    "line": 153,
+                    "line": 152,
                     "description": "<p>Assign a port to the node and set the node as its getParent</p>\n",
                     "jsdoctags": [
                         {
@@ -25238,8 +25313,8 @@
                         },
                         {
                             "tagName": {
-                                "pos": 4564,
-                                "end": 4571,
+                                "pos": 4555,
+                                "end": 4562,
                                 "flags": 0,
                                 "escapedText": "returns"
                             },
@@ -25256,7 +25331,7 @@
                     "optional": false,
                     "returnType": "Observable<Coords>",
                     "typeParameters": [],
-                    "line": 125,
+                    "line": 124,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -25267,7 +25342,7 @@
                     "optional": false,
                     "returnType": "Observable<Dimensions>",
                     "typeParameters": [],
-                    "line": 198,
+                    "line": 197,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -25278,7 +25353,7 @@
                     "optional": false,
                     "returnType": "Coords",
                     "typeParameters": [],
-                    "line": 45,
+                    "line": 44,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -25289,7 +25364,7 @@
                     "optional": false,
                     "returnType": "Dimensions",
                     "typeParameters": [],
-                    "line": 193,
+                    "line": 192,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -25300,7 +25375,7 @@
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 232,
+                    "line": 239,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -25311,7 +25386,7 @@
                     "optional": false,
                     "returnType": "number",
                     "typeParameters": [],
-                    "line": 202,
+                    "line": 201,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -25327,7 +25402,7 @@
                     "optional": false,
                     "returnType": "P",
                     "typeParameters": [],
-                    "line": 170,
+                    "line": 169,
                     "jsdoctags": [
                         {
                             "name": "id",
@@ -25353,7 +25428,7 @@
                     "optional": false,
                     "returnType": "literal type",
                     "typeParameters": [],
-                    "line": 185,
+                    "line": 184,
                     "jsdoctags": [
                         {
                             "name": "ids",
@@ -25374,7 +25449,7 @@
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 105,
+                    "line": 104,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -25385,7 +25460,7 @@
                     "optional": false,
                     "returnType": "number",
                     "typeParameters": [],
-                    "line": 206,
+                    "line": 209,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -25401,7 +25476,7 @@
                     "optional": false,
                     "returnType": "string",
                     "typeParameters": [],
-                    "line": 159,
+                    "line": 158,
                     "jsdoctags": [
                         {
                             "name": "port",
@@ -25421,7 +25496,7 @@
                     "optional": false,
                     "returnType": "Observable<Coords>",
                     "typeParameters": [],
-                    "line": 129,
+                    "line": 128,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -25446,7 +25521,7 @@
                     "typeParameters": [
                         "E"
                     ],
-                    "line": 236,
+                    "line": 243,
                     "jsdoctags": [
                         {
                             "name": "selector",
@@ -25473,7 +25548,7 @@
                     "optional": false,
                     "returnType": "Observable<number>",
                     "typeParameters": [],
-                    "line": 219,
+                    "line": 226,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -25491,7 +25566,7 @@
                     "optional": false,
                     "returnType": "Observable<P[]>",
                     "typeParameters": [],
-                    "line": 174,
+                    "line": 173,
                     "jsdoctags": [
                         {
                             "name": "selector",
@@ -25513,7 +25588,7 @@
                     "optional": false,
                     "returnType": "Observable<number>",
                     "typeParameters": [],
-                    "line": 210,
+                    "line": 217,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -25524,7 +25599,7 @@
                     "optional": false,
                     "returnType": "Observable<number>",
                     "typeParameters": [],
-                    "line": 133,
+                    "line": 132,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -25535,7 +25610,7 @@
                     "optional": false,
                     "returnType": "Observable<number>",
                     "typeParameters": [],
-                    "line": 141,
+                    "line": 140,
                     "inheritance": {
                         "file": "NodeModel"
                     }
@@ -25550,7 +25625,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 49,
+                    "line": 48,
                     "jsdoctags": [
                         {
                             "type": "Coords",
@@ -25573,7 +25648,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 189,
+                    "line": 188,
                     "jsdoctags": [
                         {
                             "type": "Dimensions",
@@ -25597,11 +25672,61 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 228,
+                    "line": 235,
                     "jsdoctags": [
                         {
                             "name": "extras",
                             "type": "any",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ],
+                    "inheritance": {
+                        "file": "NodeModel"
+                    }
+                },
+                {
+                    "name": "setHeight",
+                    "args": [
+                        {
+                            "name": "height",
+                            "type": "number"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "any",
+                    "typeParameters": [],
+                    "line": 205,
+                    "jsdoctags": [
+                        {
+                            "name": "height",
+                            "type": "number",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ],
+                    "inheritance": {
+                        "file": "NodeModel"
+                    }
+                },
+                {
+                    "name": "setWidth",
+                    "args": [
+                        {
+                            "name": "width",
+                            "type": "number"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "any",
+                    "typeParameters": [],
+                    "line": 213,
+                    "jsdoctags": [
+                        {
+                            "name": "width",
+                            "type": "number",
                             "tagName": {
                                 "text": "param"
                             }
@@ -25621,7 +25746,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 64,
+                    "line": 63,
                     "jsdoctags": [
                         {
                             "type": "Coords",
@@ -26055,7 +26180,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';\nimport { DefaultNodeModel } from '../../models/default-node.model';\nimport { PortModel } from '../../../models/port.model';\n\n@Component({\n\tselector: 'ngdx-default-node',\n\ttemplateUrl: './default-node.component.html',\n\tstyleUrls: ['./default-node.component.scss']\n})\nexport class DefaultNodeComponent extends DefaultNodeModel implements OnInit {\n\t@ViewChild('portsLayer', { read: ViewContainerRef, static: true }) portsLayer: ViewContainerRef;\n\n\tconstructor() {\n\t\tsuper('ngdx-default-node');\n\t}\n\n\tngOnInit() {\n\t\tthis.selectPorts().subscribe(ports => {\n\t\t\tports.forEach(port => {\n\t\t\t\tif (!port.getPainted()) {\n\t\t\t\t\tthis.generatePort(port);\n\t\t\t\t\tport.setPainted();\n\t\t\t\t}\n\t\t\t});\n\t\t});\n\t}\n\n\tgeneratePort(port: PortModel) {\n\t\tthis.diagramEngine.generateWidgetForPort(port, this.portsLayer);\n\t}\n\n\t// https://github.com/projectstorm/react-diagrams/blob/master/src/defaults/models/DefaultNodeModel.ts\n}\n",
+            "sourceCode": "import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';\nimport { DefaultNodeModel } from '../../models/default-node.model';\nimport { PortModel } from '../../../models/port.model';\n\n@Component({\n\tselector: 'ngdx-default-node',\n\ttemplateUrl: './default-node.component.html',\n\tstyleUrls: ['./default-node.component.scss'],\n})\nexport class DefaultNodeComponent extends DefaultNodeModel implements OnInit {\n\t@ViewChild('portsLayer', { read: ViewContainerRef, static: true }) portsLayer: ViewContainerRef;\n\n\tconstructor() {\n\t\tsuper('ngdx-default-node');\n\t}\n\n\tngOnInit() {\n\t\tthis.selectPorts().subscribe(ports => {\n\t\t\tports.forEach(port => {\n\t\t\t\tif (!port.getPainted()) {\n\t\t\t\t\tthis.generatePort(port);\n\t\t\t\t\tport.setPainted();\n\t\t\t\t}\n\t\t\t});\n\t\t});\n\t}\n\n\tgeneratePort(port: PortModel) {\n\t\tthis.diagramEngine.generateWidgetForPort(port, this.portsLayer);\n\t}\n\n\t// https://github.com/projectstorm/react-diagrams/blob/master/src/defaults/models/DefaultNodeModel.ts\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -27313,7 +27438,7 @@
         },
         {
             "name": "NgxDiagramComponent",
-            "id": "component-NgxDiagramComponent-e425599178207aed668ea8d980f5aa6b",
+            "id": "component-NgxDiagramComponent-c4de9306bbee12ba8583bd2577240f7e",
             "file": "projects/ngx-diagrams/src/lib/containers/diagram/diagram.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -27337,7 +27462,7 @@
                     "line": 39
                 },
                 {
-                    "name": "allowCanvasZoon",
+                    "name": "allowCanvasZoom",
                     "defaultValue": "true",
                     "line": 38
                 },
@@ -27690,7 +27815,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n\tComponent,\n\tOnInit,\n\tInput,\n\tRenderer2,\n\tOutput,\n\tEventEmitter,\n\tViewChild,\n\tViewContainerRef,\n\tElementRef,\n\tAfterViewInit,\n\tChangeDetectionStrategy,\n\tChangeDetectorRef,\n\tOnDestroy,\n} from '@angular/core';\nimport { DiagramModel } from '../../models/diagram.model';\nimport { NodeModel } from '../../models/node.model';\nimport { LinkModel } from '../../models/link.model';\nimport { BehaviorSubject, Observable, combineLatest, ReplaySubject } from 'rxjs';\nimport { filter, takeUntil } from 'rxjs/operators';\nimport { BaseAction, MoveCanvasAction, SelectingAction, LinkCreatedAction, InvalidLinkDestroyed } from '../../actions';\nimport { BaseModel } from '../../models/base.model';\nimport { MoveItemsAction } from '../../actions/move-items.action';\nimport { PointModel } from '../../models/point.model';\nimport { Coords } from '../../interfaces/coords.interface';\nimport { PortModel } from '../../models/port.model';\nimport { LooseLinkDestroyed } from '../../actions/loose-link-destroyed.action';\n\n@Component({\n\tselector: 'ngdx-diagram',\n\ttemplateUrl: 'diagram.component.html',\n\tstyleUrls: ['diagram.component.scss'],\n\tchangeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {\n\t// tslint:disable-next-line:no-input-rename\n\t@Input('model') diagramModel: DiagramModel;\n\t@Input() allowCanvasZoon = true;\n\t@Input() allowCanvasTranslation = true;\n\t@Input() inverseZoom = true;\n\t@Input() allowLooseLinks = true;\n\t@Input() maxZoomOut: number = null;\n\t@Input() maxZoomIn: number = null;\n\n\t@Output() actionStartedFiring: EventEmitter<BaseAction> = new EventEmitter();\n\t@Output() actionStillFiring: EventEmitter<BaseAction> = new EventEmitter();\n\t@Output() actionStoppedFiring: EventEmitter<BaseAction> = new EventEmitter();\n\n\t@ViewChild('nodesLayer', { read: ViewContainerRef, static: true }) nodesLayer: ViewContainerRef;\n\t@ViewChild('linksLayer', { read: ViewContainerRef, static: true }) linksLayer: ViewContainerRef;\n\t@ViewChild('canvas', { read: ElementRef, static: true }) canvas: ElementRef;\n\n\tprivate nodes$: Observable<{ [s: string]: NodeModel }>;\n\tprivate links$: Observable<{ [s: string]: LinkModel }>;\n\tprivate action$: BehaviorSubject<BaseAction> = new BehaviorSubject(null);\n\tprivate nodesRendered$: BehaviorSubject<boolean>;\n\tprivate destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);\n\n\tprivate mouseUpListener = () => {};\n\tprivate mouseMoveListener = () => {};\n\n\tconstructor(private renderer: Renderer2, private cdRef: ChangeDetectorRef) {}\n\n\t// TODO: handle destruction of container, resseting all observables to avoid memory leaks!\n\tngOnInit() {\n\t\tif (this.diagramModel) {\n\t\t\tthis.diagramModel.getDiagramEngine().setCanvas(this.canvas.nativeElement);\n\n\t\t\tthis.nodes$ = this.diagramModel.selectNodes();\n\t\t\tthis.links$ = this.diagramModel.selectLinks();\n\t\t\tthis.nodesRendered$ = new BehaviorSubject(false);\n\n\t\t\tthis.diagramModel.setMaxZoomIn(this.maxZoomIn);\n\t\t\tthis.diagramModel.setMaxZoomOut(this.maxZoomOut);\n\n\t\t\tthis.nodes$.pipe(takeUntil(this.destroyed$)).subscribe(nodes => {\n\t\t\t\tthis.nodesRendered$.next(false);\n\t\t\t\tObject.values(nodes).forEach(node => {\n\t\t\t\t\tif (!node.getPainted()) {\n\t\t\t\t\t\tthis.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);\n\t\t\t\t\t\tnode.setPainted();\n\t\t\t\t\t\tthis.cdRef.detectChanges();\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t\tthis.nodesRendered$.next(true);\n\t\t\t});\n\t\t}\n\t}\n\n\tngOnDestroy() {\n\t\tthis.destroyed$.next(true);\n\t\tthis.destroyed$.complete();\n\t}\n\n\tngAfterViewInit() {\n\t\tcombineLatest([this.nodesRendered$, this.links$])\n\t\t\t.pipe(\n\t\t\t\ttakeUntil(this.destroyed$),\n\t\t\t\tfilter(([nodesRendered, _]) => !!nodesRendered)\n\t\t\t)\n\t\t\t.subscribe(([_, links]) => {\n\t\t\t\tObject.values(links).forEach(link => {\n\t\t\t\t\tif (!link.getPainted()) {\n\t\t\t\t\t\tif (link.getSourcePort() !== null) {\n\t\t\t\t\t\t\tconst portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getSourcePort());\n\t\t\t\t\t\t\tlink.getPoints()[0].setCoords(portCenter);\n\n\t\t\t\t\t\t\tconst portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getSourcePort());\n\t\t\t\t\t\t\tlink.getSourcePort().updateCoords(portCoords);\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tif (link.getTargetPort() !== null) {\n\t\t\t\t\t\t\tconst portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getTargetPort());\n\t\t\t\t\t\t\tlink.getPoints()[link.getPoints().length - 1].setCoords(portCenter);\n\n\t\t\t\t\t\t\tconst portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getTargetPort());\n\t\t\t\t\t\t\tlink.getTargetPort().updateCoords(portCoords);\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tthis.diagramModel.getDiagramEngine().generateWidgetForLink(link, this.linksLayer);\n\t\t\t\t\t\tlink.setPainted();\n\t\t\t\t\t\tthis.cdRef.detectChanges();\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t});\n\t}\n\n\t/**\n\t * fire the action registered and notify subscribers\n\t */\n\tfireAction() {\n\t\tif (this.action$.value) {\n\t\t\tthis.actionStillFiring.emit(this.action$.value);\n\t\t}\n\t}\n\n\t/**\n\t * Unregister the action, post firing and notify subscribers\n\t */\n\tstopFiringAction(shouldSkipEvent?: boolean) {\n\t\tif (!shouldSkipEvent) {\n\t\t\tthis.actionStoppedFiring.emit(this.action$.value);\n\t\t}\n\t\tthis.action$.next(null);\n\t}\n\n\t/**\n\t * Register the new action, pre firing and notify subscribers\n\t */\n\tstartFiringAction(action: BaseAction) {\n\t\tthis.action$.next(action);\n\t\tthis.actionStartedFiring.emit(action);\n\t}\n\n\tselectAction() {\n\t\treturn this.action$ as BehaviorSubject<SelectingAction>;\n\t}\n\n\tshouldDrawSelectionBox() {\n\t\tconst action = this.action$.getValue();\n\t\tif (action instanceof SelectingAction) {\n\t\t\taction.getBoxDimensions();\n\t\t\treturn true;\n\t\t}\n\t\treturn false;\n\t}\n\n\tgetMouseElement(event: MouseEvent): { model: BaseModel; element: Element } {\n\t\tconst target = event.target as Element;\n\n\t\t// is it a port?\n\t\tlet element = target.closest('[data-portid]');\n\t\tif (element) {\n\t\t\t// get the relevant node and return the port.\n\t\t\tconst nodeEl = target.closest('[data-nodeid]');\n\t\t\treturn {\n\t\t\t\tmodel: this.diagramModel.getNode(nodeEl.getAttribute('data-nodeid')).getPort(element.getAttribute('data-portid')),\n\t\t\t\telement,\n\t\t\t};\n\t\t}\n\n\t\t// look for a point\n\t\telement = target.closest('[data-pointid]');\n\t\tif (element) {\n\t\t\treturn {\n\t\t\t\tmodel: this.diagramModel.getLink(element.getAttribute('data-linkid')).getPointModel(element.getAttribute('data-pointid')),\n\t\t\t\telement,\n\t\t\t};\n\t\t}\n\n\t\t// look for a link\n\t\telement = target.closest('[data-linkid]');\n\t\tif (element) {\n\t\t\treturn {\n\t\t\t\tmodel: this.diagramModel.getLink(element.getAttribute('data-linkid')),\n\t\t\t\telement,\n\t\t\t};\n\t\t}\n\n\t\t// a node maybe\n\t\telement = target.closest('[data-nodeid]');\n\t\tif (element) {\n\t\t\treturn {\n\t\t\t\tmodel: this.diagramModel.getNode(element.getAttribute('data-nodeid')),\n\t\t\t\telement,\n\t\t\t};\n\t\t}\n\n\t\t// just the canvas\n\t\treturn null;\n\t}\n\n\tonMouseUp = (event: MouseEvent) => {\n\t\tconst diagramEngine = this.diagramModel.getDiagramEngine();\n\t\tconst action = this.action$.getValue();\n\t\t// are we going to connect a link to something?\n\t\tif (action instanceof MoveItemsAction) {\n\t\t\tconst element = this.getMouseElement(event);\n\t\t\taction.selectionModels.forEach(model => {\n\t\t\t\t// only care about points connecting to things\n\t\t\t\tif (!(model.model instanceof PointModel)) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (element && element.model instanceof PortModel && !diagramEngine.isModelLocked(element.model)) {\n\t\t\t\t\tconst link = model.model.getLink();\n\t\t\t\t\tif (link.getTargetPort() !== null) {\n\t\t\t\t\t\t// if this was a valid link already and we are adding a node in the middle, create 2 links from the original\n\t\t\t\t\t\tif (link.getTargetPort() !== element.model && link.getSourcePort() !== element.model) {\n\t\t\t\t\t\t\tconst targetPort = link.getTargetPort();\n\t\t\t\t\t\t\tconst newLink = link.clone({});\n\t\t\t\t\t\t\tnewLink.setSourcePort(element.model);\n\t\t\t\t\t\t\tnewLink.setTargetPort(targetPort);\n\t\t\t\t\t\t\tlink.setTargetPort(element.model);\n\t\t\t\t\t\t\ttargetPort.removeLink(link);\n\t\t\t\t\t\t\tnewLink.removePointsBefore(newLink.getPoints()[link.getPointIndex(model.model)]);\n\t\t\t\t\t\t\tlink.removePointsAfter(model.model);\n\t\t\t\t\t\t\tdiagramEngine.getDiagramModel().addLink(newLink);\n\t\t\t\t\t\t\t// if we are connecting to the same target or source, destroy tweener points\n\t\t\t\t\t\t} else if (link.getTargetPort() === element.model) {\n\t\t\t\t\t\t\tlink.removePointsAfter(model.model);\n\t\t\t\t\t\t} else if (link.getSourcePort() === element.model) {\n\t\t\t\t\t\t\tlink.removePointsBefore(model.model);\n\t\t\t\t\t\t}\n\t\t\t\t\t} else {\n\t\t\t\t\t\tlink.setTargetPort(element.model);\n\t\t\t\t\t\tconst targetPort = link.getTargetPort();\n\t\t\t\t\t\tconst srcPort = link.getSourcePort();\n\n\t\t\t\t\t\tif (targetPort.id !== srcPort.id && srcPort.canLinkToPort(targetPort)) {\n\t\t\t\t\t\t\t// link is valid, fire the event\n\t\t\t\t\t\t\tthis.startFiringAction(new LinkCreatedAction(event.clientX, event.clientY, link));\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\n\t\t\t// check for / destroy any loose links in any models which have been moved\n\t\t\tif (!this.allowLooseLinks) {\n\t\t\t\taction.selectionModels.forEach(model => {\n\t\t\t\t\t// only care about points connecting to things\n\t\t\t\t\tif (!(model.model instanceof PointModel)) {\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\n\t\t\t\t\tconst selectedPoint: PointModel = model.model;\n\t\t\t\t\tconst link: LinkModel = selectedPoint.getLink();\n\t\t\t\t\tif (link.getSourcePort() === null || link.getTargetPort() === null) {\n\t\t\t\t\t\tlink.destroy();\n\t\t\t\t\t\tthis.startFiringAction(new LooseLinkDestroyed(event.clientX, event.clientY, link));\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\t// destroy any invalid links\n\t\t\taction.selectionModels.forEach(model => {\n\t\t\t\t// only care about points connecting to things\n\t\t\t\tif (!(model.model instanceof PointModel)) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tconst link: LinkModel = model.model.getLink();\n\t\t\t\tconst sourcePort: PortModel = link.getSourcePort();\n\t\t\t\tconst targetPort: PortModel = link.getTargetPort();\n\n\t\t\t\tif (sourcePort !== null && targetPort !== null) {\n\t\t\t\t\tif (!sourcePort.canLinkToPort(targetPort)) {\n\t\t\t\t\t\t// link not allowed\n\t\t\t\t\t\tlink.destroy();\n\t\t\t\t\t\tthis.startFiringAction(new InvalidLinkDestroyed(event.clientX, event.clientY, link));\n\t\t\t\t\t} else if (\n\t\t\t\t\t\tObject.values(targetPort.getLinks()).some(\n\t\t\t\t\t\t\t(l: LinkModel) => l !== link && (l.getSourcePort() === sourcePort || l.getTargetPort() === sourcePort)\n\t\t\t\t\t\t)\n\t\t\t\t\t) {\n\t\t\t\t\t\t// link is a duplicate\n\t\t\t\t\t\tlink.destroy();\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tthis.stopFiringAction();\n\t\t} else {\n\t\t\tthis.stopFiringAction();\n\t\t}\n\n\t\tthis.mouseUpListener();\n\t\tthis.mouseMoveListener();\n\t\tthis.action$.next(null);\n\t};\n\n\tonMouseMove = (event: MouseEvent) => {\n\t\tconst action = this.action$.getValue();\n\n\t\tif (action === null || action === undefined) {\n\t\t\treturn;\n\t\t}\n\n\t\tif (action instanceof SelectingAction) {\n\t\t\tconst relative = this.diagramModel.getDiagramEngine().getRelativePoint(event.clientX, event.clientY);\n\n\t\t\tObject.values(this.diagramModel.getNodes()).forEach(node => {\n\t\t\t\tif ((action as SelectingAction).containsElement(node.getCoords(), this.diagramModel)) {\n\t\t\t\t\tnode.setSelected();\n\t\t\t\t} else {\n\t\t\t\t\tnode.setSelected(false);\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tObject.values(this.diagramModel.getLinks()).forEach(link => {\n\t\t\t\tlet allSelected = true;\n\t\t\t\tlink.getPoints().forEach(point => {\n\t\t\t\t\tif ((action as SelectingAction).containsElement(point.getCoords(), this.diagramModel)) {\n\t\t\t\t\t\tpoint.setSelected();\n\t\t\t\t\t} else {\n\t\t\t\t\t\tpoint.setSelected(false);\n\t\t\t\t\t\tallSelected = false;\n\t\t\t\t\t}\n\t\t\t\t});\n\n\t\t\t\tif (allSelected) {\n\t\t\t\t\tlink.setSelected();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\taction.mouseX2 = relative.x;\n\t\t\taction.mouseY2 = relative.y;\n\n\t\t\tthis.fireAction();\n\t\t\tthis.action$.next(action);\n\t\t\treturn;\n\t\t} else if (action instanceof MoveItemsAction) {\n\t\t\tconst coords: Coords = {\n\t\t\t\tx: event.clientX - action.mouseX,\n\t\t\t\ty: event.clientY - action.mouseY,\n\t\t\t};\n\t\t\tconst amountZoom = this.diagramModel.getZoomLevel() / 100;\n\n\t\t\taction.selectionModels.forEach(model => {\n\t\t\t\t// in this case we need to also work out the relative grid position\n\t\t\t\tif (model.model instanceof NodeModel || (model.model instanceof PointModel && !model.model.isConnectedToPort())) {\n\t\t\t\t\tconst newCoords = { x: model.initialX + coords.x / amountZoom, y: model.initialY + coords.y / amountZoom };\n\t\t\t\t\tmodel.model.setCoords(this.diagramModel.getGridPosition(newCoords));\n\n\t\t\t\t\tif (model.model instanceof NodeModel) {\n\t\t\t\t\t\t// update port coordinates as well\n\t\t\t\t\t\tObject.values(model.model.getPorts()).forEach(port => {\n\t\t\t\t\t\t\tconst portCoords = this.diagramModel.getDiagramEngine().getPortCoords(port);\n\t\t\t\t\t\t\tport.updateCoords(portCoords);\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t} else if (model.model instanceof PointModel) {\n\t\t\t\t\t// we want points that are connected to ports, to not necessarily snap to grid\n\t\t\t\t\t// this stuff needs to be pixel perfect, dont touch it\n\t\t\t\t\tconst newCoords = this.diagramModel.getGridPosition({ x: coords.x / amountZoom, y: coords.y / amountZoom });\n\t\t\t\t\tmodel.model.setCoords({ x: model.initialX + newCoords.x, y: model.initialY + newCoords.y });\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tthis.fireAction();\n\t\t} else if (action instanceof MoveCanvasAction) {\n\t\t\tif (this.allowCanvasTranslation) {\n\t\t\t\tthis.diagramModel.setOffset(\n\t\t\t\t\taction.initialOffsetX + (event.clientX - action.mouseX),\n\t\t\t\t\taction.initialOffsetY + (event.clientY - action.mouseY)\n\t\t\t\t);\n\t\t\t\tthis.fireAction();\n\t\t\t}\n\t\t}\n\t};\n\n\tonMouseDown(event: MouseEvent) {\n\t\tif (event.button === 3) {\n\t\t\treturn;\n\t\t}\n\n\t\tconst selectedModel = this.getMouseElement(event);\n\n\t\t// canvas selected\n\t\tif (selectedModel === null) {\n\t\t\t// multiple selection\n\t\t\tif (event.shiftKey) {\n\t\t\t\t// initiate multiple selection selector\n\t\t\t\tconst relative = this.diagramModel.getDiagramEngine().getRelativePoint(event.clientX, event.clientY);\n\t\t\t\tthis.startFiringAction(new SelectingAction(relative.x, relative.y));\n\t\t\t} else {\n\t\t\t\t// drag canvas action\n\t\t\t\tthis.diagramModel.clearSelection();\n\t\t\t\tthis.startFiringAction(new MoveCanvasAction(event.clientX, event.clientY, this.diagramModel));\n\t\t\t}\n\t\t} else if (selectedModel.model instanceof PortModel) {\n\t\t\t// its a port element, we want to drag a link\n\t\t\tif (!this.diagramModel.getDiagramEngine().isModelLocked(selectedModel.model) && selectedModel.model.getCanCreateLinks()) {\n\t\t\t\tconst relative = this.diagramModel.getDiagramEngine().getRelativeMousePoint(event);\n\t\t\t\tconst sourcePort = selectedModel.model;\n\t\t\t\tconst link = sourcePort.createLinkModel();\n\n\t\t\t\tlink.setSourcePort(sourcePort);\n\n\t\t\t\tif (link) {\n\t\t\t\t\tlink.removeMiddlePoints();\n\t\t\t\t\tif (link.getSourcePort() !== sourcePort) {\n\t\t\t\t\t\tlink.setSourcePort(sourcePort);\n\t\t\t\t\t}\n\t\t\t\t\tlink.setTargetPort(null);\n\n\t\t\t\t\tlink.getFirstPoint().setCoords(relative);\n\t\t\t\t\tlink.getLastPoint().setCoords(relative);\n\n\t\t\t\t\tthis.diagramModel.clearSelection();\n\t\t\t\t\tlink.getLastPoint().setSelected();\n\t\t\t\t\tthis.diagramModel.addLink(link);\n\n\t\t\t\t\tthis.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tthis.diagramModel.clearSelection();\n\t\t\t}\n\t\t} else {\n\t\t\t// its some other element, probably want to move it\n\t\t\tif (!event.shiftKey && !selectedModel.model.getSelected()) {\n\t\t\t\tthis.diagramModel.clearSelection();\n\t\t\t}\n\t\t\tselectedModel.model.setSelected();\n\n\t\t\tthis.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));\n\t\t}\n\n\t\t// create mouseMove and mouseUp listeners\n\t\tthis.mouseMoveListener = this.renderer.listen(document, 'mousemove', this.onMouseMove);\n\t\tthis.mouseUpListener = this.renderer.listen(document, 'mouseup', this.onMouseUp);\n\t}\n\n\tonMouseWheel(event: WheelEvent) {\n\t\tif (this.allowCanvasZoon) {\n\t\t\tevent.preventDefault();\n\t\t\tevent.stopPropagation();\n\t\t\tconst currentZoomLevel = this.diagramModel.getZoomLevel();\n\n\t\t\tconst oldZoomFactor = currentZoomLevel / 100;\n\t\t\tlet scrollDelta = this.inverseZoom ? -event.deltaY : event.deltaY;\n\n\t\t\t// check if it is pinch gesture\n\t\t\tif (event.ctrlKey && scrollDelta % 1 !== 0) {\n\t\t\t\t/* Chrome and Firefox sends wheel event with deltaY that\n\t\t\t\t   have fractional part, also `ctrlKey` prop of the event is true\n\t\t\t\t   though ctrl isn't pressed\n\t\t\t\t*/\n\t\t\t\tscrollDelta /= 3;\n\t\t\t} else {\n\t\t\t\tscrollDelta /= 60;\n\t\t\t}\n\n\t\t\tif (currentZoomLevel + scrollDelta > 10) {\n\t\t\t\tconst newZoomLvl = currentZoomLevel + scrollDelta;\n\t\t\t\tthis.diagramModel.setZoomLevel(newZoomLvl);\n\t\t\t}\n\n\t\t\tconst updatedZoomLvl = this.diagramModel.getZoomLevel();\n\t\t\tconst zoomFactor = updatedZoomLvl / 100;\n\n\t\t\tconst boundingRect = (event.currentTarget as Element).getBoundingClientRect();\n\t\t\tconst clientWidth = boundingRect.width;\n\t\t\tconst clientHeight = boundingRect.height;\n\n\t\t\t// compute difference between rect before and after scroll\n\t\t\tconst widthDiff = clientWidth * zoomFactor - clientWidth * oldZoomFactor;\n\t\t\tconst heightDiff = clientHeight * zoomFactor - clientHeight * oldZoomFactor;\n\n\t\t\t// compute mouse coords relative to canvas\n\t\t\tconst clientX = event.clientX - boundingRect.left;\n\t\t\tconst clientY = event.clientY - boundingRect.top;\n\n\t\t\t// compute width and height increment factor\n\t\t\tconst xFactor = (clientX - this.diagramModel.getOffsetX()) / oldZoomFactor / clientWidth;\n\t\t\tconst yFactor = (clientY - this.diagramModel.getOffsetY()) / oldZoomFactor / clientHeight;\n\n\t\t\tconst updatedXOffset = this.diagramModel.getOffsetX() - widthDiff * xFactor;\n\t\t\tconst updatedYOffset = this.diagramModel.getOffsetY() - heightDiff * yFactor;\n\n\t\t\tthis.diagramModel.setOffset(updatedXOffset, updatedYOffset);\n\t\t}\n\t}\n}\n",
+            "sourceCode": "import {\n\tComponent,\n\tOnInit,\n\tInput,\n\tRenderer2,\n\tOutput,\n\tEventEmitter,\n\tViewChild,\n\tViewContainerRef,\n\tElementRef,\n\tAfterViewInit,\n\tChangeDetectionStrategy,\n\tChangeDetectorRef,\n\tOnDestroy,\n} from '@angular/core';\nimport { DiagramModel } from '../../models/diagram.model';\nimport { NodeModel } from '../../models/node.model';\nimport { LinkModel } from '../../models/link.model';\nimport { BehaviorSubject, Observable, combineLatest, ReplaySubject } from 'rxjs';\nimport { filter, takeUntil } from 'rxjs/operators';\nimport { BaseAction, MoveCanvasAction, SelectingAction, LinkCreatedAction, InvalidLinkDestroyed } from '../../actions';\nimport { BaseModel } from '../../models/base.model';\nimport { MoveItemsAction } from '../../actions/move-items.action';\nimport { PointModel } from '../../models/point.model';\nimport { Coords } from '../../interfaces/coords.interface';\nimport { PortModel } from '../../models/port.model';\nimport { LooseLinkDestroyed } from '../../actions/loose-link-destroyed.action';\n\n@Component({\n\tselector: 'ngdx-diagram',\n\ttemplateUrl: 'diagram.component.html',\n\tstyleUrls: ['diagram.component.scss'],\n\tchangeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {\n\t// tslint:disable-next-line:no-input-rename\n\t@Input('model') diagramModel: DiagramModel;\n\t@Input() allowCanvasZoom = true;\n\t@Input() allowCanvasTranslation = true;\n\t@Input() inverseZoom = true;\n\t@Input() allowLooseLinks = true;\n\t@Input() maxZoomOut: number = null;\n\t@Input() maxZoomIn: number = null;\n\n\t@Output() actionStartedFiring: EventEmitter<BaseAction> = new EventEmitter();\n\t@Output() actionStillFiring: EventEmitter<BaseAction> = new EventEmitter();\n\t@Output() actionStoppedFiring: EventEmitter<BaseAction> = new EventEmitter();\n\n\t@ViewChild('nodesLayer', { read: ViewContainerRef, static: true }) nodesLayer: ViewContainerRef;\n\t@ViewChild('linksLayer', { read: ViewContainerRef, static: true }) linksLayer: ViewContainerRef;\n\t@ViewChild('canvas', { read: ElementRef, static: true }) canvas: ElementRef;\n\n\tprivate nodes$: Observable<{ [s: string]: NodeModel }>;\n\tprivate links$: Observable<{ [s: string]: LinkModel }>;\n\tprivate action$: BehaviorSubject<BaseAction> = new BehaviorSubject(null);\n\tprivate nodesRendered$: BehaviorSubject<boolean>;\n\tprivate destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);\n\n\tprivate mouseUpListener = () => {};\n\tprivate mouseMoveListener = () => {};\n\n\tconstructor(private renderer: Renderer2, private cdRef: ChangeDetectorRef) {}\n\n\t// TODO: handle destruction of container, resseting all observables to avoid memory leaks!\n\tngOnInit() {\n\t\tif (this.diagramModel) {\n\t\t\tthis.diagramModel.getDiagramEngine().setCanvas(this.canvas.nativeElement);\n\n\t\t\tthis.nodes$ = this.diagramModel.selectNodes();\n\t\t\tthis.links$ = this.diagramModel.selectLinks();\n\t\t\tthis.nodesRendered$ = new BehaviorSubject(false);\n\n\t\t\tthis.diagramModel.setMaxZoomIn(this.maxZoomIn);\n\t\t\tthis.diagramModel.setMaxZoomOut(this.maxZoomOut);\n\n\t\t\tthis.nodes$.pipe(takeUntil(this.destroyed$)).subscribe(nodes => {\n\t\t\t\tthis.nodesRendered$.next(false);\n\t\t\t\tObject.values(nodes).forEach(node => {\n\t\t\t\t\tif (!node.getPainted()) {\n\t\t\t\t\t\tthis.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);\n\t\t\t\t\t\tnode.setPainted();\n\t\t\t\t\t\tthis.cdRef.detectChanges();\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t\tthis.nodesRendered$.next(true);\n\t\t\t});\n\t\t}\n\t}\n\n\tngOnDestroy() {\n\t\tthis.destroyed$.next(true);\n\t\tthis.destroyed$.complete();\n\t}\n\n\tngAfterViewInit() {\n\t\tcombineLatest([this.nodesRendered$, this.links$])\n\t\t\t.pipe(\n\t\t\t\ttakeUntil(this.destroyed$),\n\t\t\t\tfilter(([nodesRendered, _]) => !!nodesRendered)\n\t\t\t)\n\t\t\t.subscribe(([_, links]) => {\n\t\t\t\tObject.values(links).forEach(link => {\n\t\t\t\t\tif (!link.getPainted()) {\n\t\t\t\t\t\tif (link.getSourcePort() !== null) {\n\t\t\t\t\t\t\tconst portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getSourcePort());\n\t\t\t\t\t\t\tlink.getPoints()[0].setCoords(portCenter);\n\n\t\t\t\t\t\t\tconst portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getSourcePort());\n\t\t\t\t\t\t\tlink.getSourcePort().updateCoords(portCoords);\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tif (link.getTargetPort() !== null) {\n\t\t\t\t\t\t\tconst portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getTargetPort());\n\t\t\t\t\t\t\tlink.getPoints()[link.getPoints().length - 1].setCoords(portCenter);\n\n\t\t\t\t\t\t\tconst portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getTargetPort());\n\t\t\t\t\t\t\tlink.getTargetPort().updateCoords(portCoords);\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tthis.diagramModel.getDiagramEngine().generateWidgetForLink(link, this.linksLayer);\n\t\t\t\t\t\tlink.setPainted();\n\t\t\t\t\t\tthis.cdRef.detectChanges();\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t});\n\t}\n\n\t/**\n\t * fire the action registered and notify subscribers\n\t */\n\tfireAction() {\n\t\tif (this.action$.value) {\n\t\t\tthis.actionStillFiring.emit(this.action$.value);\n\t\t}\n\t}\n\n\t/**\n\t * Unregister the action, post firing and notify subscribers\n\t */\n\tstopFiringAction(shouldSkipEvent?: boolean) {\n\t\tif (!shouldSkipEvent) {\n\t\t\tthis.actionStoppedFiring.emit(this.action$.value);\n\t\t}\n\t\tthis.action$.next(null);\n\t}\n\n\t/**\n\t * Register the new action, pre firing and notify subscribers\n\t */\n\tstartFiringAction(action: BaseAction) {\n\t\tthis.action$.next(action);\n\t\tthis.actionStartedFiring.emit(action);\n\t}\n\n\tselectAction() {\n\t\treturn this.action$ as BehaviorSubject<SelectingAction>;\n\t}\n\n\tshouldDrawSelectionBox() {\n\t\tconst action = this.action$.getValue();\n\t\tif (action instanceof SelectingAction) {\n\t\t\taction.getBoxDimensions();\n\t\t\treturn true;\n\t\t}\n\t\treturn false;\n\t}\n\n\tgetMouseElement(event: MouseEvent): { model: BaseModel; element: Element } {\n\t\tconst target = event.target as Element;\n\n\t\t// is it a port?\n\t\tlet element = target.closest('[data-portid]');\n\t\tif (element) {\n\t\t\t// get the relevant node and return the port.\n\t\t\tconst nodeEl = target.closest('[data-nodeid]');\n\t\t\treturn {\n\t\t\t\tmodel: this.diagramModel.getNode(nodeEl.getAttribute('data-nodeid')).getPort(element.getAttribute('data-portid')),\n\t\t\t\telement,\n\t\t\t};\n\t\t}\n\n\t\t// look for a point\n\t\telement = target.closest('[data-pointid]');\n\t\tif (element) {\n\t\t\treturn {\n\t\t\t\tmodel: this.diagramModel.getLink(element.getAttribute('data-linkid')).getPointModel(element.getAttribute('data-pointid')),\n\t\t\t\telement,\n\t\t\t};\n\t\t}\n\n\t\t// look for a link\n\t\telement = target.closest('[data-linkid]');\n\t\tif (element) {\n\t\t\treturn {\n\t\t\t\tmodel: this.diagramModel.getLink(element.getAttribute('data-linkid')),\n\t\t\t\telement,\n\t\t\t};\n\t\t}\n\n\t\t// a node maybe\n\t\telement = target.closest('[data-nodeid]');\n\t\tif (element) {\n\t\t\treturn {\n\t\t\t\tmodel: this.diagramModel.getNode(element.getAttribute('data-nodeid')),\n\t\t\t\telement,\n\t\t\t};\n\t\t}\n\n\t\t// just the canvas\n\t\treturn null;\n\t}\n\n\tonMouseUp = (event: MouseEvent) => {\n\t\tconst diagramEngine = this.diagramModel.getDiagramEngine();\n\t\tconst action = this.action$.getValue();\n\t\t// are we going to connect a link to something?\n\t\tif (action instanceof MoveItemsAction) {\n\t\t\tconst element = this.getMouseElement(event);\n\t\t\taction.selectionModels.forEach(model => {\n\t\t\t\t// only care about points connecting to things\n\t\t\t\tif (!(model.model instanceof PointModel)) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (element && element.model instanceof PortModel && !diagramEngine.isModelLocked(element.model)) {\n\t\t\t\t\tconst link = model.model.getLink();\n\t\t\t\t\tif (link.getTargetPort() !== null) {\n\t\t\t\t\t\t// if this was a valid link already and we are adding a node in the middle, create 2 links from the original\n\t\t\t\t\t\tif (link.getTargetPort() !== element.model && link.getSourcePort() !== element.model) {\n\t\t\t\t\t\t\tconst targetPort = link.getTargetPort();\n\t\t\t\t\t\t\tconst newLink = link.clone({});\n\t\t\t\t\t\t\tnewLink.setSourcePort(element.model);\n\t\t\t\t\t\t\tnewLink.setTargetPort(targetPort);\n\t\t\t\t\t\t\tlink.setTargetPort(element.model);\n\t\t\t\t\t\t\ttargetPort.removeLink(link);\n\t\t\t\t\t\t\tnewLink.removePointsBefore(newLink.getPoints()[link.getPointIndex(model.model)]);\n\t\t\t\t\t\t\tlink.removePointsAfter(model.model);\n\t\t\t\t\t\t\tdiagramEngine.getDiagramModel().addLink(newLink);\n\t\t\t\t\t\t\t// if we are connecting to the same target or source, destroy tweener points\n\t\t\t\t\t\t} else if (link.getTargetPort() === element.model) {\n\t\t\t\t\t\t\tlink.removePointsAfter(model.model);\n\t\t\t\t\t\t} else if (link.getSourcePort() === element.model) {\n\t\t\t\t\t\t\tlink.removePointsBefore(model.model);\n\t\t\t\t\t\t}\n\t\t\t\t\t} else {\n\t\t\t\t\t\tlink.setTargetPort(element.model);\n\t\t\t\t\t\tconst targetPort = link.getTargetPort();\n\t\t\t\t\t\tconst srcPort = link.getSourcePort();\n\n\t\t\t\t\t\tif (targetPort.id !== srcPort.id && srcPort.canLinkToPort(targetPort)) {\n\t\t\t\t\t\t\t// link is valid, fire the event\n\t\t\t\t\t\t\tthis.startFiringAction(new LinkCreatedAction(event.clientX, event.clientY, link));\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\n\t\t\t// check for / destroy any loose links in any models which have been moved\n\t\t\tif (!this.allowLooseLinks) {\n\t\t\t\taction.selectionModels.forEach(model => {\n\t\t\t\t\t// only care about points connecting to things\n\t\t\t\t\tif (!(model.model instanceof PointModel)) {\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\n\t\t\t\t\tconst selectedPoint: PointModel = model.model;\n\t\t\t\t\tconst link: LinkModel = selectedPoint.getLink();\n\t\t\t\t\tif (link.getSourcePort() === null || link.getTargetPort() === null) {\n\t\t\t\t\t\tlink.destroy();\n\t\t\t\t\t\tthis.startFiringAction(new LooseLinkDestroyed(event.clientX, event.clientY, link));\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\t// destroy any invalid links\n\t\t\taction.selectionModels.forEach(model => {\n\t\t\t\t// only care about points connecting to things\n\t\t\t\tif (!(model.model instanceof PointModel)) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tconst link: LinkModel = model.model.getLink();\n\t\t\t\tconst sourcePort: PortModel = link.getSourcePort();\n\t\t\t\tconst targetPort: PortModel = link.getTargetPort();\n\n\t\t\t\tif (sourcePort !== null && targetPort !== null) {\n\t\t\t\t\tif (!sourcePort.canLinkToPort(targetPort)) {\n\t\t\t\t\t\t// link not allowed\n\t\t\t\t\t\tlink.destroy();\n\t\t\t\t\t\tthis.startFiringAction(new InvalidLinkDestroyed(event.clientX, event.clientY, link));\n\t\t\t\t\t} else if (\n\t\t\t\t\t\tObject.values(targetPort.getLinks()).some(\n\t\t\t\t\t\t\t(l: LinkModel) => l !== link && (l.getSourcePort() === sourcePort || l.getTargetPort() === sourcePort)\n\t\t\t\t\t\t)\n\t\t\t\t\t) {\n\t\t\t\t\t\t// link is a duplicate\n\t\t\t\t\t\tlink.destroy();\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tthis.stopFiringAction();\n\t\t} else {\n\t\t\tthis.stopFiringAction();\n\t\t}\n\n\t\tthis.mouseUpListener();\n\t\tthis.mouseMoveListener();\n\t\tthis.action$.next(null);\n\t};\n\n\tonMouseMove = (event: MouseEvent) => {\n\t\tconst action = this.action$.getValue();\n\n\t\tif (action === null || action === undefined) {\n\t\t\treturn;\n\t\t}\n\n\t\tif (action instanceof SelectingAction) {\n\t\t\tconst relative = this.diagramModel.getDiagramEngine().getRelativePoint(event.clientX, event.clientY);\n\n\t\t\tObject.values(this.diagramModel.getNodes()).forEach(node => {\n\t\t\t\tif ((action as SelectingAction).containsElement(node.getCoords(), this.diagramModel)) {\n\t\t\t\t\tnode.setSelected();\n\t\t\t\t} else {\n\t\t\t\t\tnode.setSelected(false);\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tObject.values(this.diagramModel.getLinks()).forEach(link => {\n\t\t\t\tlet allSelected = true;\n\t\t\t\tlink.getPoints().forEach(point => {\n\t\t\t\t\tif ((action as SelectingAction).containsElement(point.getCoords(), this.diagramModel)) {\n\t\t\t\t\t\tpoint.setSelected();\n\t\t\t\t\t} else {\n\t\t\t\t\t\tpoint.setSelected(false);\n\t\t\t\t\t\tallSelected = false;\n\t\t\t\t\t}\n\t\t\t\t});\n\n\t\t\t\tif (allSelected) {\n\t\t\t\t\tlink.setSelected();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\taction.mouseX2 = relative.x;\n\t\t\taction.mouseY2 = relative.y;\n\n\t\t\tthis.fireAction();\n\t\t\tthis.action$.next(action);\n\t\t\treturn;\n\t\t} else if (action instanceof MoveItemsAction) {\n\t\t\tconst coords: Coords = {\n\t\t\t\tx: event.clientX - action.mouseX,\n\t\t\t\ty: event.clientY - action.mouseY,\n\t\t\t};\n\t\t\tconst amountZoom = this.diagramModel.getZoomLevel() / 100;\n\n\t\t\taction.selectionModels.forEach(model => {\n\t\t\t\t// in this case we need to also work out the relative grid position\n\t\t\t\tif (model.model instanceof NodeModel || (model.model instanceof PointModel && !model.model.isConnectedToPort())) {\n\t\t\t\t\tconst newCoords = { x: model.initialX + coords.x / amountZoom, y: model.initialY + coords.y / amountZoom };\n\t\t\t\t\tmodel.model.setCoords(this.diagramModel.getGridPosition(newCoords));\n\n\t\t\t\t\tif (model.model instanceof NodeModel) {\n\t\t\t\t\t\t// update port coordinates as well\n\t\t\t\t\t\tObject.values(model.model.getPorts()).forEach(port => {\n\t\t\t\t\t\t\tconst portCoords = this.diagramModel.getDiagramEngine().getPortCoords(port);\n\t\t\t\t\t\t\tport.updateCoords(portCoords);\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t} else if (model.model instanceof PointModel) {\n\t\t\t\t\t// we want points that are connected to ports, to not necessarily snap to grid\n\t\t\t\t\t// this stuff needs to be pixel perfect, dont touch it\n\t\t\t\t\tconst newCoords = this.diagramModel.getGridPosition({ x: coords.x / amountZoom, y: coords.y / amountZoom });\n\t\t\t\t\tmodel.model.setCoords({ x: model.initialX + newCoords.x, y: model.initialY + newCoords.y });\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tthis.fireAction();\n\t\t} else if (action instanceof MoveCanvasAction) {\n\t\t\tif (this.allowCanvasTranslation) {\n\t\t\t\tthis.diagramModel.setOffset(\n\t\t\t\t\taction.initialOffsetX + (event.clientX - action.mouseX),\n\t\t\t\t\taction.initialOffsetY + (event.clientY - action.mouseY)\n\t\t\t\t);\n\t\t\t\tthis.fireAction();\n\t\t\t}\n\t\t}\n\t};\n\n\tonMouseDown(event: MouseEvent) {\n\t\tif (event.button === 3) {\n\t\t\treturn;\n\t\t}\n\n\t\tconst selectedModel = this.getMouseElement(event);\n\n\t\t// canvas selected\n\t\tif (selectedModel === null) {\n\t\t\t// multiple selection\n\t\t\tif (event.shiftKey) {\n\t\t\t\t// initiate multiple selection selector\n\t\t\t\tconst relative = this.diagramModel.getDiagramEngine().getRelativePoint(event.clientX, event.clientY);\n\t\t\t\tthis.startFiringAction(new SelectingAction(relative.x, relative.y));\n\t\t\t} else {\n\t\t\t\t// drag canvas action\n\t\t\t\tthis.diagramModel.clearSelection();\n\t\t\t\tthis.startFiringAction(new MoveCanvasAction(event.clientX, event.clientY, this.diagramModel));\n\t\t\t}\n\t\t} else if (selectedModel.model instanceof PortModel) {\n\t\t\t// its a port element, we want to drag a link\n\t\t\tif (!this.diagramModel.getDiagramEngine().isModelLocked(selectedModel.model) && selectedModel.model.getCanCreateLinks()) {\n\t\t\t\tconst relative = this.diagramModel.getDiagramEngine().getRelativeMousePoint(event);\n\t\t\t\tconst sourcePort = selectedModel.model;\n\t\t\t\tconst link = sourcePort.createLinkModel();\n\n\t\t\t\tlink.setSourcePort(sourcePort);\n\n\t\t\t\tif (link) {\n\t\t\t\t\tlink.removeMiddlePoints();\n\t\t\t\t\tif (link.getSourcePort() !== sourcePort) {\n\t\t\t\t\t\tlink.setSourcePort(sourcePort);\n\t\t\t\t\t}\n\t\t\t\t\tlink.setTargetPort(null);\n\n\t\t\t\t\tlink.getFirstPoint().setCoords(relative);\n\t\t\t\t\tlink.getLastPoint().setCoords(relative);\n\n\t\t\t\t\tthis.diagramModel.clearSelection();\n\t\t\t\t\tlink.getLastPoint().setSelected();\n\t\t\t\t\tthis.diagramModel.addLink(link);\n\n\t\t\t\t\tthis.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tthis.diagramModel.clearSelection();\n\t\t\t}\n\t\t} else {\n\t\t\t// its some other element, probably want to move it\n\t\t\tif (!event.shiftKey && !selectedModel.model.getSelected()) {\n\t\t\t\tthis.diagramModel.clearSelection();\n\t\t\t}\n\t\t\tselectedModel.model.setSelected();\n\n\t\t\tthis.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));\n\t\t}\n\n\t\t// create mouseMove and mouseUp listeners\n\t\tthis.mouseMoveListener = this.renderer.listen(document, 'mousemove', this.onMouseMove);\n\t\tthis.mouseUpListener = this.renderer.listen(document, 'mouseup', this.onMouseUp);\n\t}\n\n\tonMouseWheel(event: WheelEvent) {\n\t\tif (this.allowCanvasZoom) {\n\t\t\tevent.preventDefault();\n\t\t\tevent.stopPropagation();\n\t\t\tconst currentZoomLevel = this.diagramModel.getZoomLevel();\n\n\t\t\tconst oldZoomFactor = currentZoomLevel / 100;\n\t\t\tlet scrollDelta = this.inverseZoom ? -event.deltaY : event.deltaY;\n\n\t\t\t// check if it is pinch gesture\n\t\t\tif (event.ctrlKey && scrollDelta % 1 !== 0) {\n\t\t\t\t/* Chrome and Firefox sends wheel event with deltaY that\n\t\t\t\t   have fractional part, also `ctrlKey` prop of the event is true\n\t\t\t\t   though ctrl isn't pressed\n\t\t\t\t*/\n\t\t\t\tscrollDelta /= 3;\n\t\t\t} else {\n\t\t\t\tscrollDelta /= 60;\n\t\t\t}\n\n\t\t\tif (currentZoomLevel + scrollDelta > 10) {\n\t\t\t\tconst newZoomLvl = currentZoomLevel + scrollDelta;\n\t\t\t\tthis.diagramModel.setZoomLevel(newZoomLvl);\n\t\t\t}\n\n\t\t\tconst updatedZoomLvl = this.diagramModel.getZoomLevel();\n\t\t\tconst zoomFactor = updatedZoomLvl / 100;\n\n\t\t\tconst boundingRect = (event.currentTarget as Element).getBoundingClientRect();\n\t\t\tconst clientWidth = boundingRect.width;\n\t\t\tconst clientHeight = boundingRect.height;\n\n\t\t\t// compute difference between rect before and after scroll\n\t\t\tconst widthDiff = clientWidth * zoomFactor - clientWidth * oldZoomFactor;\n\t\t\tconst heightDiff = clientHeight * zoomFactor - clientHeight * oldZoomFactor;\n\n\t\t\t// compute mouse coords relative to canvas\n\t\t\tconst clientX = event.clientX - boundingRect.left;\n\t\t\tconst clientY = event.clientY - boundingRect.top;\n\n\t\t\t// compute width and height increment factor\n\t\t\tconst xFactor = (clientX - this.diagramModel.getOffsetX()) / oldZoomFactor / clientWidth;\n\t\t\tconst yFactor = (clientY - this.diagramModel.getOffsetY()) / oldZoomFactor / clientHeight;\n\n\t\t\tconst updatedXOffset = this.diagramModel.getOffsetX() - widthDiff * xFactor;\n\t\t\tconst updatedYOffset = this.diagramModel.getOffsetY() - heightDiff * yFactor;\n\n\t\t\tthis.diagramModel.setOffset(updatedXOffset, updatedYOffset);\n\t\t}\n\t}\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -28927,7 +29052,7 @@
                 "linktype": "component",
                 "name": "DefaultNodeComponent",
                 "coveragePercent": 2,
-                "coverageCount": "2/78",
+                "coverageCount": "2/79",
                 "status": "low"
             },
             {
@@ -28999,7 +29124,7 @@
                 "linktype": "classe",
                 "name": "DefaultNodeModel",
                 "coveragePercent": 3,
-                "coverageCount": "5/139",
+                "coverageCount": "5/140",
                 "status": "low"
             },
             {
@@ -29188,7 +29313,7 @@
                 "linktype": "classe",
                 "name": "NodeModel",
                 "coveragePercent": 3,
-                "coverageCount": "3/84",
+                "coverageCount": "3/85",
                 "status": "low"
             },
             {
@@ -29210,16 +29335,16 @@
                 "status": "low"
             },
             {
-                "filePath": "projects/ngx-diagrams/src/lib/services/dagre-engine.service.ts",
+                "filePath": "projects/ngx-diagrams/src/lib/plugins/dagre-engine.plugin.ts",
                 "type": "injectable",
                 "linktype": "injectable",
                 "name": "DagreEngine",
                 "coveragePercent": 0,
-                "coverageCount": "0/3",
+                "coverageCount": "0/4",
                 "status": "low"
             },
             {
-                "filePath": "projects/ngx-diagrams/src/lib/services/dagre-engine.service.ts",
+                "filePath": "projects/ngx-diagrams/src/lib/plugins/dagre-engine.plugin.ts",
                 "type": "interface",
                 "linktype": "interface",
                 "name": "DagreEngineOptions",

@@ -37,6 +37,6 @@ export class CustomLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 	}
 
 	getNewInstance() {
-		return new DefaultLinkModel('intent-link');
+		return new DefaultLinkModel('custom-link');
 	}
 }
