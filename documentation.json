@@ -5264,10 +5264,10 @@
         },
         {
             "name": "DefaultLinkModel",
-            "id": "class-DefaultLinkModel-e6cb142ddd476f3b9ab3b2460fe39fd5",
+            "id": "class-DefaultLinkModel-d1b6618751bd4277eb3195dec4f72776",
             "file": "projects/ngx-diagrams/src/lib/defaults/models/default-link.model.ts",
             "type": "class",
-            "sourceCode": "import { LinkModel } from '../../models/link.model';\nimport { BehaviorSubject } from 'rxjs';\n\nexport class DefaultLinkModel extends LinkModel {\n\twidth$: BehaviorSubject<number>;\n\tcolor$: BehaviorSubject<string>;\n\tcurvyness$: BehaviorSubject<number>;\n\n\tconstructor(type: string = 'default') {\n\t\tsuper(type);\n\t\tthis.color$ = new BehaviorSubject('rgba(255,255,255,0.5)');\n\t\tthis.width$ = new BehaviorSubject(3);\n\t\tthis.curvyness$ = new BehaviorSubject(50);\n\t}\n\n\tsetWidth(width: number) {\n\t\tthis.width$.next(width);\n\t}\n\n\tsetColor(color: string) {\n\t\tthis.color$.next(color);\n\t}\n\n\tsetCurvyness(curvyness: number) {\n\t\tthis.curvyness$.next(curvyness);\n\t}\n\n\tget color() {\n\t\treturn this.color$.getValue();\n\t}\n\n\tget width() {\n\t\treturn this.width$.getValue();\n\t}\n\n\tget curvyness() {\n\t\treturn this.curvyness$.getValue();\n\t}\n}\n",
+            "sourceCode": "import { LinkModel } from '../../models/link.model';\nimport { BehaviorSubject, Observable } from 'rxjs';\n\nexport class DefaultLinkModel extends LinkModel {\n\twidth$: BehaviorSubject<number>;\n\tprivate color$: BehaviorSubject<string>;\n\tcurvyness$: BehaviorSubject<number>;\n\n\tconstructor(type: string = 'default') {\n\t\tsuper(type);\n\t\tthis.color$ = new BehaviorSubject('rgba(255,255,255,0.5)');\n\t\tthis.width$ = new BehaviorSubject(3);\n\t\tthis.curvyness$ = new BehaviorSubject(50);\n\t}\n\n\tsetWidth(width: number) {\n\t\tthis.width$.next(width);\n\t}\n\n\tsetColor(color: string) {\n\t\tthis.color$.next(color);\n\t}\n\n\tselectWidth(): Observable<number> {\n\t\treturn this.width$.asObservable();\n\t}\n\n\tselectColor(): Observable<string> {\n\t\treturn this.color$.asObservable();\n\t}\n\n\tsetCurvyness(curvyness: number) {\n\t\tthis.curvyness$.next(curvyness);\n\t}\n\n\tget color() {\n\t\treturn this.color$.getValue();\n\t}\n\n\tget width() {\n\t\treturn this.width$.getValue();\n\t}\n\n\tget curvyness() {\n\t\treturn this.curvyness$.getValue();\n\t}\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -5296,7 +5296,10 @@
                     "type": "BehaviorSubject<string>",
                     "optional": false,
                     "description": "",
-                    "line": 6
+                    "line": 6,
+                    "modifierKind": [
+                        112
+                    ]
                 },
                 {
                     "name": "curvyness$",
@@ -5941,6 +5944,22 @@
             ],
             "methods": [
                 {
+                    "name": "selectColor",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "Observable<string>",
+                    "typeParameters": [],
+                    "line": 28
+                },
+                {
+                    "name": "selectWidth",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "Observable<number>",
+                    "typeParameters": [],
+                    "line": 24
+                },
+                {
                     "name": "setColor",
                     "args": [
                         {
@@ -5973,7 +5992,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 24,
+                    "line": 32,
                     "jsdoctags": [
                         {
                             "name": "curvyness",
@@ -7969,7 +7988,7 @@
                         "name": "color",
                         "type": "",
                         "returnType": "",
-                        "line": 28
+                        "line": 36
                     }
                 },
                 "width": {
@@ -7978,7 +7997,7 @@
                         "name": "width",
                         "type": "",
                         "returnType": "",
-                        "line": 32
+                        "line": 40
                     }
                 },
                 "curvyness": {
@@ -7987,7 +8006,7 @@
                         "name": "curvyness",
                         "type": "",
                         "returnType": "",
-                        "line": 36
+                        "line": 44
                     }
                 }
             },
@@ -23274,6 +23293,9 @@
                     "optional": false,
                     "description": "",
                     "line": 6,
+                    "modifierKind": [
+                        112
+                    ],
                     "inheritance": {
                         "file": "DefaultLinkModel"
                     }
@@ -23651,6 +23673,28 @@
                     "line": 27
                 },
                 {
+                    "name": "selectColor",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "Observable<string>",
+                    "typeParameters": [],
+                    "line": 28,
+                    "inheritance": {
+                        "file": "DefaultLinkModel"
+                    }
+                },
+                {
+                    "name": "selectWidth",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "Observable<number>",
+                    "typeParameters": [],
+                    "line": 24,
+                    "inheritance": {
+                        "file": "DefaultLinkModel"
+                    }
+                },
+                {
                     "name": "setColor",
                     "args": [
                         {
@@ -23686,7 +23730,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 24,
+                    "line": 32,
                     "jsdoctags": [
                         {
                             "name": "curvyness",
@@ -24828,7 +24872,7 @@
             "implements": [
                 "AfterViewInit"
             ],
-            "templateData": "<!-- Label Host -->\n<ng-template #labelLayer></ng-template>\n\n<!-- Link -->\n<svg class=\"default-link\">\n\t<g>\n\t\t<path [attr.stroke-width]=\"width\" [attr.stroke]=\"color$ | async\" [attr.d]=\"path$ | async\"></path>\n\t\t<path\n\t\t\t(mouseleave)=\"setSelected(false)\"\n\t\t\t(mouseenter)=\"setSelected()\"\n\t\t\t[attr.stroke-width]=\"20\"\n\t\t\t[attr.stroke]=\"color$ | async\"\n\t\t\t[attr.stroke-linecap]=\"'round'\"\n\t\t\t[attr.data-linkid]=\"id\"\n\t\t\t[attr.stroke-opacity]=\"(selectSelected() | async) ? '0.1' : '0'\"\n\t\t\t[attr.d]=\"path$ | async\"\n\t\t></path>\n\t</g>\n\t<g *ngFor=\"let point of points$ | async\">\n\t\t<circle [attr.cx]=\"point.selectX() | async\" [attr.cy]=\"point.selectY() | async\" r=\"5\" class=\"default-point\" />\n\n\t\t<circle\n\t\t\t(mouseleave)=\"setSelected(false)\"\n\t\t\t(mouseenter)=\"setSelected()\"\n\t\t\t[attr.data-id]=\"point.id\"\n\t\t\t[attr.data-linkid]=\"id\"\n\t\t\t[attr.cx]=\"point.selectX() | async\"\n\t\t\t[attr.cy]=\"point.selectY() | async\"\n\t\t\tr=\"15\"\n\t\t\t[attr.opacity]=\"0\"\n\t\t\tclass=\"default-point\"\n\t\t\t[ngClass]=\"{ 'default-point': true, selected: point.selectSelected() | async }\"\n\t\t/>\n\t\t{{ point.selectSelected() | async }}\n\t</g>\n</svg>\n"
+            "templateData": "<!-- Label Host -->\n<ng-template #labelLayer></ng-template>\n\n<!-- Link -->\n<svg class=\"default-link\">\n\t<g>\n\t\t<path [attr.stroke-width]=\"width\" [attr.stroke]=\"selectColor() | async\" [attr.d]=\"path$ | async\"></path>\n\t\t<path\n\t\t\t(mouseleave)=\"setSelected(false)\"\n\t\t\t(mouseenter)=\"setSelected()\"\n\t\t\t[attr.stroke-width]=\"20\"\n\t\t\t[attr.stroke]=\"selectColor() | async\"\n\t\t\t[attr.stroke-linecap]=\"'round'\"\n\t\t\t[attr.data-linkid]=\"id\"\n\t\t\t[attr.stroke-opacity]=\"(selectSelected() | async) ? '0.1' : '0'\"\n\t\t\t[attr.d]=\"path$ | async\"\n\t\t></path>\n\t</g>\n\t<g *ngFor=\"let point of points$ | async\">\n\t\t<circle [attr.cx]=\"point.selectX() | async\" [attr.cy]=\"point.selectY() | async\" r=\"5\" class=\"default-point\" />\n\n\t\t<circle\n\t\t\t(mouseleave)=\"setSelected(false)\"\n\t\t\t(mouseenter)=\"setSelected()\"\n\t\t\t[attr.data-id]=\"point.id\"\n\t\t\t[attr.data-linkid]=\"id\"\n\t\t\t[attr.cx]=\"point.selectX() | async\"\n\t\t\t[attr.cy]=\"point.selectY() | async\"\n\t\t\tr=\"15\"\n\t\t\t[attr.opacity]=\"0\"\n\t\t\tclass=\"default-point\"\n\t\t\t[ngClass]=\"{ 'default-point': true, selected: point.selectSelected() | async }\"\n\t\t/>\n\t\t{{ point.selectSelected() | async }}\n\t</g>\n</svg>\n"
         },
         {
             "name": "DefaultNodeComponent",
@@ -29043,7 +29087,7 @@
                 "linktype": "component",
                 "name": "DefaultLinkComponent",
                 "coveragePercent": 1,
-                "coverageCount": "1/88",
+                "coverageCount": "1/90",
                 "status": "low"
             },
             {
@@ -29115,7 +29159,7 @@
                 "linktype": "classe",
                 "name": "DefaultLinkModel",
                 "coveragePercent": 2,
-                "coverageCount": "4/144",
+                "coverageCount": "4/146",
                 "status": "low"
             },
             {

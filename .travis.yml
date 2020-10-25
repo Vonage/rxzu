@@ -34,7 +34,7 @@ jobs:
         skip_cleanup: true
         token: $GH_TOKEN
         keep_history: true
-        local_dir: dist/docs
+        local_dir: storybook-static
 
 branches:
   except:
