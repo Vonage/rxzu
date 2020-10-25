@@ -7,7 +7,7 @@ import { CustomNodeComponent } from './custom/custom.component';
 export default {
 	title: 'Node',
 	component: DefaultNodeComponent,
-	parameters: { docs: { iframeHeight: '400px', source: { type: 'dynamic' } } },
+	parameters: { docs: { iframeHeight: '400px' } },
 	decorators: [
 		moduleMetadata({
 			declarations: [DefaultNodeComponent, CustomNodeComponent, DefaultLinkComponent, DefaultLabelComponent, DefaultPortComponent],

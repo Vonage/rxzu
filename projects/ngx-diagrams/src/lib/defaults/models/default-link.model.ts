@@ -1,9 +1,9 @@
 import { LinkModel } from '../../models/link.model';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 export class DefaultLinkModel extends LinkModel {
 	width$: BehaviorSubject<number>;
-	color$: BehaviorSubject<string>;
+	private color$: BehaviorSubject<string>;
 	curvyness$: BehaviorSubject<number>;
 
 	constructor(type: string = 'default') {
@@ -19,6 +19,14 @@ export class DefaultLinkModel extends LinkModel {
 
 	setColor(color: string) {
 		this.color$.next(color);
+	}
+
+	selectWidth(): Observable<number> {
+		return this.width$.asObservable();
+	}
+
+	selectColor(): Observable<string> {
+		return this.color$.asObservable();
 	}
 
 	setCurvyness(curvyness: number) {
