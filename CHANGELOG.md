@@ -1,3 +1,10 @@
+## [2.18.7](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.6...v2.18.7) (2020-10-25)
+
+
+### Bug Fixes
+
+* **default link:** using public members selectColor ([99f5ab9](https://github.com/DanielNetzer/ngx-diagrams/commit/99f5ab987d33d9caff341603b6a9075b14582db4))
+
 ## [2.18.6](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.5...v2.18.6) (2020-06-10)
 
 
