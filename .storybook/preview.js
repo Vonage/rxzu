@@ -10,7 +10,7 @@ export const parameters = {
 	},
 	options: {
 		storySort: {
-			order: ['Getting Started', 'Node', 'Link', 'Port', 'Label', 'Actions', 'Examples'],
+			order: ['Getting Started', 'Node', 'Link', 'Port', 'Label', 'Actions', 'Plugins', 'Examples'],
 		},
 	},
 };
