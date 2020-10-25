@@ -14,14 +14,19 @@ export interface DagreEngineOptions {
 
 @Injectable()
 export class DagreEngine {
-	constructor() {}
+	g: dagre.graphlib.Graph;
+	constructor() {
+		try {
+			this.g = new dagre.graphlib.Graph({ multigraph: true });
+		} catch (error) {
+			console.warn("`dagre` packages isn't installed, please install it before using the DagreEngine plugin");
+		}
+	}
 
 	redistribute(model: DiagramModel, options: DagreEngineOptions = {}): void {
-		const g = new dagre.graphlib.Graph({ multigraph: true });
+		this.g.setGraph(options.graph || {});
 
-		g.setGraph(options.graph || {});
-
-		g.setDefaultEdgeLabel(() => {
+		this.g.setDefaultEdgeLabel(() => {
 			return {};
 		});
 
@@ -29,33 +34,33 @@ export class DagreEngine {
 
 		// set nodes
 		Object.values(model.getNodes()).forEach(node => {
-			g.setNode(node.id, { width: node.getWidth(), height: node.getHeight() });
+			this.g.setNode(node.id, { width: node.getWidth(), height: node.getHeight() });
 		});
 
 		Object.values(model.getLinks()).forEach(link => {
 			// set edges
 			if (link.getSourcePort() && link.getTargetPort()) {
 				processedlinks[link.id] = true;
-				g.setEdge({
+				this.g.setEdge({
 					v: link.getSourcePort().getNode().id,
 					w: link.getTargetPort().getNode().id,
-					name: link.id
+					name: link.id,
 				});
 			}
 		});
 
 		// layout the graph
-		dagre.layout(g, options.layout);
+		dagre.layout(this.g, options.layout);
 
-		g.nodes().forEach(v => {
-			const { x, y } = g.node(v);
+		this.g.nodes().forEach(v => {
+			const { x, y } = this.g.node(v);
 			model.getNode(v).setCoords({ x, y });
 		});
 
 		// also include links?
 		if (options.includeLinks) {
-			g.edges().forEach(e => {
-				const edge = g.edge(e);
+			this.g.edges().forEach(e => {
+				const edge = this.g.edge(e);
 				const link = model.getLink(e.name);
 
 				const points = [link.getFirstPoint()];

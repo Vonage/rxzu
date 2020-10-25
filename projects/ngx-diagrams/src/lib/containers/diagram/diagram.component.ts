@@ -35,7 +35,7 @@ import { LooseLinkDestroyed } from '../../actions/loose-link-destroyed.action';
 export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	// tslint:disable-next-line:no-input-rename
 	@Input('model') diagramModel: DiagramModel;
-	@Input() allowCanvasZoon = true;
+	@Input() allowCanvasZoom = true;
 	@Input() allowCanvasTranslation = true;
 	@Input() inverseZoom = true;
 	@Input() allowLooseLinks = true;
@@ -451,7 +451,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	onMouseWheel(event: WheelEvent) {
-		if (this.allowCanvasZoon) {
+		if (this.allowCanvasZoom) {
 			event.preventDefault();
 			event.stopPropagation();
 			const currentZoomLevel = this.diagramModel.getZoomLevel();

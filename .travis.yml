@@ -14,8 +14,8 @@ jobs:
         - npm i -g snyk
         - snyk --help
         - snyk auth $SNYK_TOKEN
-        - snyk test
-        - snyk monitor
+        - snyk test --file=package.json
+        - snyk monitor --file=package.json
     - stage: "Build"
       name: "build lib"
       script:

@@ -1,15 +1,16 @@
 import { ViewContainerRef, ComponentRef, ComponentFactoryResolver, ComponentFactory, Renderer2 } from '@angular/core';
-import { CustomLinkComponent } from './custom-link.component';
 import { AbstractLinkFactory, DefaultLinkModel, DiagramEngine } from 'ngx-diagrams';
+import { CustomLinkComponent } from './custom-link.component';
 
 export class CustomLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 	constructor(private resolver: ComponentFactoryResolver, private renderer: Renderer2) {
-		super('custom');
+		super('custom-link');
 	}
 
 	generateWidget(diagramEngine: DiagramEngine, link: DefaultLinkModel, linksHost: ViewContainerRef): ComponentRef<CustomLinkComponent> {
 		const componentRef = linksHost.createComponent(this.getRecipe());
-
+		link.setWidth(1);
+		link.setColor('pink');
 		// attach coordinates and default positional behaviour to the generated component host
 		const rootNode = componentRef.location.nativeElement;
 
@@ -28,6 +29,7 @@ export class CustomLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 		Object.entries(link).forEach(([key, value]) => {
 			componentRef.instance[key] = value;
 		});
+
 		componentRef.instance.diagramEngine = diagramEngine;
 		return componentRef;
 	}

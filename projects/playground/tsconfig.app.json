@@ -10,5 +10,8 @@
   ],
   "include": [
     "projects/playground/src/**/*.d.ts"
+  ],
+  "exclude": [
+    "**/*.stories.*"
   ]
 }

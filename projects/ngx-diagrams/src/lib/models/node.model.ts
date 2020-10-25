@@ -9,7 +9,6 @@ import { Dimensions } from '../interfaces/dimensions.interface';
 import { ID, mapToArray } from '../utils/tool-kit.util';
 
 export class NodeModel<P extends PortModel = PortModel> extends BaseModel<DiagramModel> {
-	id: ID;
 	diagramEngine: DiagramEngine;
 
 	private readonly _extras: BehaviorSubject<{ [s: string]: any }>;
@@ -203,8 +202,16 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 		return this._dimensions.getValue().height;
 	}
 
+	setHeight(height: number) {
+		return this._dimensions.next({ width: this.getWidth(), height });
+	}
+
 	getWidth(): number {
 		return this._dimensions.getValue().width;
+	}
+
+	setWidth(width: number) {
+		return this._dimensions.next({ width, height: this.getHeight() });
 	}
 
 	selectWidth(): Observable<number> {
@@ -219,7 +226,7 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 	selectHeight(): Observable<number> {
 		return this.dimensions$.pipe(
 			takeUntil(this.onEntityDestroy()),
-			map(d => d.width),
+			map(d => d.height),
 			distinctUntilChanged(),
 			this.withLog('selectHeight')
 		);
