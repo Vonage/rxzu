@@ -4,12 +4,12 @@
 <!-- Link -->
 <svg class="default-link">
 	<g>
-		<path [attr.stroke-width]="width" [attr.stroke]="color$ | async" [attr.d]="path$ | async"></path>
+		<path [attr.stroke-width]="width" [attr.stroke]="selectColor() | async" [attr.d]="path$ | async"></path>
 		<path
 			(mouseleave)="setSelected(false)"
 			(mouseenter)="setSelected()"
 			[attr.stroke-width]="20"
-			[attr.stroke]="color$ | async"
+			[attr.stroke]="selectColor() | async"
 			[attr.stroke-linecap]="'round'"
 			[attr.data-linkid]="id"
 			[attr.stroke-opacity]="(selectSelected() | async) ? '0.1' : '0'"
