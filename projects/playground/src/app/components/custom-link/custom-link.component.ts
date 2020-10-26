@@ -6,7 +6,7 @@ import { filter, takeUntil } from 'rxjs/operators';
 @Component({
 	selector: 'app-custom-link',
 	templateUrl: './custom-link.component.html',
-	styleUrls: ['./custom-link.component.scss']
+	styleUrls: ['./custom-link.component.scss'],
 })
 export class CustomLinkComponent extends DefaultLinkModel implements AfterViewInit {
 	@ViewChild('labelLayer', { read: ViewContainerRef, static: true }) labelLayer: ViewContainerRef;
@@ -47,8 +47,10 @@ export class CustomLinkComponent extends DefaultLinkModel implements AfterViewIn
 				}
 
 				const label = this.getLabel();
+
 				// update label position
 				if (label) {
+					// TODO: calculate size of the label itself and retract from the center point.
 					label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));
 				}
 
