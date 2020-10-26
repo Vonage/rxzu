@@ -2,9 +2,7 @@
 	"name": "ngx-diagrams",
 	"peerDependencies": {
 		"@angular/common": ">= 6.0.0",
-		"@angular/core": ">= 6.0.0"
-	},
-	"dependencies": {
+		"@angular/core": ">= 6.0.0",
 		"dagre": "^0.8.4"
 	},
 	"keywords": [
