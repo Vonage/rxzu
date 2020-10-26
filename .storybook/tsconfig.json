@@ -1,5 +1,5 @@
 {
-  "extends": "../projects/playground/tsconfig.app.json",
+  "extends": "../projects/ngx-diagrams/tsconfig.lib.json",
   "compilerOptions": {
     "types": [
       "node"
