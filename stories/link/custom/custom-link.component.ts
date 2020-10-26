@@ -14,6 +14,7 @@ export class CustomLinkComponent extends DefaultLinkModel implements AfterViewIn
 	path$: Observable<string> = this._path$.asObservable();
 	points$: BehaviorSubject<PointModel[]> = new BehaviorSubject([]);
 
+	hover = false;
 	constructor() {
 		super('custom-link');
 	}
@@ -45,7 +46,13 @@ export class CustomLinkComponent extends DefaultLinkModel implements AfterViewIn
 		});
 	}
 
-	calcCenterOfPath(firstPoint: Coords, secondPoint: Coords): Coords {
-		return { x: (firstPoint.x + secondPoint.x) / 2, y: (firstPoint.y + secondPoint.y) / 2 };
+	calcCenterOfPath(): Coords {
+		const firstPointCoords = this.getFirstPoint().getCoords();
+		const lastPointCoords = this.getLastPoint().getCoords();
+		return { x: (firstPointCoords.x + lastPointCoords.x) / 2, y: (firstPointCoords.y + lastPointCoords.y) / 2 };
+	}
+
+	deleteLink() {
+		this.destroy();
 	}
 }
