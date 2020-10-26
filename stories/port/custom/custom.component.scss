@@ -1,0 +1,8 @@
+:host {
+	position: absolute;
+
+	&.in {
+		left: 45%;
+		top: -10px;
+	}
+}
