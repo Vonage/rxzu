@@ -29,6 +29,7 @@ export class DefaultPortFactory extends AbstractPortFactory<DefaultPortModel> {
 			componentRef.destroy();
 		});
 
+		componentRef.instance.setPainted(true);
 		return componentRef;
 	}
 

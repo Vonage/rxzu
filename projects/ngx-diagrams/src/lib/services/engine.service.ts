@@ -186,7 +186,7 @@ export class DiagramEngine {
 
 		return {
 			x: sourceElement.offsetWidth / 2 + (rel.x - this.diagramModel.getOffsetX()) / (this.diagramModel.getZoomLevel() / 100.0),
-			y: sourceElement.offsetHeight / 2 + (rel.y - this.diagramModel.getOffsetY()) / (this.diagramModel.getZoomLevel() / 100.0)
+			y: sourceElement.offsetHeight / 2 + (rel.y - this.diagramModel.getOffsetY()) / (this.diagramModel.getZoomLevel() / 100.0),
 		};
 	}
 
@@ -209,7 +209,7 @@ export class DiagramEngine {
 			x: (sourceRect.x - this.diagramModel.getOffsetX()) / (this.diagramModel.getZoomLevel() / 100.0) - canvasRect.left,
 			y: (sourceRect.y - this.diagramModel.getOffsetY()) / (this.diagramModel.getZoomLevel() / 100.0) - canvasRect.top,
 			width: sourceRect.width,
-			height: sourceRect.height
+			height: sourceRect.height,
 		};
 	}
 
@@ -221,7 +221,7 @@ export class DiagramEngine {
 		if (!this.canvas$.getValue()) {
 			return {
 				width: 0,
-				height: 0
+				height: 0,
 			};
 		}
 
@@ -230,7 +230,7 @@ export class DiagramEngine {
 
 		return {
 			width: nodeRect.width,
-			height: nodeRect.height
+			height: nodeRect.height,
 		};
 	}
 
@@ -242,7 +242,7 @@ export class DiagramEngine {
 		const point = this.getRelativePoint(event.clientX, event.clientY);
 		return {
 			x: (point.x - this.diagramModel.getOffsetX()) / (this.diagramModel.getZoomLevel() / 100.0),
-			y: (point.y - this.diagramModel.getOffsetY()) / (this.diagramModel.getZoomLevel() / 100.0)
+			y: (point.y - this.diagramModel.getOffsetY()) / (this.diagramModel.getZoomLevel() / 100.0),
 		};
 	}
 

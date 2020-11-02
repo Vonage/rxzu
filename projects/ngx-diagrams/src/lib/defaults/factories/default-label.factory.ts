@@ -30,6 +30,7 @@ export class DefaultLabelFactory extends AbstractLabelFactory<DefaultLabelModel>
 			componentRef.instance[key] = value;
 		});
 
+		componentRef.instance.setPainted(true);
 		return componentRef;
 	}
 

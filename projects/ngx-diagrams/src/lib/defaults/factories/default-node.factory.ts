@@ -41,7 +41,9 @@ export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 			componentRef.instance[key] = value;
 		});
 
-		componentRef.instance.diagramEngine = diagramEngine;
+		componentRef.instance.setDiagramEngine(diagramEngine);
+
+		componentRef.instance.setPainted(true);
 
 		return componentRef;
 	}

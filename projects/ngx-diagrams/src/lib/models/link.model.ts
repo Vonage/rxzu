@@ -163,7 +163,6 @@ export class LinkModel extends BaseModel<DiagramModel> {
 	setLabel(label: LabelModel) {
 		label.setParent(this);
 		this.label.next(label);
-		label.setPainted();
 	}
 
 	selectLabel(): Observable<LabelModel | null> {

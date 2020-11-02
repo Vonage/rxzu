@@ -8,6 +8,7 @@ import { PortModel } from './port.model';
 import { PointModel } from './point.model';
 import { Coords } from '../interfaces/coords.interface';
 import { ID } from '../utils/tool-kit.util';
+import { SelectOptions } from '../interfaces/select-options.interface';
 
 export class DiagramModel extends BaseEntity {
 	links$: BehaviorSubject<{ [s: string]: LinkModel }>;
@@ -47,6 +48,23 @@ export class DiagramModel extends BaseEntity {
 
 	getLinks(): { [s: string]: LinkModel } {
 		return this.links$.getValue();
+	}
+
+	getAllPorts(options?: SelectOptions<PortModel>): Map<string, PortModel> {
+		const portsMap = new Map();
+		// TODO: optimize!
+		Object.values(this.getNodes()).forEach(node => {
+			for (const [key, port] of Object.entries(node.getPorts())) {
+				if (options.filter) {
+					if (options.filter(port as PortModel)) {
+						portsMap.set(key, port);
+					}
+				} else {
+					portsMap.set(key, port);
+				}
+			}
+		});
+		return portsMap;
 	}
 
 	/**

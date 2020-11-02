@@ -22,7 +22,7 @@ export class DefaultPortModel extends PortModel {
 		type = 'default',
 		id = null,
 		label = null,
-		linkType = 'default'
+		linkType = 'default',
 	}: DefaultPortModelConfig = {}) {
 		super(name, type, id, null, linkType);
 		this.in = isInput;
@@ -30,6 +30,8 @@ export class DefaultPortModel extends PortModel {
 
 		if (this.in) {
 			this.setCanCreateLinks(false);
+		} else {
+			this.setMagnetic(false);
 		}
 	}
 

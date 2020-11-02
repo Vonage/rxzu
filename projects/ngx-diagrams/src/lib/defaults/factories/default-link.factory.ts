@@ -33,7 +33,7 @@ export class DefaultLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 		});
 
 		componentRef.instance.diagramEngine = diagramEngine;
-
+		componentRef.instance.setPainted(true);
 		return componentRef;
 	}
 

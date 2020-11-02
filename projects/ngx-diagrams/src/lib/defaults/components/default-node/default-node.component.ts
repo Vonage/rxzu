@@ -19,14 +19,15 @@ export class DefaultNodeComponent extends DefaultNodeModel implements OnInit {
 			ports.forEach(port => {
 				if (!port.getPainted()) {
 					this.generatePort(port);
-					port.setPainted();
 				}
 			});
 		});
 	}
 
 	generatePort(port: PortModel) {
-		this.diagramEngine.generateWidgetForPort(port, this.portsLayer);
+		const diagramEngine = this.getDiagramEngine();
+		diagramEngine.generateWidgetForPort(port, this.portsLayer);
+		port.updateCoords(diagramEngine.getPortCoords(port));
 	}
 
 	// https://github.com/projectstorm/react-diagrams/blob/master/src/defaults/models/DefaultNodeModel.ts

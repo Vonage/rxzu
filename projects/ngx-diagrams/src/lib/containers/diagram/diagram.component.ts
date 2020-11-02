@@ -41,6 +41,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	@Input() allowLooseLinks = true;
 	@Input() maxZoomOut: number = null;
 	@Input() maxZoomIn: number = null;
+	@Input() portMagneticRadius = 30;
 
 	@Output() actionStartedFiring: EventEmitter<BaseAction> = new EventEmitter();
 	@Output() actionStillFiring: EventEmitter<BaseAction> = new EventEmitter();
@@ -78,7 +79,6 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 				Object.values(nodes).forEach(node => {
 					if (!node.getPainted()) {
 						this.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);
-						node.setPainted();
 						this.cdRef.detectChanges();
 					}
 				});
@@ -118,7 +118,6 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 						}
 
 						this.diagramModel.getDiagramEngine().generateWidgetForLink(link, this.linksLayer);
-						link.setPainted();
 						this.cdRef.detectChanges();
 					}
 				});
@@ -308,6 +307,10 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.action$.next(null);
 	};
 
+	/**
+	 * @description Mouse Move Event Handler
+	 * @param event MouseEvent
+	 */
 	onMouseMove = (event: MouseEvent) => {
 		const action = this.action$.getValue();
 
@@ -355,24 +358,49 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			};
 			const amountZoom = this.diagramModel.getZoomLevel() / 100;
 
-			action.selectionModels.forEach(model => {
+			action.selectionModels.forEach(selectionModel => {
 				// in this case we need to also work out the relative grid position
-				if (model.model instanceof NodeModel || (model.model instanceof PointModel && !model.model.isConnectedToPort())) {
-					const newCoords = { x: model.initialX + coords.x / amountZoom, y: model.initialY + coords.y / amountZoom };
-					model.model.setCoords(this.diagramModel.getGridPosition(newCoords));
+				if (
+					selectionModel.model instanceof NodeModel ||
+					(selectionModel.model instanceof PointModel && !selectionModel.model.isConnectedToPort())
+				) {
+					const newCoords = { x: selectionModel.initialX + coords.x / amountZoom, y: selectionModel.initialY + coords.y / amountZoom };
+					const gridRelativeCoords = this.diagramModel.getGridPosition(newCoords);
 
-					if (model.model instanceof NodeModel) {
+					if (selectionModel.model instanceof PointModel) {
+						// get all ports on canvas, check distances, if smaller then defined radius, magnetize!
+						const portsMap = this.diagramModel.getAllPorts({ filter: p => p.getMagnetic() });
+						const portsDistances = [];
+
+						portsMap.forEach(port => {
+							const portCoords = port.getCoords();
+							console.log(port);
+							console.log('PORT COORDS:', portCoords);
+							const distance = Math.hypot(portCoords.x - coords.x / amountZoom, portCoords.y - coords.y / amountZoom);
+
+							// if (distance <= this.portMagneticRadius) {
+							portsDistances.push(distance);
+							// }
+						});
+
+						// console.log(portsDistances);
+					}
+
+					selectionModel.model.setCoords(gridRelativeCoords);
+
+					if (selectionModel.model instanceof NodeModel) {
 						// update port coordinates as well
-						Object.values(model.model.getPorts()).forEach(port => {
+						Object.values(selectionModel.model.getPorts()).forEach(port => {
 							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(port);
 							port.updateCoords(portCoords);
 						});
 					}
-				} else if (model.model instanceof PointModel) {
+				} else if (selectionModel.model instanceof PointModel) {
+					// will only run here when trying to create a point on an existing link
 					// we want points that are connected to ports, to not necessarily snap to grid
 					// this stuff needs to be pixel perfect, dont touch it
 					const newCoords = this.diagramModel.getGridPosition({ x: coords.x / amountZoom, y: coords.y / amountZoom });
-					model.model.setCoords({ x: model.initialX + newCoords.x, y: model.initialY + newCoords.y });
+					selectionModel.model.setCoords({ x: selectionModel.initialX + newCoords.x, y: selectionModel.initialY + newCoords.y });
 				}
 			});
 

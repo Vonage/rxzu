@@ -9,8 +9,7 @@ import { Dimensions } from '../interfaces/dimensions.interface';
 import { ID, mapToArray } from '../utils/tool-kit.util';
 
 export class NodeModel<P extends PortModel = PortModel> extends BaseModel<DiagramModel> {
-	diagramEngine: DiagramEngine;
-
+	private readonly _diagramEngine: BehaviorSubject<DiagramEngine>;
 	private readonly _extras: BehaviorSubject<{ [s: string]: any }>;
 	private readonly _ports: BehaviorSubject<{ [s: string]: P }>;
 	private readonly _coords: BehaviorSubject<Coords>;
@@ -34,11 +33,24 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 		this._extras = new BehaviorSubject(extras);
 		this._ports = new BehaviorSubject({});
 		this._dimensions = new BehaviorSubject<Dimensions>({ width, height });
+		this._diagramEngine = new BehaviorSubject<DiagramEngine>(null);
 		this._coords = new BehaviorSubject<Coords>({ x, y });
 		this.extras$ = this._extras.asObservable();
 		this.ports$ = this._ports.asObservable();
 		this.coords$ = this._coords.asObservable();
 		this.dimensions$ = this._dimensions.asObservable();
+	}
+
+	getDiagramEngine() {
+		return this._diagramEngine.getValue();
+	}
+
+	selectDiagramEngine() {
+		return this._diagramEngine.asObservable();
+	}
+
+	setDiagramEngine(diagramEngine: DiagramEngine) {
+		this._diagramEngine.next(diagramEngine);
 	}
 
 	getCoords(): Coords {

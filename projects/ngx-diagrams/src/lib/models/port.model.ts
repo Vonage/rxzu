@@ -12,13 +12,15 @@ export class PortModel extends BaseModel<NodeModel> {
 
 	private x$: BehaviorSubject<number>;
 	private y$: BehaviorSubject<number>;
+	private magnetic$: BehaviorSubject<boolean>;
 	private width$: BehaviorSubject<number>;
 	private height$: BehaviorSubject<number>;
 	private canCreateLinks$: BehaviorSubject<boolean>;
 
-	constructor(name: string, type?: string, id?: string, maximumLinks?: number, linkType?: string) {
+	constructor(name: string, type?: string, id?: string, maximumLinks?: number, linkType?: string, magnetic: boolean = true) {
 		super(type, id);
 		this.name = name;
+		this.magnetic$ = new BehaviorSubject(magnetic);
 		this.links$ = new BehaviorSubject({});
 		this.maximumLinks = maximumLinks;
 		this.x$ = new BehaviorSubject(0);
@@ -41,12 +43,28 @@ export class PortModel extends BaseModel<NodeModel> {
 		return this.canCreateLinks$.getValue();
 	}
 
+	getCoords() {
+		return { x: this.getX(), y: this.getY() };
+	}
+
 	selectCanCreateLinks() {
 		return this.canCreateLinks$.asObservable();
 	}
 
 	setCanCreateLinks(value: boolean) {
 		this.canCreateLinks$.next(value);
+	}
+
+	getMagnetic() {
+		return this.magnetic$.getValue();
+	}
+
+	selectMagnetic() {
+		return this.magnetic$.asObservable();
+	}
+
+	setMagnetic(magnetic: boolean) {
+		this.magnetic$.next(magnetic);
 	}
 
 	selectX(): Observable<number> {
