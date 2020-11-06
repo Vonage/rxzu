@@ -367,23 +367,21 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 					const newCoords = { x: selectionModel.initialX + coords.x / amountZoom, y: selectionModel.initialY + coords.y / amountZoom };
 					const gridRelativeCoords = this.diagramModel.getGridPosition(newCoords);
 
-					if (selectionModel.model instanceof PointModel) {
+					// magnetic inputs handling
+					if (selectionModel.model instanceof PointModel && this.portMagneticRadius) {
 						// get all ports on canvas, check distances, if smaller then defined radius, magnetize!
 						const portsMap = this.diagramModel.getAllPorts({ filter: p => p.getMagnetic() });
-						const portsDistances = [];
 
-						portsMap.forEach(port => {
+						for (const port of portsMap.values()) {
 							const portCoords = port.getCoords();
-							console.log(port);
-							console.log('PORT COORDS:', portCoords);
-							const distance = Math.hypot(portCoords.x - coords.x / amountZoom, portCoords.y - coords.y / amountZoom);
+							const distance = Math.hypot(portCoords.x - newCoords.x, portCoords.y - newCoords.y);
 
-							// if (distance <= this.portMagneticRadius) {
-							portsDistances.push(distance);
-							// }
-						});
-
-						// console.log(portsDistances);
+							if (distance <= this.portMagneticRadius) {
+								const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(port);
+								selectionModel.model.setCoords(portCenter);
+								return;
+							}
+						}
 					}
 
 					selectionModel.model.setCoords(gridRelativeCoords);
