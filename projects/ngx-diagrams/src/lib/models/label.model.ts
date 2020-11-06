@@ -3,7 +3,6 @@ import { LinkModel } from './link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Coords } from '../interfaces/coords.interface';
 import { takeUntil, distinctUntilChanged } from 'rxjs/operators';
-import { DestroyOptions } from '../interfaces';
 
 export class LabelModel extends BaseModel<LinkModel> {
 	private readonly _coords: BehaviorSubject<Coords>;
@@ -21,8 +20,8 @@ export class LabelModel extends BaseModel<LinkModel> {
 		this.rotation$ = this._rotation.asObservable();
 	}
 
-	destroy(options?: DestroyOptions) {
-		super.destroy(options);
+	destroy() {
+		super.destroy();
 	}
 
 	setRotation(angle: number) {

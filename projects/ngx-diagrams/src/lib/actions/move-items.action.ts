@@ -24,7 +24,7 @@ export class MoveItemsAction extends BaseAction {
 			return {
 				model: item,
 				initialX,
-				initialY
+				initialY,
 			};
 		});
 	}

@@ -10,7 +10,7 @@ import { Coords } from '../../../interfaces';
 @Component({
 	selector: 'ngdx-default-link',
 	templateUrl: './default-link.component.html',
-	styleUrls: ['./default-link.component.scss']
+	styleUrls: ['./default-link.component.scss'],
 })
 export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewInit {
 	@ViewChild('labelLayer', { read: ViewContainerRef, static: true }) labelLayer: ViewContainerRef;

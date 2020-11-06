@@ -24,7 +24,7 @@ export class CustomLinkDiagramComponent implements OnInit {
 		const node1 = new DefaultNodeModel();
 		node1.setCoords({ x: 500, y: 300 });
 		node1.setDimensions(nodesDefaultDimensions);
-		const outport1 = node1.addOutPort({ name: 'outport1', linkType: 'custom-link' });
+		const outport1 = node1.addOutPort({ name: 'outport1', linkType: 'custom-link', maximumLinks: 3 });
 
 		const node2 = new DefaultNodeModel();
 		node2.setCoords({ x: 1000, y: 300 });

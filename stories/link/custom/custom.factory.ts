@@ -31,6 +31,7 @@ export class CustomLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 		});
 
 		componentRef.instance.diagramEngine = diagramEngine;
+		componentRef.instance.setPainted(true);
 		return componentRef;
 	}
 

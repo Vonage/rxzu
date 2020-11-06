@@ -6,31 +6,32 @@
 	<g>
 		<path [attr.stroke-width]="width" [attr.stroke]="selectColor() | async" [attr.d]="path$ | async"></path>
 		<path
-			(mouseleave)="setSelected(false)"
-			(mouseenter)="setSelected()"
+			(mouseleave)="setHovered(false)"
+			(mouseenter)="setHovered()"
 			[attr.stroke-width]="20"
 			[attr.stroke]="selectColor() | async"
 			[attr.stroke-linecap]="'round'"
 			[attr.data-linkid]="id"
-			[attr.stroke-opacity]="(selectSelected() | async) ? '0.1' : '0'"
+			[attr.stroke-opacity]="(selectHovered() | async) ? '0.1' : '0'"
 			[attr.d]="path$ | async"
 		></path>
 	</g>
+</svg>
+
+<svg class="default-point">
+	<!-- Points -->
 	<g *ngFor="let point of points$ | async">
-		<circle [attr.cx]="point.selectX() | async" [attr.cy]="point.selectY() | async" r="5" class="default-point" />
+		<circle [attr.fill]="selectColor() | async" [attr.cx]="point.selectX() | async" [attr.cy]="point.selectY() | async" r="5" />
 
 		<circle
-			(mouseleave)="setSelected(false)"
-			(mouseenter)="setSelected()"
 			[attr.data-id]="point.id"
 			[attr.data-linkid]="id"
+			[attr.fill]="selectColor() | async"
 			[attr.cx]="point.selectX() | async"
 			[attr.cy]="point.selectY() | async"
 			r="15"
 			[attr.opacity]="0"
-			class="default-point"
-			[ngClass]="{ 'default-point': true, selected: point.selectSelected() | async }"
+			[ngClass]="{ selected: point.selectSelected() | async }"
 		/>
-		{{ point.selectSelected() | async }}
 	</g>
 </svg>

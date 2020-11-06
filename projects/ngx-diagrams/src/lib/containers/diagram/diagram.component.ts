@@ -220,28 +220,36 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 				if (!(model.model instanceof PointModel)) {
 					return;
 				}
-				if (element && element.model instanceof PortModel && !diagramEngine.isModelLocked(element.model)) {
+
+				let el: BaseModel;
+				if (model.magnet) {
+					el = model.magnet;
+				} else {
+					el = element.model;
+				}
+
+				if (el instanceof PortModel && !diagramEngine.isModelLocked(el)) {
 					const link = model.model.getLink();
 					if (link.getTargetPort() !== null) {
 						// if this was a valid link already and we are adding a node in the middle, create 2 links from the original
-						if (link.getTargetPort() !== element.model && link.getSourcePort() !== element.model) {
+						if (link.getTargetPort() !== el && link.getSourcePort() !== el) {
 							const targetPort = link.getTargetPort();
 							const newLink = link.clone({});
-							newLink.setSourcePort(element.model);
+							newLink.setSourcePort(el);
 							newLink.setTargetPort(targetPort);
-							link.setTargetPort(element.model);
+							link.setTargetPort(el);
 							targetPort.removeLink(link);
 							newLink.removePointsBefore(newLink.getPoints()[link.getPointIndex(model.model)]);
 							link.removePointsAfter(model.model);
 							diagramEngine.getDiagramModel().addLink(newLink);
 							// if we are connecting to the same target or source, destroy tweener points
-						} else if (link.getTargetPort() === element.model) {
+						} else if (link.getTargetPort() === el) {
 							link.removePointsAfter(model.model);
-						} else if (link.getSourcePort() === element.model) {
+						} else if (link.getSourcePort() === el) {
 							link.removePointsBefore(model.model);
 						}
 					} else {
-						link.setTargetPort(element.model);
+						link.setTargetPort(el);
 						const targetPort = link.getTargetPort();
 						const srcPort = link.getSourcePort();
 
@@ -251,6 +259,9 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 						}
 					}
 				}
+
+				// reset current magent
+				model.magnet = undefined;
 			});
 
 			// check for / destroy any loose links in any models which have been moved
@@ -379,6 +390,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 							if (distance <= this.portMagneticRadius) {
 								const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(port);
 								selectionModel.model.setCoords(portCenter);
+								selectionModel.magnet = port;
 								return;
 							}
 						}
@@ -435,14 +447,14 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			}
 		} else if (selectedModel.model instanceof PortModel) {
 			// its a port element, we want to drag a link
-			if (!this.diagramModel.getDiagramEngine().isModelLocked(selectedModel.model) && selectedModel.model.getCanCreateLinks()) {
+			if (!selectedModel.model.isLocked() && selectedModel.model.getCanCreateLinks()) {
 				const relative = this.diagramModel.getDiagramEngine().getRelativeMousePoint(event);
 				const sourcePort = selectedModel.model;
 				const link = sourcePort.createLinkModel();
 
-				link.setSourcePort(sourcePort);
-
+				// if we don't have a link then we have reached the max amount, or we cannot create new ones
 				if (link) {
+					link.setSourcePort(sourcePort);
 					link.removeMiddlePoints();
 					if (link.getSourcePort() !== sourcePort) {
 						link.setSourcePort(sourcePort);
@@ -466,6 +478,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			if (!event.shiftKey && !selectedModel.model.getSelected()) {
 				this.diagramModel.clearSelection();
 			}
+
 			selectedModel.model.setSelected();
 
 			this.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));

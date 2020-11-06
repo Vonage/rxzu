@@ -2,14 +2,6 @@
 	fill: none;
 	overflow: visible;
 
-	.default-point {
-		fill: rgba(white, 0.5);
-
-		&.selected {
-			fill: rgba(blue, 0.5);
-		}
-	}
-
 	@keyframes dash {
 		from {
 			stroke-dashoffset: 24;
@@ -28,5 +20,13 @@
 		stroke: rgb(0, 192, 255) !important;
 		stroke-dasharray: 10, 2;
 		animation: dash 1s linear infinite;
+	}
+}
+
+.default-point {
+	overflow: visible;
+
+	path {
+		pointer-events: all;
 	}
 }
