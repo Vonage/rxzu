@@ -1,3 +1,33 @@
+# [3.0.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.7...v3.0.0) (2020-11-07)
+
+
+### Bug Fixes
+
+* **links model:** auto resolve the correct model for ports links ([cf6d074](https://github.com/DanielNetzer/ngx-diagrams/commit/cf6d0740e8c0177af38c50b85ce9c991daddd8e0))
+* **magnets:** resseting all previously defined magnets on selection models ([63d17f8](https://github.com/DanielNetzer/ngx-diagrams/commit/63d17f80a52b826444a253cf7c08dcedc91fb6d9))
+* **points:** reselecting points and moving links ([f123e05](https://github.com/DanielNetzer/ngx-diagrams/commit/f123e05ba2ca97bb9b17d1bce0e5b9443cf4c03e))
+* **ports:** multiple bugs and rendering races ([636aa39](https://github.com/DanielNetzer/ngx-diagrams/commit/636aa394af6dea42e7ba46b10bbb62d3150e9bc7))
+* **ports coords:** on initialization ports coords will align based on their true position ([22dd4bd](https://github.com/DanielNetzer/ngx-diagrams/commit/22dd4bd8ed710386d4be70ad26cf675868d3fc1b))
+
+
+### Documentation
+
+* **changelog:** added to stories ([c43b109](https://github.com/DanielNetzer/ngx-diagrams/commit/c43b109d8c943308f804dbf1e88874ba271cd4ec))
+* **custom link:** updated models and template according to changes ([1d09e0f](https://github.com/DanielNetzer/ngx-diagrams/commit/1d09e0f8a1347a9c4b7d2f6295cd1802eb57a0b0))
+
+
+### Features
+
+* **magnetic ports:** on link drag when getting to 30px proximity, magnetize ([a696474](https://github.com/DanielNetzer/ngx-diagrams/commit/a696474c69538ec04d84f5aa7ca0672da48ef264))
+
+
+### BREAKING CHANGES
+
+* **changelog:** models changes
+* **custom link:** models changes
+* **magnets:** models changes
+* **points:** models changes
+
 ## [2.18.7](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.6...v2.18.7) (2020-10-25)
 
 
