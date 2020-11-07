@@ -19,6 +19,13 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 		this._type = type;
 	}
 
+	serialize() {
+		return {
+			...super.serialize(),
+			type: this.getType(),
+		};
+	}
+
 	getParent(): X {
 		return this._parent.getValue();
 	}

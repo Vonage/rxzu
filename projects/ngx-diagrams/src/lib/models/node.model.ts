@@ -7,6 +7,7 @@ import { DiagramEngine } from '../services/engine.service';
 import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 import { Dimensions } from '../interfaces/dimensions.interface';
 import { ID, mapToArray } from '../utils/tool-kit.util';
+import { SerializedNodeModel } from '../interfaces/serialization.interface';
 
 export class NodeModel<P extends PortModel = PortModel> extends BaseModel<DiagramModel> {
 	private readonly _diagramEngine: BehaviorSubject<DiagramEngine>;
@@ -69,6 +70,19 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 		});
 
 		this._coords.next({ x, y });
+	}
+
+	serialize(): SerializedNodeModel {
+		const serializedPorts = Object.values(this.getPorts()).map((port: P) => port.serialize());
+		return {
+			...super.serialize(),
+			nodeType: this.getType(),
+			extras: this.getExtras(),
+			width: this.getWidth(),
+			height: this.getHeight(),
+			...this.getCoords(),
+			ports: serializedPorts,
+		};
 	}
 
 	// TODO: implement better transition on auto arrange!

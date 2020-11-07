@@ -3,6 +3,7 @@ import { LinkModel } from './link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Coords } from '../interfaces/coords.interface';
 import { takeUntil, distinctUntilChanged } from 'rxjs/operators';
+import { SerializedLabelModel } from '../interfaces/serialization.interface';
 
 export class LabelModel extends BaseModel<LinkModel> {
 	private readonly _coords: BehaviorSubject<Coords>;
@@ -18,6 +19,23 @@ export class LabelModel extends BaseModel<LinkModel> {
 
 		this._rotation = new BehaviorSubject(0);
 		this.rotation$ = this._rotation.asObservable();
+	}
+
+	serialize(): SerializedLabelModel {
+		return {
+			...super.serialize(),
+			type: this.getType(),
+			rotation: this.getRotation(),
+			coords: this.getCoords(),
+		};
+	}
+
+	getRotation() {
+		return this._rotation.getValue();
+	}
+
+	getCoords() {
+		return this._coords.getValue();
 	}
 
 	destroy() {

@@ -40,7 +40,6 @@ export class DefaultPortModel extends PortModel {
 
 	link(port: PortModel): LinkModel {
 		if (super.getCanCreateLinks()) {
-			console.log(port.getLinkType());
 			const link = new DefaultLinkModel(this.getLinkType());
 			link.setSourcePort(this);
 			link.setTargetPort(port);

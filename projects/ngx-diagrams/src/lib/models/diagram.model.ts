@@ -9,7 +9,7 @@ import { PointModel } from './point.model';
 import { Coords } from '../interfaces/coords.interface';
 import { ID } from '../utils/tool-kit.util';
 import { SelectOptions } from '../interfaces/select-options.interface';
-import { SerializedModel } from '../interfaces/serialization.interface';
+import { SerializedDiagramModel } from '../interfaces/serialization.interface';
 
 export class DiagramModel extends BaseEntity {
 	links$: BehaviorSubject<{ [s: string]: LinkModel }>;
@@ -128,21 +128,22 @@ export class DiagramModel extends BaseEntity {
 	//  * Serialize the diagram model to JSON
 	//  * @returns diagram model as a string
 	//  */
-	serialize(): SerializedModel {
-		return { nodes: this.nodes$.getValue(), links: this.links$.getValue() };
+	serialize(): SerializedDiagramModel {
+		const serializedNodes = Object.values(this.nodes$.getValue()).map(node => node.serialize());
+		const serializedLinks = Object.values(this.links$.getValue()).map(link => link.serialize());
+		return { ...super.serialize(), nodes: serializedNodes, links: serializedLinks };
 	}
 
 	// /**
 	//  * Load diagram from JSON
 	//  */
-	deserialize(serializedModel: SerializedModel) {
-		Object.values(serializedModel.nodes).forEach(node => {
-			this.addNode(node);
-		});
-
-		Object.values(serializedModel.links).forEach(link => {
-			this.addLink(link);
-		});
+	deserialize(serializedModel: SerializedDiagramModel) {
+		// Object.values(serializedModel.nodes).forEach(node => {
+		// 	this.addNode(node);
+		// });
+		// Object.values(serializedModel.links).forEach(link => {
+		// 	this.addLink(link);
+		// });
 	}
 
 	setMaxZoomOut(maxZoomOut: number) {

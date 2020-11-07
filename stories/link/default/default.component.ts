@@ -42,5 +42,14 @@ export class DefaultLinkStoryComponent implements OnInit {
 		this.diagramModel.addAll(node1, node2, link);
 
 		this.diagramModel.getDiagramEngine().zoomToFit();
+
+		const model = this.diagramModel.serialize();
+		console.log(model);
+
+		// this.diagramModel.deleteNode(node1);
+		// this.diagramModel.deleteNode(node2);
+		// this.diagramModel.deleteLink(link);
+
+		// this.diagramModel.deserialize(model);
 	}
 }
