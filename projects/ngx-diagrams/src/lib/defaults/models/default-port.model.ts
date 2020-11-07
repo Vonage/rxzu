@@ -1,5 +1,6 @@
 import { PortModel } from '../../models/port.model';
 import { LinkModel } from '../../models/link.model';
+import { DefaultLinkModel } from './default-link.model';
 
 export interface DefaultPortModelConfig {
 	id?: string;
@@ -23,7 +24,7 @@ export class DefaultPortModel extends PortModel {
 		id = null,
 		label = null,
 		linkType = 'default',
-		maximumLinks = 1,
+		maximumLinks = null,
 	}: DefaultPortModelConfig = {}) {
 		super(name, type, id, null, linkType);
 		this.in = isInput;
@@ -38,10 +39,20 @@ export class DefaultPortModel extends PortModel {
 	}
 
 	link(port: PortModel): LinkModel {
-		const link = this.createLinkModel();
-		link.setSourcePort(this);
-		link.setTargetPort(port);
-		return link;
+		if (super.getCanCreateLinks()) {
+			const link = new DefaultLinkModel();
+			link.setSourcePort(this);
+			link.setTargetPort(port);
+			return link;
+		}
+
+		return null;
+	}
+
+	createLinkModel() {
+		if (super.getCanCreateLinks()) {
+			return new DefaultLinkModel();
+		}
 	}
 
 	canLinkToPort(port: PortModel): boolean {
@@ -49,9 +60,5 @@ export class DefaultPortModel extends PortModel {
 			return this.in !== port.in;
 		}
 		return true;
-	}
-
-	createLinkModel(): LinkModel {
-		return super.createLinkModel();
 	}
 }

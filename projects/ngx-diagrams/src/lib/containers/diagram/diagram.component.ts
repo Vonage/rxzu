@@ -82,6 +82,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 						this.cdRef.detectChanges();
 					}
 				});
+
 				this.nodesRendered$.next(true);
 			});
 		}
@@ -100,7 +101,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			)
 			.subscribe(([_, links]) => {
 				Object.values(links).forEach(link => {
-					if (!link.getPainted()) {
+					if (!link.getPainted() && link.getSourcePort().getPainted()) {
 						if (link.getSourcePort() !== null) {
 							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getSourcePort());
 							link.getPoints()[0].setCoords(portCenter);

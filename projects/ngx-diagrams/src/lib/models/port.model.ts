@@ -38,7 +38,13 @@ export class PortModel extends BaseModel<NodeModel> {
 		return this.name;
 	}
 
-	getCanCreateLinks() {
+	getCanCreateLinks(): boolean {
+		const numberOfLinks: number = Object.keys(this.links$.getValue()).length;
+
+		if (this.maximumLinks && numberOfLinks >= this.maximumLinks) {
+			return false;
+		}
+
 		return this.canCreateLinks$.getValue();
 	}
 
@@ -139,22 +145,17 @@ export class PortModel extends BaseModel<NodeModel> {
 		return super.getLocked();
 	}
 
+	createLinkModel() {
+		if (this.getCanCreateLinks()) {
+			return new LinkModel();
+		}
+	}
+
 	destroy() {
 		super.destroy();
 
 		Object.values(this.getLinks()).forEach(link => {
 			link.destroy();
 		});
-	}
-
-	public createLinkModel(): LinkModel | null {
-		const numberOfLinks: number = Object.keys(this.links$.getValue()).length;
-
-		if (numberOfLinks >= this.maximumLinks) {
-			return null;
-		}
-
-		const linkFactory = this.getParent().getDiagramEngine().getLinkFactory(this.getLinkType());
-		return linkFactory.getNewInstance();
 	}
 }

@@ -27,7 +27,7 @@ export class DefaultNodeModel extends NodeModel {
 		type = 'default',
 		id,
 		linkType = 'default',
-		maximumLinks = 1,
+		maximumLinks = null,
 	}: {
 		name: string;
 		type?: string;
