@@ -14,6 +14,7 @@ export class CustomLinkComponent extends DefaultLinkModel implements AfterViewIn
 	path$: Observable<string> = this._path$.asObservable();
 
 	hover = false;
+
 	constructor() {
 		super('custom-link');
 	}
@@ -37,11 +38,6 @@ export class CustomLinkComponent extends DefaultLinkModel implements AfterViewIn
 
 			const path = generateCurvePath(firstPCoords, lastPCoords, isStraight ? 0 : 200);
 			this._path$.next(path);
-
-			if (!this.getTargetPort()) {
-				const danglingPoint = this.generatePoint(lastPCoords);
-				this.setPoints([danglingPoint]);
-			}
 		});
 	}
 

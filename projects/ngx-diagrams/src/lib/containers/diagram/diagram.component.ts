@@ -370,6 +370,9 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			};
 			const amountZoom = this.diagramModel.getZoomLevel() / 100;
 			action.selectionModels.forEach(selectionModel => {
+				// reset all previous magnets if any
+				selectionModel.magnet = undefined;
+
 				// in this case we need to also work out the relative grid position
 				if (
 					selectionModel.model instanceof NodeModel ||
@@ -386,7 +389,6 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 						for (const port of portsMap.values()) {
 							const portCoords = port.getCoords();
 							const distance = Math.hypot(portCoords.x - newCoords.x, portCoords.y - newCoords.y);
-
 							if (distance <= this.portMagneticRadius) {
 								const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(port);
 								selectionModel.model.setCoords(portCenter);
@@ -473,6 +475,8 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			} else {
 				this.diagramModel.clearSelection();
 			}
+		} else if (selectedModel.model instanceof PointModel && selectedModel.model.isConnectedToPort()) {
+			this.diagramModel.clearSelection();
 		} else {
 			// its some other element, probably want to move it
 			if (!event.shiftKey && !selectedModel.model.getSelected()) {
