@@ -1,7 +1,7 @@
 <!-- Label Host -->
 <ng-template #labelLayer></ng-template>
 
-<svg class="custom-link" [ngStyle]="{ color: selectColor() | async }">
+<svg class="custom-link-container" [ngStyle]="{ color: selectColor() | async }">
 	<g>
 		<defs>
 			<marker id="triangle" viewBox="0 0 20 20" refX="15" refY="4" markerUnits="strokeWidth" markerWidth="1" markerHeight="1" orient="auto">
@@ -12,14 +12,14 @@
 			[attr.stroke-width]="width"
 			[attr.stroke]="selectColor() | async"
 			[attr.d]="path$ | async"
-			class="default-link"
+			class="custom-link"
 			(mouseleave)="setHovered(false)"
 			(mouseenter)="setHovered()"
 			[ngClass]="{ hovered: selectHovered() | async }"
 			marker-end="url(#triangle)"
 		></path>
 		<path
-			class="default-link"
+			class="custom-link"
 			(mouseleave)="setHovered(false)"
 			(mouseenter)="setHovered()"
 			[attr.stroke-width]="20"

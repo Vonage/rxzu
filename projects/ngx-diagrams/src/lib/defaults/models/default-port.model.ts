@@ -40,7 +40,8 @@ export class DefaultPortModel extends PortModel {
 
 	link(port: PortModel): LinkModel {
 		if (super.getCanCreateLinks()) {
-			const link = new DefaultLinkModel(port.getLinkType());
+			console.log(port.getLinkType());
+			const link = new DefaultLinkModel(this.getLinkType());
 			link.setSourcePort(this);
 			link.setTargetPort(port);
 			return link;
@@ -51,7 +52,7 @@ export class DefaultPortModel extends PortModel {
 
 	createLinkModel() {
 		if (super.getCanCreateLinks()) {
-			return new DefaultLinkModel();
+			return new DefaultLinkModel(this.getLinkType());
 		}
 	}
 
