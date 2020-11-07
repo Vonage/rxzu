@@ -9,6 +9,7 @@ import { PointModel } from './point.model';
 import { Coords } from '../interfaces/coords.interface';
 import { ID } from '../utils/tool-kit.util';
 import { SelectOptions } from '../interfaces/select-options.interface';
+import { SerializedModel } from '../interfaces/serialization.interface';
 
 export class DiagramModel extends BaseEntity {
 	links$: BehaviorSubject<{ [s: string]: LinkModel }>;
@@ -124,22 +125,25 @@ export class DiagramModel extends BaseEntity {
 	}
 
 	// /**
-	//  * Serialize the diagram model
+	//  * Serialize the diagram model to JSON
 	//  * @returns diagram model as a string
 	//  */
-	// serialize(): string {
-	// 	const model = this.nodes$.getValue();
-	// 	console.log(model);
-	// 	return JSON.stringify(model);
-	// }
+	serialize(): SerializedModel {
+		return { nodes: this.nodes$.getValue(), links: this.links$.getValue() };
+	}
 
 	// /**
-	//  * Load into the diagram model a serialized diagram
+	//  * Load diagram from JSON
 	//  */
-	// deserialize(serializedModel: string) {
-	// 	const model = JSON.parse(serializedModel);
-	// 	console.log(model);
-	// }
+	deserialize(serializedModel: SerializedModel) {
+		Object.values(serializedModel.nodes).forEach(node => {
+			this.addNode(node);
+		});
+
+		Object.values(serializedModel.links).forEach(link => {
+			this.addLink(link);
+		});
+	}
 
 	setMaxZoomOut(maxZoomOut: number) {
 		this.maxZoomOut$.next(maxZoomOut);
