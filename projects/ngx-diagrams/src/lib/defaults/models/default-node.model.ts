@@ -22,8 +22,20 @@ export class DefaultNodeModel extends NodeModel {
 		return port;
 	}
 
-	addOutPort({ name, type = 'default', id, linkType = 'default' }: { name: string; type?: string; id?: string; linkType?: string }) {
-		const port = new DefaultPortModel({ isInput: false, name, type, id, label: null, linkType });
+	addOutPort({
+		name,
+		type = 'default',
+		id,
+		linkType = 'default',
+		maximumLinks = null,
+	}: {
+		name: string;
+		type?: string;
+		id?: string;
+		linkType?: string;
+		maximumLinks?: number;
+	}) {
+		const port = new DefaultPortModel({ isInput: false, name, type, id, label: null, linkType, maximumLinks });
 		this.addPort(port);
 		return port;
 	}

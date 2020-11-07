@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { DefaultNodeModel } from '../../models/default-node.model';
-import { PortModel } from '../../../models/port.model';
+import { DefaultPortModel } from '../../models';
+import { filter, switchMap } from 'rxjs/operators';
 
 @Component({
 	selector: 'ngdx-default-node',
@@ -15,18 +16,31 @@ export class DefaultNodeComponent extends DefaultNodeModel implements OnInit {
 	}
 
 	ngOnInit() {
-		this.selectPorts().subscribe(ports => {
-			ports.forEach(port => {
-				if (!port.getPainted()) {
-					this.generatePort(port);
-					port.setPainted();
-				}
+		// when node is painted and port isn't, draw ports
+
+		this.paintChanges()
+			.pipe(
+				filter(paintedE => paintedE.isPainted),
+				switchMap(() => this.selectPorts())
+			)
+			.subscribe(ports => {
+				ports.forEach((port: DefaultPortModel) => {
+					if (!port.getPainted()) {
+						this.generatePort(port);
+					}
+				});
 			});
-		});
 	}
 
-	generatePort(port: PortModel) {
-		this.diagramEngine.generateWidgetForPort(port, this.portsLayer);
+	generatePort(port: DefaultPortModel) {
+		const diagramEngine = this.getDiagramEngine();
+		diagramEngine.generateWidgetForPort(port, this.portsLayer);
+
+		port.paintChanges().subscribe(paintedEvent => {
+			if (paintedEvent.isPainted) {
+				port.updateCoords(diagramEngine.getPortCoords(port));
+			}
+		});
 	}
 
 	// https://github.com/projectstorm/react-diagrams/blob/master/src/defaults/models/DefaultNodeModel.ts

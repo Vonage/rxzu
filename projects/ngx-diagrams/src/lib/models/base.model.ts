@@ -11,6 +11,8 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 	private readonly _selected$: Observable<boolean> = this._selected.asObservable();
 	private readonly _painted: BehaviorSubject<boolean> = new BehaviorSubject(false);
 	private readonly _painted$: Observable<boolean> = this._painted.asObservable();
+	private readonly _hovered: BehaviorSubject<boolean> = new BehaviorSubject(false);
+	private readonly _hovered$: Observable<boolean> = this._hovered.asObservable();
 
 	constructor(type?: string, id?: string, logPrefix = '[Base]') {
 		super(id, logPrefix);
@@ -38,6 +40,18 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 
 	setPainted(painted: boolean = true) {
 		this._painted.next(painted);
+	}
+
+	getHovered(): boolean {
+		return this._hovered.getValue();
+	}
+
+	setHovered(painted: boolean = true) {
+		this._hovered.next(painted);
+	}
+
+	selectHovered() {
+		return this._hovered$;
 	}
 
 	paintChanges(): Observable<PaintedEvent> {

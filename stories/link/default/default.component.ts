@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DiagramEngine, DiagramModel, DefaultNodeModel } from 'ngx-diagrams';
+import { DiagramEngine, DiagramModel, DefaultNodeModel, DefaultLinkModel } from 'ngx-diagrams';
 
 @Component({
 	selector: 'app-root',
@@ -23,9 +23,18 @@ export class DefaultLinkStoryComponent implements OnInit {
 		const outport1 = node1.addOutPort({ name: 'outport1' });
 
 		const node2 = new DefaultNodeModel();
-		node2.setCoords({ x: 1000, y: 300 });
+		node2.setCoords({ x: 1000, y: 0 });
 		node2.setDimensions(nodesDefaultDimensions);
 		const inport = node2.addInPort({ name: 'inport2' });
+
+		for (let index = 0; index < 2; index++) {
+			const nodeLoop = new DefaultNodeModel();
+			nodeLoop.setCoords({ x: 1000, y: 300 + index * 300 });
+			nodeLoop.setDimensions(nodesDefaultDimensions);
+			nodeLoop.addInPort({ name: `inport${index + 3}` });
+
+			this.diagramModel.addNode(nodeLoop);
+		}
 
 		const link = outport1.link(inport);
 		link.setLocked();

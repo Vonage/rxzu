@@ -2,7 +2,6 @@ import { BaseModel } from './base.model';
 import { NodeModel } from './node.model';
 import { LinkModel } from './link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { DestroyOptions } from '../interfaces';
 
 export class PortModel extends BaseModel<NodeModel> {
 	private name: string;
@@ -12,13 +11,15 @@ export class PortModel extends BaseModel<NodeModel> {
 
 	private x$: BehaviorSubject<number>;
 	private y$: BehaviorSubject<number>;
+	private magnetic$: BehaviorSubject<boolean>;
 	private width$: BehaviorSubject<number>;
 	private height$: BehaviorSubject<number>;
 	private canCreateLinks$: BehaviorSubject<boolean>;
 
-	constructor(name: string, type?: string, id?: string, maximumLinks?: number, linkType?: string) {
+	constructor(name: string, type?: string, id?: string, maximumLinks?: number, linkType?: string, magnetic: boolean = true) {
 		super(type, id);
 		this.name = name;
+		this.magnetic$ = new BehaviorSubject(magnetic);
 		this.links$ = new BehaviorSubject({});
 		this.maximumLinks = maximumLinks;
 		this.x$ = new BehaviorSubject(0);
@@ -37,8 +38,18 @@ export class PortModel extends BaseModel<NodeModel> {
 		return this.name;
 	}
 
-	getCanCreateLinks() {
+	getCanCreateLinks(): boolean {
+		const numberOfLinks: number = Object.keys(this.links$.getValue()).length;
+
+		if (this.maximumLinks && numberOfLinks >= this.maximumLinks) {
+			return false;
+		}
+
 		return this.canCreateLinks$.getValue();
+	}
+
+	getCoords() {
+		return { x: this.getX(), y: this.getY() };
 	}
 
 	selectCanCreateLinks() {
@@ -47,6 +58,18 @@ export class PortModel extends BaseModel<NodeModel> {
 
 	setCanCreateLinks(value: boolean) {
 		this.canCreateLinks$.next(value);
+	}
+
+	getMagnetic() {
+		return this.magnetic$.getValue();
+	}
+
+	selectMagnetic() {
+		return this.magnetic$.asObservable();
+	}
+
+	setMagnetic(magnetic: boolean) {
+		this.magnetic$.next(magnetic);
 	}
 
 	selectX(): Observable<number> {
@@ -122,30 +145,17 @@ export class PortModel extends BaseModel<NodeModel> {
 		return super.getLocked();
 	}
 
-	destroy(options?: DestroyOptions) {
-		super.destroy(options);
+	createLinkModel() {
+		if (this.getCanCreateLinks()) {
+			return new LinkModel();
+		}
+	}
+
+	destroy() {
+		super.destroy();
 
 		Object.values(this.getLinks()).forEach(link => {
 			link.destroy();
 		});
-	}
-
-	public createLinkModel(): LinkModel | null {
-		const numberOfLinks: number = Object.keys(this.links$.getValue()).length;
-		if (this.maximumLinks === 1 && numberOfLinks >= 1) {
-			const linkToRemove = Object.values(this.links$.getValue())[0];
-			if (linkToRemove) {
-				linkToRemove.destroy();
-			}
-			return null;
-		} else if (numberOfLinks >= this.maximumLinks) {
-			// for the moment we will remove the first link by default
-			const linkToRemove = Object.values(this.links$.getValue())[0];
-			if (linkToRemove) {
-				linkToRemove.destroy();
-			}
-			return null;
-		}
-		return null;
 	}
 }

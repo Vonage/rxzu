@@ -1,36 +1,51 @@
 <!-- Label Host -->
 <ng-template #labelLayer></ng-template>
 
-<!-- Link -->
-<svg class="default-link">
-	<g>
-		<path [attr.stroke-width]="width" [attr.stroke]="selectColor() | async" [attr.d]="path$ | async"></path>
+<svg class="link-container">
+	<!-- Link -->
+	<g [id]="id">
 		<path
-			(mouseleave)="setSelected(false)"
-			(mouseenter)="setSelected()"
+			[attr.stroke-width]="width"
+			[attr.stroke]="selectColor() | async"
+			[attr.d]="path$ | async"
+			class="default-link"
+			(mouseleave)="setHovered(false)"
+			(mouseenter)="setHovered()"
+			[ngClass]="{ hovered: selectHovered() | async }"
+		></path>
+		<path
+			class="default-link"
+			(mouseleave)="setHovered(false)"
+			(mouseenter)="setHovered()"
 			[attr.stroke-width]="20"
 			[attr.stroke]="selectColor() | async"
 			[attr.stroke-linecap]="'round'"
 			[attr.data-linkid]="id"
-			[attr.stroke-opacity]="(selectSelected() | async) ? '0.1' : '0'"
+			[attr.stroke-opacity]="(selectHovered() | async) ? '0.1' : '0'"
 			[attr.d]="path$ | async"
 		></path>
 	</g>
-	<g *ngFor="let point of points$ | async">
-		<circle [attr.cx]="point.selectX() | async" [attr.cy]="point.selectY() | async" r="5" class="default-point" />
 
+	<!-- Points -->
+	<g *ngFor="let point of getPoints()" [id]="point.id">
 		<circle
-			(mouseleave)="setSelected(false)"
-			(mouseenter)="setSelected()"
-			[attr.data-id]="point.id"
+			fill="currentColor"
+			[attr.cx]="point.selectX() | async"
+			[attr.cy]="point.selectY() | async"
+			r="5"
+			class="default-point"
+			[ngClass]="{ hovered: point.selectHovered() | async }"
+		/>
+		<circle
+			[attr.data-pointid]="point.id"
 			[attr.data-linkid]="id"
+			(mouseleave)="point.setHovered(false); setHovered(false)"
+			(mouseenter)="point.setHovered(); setHovered()"
 			[attr.cx]="point.selectX() | async"
 			[attr.cy]="point.selectY() | async"
 			r="15"
 			[attr.opacity]="0"
-			class="default-point"
-			[ngClass]="{ 'default-point': true, selected: point.selectSelected() | async }"
+			[ngClass]="{ selected: point.selectSelected() | async }"
 		/>
-		{{ point.selectSelected() | async }}
 	</g>
 </svg>

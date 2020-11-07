@@ -134,6 +134,21 @@ yarn add ngx-diagrams
 npm install ngx-diagrams
 ```
 
+On production environemnt add the following:
+
+`main.ts`
+```typescript
+import { enableProdMode } from '@angular/core';
+import { enableDiagramProdMode } from 'ngx-diagrams';
+
+...
+if(environemnt.production) {
+	enableDiagramProdMode();
+	enableProdMode();
+}
+...
+```
+
 <div class="subheading">Configure</div>
 
 <div class="link-list">

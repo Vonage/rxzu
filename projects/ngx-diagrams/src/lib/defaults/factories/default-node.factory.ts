@@ -32,7 +32,7 @@ export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 			e.isSelected ? this.renderer.addClass(rootNode, 'selected') : this.renderer.removeClass(rootNode, 'selected');
 		});
 
-		node.onEntityDestroy().subscribe((/** e */) => {
+		node.onEntityDestroy().subscribe(() => {
 			componentRef.destroy();
 		});
 
@@ -41,7 +41,8 @@ export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 			componentRef.instance[key] = value;
 		});
 
-		componentRef.instance.diagramEngine = diagramEngine;
+		componentRef.instance.setDiagramEngine(diagramEngine);
+		componentRef.instance.setPainted(true);
 
 		return componentRef;
 	}

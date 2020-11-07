@@ -24,7 +24,6 @@ export class CustomNodeComponent extends DefaultNodeModel implements OnInit, OnD
 				if (!port.getPainted()) {
 					port.setLocked(this.getLocked());
 					this.generatePort(port);
-					port.setPainted();
 				}
 			});
 		});

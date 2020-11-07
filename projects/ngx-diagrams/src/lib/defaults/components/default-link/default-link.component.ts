@@ -10,7 +10,7 @@ import { Coords } from '../../../interfaces';
 @Component({
 	selector: 'ngdx-default-link',
 	templateUrl: './default-link.component.html',
-	styleUrls: ['./default-link.component.scss']
+	styleUrls: ['./default-link.component.scss'],
 })
 export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewInit {
 	@ViewChild('labelLayer', { read: ViewContainerRef, static: true }) labelLayer: ViewContainerRef;
@@ -46,11 +46,6 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 
 				const path = generateCurvePath(firstPCoords, lastPCoords, isStraight ? 0 : this.curvyness);
 				this._path$.next(path);
-
-				if (!this.getTargetPort()) {
-					const danglingPoint = this.generatePoint(lastPCoords);
-					this.points$.next([danglingPoint]);
-				}
 
 				const label = this.getLabel();
 				// update label position

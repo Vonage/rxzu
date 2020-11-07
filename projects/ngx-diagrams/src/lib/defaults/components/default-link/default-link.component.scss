@@ -1,14 +1,12 @@
+.link-container {
+	fill: none;
+	overflow: visible;
+	pointer-events: all;
+}
+
 .default-link {
 	fill: none;
 	overflow: visible;
-
-	.default-point {
-		fill: rgba(white, 0.5);
-
-		&.selected {
-			fill: rgba(blue, 0.5);
-		}
-	}
 
 	@keyframes dash {
 		from {
@@ -19,14 +17,19 @@
 		}
 	}
 
-	path {
-		fill: none;
-		pointer-events: all;
-	}
-
-	&.path-selected {
-		stroke: rgb(0, 192, 255) !important;
+	&.hovered {
+		stroke: rgb(0, 192, 255);
 		stroke-dasharray: 10, 2;
 		animation: dash 1s linear infinite;
+	}
+}
+
+.default-point {
+	color: lightgray;
+	overflow: visible;
+	pointer-events: all;
+
+	&.hovered {
+		color: rgb(0, 192, 255);
 	}
 }

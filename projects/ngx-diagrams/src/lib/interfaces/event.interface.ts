@@ -51,9 +51,4 @@ export class PaintedEvent<T extends BaseEntity = BaseEntity> extends BaseEvent<T
 		this.isPainted = painted;
 	}
 }
-
-export interface DestroyOptions {
-	propagate?: boolean;
-	emit?: boolean;
-}
 // endregion
