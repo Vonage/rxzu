@@ -1,5 +1,5 @@
 import { Component, AfterViewInit, ViewChild, ViewContainerRef } from '@angular/core';
-import { DefaultLinkModel, PointModel, generateCurvePath, Coords } from 'ngx-diagrams';
+import { DefaultLinkModel, generateCurvePath, Coords } from 'ngx-diagrams';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
 
 @Component({
@@ -12,7 +12,6 @@ export class CustomLinkComponent extends DefaultLinkModel implements AfterViewIn
 
 	_path$: BehaviorSubject<string> = new BehaviorSubject(null);
 	path$: Observable<string> = this._path$.asObservable();
-	points$: BehaviorSubject<PointModel[]> = new BehaviorSubject([]);
 
 	hover = false;
 	constructor() {
@@ -41,7 +40,7 @@ export class CustomLinkComponent extends DefaultLinkModel implements AfterViewIn
 
 			if (!this.getTargetPort()) {
 				const danglingPoint = this.generatePoint(lastPCoords);
-				this.points$.next([danglingPoint]);
+				this.setPoints([danglingPoint]);
 			}
 		});
 	}

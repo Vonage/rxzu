@@ -47,11 +47,6 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 				const path = generateCurvePath(firstPCoords, lastPCoords, isStraight ? 0 : this.curvyness);
 				this._path$.next(path);
 
-				if (!this.getTargetPort()) {
-					const danglingPoint = this.generatePoint(lastPCoords);
-					this.points$.next([danglingPoint]);
-				}
-
 				const label = this.getLabel();
 				// update label position
 				if (label) {

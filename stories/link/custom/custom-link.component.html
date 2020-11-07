@@ -27,7 +27,7 @@
 		<circle
 			(mouseleave)="setSelected(false)"
 			(mouseenter)="setSelected()"
-			[attr.data-id]="point.id"
+			[attr.data-pointid]="point.id"
 			[attr.data-linkid]="id"
 			[attr.cx]="point.selectX() | async"
 			[attr.cy]="point.selectY() | async"

@@ -369,7 +369,6 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 				y: event.clientY - action.mouseY,
 			};
 			const amountZoom = this.diagramModel.getZoomLevel() / 100;
-
 			action.selectionModels.forEach(selectionModel => {
 				// in this case we need to also work out the relative grid position
 				if (
