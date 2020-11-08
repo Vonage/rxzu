@@ -39,7 +39,7 @@
 		"dagre": "^0.8.5",
 		"rxjs": "~6.6.3",
 		"tslib": "^2.0.3",
-		"snyk": "^1.414.1",
+		"snyk": "^1.415.0",
 		"zone.js": "~0.10.3"
 	},
 	"devDependencies": {
