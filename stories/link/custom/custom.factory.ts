@@ -40,6 +40,6 @@ export class CustomLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
 	}
 
 	getNewInstance() {
-		return new DefaultLinkModel('custom-link');
+		return new DefaultLinkModel({ type: 'custom-link' });
 	}
 }

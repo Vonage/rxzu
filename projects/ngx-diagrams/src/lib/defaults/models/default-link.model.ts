@@ -6,7 +6,7 @@ export class DefaultLinkModel extends LinkModel {
 	private color$: BehaviorSubject<string>;
 	curvyness$: BehaviorSubject<number>;
 
-	constructor(type: string = 'default') {
+	constructor({ type = 'default' }: { type?: string } = {}) {
 		super(type);
 		this.color$ = new BehaviorSubject('rgba(255,255,255,0.5)');
 		this.width$ = new BehaviorSubject(3);

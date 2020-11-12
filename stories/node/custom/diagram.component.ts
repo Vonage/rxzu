@@ -21,7 +21,7 @@ export class CustomNodeDiagramComponent implements OnInit, OnChanges {
 
 		this.diagramModel = this.diagramEngine.createDiagram();
 
-		const node1 = new DefaultNodeModel('custom-node-name', 'custom-node');
+		const node1 = new DefaultNodeModel({ type: 'custom-node' });
 		node1.setCoords({ x: 500, y: 300 });
 		node1.setDimensions(nodesDefaultDimensions);
 

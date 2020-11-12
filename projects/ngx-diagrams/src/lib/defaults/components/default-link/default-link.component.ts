@@ -21,7 +21,7 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 	label$: Observable<LabelModel>;
 
 	constructor(private cdRef: ChangeDetectorRef) {
-		super('ngdx-default-link');
+		super({ type: 'ngdx-default-link' });
 	}
 
 	ngAfterViewInit() {

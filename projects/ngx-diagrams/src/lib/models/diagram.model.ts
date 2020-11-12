@@ -82,11 +82,20 @@ export class DiagramModel extends BaseEntity {
 	 */
 	deleteNode(nodeOrId: NodeModel | string): void {
 		const nodeID: ID = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
+		const node = this.getNode(nodeID);
 
-		// TODO: delete all related links
+		// delete all related links
+		Object.values(node.getPorts()).forEach((port: PortModel) => {
+			Object.values(port.getLinks()).forEach(link => {
+				this.deleteLink(link);
+			});
+		});
+
 		const updNodes = { ...this.nodes$.value };
 		delete updNodes[nodeID];
 		this.nodes$.next(updNodes);
+
+		node.destroy();
 	}
 
 	/**
@@ -110,11 +119,19 @@ export class DiagramModel extends BaseEntity {
 	 */
 	deleteLink(linkOrId: LinkModel | string) {
 		const linkID: ID = typeof linkOrId === 'string' ? linkOrId : linkOrId.id;
+		const link = this.getLink(linkID);
 
 		const updLinks = { ...this.links$.value };
 		delete updLinks[linkID];
 
 		this.links$.next(updLinks);
+		link.destroy();
+	}
+
+	reset() {
+		Object.values(this.getNodes()).forEach(node => {
+			this.deleteNode(node);
+		});
 	}
 
 	/**
@@ -137,14 +154,20 @@ export class DiagramModel extends BaseEntity {
 	// /**
 	//  * Load diagram from JSON
 	//  */
-	deserialize(serializedModel: SerializedDiagramModel) {
-		// Object.values(serializedModel.nodes).forEach(node => {
-		// 	this.addNode(node);
-		// });
-		// Object.values(serializedModel.links).forEach(link => {
-		// 	this.addLink(link);
-		// });
-	}
+	// deserialize(serializedModel: SerializedDiagramModel) {
+	// 	const nodes: DefaultNodeModel[] = [];
+	// 	Object.values(serializedModel.nodes).forEach(node => {
+	// 		const nodeModel = new DefaultNodeModel(node);
+	// 		console.log(nodeModel);
+	// 		nodes.push(nodeModel);
+	// 	});
+
+	// 	this.addAll(...nodes);
+	// Object.values(serializedModel.links).forEach(link => {
+	// 	const linkModel = new DefaultLinkModel(link);
+	// 	this.addLink(linkModel);
+	// });
+	// }
 
 	setMaxZoomOut(maxZoomOut: number) {
 		this.maxZoomOut$.next(maxZoomOut);

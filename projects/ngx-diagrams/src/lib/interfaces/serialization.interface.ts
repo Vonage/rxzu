@@ -26,12 +26,12 @@ export interface SerializedNodeModel extends SerializedBaseModel {
 }
 
 export interface SerializedLinkModel extends SerializedBaseModel {
-	name: string;
+	name?: string;
 	sourcePort: string;
 	targetPort: string;
 	extras: any;
 	points: SerializedPointModel[];
-	label: SerializedLabelModel;
+	label?: SerializedLabelModel;
 	type: string;
 }
 

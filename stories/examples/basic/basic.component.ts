@@ -6,7 +6,7 @@ import { DiagramEngine, DiagramModel, DefaultNodeModel } from 'ngx-diagrams';
 	template: `<ngdx-diagram class="demo-diagram" [model]="diagramModel"></ngdx-diagram>`,
 	styleUrls: ['../demo-diagram.component.scss'],
 })
-export class DefaultLinkStoryComponent implements OnInit {
+export class BasicExampleStoryComponent implements OnInit {
 	diagramModel: DiagramModel;
 
 	constructor(private diagramEngine: DiagramEngine) {}

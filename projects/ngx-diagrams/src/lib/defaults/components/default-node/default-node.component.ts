@@ -12,7 +12,7 @@ export class DefaultNodeComponent extends DefaultNodeModel implements OnInit {
 	@ViewChild('portsLayer', { read: ViewContainerRef, static: true }) portsLayer: ViewContainerRef;
 
 	constructor() {
-		super('ngdx-default-node');
+		super({ type: 'ngdx-default-node' });
 	}
 
 	ngOnInit() {

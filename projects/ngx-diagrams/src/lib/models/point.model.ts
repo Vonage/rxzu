@@ -10,7 +10,7 @@ export class PointModel extends BaseModel<LinkModel> {
 	private readonly coords$: Observable<Coords>;
 
 	constructor(link: LinkModel, { x, y }: Coords) {
-		super();
+		super(link.getType());
 		this._coords = new BehaviorSubject<Coords>({ x, y });
 		this.coords$ = this._coords.asObservable();
 		this.setParent(link);
