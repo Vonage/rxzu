@@ -64,6 +64,13 @@ export class BaseEntity {
 		return clone;
 	}
 
+	serialize() {
+		return {
+			id: this.id,
+			locked: this.getLocked(),
+		};
+	}
+
 	public lockChanges(): Observable<LockEvent> {
 		return this._locked$.pipe(
 			takeUntil(this.onEntityDestroy()),

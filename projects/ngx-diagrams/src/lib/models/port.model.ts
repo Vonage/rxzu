@@ -30,6 +30,21 @@ export class PortModel extends BaseModel<NodeModel> {
 		this.linkType = linkType;
 	}
 
+	serialize() {
+		return {
+			...super.serialize(),
+			name: this.getName(),
+			linkType: this.getLinkType(),
+			maximumLinks: this.getMaximumLinks(),
+			type: this.getType(),
+			magnetic: this.getMagnetic(),
+			height: this.getHeight(),
+			width: this.getWidth(),
+			canCreateLinks: this.getCanCreateLinks(),
+			...this.getCoords(),
+		};
+	}
+
 	getNode() {
 		return this.getParent();
 	}

@@ -39,7 +39,7 @@ export class CustomNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 			componentRef.instance[key] = value;
 		});
 
-		componentRef.instance.diagramEngine = diagramEngine;
+		componentRef.instance.setDiagramEngine(diagramEngine);
 
 		return componentRef;
 	}

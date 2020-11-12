@@ -52,6 +52,6 @@ export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
 	}
 
 	getNewInstance(initialConfig?: any): DefaultNodeModel {
-		return new DefaultNodeModel('default', ...initialConfig);
+		return new DefaultNodeModel(initialConfig);
 	}
 }

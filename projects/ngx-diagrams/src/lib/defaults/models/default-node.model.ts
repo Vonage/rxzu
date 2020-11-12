@@ -8,7 +8,17 @@ export class DefaultNodeModel extends NodeModel {
 	height$: Observable<number>;
 	width$: Observable<number>;
 
-	constructor(name: string = 'Untitled', type: string = 'default', id?: string, color: string = 'rgb(0, 192, 255)') {
+	constructor({
+		name = 'Untitled',
+		type = 'default',
+		color = 'rgb(0, 192, 255)',
+		id,
+	}: {
+		name?: string;
+		type?: string;
+		id?: string;
+		color?: string;
+	} = {}) {
 		super(type, id);
 		this.name = name;
 		this.color = color;

@@ -31,7 +31,7 @@ export class CustomLinkDiagramComponent implements OnInit {
 		node2.setDimensions(nodesDefaultDimensions);
 		const inport = node2.addInPort({ name: 'inport2' });
 
-		const link = new DefaultLinkModel('custom-link');
+		const link = new DefaultLinkModel({ type: 'custom-link' });
 
 		link.setSourcePort(outport1);
 		link.setTargetPort(inport);

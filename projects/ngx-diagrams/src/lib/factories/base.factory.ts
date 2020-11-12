@@ -3,8 +3,8 @@ import { BaseModel } from '../models/base.model';
 export abstract class AbstractFactory<T extends BaseModel> {
 	protected _type: string;
 
-	constructor(name: string) {
-		this._type = name;
+	constructor(type: string) {
+		this._type = type;
 	}
 
 	get type(): string {

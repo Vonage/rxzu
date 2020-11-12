@@ -7,6 +7,7 @@ import { ID } from '../utils/tool-kit.util';
 import { Coords } from '../interfaces/coords.interface';
 import { LabelModel } from './label.model';
 import { DiagramEngine } from '../services/engine.service';
+import { SerializedLinkModel } from '../interfaces/serialization.interface';
 
 export class LinkModel extends BaseModel<DiagramModel> {
 	diagramEngine: DiagramEngine;
@@ -26,6 +27,20 @@ export class LinkModel extends BaseModel<DiagramModel> {
 		this.extras = {};
 		this.sourcePort = null;
 		this.targetPort = null;
+	}
+
+	serialize(): SerializedLinkModel {
+		const serializedPoints = this.points.map(point => point.serialize());
+		const label = this.getLabel()?.serialize();
+		return {
+			...super.serialize(),
+			name: this.getName(),
+			sourcePort: this.getSourcePort().id,
+			targetPort: this.getTargetPort().id,
+			extras: this.getExtras(),
+			points: serializedPoints,
+			label,
+		};
 	}
 
 	setName(name: string) {

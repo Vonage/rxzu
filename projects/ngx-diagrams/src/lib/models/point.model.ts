@@ -3,16 +3,24 @@ import { LinkModel } from './link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Coords } from '../interfaces/coords.interface';
 import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
+import { SerializedPointModel } from '../interfaces/serialization.interface';
 
 export class PointModel extends BaseModel<LinkModel> {
 	private readonly _coords: BehaviorSubject<Coords>;
 	private readonly coords$: Observable<Coords>;
 
 	constructor(link: LinkModel, { x, y }: Coords) {
-		super();
+		super(link.getType());
 		this._coords = new BehaviorSubject<Coords>({ x, y });
 		this.coords$ = this._coords.asObservable();
 		this.setParent(link);
+	}
+
+	serialize(): SerializedPointModel {
+		return {
+			...super.serialize(),
+			coords: this.getCoords(),
+		};
 	}
 
 	isConnectedToPort() {
