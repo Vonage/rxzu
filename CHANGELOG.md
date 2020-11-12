@@ -1,3 +1,12 @@
+# [3.1.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.0.1...v3.1.0) (2020-11-12)
+
+
+### Features
+
+* **serialization:** from and to json ([6fbd0be](https://github.com/DanielNetzer/ngx-diagrams/commit/6fbd0bea4009b3add591df80ff2e1143f1066e90))
+* **serialization:** interface for all serialized models ([4a3539a](https://github.com/DanielNetzer/ngx-diagrams/commit/4a3539a0a9b9c51d1dd0ce6da02b6aabffece70a))
+* **serialization:** serialize graph to json ([df6aa19](https://github.com/DanielNetzer/ngx-diagrams/commit/df6aa193f4a9ea1f8d886272e05756a622a56137)), closes [#17](https://github.com/DanielNetzer/ngx-diagrams/issues/17)
+
 ## [3.0.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.0.0...v3.0.1) (2020-11-12)
 
 
