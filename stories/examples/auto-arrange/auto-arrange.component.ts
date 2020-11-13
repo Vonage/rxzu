@@ -1,5 +1,5 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { DiagramEngine, DiagramModel, DefaultNodeModel, SerializedDiagramModel, DagreEngine } from 'ngx-diagrams';
+import { Component, OnInit } from '@angular/core';
+import { DiagramEngine, DiagramModel, DefaultNodeModel, DagreEngine } from 'ngx-diagrams';
 
 @Component({
 	selector: 'app-root',
@@ -13,8 +13,6 @@ import { DiagramEngine, DiagramModel, DefaultNodeModel, SerializedDiagramModel, 
 })
 export class AutoArrangeExampleStoryComponent implements OnInit {
 	diagramModel: DiagramModel;
-
-	@Output() serialized: EventEmitter<SerializedDiagramModel> = new EventEmitter();
 
 	constructor(private diagramEngine: DiagramEngine, private dagreEngine: DagreEngine) {}
 

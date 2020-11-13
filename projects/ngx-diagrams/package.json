@@ -3,7 +3,9 @@
 	"peerDependencies": {
 		"@angular/common": ">= 6.0.0",
 		"@angular/core": ">= 6.0.0",
-		"dagre": "^0.8.4"
+		"dagre": "^0.8.4",
+		"paths-js": "^0.4.11",
+		"pathfinding": "^0.4.18"
 	},
 	"keywords": [
 		"web",

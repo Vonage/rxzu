@@ -3,6 +3,7 @@ import { Story } from '@storybook/angular';
 import { AutoArrangeExampleStoryComponent } from './auto-arrange/auto-arrange.component';
 import { BasicExampleStoryComponent } from './basic/basic.component';
 import { SerializationExampleStoryComponent } from './serialization/serialization.component';
+import { SmartRoutingExampleStoryComponent } from './smart-routing/smart-routing.component';
 
 export const BasicDiagramTemplate: Story<BasicExampleStoryComponent> = (args: any) => ({
 	component: BasicExampleStoryComponent,
@@ -16,5 +17,10 @@ export const SerializationDiagramTemplate: Story<SerializationExampleStoryCompon
 
 export const AutoArrangeDiagramTemplate: Story<AutoArrangeExampleStoryComponent> = (args: any) => ({
 	component: AutoArrangeExampleStoryComponent,
+	props: args,
+});
+
+export const SmartRoutingDiagramTemplate: Story<SmartRoutingExampleStoryComponent> = (args: any) => ({
+	component: SmartRoutingExampleStoryComponent,
 	props: args,
 });
