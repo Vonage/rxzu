@@ -16,9 +16,7 @@ import { NgxDiagramsModule } from '../ngx-diagrams.module';
 import { AbstractLabelFactory } from '../factories/label.factory';
 import { LabelModel } from '../models/label.model';
 import { DefaultLabelFactory } from '../defaults/factories/default-label.factory';
-import { PathFinding } from '../plugins/smart-routing.plugin';
-
-export const ROUTING_SCALING_FACTOR = 5;
+import { PathFinding, ROUTING_SCALING_FACTOR } from '../plugins/smart-routing.plugin';
 
 @Injectable({ providedIn: NgxDiagramsModule })
 export class DiagramEngine {
@@ -470,7 +468,7 @@ export class DiagramEngine {
 	}
 
 	calculateRoutingMatrix(): void {
-		const matrix = [...this.getCanvasMatrix()];
+		const matrix = this.getCanvasMatrix().map(item => item.slice(0));
 
 		// nodes need to be marked as blocked points
 		this.markNodes(matrix);

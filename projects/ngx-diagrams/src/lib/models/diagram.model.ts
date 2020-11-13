@@ -151,24 +151,6 @@ export class DiagramModel extends BaseEntity {
 		return { ...super.serialize(), nodes: serializedNodes, links: serializedLinks };
 	}
 
-	// /**
-	//  * Load diagram from JSON
-	//  */
-	// deserialize(serializedModel: SerializedDiagramModel) {
-	// 	const nodes: DefaultNodeModel[] = [];
-	// 	Object.values(serializedModel.nodes).forEach(node => {
-	// 		const nodeModel = new DefaultNodeModel(node);
-	// 		console.log(nodeModel);
-	// 		nodes.push(nodeModel);
-	// 	});
-
-	// 	this.addAll(...nodes);
-	// Object.values(serializedModel.links).forEach(link => {
-	// 	const linkModel = new DefaultLinkModel(link);
-	// 	this.addLink(linkModel);
-	// });
-	// }
-
 	setMaxZoomOut(maxZoomOut: number) {
 		this.maxZoomOut$.next(maxZoomOut);
 	}

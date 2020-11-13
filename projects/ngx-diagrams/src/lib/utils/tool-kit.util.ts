@@ -1,6 +1,4 @@
 // tslint:disable no-bitwise
-import * as Path from 'paths-js/path';
-
 /**
  * Utility pathing and routing service
  */
@@ -9,6 +7,7 @@ import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Coords } from '../interfaces/coords.interface';
 import { ROUTING_SCALING_FACTOR } from '../plugins/smart-routing.plugin';
+import * as Path from 'paths-js/path';
 
 export enum LOG_LEVEL {
 	'LOG',

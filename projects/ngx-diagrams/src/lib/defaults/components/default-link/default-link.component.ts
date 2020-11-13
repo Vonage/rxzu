@@ -4,7 +4,7 @@ import { generateCurvePath, generateDynamicPath } from '../../../utils/tool-kit.
 import { combineLatest, BehaviorSubject, Observable } from 'rxjs';
 import { PointModel } from '../../../models/point.model';
 import { LabelModel } from '../../../models/label.model';
-import { distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { Coords } from '../../../interfaces';
 import { PathFinding } from '../../../plugins/smart-routing.plugin';
 
@@ -42,7 +42,7 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 
 		// Observe link coords and update drawing accordingly
 		combineLatest([firstPCoords$, lastPCoords$])
-			.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged())
+			.pipe(takeUntil(this.onEntityDestroy()))
 			.subscribe(([firstPCoords, lastPCoords]) => {
 				const points = [firstPCoords, lastPCoords];
 
