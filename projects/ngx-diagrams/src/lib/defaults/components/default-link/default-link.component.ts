@@ -4,7 +4,7 @@ import { generateCurvePath, generateDynamicPath } from '../../../utils/tool-kit.
 import { combineLatest, BehaviorSubject, Observable } from 'rxjs';
 import { PointModel } from '../../../models/point.model';
 import { LabelModel } from '../../../models/label.model';
-import { filter, takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, filter, shareReplay, takeUntil } from 'rxjs/operators';
 import { Coords } from '../../../interfaces';
 import { PathFinding } from '../../../plugins/smart-routing.plugin';
 
@@ -17,7 +17,7 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 	@ViewChild('labelLayer', { read: ViewContainerRef, static: true }) labelLayer: ViewContainerRef;
 
 	_path$: BehaviorSubject<string> = new BehaviorSubject(null);
-	path$: Observable<string> = this._path$.asObservable();
+	path$: Observable<string> = this._path$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
 	points$: BehaviorSubject<PointModel[]> = new BehaviorSubject([]);
 	label$: Observable<LabelModel>;
 	pathFinding: PathFinding; // only set when smart routing is active
@@ -46,7 +46,7 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 			.subscribe(([firstPCoords, lastPCoords]) => {
 				const points = [firstPCoords, lastPCoords];
 
-				if (this.isSmartRoutingApplicable()) {
+				if (this.diagramEngine.getSmartRouting()) {
 					// first step: calculate a direct path between the points being linked
 					const directPathCoords = this.pathFinding.calculateDirectPath(firstPCoords, lastPCoords);
 					const routingMatrix = this.diagramEngine.getRoutingMatrix();
@@ -120,26 +120,5 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 
 	calcCenterOfPath(firstPoint: Coords, secondPoint: Coords): Coords {
 		return { x: (firstPoint.x + secondPoint.x) / 2 + 20, y: (firstPoint.y + secondPoint.y) / 2 + 20 };
-	}
-
-	/**
-	 * Smart routing is only applicable when all conditions below are true:
-	 * - smart routing is set to true on the engine
-	 * - current link is between two nodes (not between a node and an empty point)
-	 * - no custom points exist along the line
-	 */
-	isSmartRoutingApplicable(): boolean {
-		const srcPort = this.getSourcePort();
-		const trgtPort = this.getTargetPort();
-
-		if (!this.diagramEngine.getSmartRouting()) {
-			return false;
-		}
-
-		if (srcPort === null || trgtPort === null) {
-			return false;
-		}
-
-		return true;
 	}
 }

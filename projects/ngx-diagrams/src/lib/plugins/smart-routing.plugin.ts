@@ -1,7 +1,7 @@
 import { DiagramEngine } from '../services/engine.service';
 import * as PF from 'pathfinding';
 
-export const ROUTING_SCALING_FACTOR = 5;
+export const ROUTING_SCALING_FACTOR = 10;
 
 export class PathFinding {
 	private pathFinderInstance:

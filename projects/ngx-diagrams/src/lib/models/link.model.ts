@@ -8,6 +8,7 @@ import { Coords } from '../interfaces/coords.interface';
 import { LabelModel } from './label.model';
 import { DiagramEngine } from '../services/engine.service';
 import { SerializedLinkModel } from '../interfaces/serialization.interface';
+import { distinctUntilChanged, shareReplay, takeUntil } from 'rxjs/operators';
 
 export class LinkModel extends BaseModel<DiagramModel> {
 	diagramEngine: DiagramEngine;
@@ -19,7 +20,8 @@ export class LinkModel extends BaseModel<DiagramModel> {
 	private points: PointModel[];
 	private extras: any;
 
-	private readonly label: BehaviorSubject<LabelModel> = new BehaviorSubject(null);
+	private readonly _label$: BehaviorSubject<LabelModel> = new BehaviorSubject(null);
+	label$: Observable<LabelModel> = this._label$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
 
 	constructor(linkType: string = 'default', id?: string) {
 		super(linkType, id);
@@ -176,26 +178,26 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
 	setLabel(label: LabelModel) {
 		label.setParent(this);
-		this.label.next(label);
+		this._label$.next(label);
 	}
 
 	selectLabel(): Observable<LabelModel | null> {
-		return this.label.asObservable();
+		return this.label$;
 	}
 
 	getLabel(): LabelModel {
-		return this.label.getValue();
+		return this._label$.getValue();
 	}
 
 	resetLabel() {
-		const currentLabel = this.label.getValue();
+		const currentLabel = this._label$.getValue();
 
 		if (currentLabel) {
 			currentLabel.setParent(null);
 			currentLabel.setPainted(false);
 		}
 
-		this.label.next(null);
+		this._label$.next(null);
 	}
 
 	removePoint(pointModel: PointModel) {

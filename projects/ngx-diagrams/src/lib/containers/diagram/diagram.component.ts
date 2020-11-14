@@ -411,7 +411,9 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 					}
 
 					if (this.diagramModel.getDiagramEngine().getSmartRouting()) {
-						this.diagramModel.getDiagramEngine().calculateRoutingMatrix();
+						setTimeout(() => {
+							this.diagramModel.getDiagramEngine().calculateRoutingMatrix();
+						}, 1);
 					}
 				} else if (selectionModel.model instanceof PointModel) {
 					// will only run here when trying to create a point on an existing link

@@ -14,7 +14,11 @@ export class BaseEntity {
 	private _destroyed: Subject<null> = new Subject();
 	private _destroyed$: Observable<null> = this._destroyed.asObservable();
 	private _locked: BehaviorSubject<boolean> = new BehaviorSubject(false);
-	private _locked$: Observable<boolean> = this._locked.asObservable();
+	private _locked$: Observable<LockEvent> = this._locked.pipe(
+		takeUntil(this.onEntityDestroy()),
+		map(locked => new LockEvent(this, locked)),
+		this.withLog('lockChanges')
+	);
 
 	constructor(id?: ID, logPrefix = '') {
 		this._id = id || UID();
@@ -72,11 +76,7 @@ export class BaseEntity {
 	}
 
 	public lockChanges(): Observable<LockEvent> {
-		return this._locked$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			map(locked => new LockEvent(this, locked)),
-			this.withLog('lockChanges')
-		);
+		return this._locked$;
 	}
 
 	public destroy() {

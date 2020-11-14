@@ -2,7 +2,7 @@ import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Coords } from '../interfaces/coords.interface';
-import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, map, shareReplay, takeUntil } from 'rxjs/operators';
 import { SerializedPointModel } from '../interfaces/serialization.interface';
 
 export class PointModel extends BaseModel<LinkModel> {
@@ -12,7 +12,7 @@ export class PointModel extends BaseModel<LinkModel> {
 	constructor(link: LinkModel, { x, y }: Coords) {
 		super(link.getType());
 		this._coords = new BehaviorSubject<Coords>({ x, y });
-		this.coords$ = this._coords.asObservable();
+		this.coords$ = this._coords.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
 		this.setParent(link);
 	}
 
@@ -44,7 +44,7 @@ export class PointModel extends BaseModel<LinkModel> {
 	}
 
 	selectCoords(): Observable<Coords> {
-		return this.coords$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged());
+		return this.coords$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
 	}
 
 	getCoords(): Coords {
@@ -54,14 +54,18 @@ export class PointModel extends BaseModel<LinkModel> {
 	selectX(): Observable<number> {
 		return this.selectCoords().pipe(
 			map(c => c.x),
-			distinctUntilChanged()
+			takeUntil(this.onEntityDestroy()),
+			distinctUntilChanged(),
+			shareReplay(1)
 		);
 	}
 
 	selectY(): Observable<number> {
 		return this.selectCoords().pipe(
 			map(c => c.y),
-			distinctUntilChanged()
+			takeUntil(this.onEntityDestroy()),
+			distinctUntilChanged(),
+			shareReplay(1)
 		);
 	}
 }

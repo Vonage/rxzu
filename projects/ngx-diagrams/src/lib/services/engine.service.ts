@@ -404,9 +404,9 @@ export class DiagramEngine {
 		const maxY = Math.max(maxYElement.y + maxYElement.height, canvas.offsetWidth);
 
 		return {
-			width: Math.ceil(Math.abs(minX) + maxX),
+			width: Math.ceil(Math.abs(minX) + maxX) + 1000,
 			hAdjustmentFactor: Math.abs(minX) / ROUTING_SCALING_FACTOR + 1,
-			height: Math.ceil(Math.abs(minY) + maxY),
+			height: Math.ceil(Math.abs(minY) + maxY) + 1000,
 			vAdjustmentFactor: Math.abs(minY) / ROUTING_SCALING_FACTOR + 1,
 		};
 	}

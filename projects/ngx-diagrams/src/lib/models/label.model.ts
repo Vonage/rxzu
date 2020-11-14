@@ -2,7 +2,7 @@ import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Coords } from '../interfaces/coords.interface';
-import { takeUntil, distinctUntilChanged } from 'rxjs/operators';
+import { takeUntil, distinctUntilChanged, shareReplay } from 'rxjs/operators';
 import { SerializedLabelModel } from '../interfaces/serialization.interface';
 
 export class LabelModel extends BaseModel<LinkModel> {
@@ -15,10 +15,10 @@ export class LabelModel extends BaseModel<LinkModel> {
 	constructor(type?: string, id?: string) {
 		super(type, id);
 		this._coords = new BehaviorSubject<Coords>({ x: 0, y: 0 });
-		this.coords$ = this._coords.asObservable();
+		this.coords$ = this._coords.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
 
 		this._rotation = new BehaviorSubject(0);
-		this.rotation$ = this._rotation.asObservable();
+		this.rotation$ = this._rotation.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
 	}
 
 	serialize(): SerializedLabelModel {
@@ -47,7 +47,7 @@ export class LabelModel extends BaseModel<LinkModel> {
 	}
 
 	selectRotation(): Observable<number> {
-		return this.rotation$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged());
+		return this.rotation$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
 	}
 
 	setCoords(newCoords: Partial<Coords>) {
@@ -55,6 +55,6 @@ export class LabelModel extends BaseModel<LinkModel> {
 	}
 
 	selectCoords(): Observable<Coords> {
-		return this.coords$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged());
+		return this.coords$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
 	}
 }

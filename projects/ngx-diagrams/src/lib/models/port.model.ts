@@ -2,32 +2,37 @@ import { BaseModel } from './base.model';
 import { NodeModel } from './node.model';
 import { LinkModel } from './link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { distinctUntilChanged, shareReplay, takeUntil } from 'rxjs/operators';
 
 export class PortModel extends BaseModel<NodeModel> {
+	// TODO: convert all primitives to subjects
 	private name: string;
-	private links$: BehaviorSubject<{ [id: string]: LinkModel }>;
 	private maximumLinks: number;
 	private linkType: string;
 
-	private x$: BehaviorSubject<number>;
-	private y$: BehaviorSubject<number>;
-	private magnetic$: BehaviorSubject<boolean>;
-	private width$: BehaviorSubject<number>;
-	private height$: BehaviorSubject<number>;
-	private canCreateLinks$: BehaviorSubject<boolean>;
+	private _links$: BehaviorSubject<{ [id: string]: LinkModel }> = new BehaviorSubject({});
+	private _x$: BehaviorSubject<number> = new BehaviorSubject(0);
+	private _y$: BehaviorSubject<number> = new BehaviorSubject(0);
+	private _magnetic$: BehaviorSubject<boolean> = new BehaviorSubject(true);
+	private _width$: BehaviorSubject<number> = new BehaviorSubject(0);
+	private _height$: BehaviorSubject<number> = new BehaviorSubject(0);
+	private _canCreateLinks$: BehaviorSubject<boolean> = new BehaviorSubject(true);
+
+	private links$: Observable<{ [id: string]: LinkModel }> = this._links$.pipe(
+		takeUntil(this.onEntityDestroy()),
+		distinctUntilChanged(),
+		shareReplay(1)
+	);
+	private x$: Observable<number> = this._x$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
+	private y$: Observable<number> = this._y$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
+	private magnetic$: Observable<boolean> = this._magnetic$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
 
 	constructor(name: string, type?: string, id?: string, maximumLinks?: number, linkType?: string, magnetic: boolean = true) {
 		super(type, id);
 		this.name = name;
-		this.magnetic$ = new BehaviorSubject(magnetic);
-		this.links$ = new BehaviorSubject({});
 		this.maximumLinks = maximumLinks;
-		this.x$ = new BehaviorSubject(0);
-		this.y$ = new BehaviorSubject(0);
-		this.height$ = new BehaviorSubject(0);
-		this.width$ = new BehaviorSubject(0);
-		this.canCreateLinks$ = new BehaviorSubject(true);
 		this.linkType = linkType;
+		this.setMagnetic(magnetic);
 	}
 
 	serialize() {
@@ -54,13 +59,13 @@ export class PortModel extends BaseModel<NodeModel> {
 	}
 
 	getCanCreateLinks(): boolean {
-		const numberOfLinks: number = Object.keys(this.links$.getValue()).length;
+		const numberOfLinks: number = Object.keys(this._links$.getValue()).length;
 
 		if (this.maximumLinks && numberOfLinks >= this.maximumLinks) {
 			return false;
 		}
 
-		return this.canCreateLinks$.getValue();
+		return this._canCreateLinks$.getValue();
 	}
 
 	getCoords() {
@@ -68,47 +73,47 @@ export class PortModel extends BaseModel<NodeModel> {
 	}
 
 	selectCanCreateLinks() {
-		return this.canCreateLinks$.asObservable();
+		return this._canCreateLinks$;
 	}
 
 	setCanCreateLinks(value: boolean) {
-		this.canCreateLinks$.next(value);
+		this._canCreateLinks$.next(value);
 	}
 
 	getMagnetic() {
-		return this.magnetic$.getValue();
+		return this._magnetic$.getValue();
 	}
 
 	selectMagnetic() {
-		return this.magnetic$.asObservable();
+		return this.magnetic$;
 	}
 
 	setMagnetic(magnetic: boolean) {
-		this.magnetic$.next(magnetic);
+		this._magnetic$.next(magnetic);
 	}
 
 	selectX(): Observable<number> {
-		return this.x$.asObservable();
+		return this.x$;
 	}
 
 	selectY(): Observable<number> {
-		return this.y$.asObservable();
+		return this.y$;
 	}
 
 	getY() {
-		return this.y$.getValue();
+		return this._y$.getValue();
 	}
 
 	getX() {
-		return this.x$.getValue();
+		return this._x$.getValue();
 	}
 
 	getHeight() {
-		return this.height$.getValue();
+		return this._height$.getValue();
 	}
 
 	getWidth() {
-		return this.width$.getValue();
+		return this._width$.getValue();
 	}
 
 	getMaximumLinks(): number {
@@ -128,28 +133,28 @@ export class PortModel extends BaseModel<NodeModel> {
 	}
 
 	removeLink(link: LinkModel) {
-		const links = this.links$.getValue();
+		const links = this._links$.getValue();
 		delete links[link.id];
-		this.links$.next({ ...links });
+		this._links$.next({ ...links });
 	}
 
 	addLink(link: LinkModel) {
-		this.links$.next({ ...this.links$.value, [link.id]: link });
+		this._links$.next({ ...this._links$.value, [link.id]: link });
 	}
 
 	getLinks(): { [id: string]: LinkModel } {
-		return this.links$.getValue();
+		return this._links$.getValue();
 	}
 
 	selectLinks(): Observable<{ [id: string]: LinkModel }> {
-		return this.links$.asObservable();
+		return this.links$;
 	}
 
 	updateCoords({ x, y, width, height }: { x: number; y: number; width: number; height: number }) {
-		this.x$.next(x);
-		this.y$.next(y);
-		this.width$.next(width);
-		this.height$.next(height);
+		this._x$.next(x);
+		this._y$.next(y);
+		this._width$.next(width);
+		this._height$.next(height);
 	}
 
 	canLinkToPort(port: PortModel): boolean {
