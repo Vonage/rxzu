@@ -8,7 +8,6 @@ import { Coords } from '../interfaces/coords.interface';
 import { LabelModel } from './label.model';
 import { DiagramEngine } from '../services/engine.service';
 import { SerializedLinkModel } from '../interfaces/serialization.interface';
-import { distinctUntilChanged, shareReplay, takeUntil } from 'rxjs/operators';
 
 export class LinkModel extends BaseModel<DiagramModel> {
 	diagramEngine: DiagramEngine;
@@ -21,10 +20,10 @@ export class LinkModel extends BaseModel<DiagramModel> {
 	private extras: any;
 
 	private readonly _label$: BehaviorSubject<LabelModel> = new BehaviorSubject(null);
-	label$: Observable<LabelModel> = this._label$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
+	label$: Observable<LabelModel> = this._label$.pipe(this.entityPipe('label'));
 
-	constructor(linkType: string = 'default', id?: string) {
-		super(linkType, id);
+	constructor(linkType: string = 'default', id?: string, logPrefix: string = '[Link]') {
+		super(linkType, id, logPrefix);
 		this.points = [new PointModel(this, { x: 0, y: 0 }), new PointModel(this, { x: 0, y: 0 })];
 		this.extras = {};
 		this.sourcePort = null;

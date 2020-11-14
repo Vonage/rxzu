@@ -4,7 +4,7 @@ import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
 import { Coords } from '../interfaces/coords.interface';
 import { DiagramEngine } from '../services/engine.service';
-import { distinctUntilChanged, map, shareReplay, takeUntil } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Dimensions } from '../interfaces/dimensions.interface';
 import { ID, mapToArray } from '../utils/tool-kit.util';
 import { SerializedNodeModel } from '../interfaces/serialization.interface';
@@ -16,31 +16,11 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 	private readonly _coords$: BehaviorSubject<Coords> = new BehaviorSubject<Coords>({ x: 0, y: 0 });
 	private readonly _dimensions$: BehaviorSubject<Dimensions> = new BehaviorSubject<Dimensions>({ width: 0, height: 0 });
 
-	private readonly diagramEngine$: Observable<{ [s: string]: any }> = this._diagramEngine$.pipe(
-		takeUntil(this.onEntityDestroy()),
-		distinctUntilChanged(),
-		shareReplay(1)
-	);
-	private readonly extras$: Observable<{ [s: string]: any }> = this._extras$.pipe(
-		takeUntil(this.onEntityDestroy()),
-		distinctUntilChanged(),
-		shareReplay(1)
-	);
-	private readonly ports$: Observable<{ [s: string]: P }> = this._ports$.pipe(
-		takeUntil(this.onEntityDestroy()),
-		distinctUntilChanged(),
-		shareReplay(1)
-	);
-	private readonly coords$: Observable<Coords> = this._coords$.pipe(
-		takeUntil(this.onEntityDestroy()),
-		distinctUntilChanged(),
-		shareReplay(1)
-	);
-	private readonly dimensions$: Observable<Dimensions> = this._dimensions$.pipe(
-		takeUntil(this.onEntityDestroy()),
-		distinctUntilChanged(),
-		shareReplay(1)
-	);
+	private readonly diagramEngine$: Observable<{ [s: string]: any }> = this._diagramEngine$.pipe(this.entityPipe('diagramEngine'));
+	private readonly extras$: Observable<{ [s: string]: any }> = this._extras$.pipe(this.entityPipe('extras'));
+	private readonly ports$: Observable<{ [s: string]: P }> = this._ports$.pipe(this.entityPipe('ports'));
+	private readonly coords$: Observable<Coords> = this._coords$.pipe(this.entityPipe('coords'));
+	private readonly dimensions$: Observable<Dimensions> = this._dimensions$.pipe(this.entityPipe('dimensions'));
 
 	constructor(
 		nodeType: string = 'default',
@@ -105,7 +85,6 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 	transitionToCoords({ x, y }: Coords) {
 		// const transitionCompleted = new ReplaySubject(1);
 		// let { x: oldX, y: oldY } = this.getCoords();
-		// console.log(x, y, oldX, oldY);
 		// interval(0)
 		// 	.pipe(takeUntil(transitionCompleted))
 		// 	.subscribe(
@@ -137,7 +116,6 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 		// 			console.error(err);
 		// 		},
 		// 		() => {
-		// 			console.log('finished transition');
 		// 		}
 		// 	);
 	}
@@ -164,27 +142,19 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 
 	// TODO: map to BaseEvent
 	coordsChanges(): Observable<Coords> {
-		return this.coords$.pipe(takeUntil(this.onEntityDestroy()));
+		return this.coords$;
 	}
 
 	selectCoords(): Observable<Coords> {
-		return this.coords$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged());
+		return this.coords$;
 	}
 
 	selectX(): Observable<number> {
-		return this.selectCoords().pipe(
-			map(c => c.x),
-			this.withLog('selectX'),
-			distinctUntilChanged()
-		);
+		return this.coords$.pipe(map(c => c.x));
 	}
 
 	selectY(): Observable<number> {
-		return this.selectCoords().pipe(
-			map(c => c.y),
-			this.withLog('selectY'),
-			distinctUntilChanged()
-		);
+		return this.coords$.pipe(map(c => c.y));
 	}
 
 	/**
@@ -216,8 +186,6 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 		// TODO: implement selector
 		// TODO: create coerce func
 		return this.ports$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			distinctUntilChanged(),
 			map(ports => mapToArray(ports)),
 			this.withLog('selectPorts')
 		);
@@ -237,7 +205,7 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 
 	// TODO: return BaseEvent extension
 	dimensionChanges(): Observable<Dimensions> {
-		return this.dimensions$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), this.withLog('DimensionChanges'));
+		return this.dimensions$;
 	}
 
 	getHeight(): number {
@@ -258,18 +226,14 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 
 	selectWidth(): Observable<number> {
 		return this.dimensions$.pipe(
-			takeUntil(this.onEntityDestroy()),
 			map(d => d.width),
-			distinctUntilChanged(),
 			this.withLog('selectWidth')
 		);
 	}
 
 	selectHeight(): Observable<number> {
 		return this.dimensions$.pipe(
-			takeUntil(this.onEntityDestroy()),
 			map(d => d.height),
-			distinctUntilChanged(),
 			this.withLog('selectHeight')
 		);
 	}
@@ -284,6 +248,6 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 
 	selectExtras<E = any>(selector?: (extra: E) => E[keyof E] | string | string[]) {
 		// TODO: impl selector
-		return this.extras$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged());
+		return this.extras$;
 	}
 }

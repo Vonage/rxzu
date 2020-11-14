@@ -1,7 +1,6 @@
 import { Component, AfterViewInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { DefaultLinkModel, generateCurvePath, Coords } from 'ngx-diagrams';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
-import { distinctUntilChanged, shareReplay, takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'custom-link',
@@ -12,12 +11,12 @@ export class CustomLinkComponent extends DefaultLinkModel implements AfterViewIn
 	@ViewChild('labelLayer', { read: ViewContainerRef, static: true }) labelLayer: ViewContainerRef;
 
 	_path$: BehaviorSubject<string> = new BehaviorSubject(null);
-	path$: Observable<string> = this._path$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
+	path$: Observable<string> = this._path$.pipe(this.entityPipe('path'));
 
 	hover = false;
 
 	constructor() {
-		super({ type: 'custom-link' });
+		super({ type: 'custom-link', logPrefix: '[CustomLink]' });
 	}
 
 	ngAfterViewInit() {

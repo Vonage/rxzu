@@ -10,7 +10,6 @@ import { Coords } from '../interfaces/coords.interface';
 import { ID } from '../utils/tool-kit.util';
 import { SelectOptions } from '../interfaces/select-options.interface';
 import { SerializedDiagramModel } from '../interfaces/serialization.interface';
-import { distinctUntilChanged, shareReplay, takeUntil } from 'rxjs/operators';
 
 export class DiagramModel extends BaseEntity {
 	private _links$: BehaviorSubject<{ [s: string]: LinkModel }> = new BehaviorSubject<{ [s: string]: LinkModel }>({});
@@ -22,24 +21,16 @@ export class DiagramModel extends BaseEntity {
 	private _maxZoomOut$: BehaviorSubject<number> = new BehaviorSubject(null);
 	private _maxZoomIn$: BehaviorSubject<number> = new BehaviorSubject(null);
 
-	private nodes$: Observable<{ [s: string]: NodeModel }> = this._nodes$.pipe(
-		takeUntil(this.onEntityDestroy()),
-		distinctUntilChanged(),
-		shareReplay(1)
-	);
+	private nodes$: Observable<{ [s: string]: NodeModel }> = this._nodes$.pipe(this.entityPipe('nodes'));
 
-	private links$: Observable<{ [s: string]: LinkModel }> = this._links$.pipe(
-		takeUntil(this.onEntityDestroy()),
-		distinctUntilChanged(),
-		shareReplay(1)
-	);
+	private links$: Observable<{ [s: string]: LinkModel }> = this._links$.pipe(this.entityPipe('links'));
 
-	private offsetX$: Observable<number> = this._offsetX$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
-	private offsetY$: Observable<number> = this._offsetY$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
-	private zoom$: Observable<number> = this._zoom$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
+	private offsetX$: Observable<number> = this._offsetX$.pipe(this.entityPipe('offsetX'));
+	private offsetY$: Observable<number> = this._offsetY$.pipe(this.entityPipe('offsetY'));
+	private zoom$: Observable<number> = this._zoom$.pipe(this.entityPipe('zoom'));
 
-	constructor(private diagramEngine: DiagramEngine, id?: string) {
-		super(id);
+	constructor(private diagramEngine: DiagramEngine, id?: string, logPrefix: string = '[Diagram]') {
+		super(id, logPrefix);
 	}
 
 	// TODO: support the following events for links and nodes

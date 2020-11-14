@@ -4,7 +4,7 @@
  */
 
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { distinctUntilChanged, shareReplay, takeUntil, tap } from 'rxjs/operators';
 import { Coords } from '../interfaces/coords.interface';
 import { ROUTING_SCALING_FACTOR } from '../plugins/smart-routing.plugin';
 import * as Path from 'paths-js/path';
@@ -17,7 +17,7 @@ export enum LOG_LEVEL {
 // @internal
 export let __DEV__ = true;
 // @internal
-export let __LOG__: LOG_LEVEL = LOG_LEVEL.ERROR;
+export let __LOG__: LOG_LEVEL = LOG_LEVEL.LOG;
 
 export function enableDiagramProdMode(): void {
 	__DEV__ = false;
@@ -49,6 +49,15 @@ export function log(message: string, level: LOG_LEVEL = LOG_LEVEL.LOG, ...args: 
  */
 export function withLog(message: string, level: LOG_LEVEL = LOG_LEVEL.LOG, ...args: any) {
 	return <T>(source: Observable<T>) => (isDev() ? source.pipe(tap(val => log(message, level, val, ...args))) : source);
+}
+
+/**
+ * rxjs entity properties operator
+ * @internal
+ */
+export function entityProperty<Y>(destroyedNotifier: Observable<Y>, replayBy: number = 1, logMessage: string = '') {
+	return <T>(source: Observable<T>) =>
+		source.pipe(takeUntil(destroyedNotifier), distinctUntilChanged(), shareReplay(replayBy), withLog(logMessage));
 }
 
 export type ID = string;

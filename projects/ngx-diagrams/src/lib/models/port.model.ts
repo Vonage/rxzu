@@ -23,12 +23,20 @@ export class PortModel extends BaseModel<NodeModel> {
 		distinctUntilChanged(),
 		shareReplay(1)
 	);
-	private x$: Observable<number> = this._x$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
-	private y$: Observable<number> = this._y$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
-	private magnetic$: Observable<boolean> = this._magnetic$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
+	private x$: Observable<number> = this._x$.pipe(this.entityPipe('x'));
+	private y$: Observable<number> = this._y$.pipe(this.entityPipe('y'));
+	private magnetic$: Observable<boolean> = this._magnetic$.pipe(this.entityPipe('magnetic'));
 
-	constructor(name: string, type?: string, id?: string, maximumLinks?: number, linkType?: string, magnetic: boolean = true) {
-		super(type, id);
+	constructor(
+		name: string,
+		type?: string,
+		id?: string,
+		maximumLinks?: number,
+		linkType?: string,
+		magnetic: boolean = true,
+		logPrefix: string = '[Port]'
+	) {
+		super(type, id, logPrefix);
 		this.name = name;
 		this.maximumLinks = maximumLinks;
 		this.linkType = linkType;

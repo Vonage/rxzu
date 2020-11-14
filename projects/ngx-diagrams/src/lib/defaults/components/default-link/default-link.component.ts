@@ -4,7 +4,7 @@ import { generateCurvePath, generateDynamicPath } from '../../../utils/tool-kit.
 import { combineLatest, BehaviorSubject, Observable } from 'rxjs';
 import { PointModel } from '../../../models/point.model';
 import { LabelModel } from '../../../models/label.model';
-import { distinctUntilChanged, filter, shareReplay, takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { Coords } from '../../../interfaces';
 import { PathFinding } from '../../../plugins/smart-routing.plugin';
 
@@ -17,7 +17,7 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 	@ViewChild('labelLayer', { read: ViewContainerRef, static: true }) labelLayer: ViewContainerRef;
 
 	_path$: BehaviorSubject<string> = new BehaviorSubject(null);
-	path$: Observable<string> = this._path$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
+	path$: Observable<string> = this._path$.pipe(this.entityPipe('path'));
 	points$: BehaviorSubject<PointModel[]> = new BehaviorSubject([]);
 	label$: Observable<LabelModel>;
 	pathFinding: PathFinding; // only set when smart routing is active
