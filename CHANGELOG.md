@@ -1,3 +1,10 @@
+## [3.1.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.1.0...v3.1.1) (2020-11-14)
+
+
+### Bug Fixes
+
+* upgrade snyk from 1.415.0 to 1.419.1 ([d7e38df](https://github.com/DanielNetzer/ngx-diagrams/commit/d7e38df9ef538904b2fa619121f78d17db2adc7d))
+
 # [3.1.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.0.1...v3.1.0) (2020-11-12)
 
 
