@@ -1,8 +1,5 @@
 {
 	"name": "ngx-diagrams",
-	"dependencies": {
-		"@projectstorm/geometry": "^6.2.0"
-	},
 	"peerDependencies": {
 		"@angular/common": ">= 6.0.0",
 		"@angular/core": ">= 6.0.0",
