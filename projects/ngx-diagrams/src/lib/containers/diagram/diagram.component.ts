@@ -33,7 +33,7 @@ import { LooseLinkDestroyed } from '../../actions/loose-link-destroyed.action';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
-	// tslint:disable-next-line:no-input-rename
+	// eslint-disable-next-line @angular-eslint/no-input-rename
 	@Input('model') diagramModel: DiagramModel;
 	@Input() allowCanvasZoom = true;
 	@Input() allowCanvasTranslation = true;
