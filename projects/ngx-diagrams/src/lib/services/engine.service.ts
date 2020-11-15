@@ -345,6 +345,7 @@ export class DiagramEngine {
 			y: item.getCoords().y,
 			height: item.getHeight(),
 		}));
+
 		const allLinks = Object.values(this.diagramModel.getLinks());
 
 		const allPortsCoords = allLinks
@@ -403,10 +404,13 @@ export class DiagramEngine {
 
 		const maxY = Math.max(maxYElement.y + maxYElement.height, canvas.offsetWidth);
 
+		const width = Math.ceil(Math.abs(minX) + maxX);
+		const height = Math.ceil(Math.abs(minY) + maxY);
+
 		return {
-			width: Math.ceil(Math.abs(minX) + maxX) + 1000,
+			width,
 			hAdjustmentFactor: Math.abs(minX) / ROUTING_SCALING_FACTOR + 1,
-			height: Math.ceil(Math.abs(minY) + maxY) + 1000,
+			height,
 			vAdjustmentFactor: Math.abs(minY) / ROUTING_SCALING_FACTOR + 1,
 		};
 	}

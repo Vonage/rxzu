@@ -10,10 +10,11 @@ export class PathFinding {
 		| PF.JPFMoveDiagonallyIfNoObstacles
 		| PF.JPFMoveDiagonallyIfAtMostOneObstacle;
 
-	constructor(private diagramEngine: DiagramEngine) {
-		this.pathFinderInstance = PF.JumpPointFinder({
-			heuristic: PF.Heuristic.manhattan,
-			diagonalMovement: PF.DiagonalMovement.Never,
+	constructor(private diagramEngine: DiagramEngine, heuristic = PF.Heuristic.manhattan) {
+		this.pathFinderInstance = new PF.AStarFinder({
+			heuristic,
+			diagonalMovement: PF.DiagonalMovement.Always,
+			weight: 0,
 		});
 	}
 

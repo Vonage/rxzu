@@ -22,7 +22,7 @@ export class SmartRoutingExampleStoryComponent implements OnInit {
 		node1.setDimensions(nodesDefaultDimensions);
 		const outport1 = node1.addOutPort({ name: 'outport1' });
 
-		for (let index = 1; index < 2; index++) {
+		for (let index = 0; index < 5; index++) {
 			const nodeLoop = new DefaultNodeModel();
 			nodeLoop.setCoords({ x: 1500, y: index * 300 });
 			nodeLoop.setDimensions(nodesDefaultDimensions);

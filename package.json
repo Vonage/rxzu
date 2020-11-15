@@ -41,7 +41,8 @@
 		"pathfinding": "^0.4.18",
 		"rxjs": "~6.6.3",
 		"tslib": "^2.0.3",
-		"snyk": "^1.415.0"
+		"snyk": "^1.415.0",
+		"zone.js": "^0.10.2"
 	},
 	"devDependencies": {
 		"@angular-devkit/build-angular": "~0.1002.0",
@@ -59,11 +60,11 @@
 		"@semantic-release/exec": "^5.0.0",
 		"@semantic-release/git": "^9.0.0",
 		"@semantic-release/npm": "^7.0.5",
-		"@storybook/addon-actions": "^6.0.27",
-		"@storybook/addon-docs": "^6.0.27",
-		"@storybook/addon-essentials": "^6.0.27",
-		"@storybook/addon-links": "^6.0.27",
-		"@storybook/angular": "^6.0.27",
+		"@storybook/addon-actions": "^6.0.28",
+		"@storybook/addon-docs": "^6.0.28",
+		"@storybook/addon-essentials": "^6.0.28",
+		"@storybook/addon-links": "^6.0.28",
+		"@storybook/angular": "^6.0.28",
 		"@types/dagre": "^0.7.42",
 		"@types/jasmine": "~3.4.0",
 		"@types/jasminewd2": "~2.0.6",

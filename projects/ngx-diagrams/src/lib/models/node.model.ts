@@ -81,45 +81,6 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 		};
 	}
 
-	// TODO: implement better transition on auto arrange!
-	transitionToCoords({ x, y }: Coords) {
-		// const transitionCompleted = new ReplaySubject(1);
-		// let { x: oldX, y: oldY } = this.getCoords();
-		// interval(0)
-		// 	.pipe(takeUntil(transitionCompleted))
-		// 	.subscribe(
-		// 		() => {
-		// 			if (oldX < x) {
-		// 				oldX++;
-		// 			} else if (oldX > x) {
-		// 				oldX--;
-		// 			}
-		// 			if (y > oldY) {
-		// 				oldY++;
-		// 			} else if (y < oldY) {
-		// 				oldY--;
-		// 			}
-		// 			Object.values(this._ports.getValue()).forEach(port => {
-		// 				Object.values(port.getLinks()).forEach(link => {
-		// 					const point = link.getPointForPort(port);
-		// 					const { x: pointX, y: pointY } = point.getCoords();
-		// 					point.setCoords({ x: pointX + x - oldX, y: pointY + y - oldY });
-		// 				});
-		// 			});
-		// 			this._coords.next({ x: oldX, y: oldY });
-		// 			if (x === oldX && y === oldY) {
-		// 				transitionCompleted.next(true);
-		// 				transitionCompleted.complete();
-		// 			}
-		// 		},
-		// 		err => {
-		// 			console.error(err);
-		// 		},
-		// 		() => {
-		// 		}
-		// 	);
-	}
-
 	// TODO: override selectionChanges and replace this with it (convert to rx)
 	getSelectedEntities() {
 		let entities = super.getSelectedEntities();

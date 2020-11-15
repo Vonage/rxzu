@@ -2,12 +2,11 @@
 /**
  * Utility pathing and routing service
  */
-
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, shareReplay, takeUntil, tap } from 'rxjs/operators';
 import { Coords } from '../interfaces/coords.interface';
-import { ROUTING_SCALING_FACTOR } from '../plugins/smart-routing.plugin';
 import * as Path from 'paths-js/path';
+import { ROUTING_SCALING_FACTOR } from '../plugins/smart-routing.plugin';
 
 export enum LOG_LEVEL {
 	'LOG',
@@ -17,7 +16,7 @@ export enum LOG_LEVEL {
 // @internal
 export let __DEV__ = true;
 // @internal
-export let __LOG__: LOG_LEVEL = LOG_LEVEL.LOG;
+export let __LOG__: LOG_LEVEL = LOG_LEVEL.ERROR;
 
 export function enableDiagramProdMode(): void {
 	__DEV__ = false;
