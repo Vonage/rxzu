@@ -1,3 +1,10 @@
+# [3.3.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.2.0...v3.3.0) (2020-11-15)
+
+
+### Features
+
+* **angular 11:** updated library, storybook to angular 11 ([d67fd6b](https://github.com/DanielNetzer/ngx-diagrams/commit/d67fd6b63acc9d77837bbcb5482038feb82c17ff))
+
 # [3.2.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.1.1...v3.2.0) (2020-11-15)
 
 
