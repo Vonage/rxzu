@@ -11,12 +11,12 @@ export class CustomLinkComponent extends DefaultLinkModel implements AfterViewIn
 	@ViewChild('labelLayer', { read: ViewContainerRef, static: true }) labelLayer: ViewContainerRef;
 
 	_path$: BehaviorSubject<string> = new BehaviorSubject(null);
-	path$: Observable<string> = this._path$.asObservable();
+	path$: Observable<string> = this._path$.pipe(this.entityPipe('path'));
 
 	hover = false;
 
 	constructor() {
-		super('custom-link');
+		super({ type: 'custom-link', logPrefix: '[CustomLink]' });
 	}
 
 	ngAfterViewInit() {

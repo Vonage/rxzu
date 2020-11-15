@@ -42,6 +42,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	@Input() maxZoomOut: number = null;
 	@Input() maxZoomIn: number = null;
 	@Input() portMagneticRadius = 30;
+	@Input() smartRouting = false;
 
 	@Output() actionStartedFiring: EventEmitter<BaseAction> = new EventEmitter();
 	@Output() actionStillFiring: EventEmitter<BaseAction> = new EventEmitter();
@@ -66,6 +67,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	ngOnInit() {
 		if (this.diagramModel) {
 			this.diagramModel.getDiagramEngine().setCanvas(this.canvas.nativeElement);
+			this.diagramModel.getDiagramEngine().setSmartRoutingStatus(this.smartRouting);
 
 			this.nodes$ = this.diagramModel.selectNodes();
 			this.links$ = this.diagramModel.selectLinks();
@@ -406,6 +408,12 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(port);
 							port.updateCoords(portCoords);
 						});
+					}
+
+					if (this.diagramModel.getDiagramEngine().getSmartRouting()) {
+						setTimeout(() => {
+							this.diagramModel.getDiagramEngine().calculateRoutingMatrix();
+						}, 1);
 					}
 				} else if (selectionModel.model instanceof PointModel) {
 					// will only run here when trying to create a point on an existing link

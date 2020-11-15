@@ -2,17 +2,17 @@ import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Coords } from '../interfaces/coords.interface';
-import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { SerializedPointModel } from '../interfaces/serialization.interface';
 
 export class PointModel extends BaseModel<LinkModel> {
 	private readonly _coords: BehaviorSubject<Coords>;
 	private readonly coords$: Observable<Coords>;
 
-	constructor(link: LinkModel, { x, y }: Coords) {
-		super(link.getType());
+	constructor(link: LinkModel, { x, y }: Coords, id?: string, logPrefix: string = '[Point]') {
+		super(link.getType(), id, logPrefix);
 		this._coords = new BehaviorSubject<Coords>({ x, y });
-		this.coords$ = this._coords.asObservable();
+		this.coords$ = this._coords.pipe(this.entityPipe('coords'));
 		this.setParent(link);
 	}
 
@@ -44,7 +44,7 @@ export class PointModel extends BaseModel<LinkModel> {
 	}
 
 	selectCoords(): Observable<Coords> {
-		return this.coords$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged());
+		return this.coords$;
 	}
 
 	getCoords(): Coords {
@@ -52,16 +52,10 @@ export class PointModel extends BaseModel<LinkModel> {
 	}
 
 	selectX(): Observable<number> {
-		return this.selectCoords().pipe(
-			map(c => c.x),
-			distinctUntilChanged()
-		);
+		return this.selectCoords().pipe(map(c => c.x));
 	}
 
 	selectY(): Observable<number> {
-		return this.selectCoords().pipe(
-			map(c => c.y),
-			distinctUntilChanged()
-		);
+		return this.selectCoords().pipe(map(c => c.y));
 	}
 }

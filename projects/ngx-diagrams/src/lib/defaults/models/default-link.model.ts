@@ -2,46 +2,46 @@ import { LinkModel } from '../../models/link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export class DefaultLinkModel extends LinkModel {
-	width$: BehaviorSubject<number>;
-	private color$: BehaviorSubject<string>;
-	curvyness$: BehaviorSubject<number>;
+	private _width$: BehaviorSubject<number> = new BehaviorSubject(3);
+	private _color$: BehaviorSubject<string> = new BehaviorSubject('rgba(255,255,255,0.5)');
+	private _curvyness$: BehaviorSubject<number> = new BehaviorSubject(50);
+	width$: Observable<number> = this._width$.pipe(this.entityPipe('width'));
+	color$: Observable<string> = this._color$.pipe(this.entityPipe('color'));
+	curvyness$: Observable<number> = this._curvyness$.pipe(this.entityPipe('curvyness'));
 
-	constructor({ type = 'default' }: { type?: string } = {}) {
-		super(type);
-		this.color$ = new BehaviorSubject('rgba(255,255,255,0.5)');
-		this.width$ = new BehaviorSubject(3);
-		this.curvyness$ = new BehaviorSubject(50);
+	constructor({ type = 'default', id, logPrefix = '[DefaultLink]' }: { type?: string; id?: string; logPrefix?: string } = {}) {
+		super(type, id, logPrefix);
 	}
 
 	setWidth(width: number) {
-		this.width$.next(width);
+		this._width$.next(width);
 	}
 
 	setColor(color: string) {
-		this.color$.next(color);
+		this._color$.next(color);
 	}
 
 	selectWidth(): Observable<number> {
-		return this.width$.asObservable();
+		return this.width$;
 	}
 
 	selectColor(): Observable<string> {
-		return this.color$.asObservable();
+		return this.color$;
 	}
 
 	setCurvyness(curvyness: number) {
-		this.curvyness$.next(curvyness);
+		this._curvyness$.next(curvyness);
 	}
 
 	get color() {
-		return this.color$.getValue();
+		return this._color$.getValue();
 	}
 
 	get width() {
-		return this.width$.getValue();
+		return this._width$.getValue();
 	}
 
 	get curvyness() {
-		return this.curvyness$.getValue();
+		return this._curvyness$.getValue();
 	}
 }

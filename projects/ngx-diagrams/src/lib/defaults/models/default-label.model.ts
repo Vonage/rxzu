@@ -3,10 +3,10 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 export class DefaultLabelModel extends LabelModel {
 	private _label: BehaviorSubject<string> = new BehaviorSubject('');
-	label$: Observable<string> = this._label.asObservable();
+	label$: Observable<string> = this._label.pipe(this.entityPipe('label'));
 
-	constructor(label: string = 'NO LABEL', type: string = 'default') {
-		super(type);
+	constructor(label: string = 'NO LABEL', type: string = 'default', id?: string, logPrefix: string = '[DefaultLabel]') {
+		super(type, id, logPrefix);
 		this.setLabel(label);
 	}
 

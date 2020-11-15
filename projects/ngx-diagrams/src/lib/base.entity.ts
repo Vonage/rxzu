@@ -1,6 +1,6 @@
-import { ID, log as _log, withLog as _withLog, UID, LOG_LEVEL } from './utils/tool-kit.util';
+import { ID, log as _log, withLog as _withLog, entityProperty as _entityProperty, UID, LOG_LEVEL } from './utils/tool-kit.util';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { map, takeUntil } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { BaseEvent, LockEvent } from './interfaces/event.interface';
 
 export type BaseEntityType = 'node' | 'link' | 'port' | 'point';
@@ -14,7 +14,10 @@ export class BaseEntity {
 	private _destroyed: Subject<null> = new Subject();
 	private _destroyed$: Observable<null> = this._destroyed.asObservable();
 	private _locked: BehaviorSubject<boolean> = new BehaviorSubject(false);
-	private _locked$: Observable<boolean> = this._locked.asObservable();
+	private _locked$: Observable<LockEvent> = this._locked.pipe(
+		this.entityPipe('locked'),
+		map(locked => new LockEvent(this, locked))
+	);
 
 	constructor(id?: ID, logPrefix = '') {
 		this._id = id || UID();
@@ -37,6 +40,10 @@ export class BaseEntity {
 		return _withLog(`${this._logPrefix} ${message}: `, LOG_LEVEL.LOG, ...args);
 	}
 
+	entityPipe(logMessage: string = '') {
+		return _entityProperty(this.onEntityDestroy(), 0, `${this._logPrefix}: ${logMessage}`);
+	}
+
 	getLocked(): boolean {
 		return this._locked.getValue();
 	}
@@ -50,7 +57,7 @@ export class BaseEntity {
 		/*noop*/
 	}
 
-	clone(lookupTable: { [s: string]: any } = {}) {
+	public clone(lookupTable: { [s: string]: any } = {}) {
 		// try and use an existing clone first
 		if (lookupTable[this.id]) {
 			return lookupTable[this.id];
@@ -64,7 +71,7 @@ export class BaseEntity {
 		return clone;
 	}
 
-	serialize() {
+	public serialize() {
 		return {
 			id: this.id,
 			locked: this.getLocked(),
@@ -72,11 +79,7 @@ export class BaseEntity {
 	}
 
 	public lockChanges(): Observable<LockEvent> {
-		return this._locked$.pipe(
-			takeUntil(this.onEntityDestroy()),
-			map(locked => new LockEvent(this, locked)),
-			this.withLog('lockChanges')
-		);
+		return this._locked$;
 	}
 
 	public destroy() {

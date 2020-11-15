@@ -15,7 +15,7 @@ export class CustomNodeComponent extends DefaultNodeModel implements OnInit, OnD
 	nodeContent = 'Pick me!';
 
 	constructor() {
-		super('custom-node');
+		super({ type: 'custom-node' });
 	}
 
 	ngOnInit() {
@@ -39,6 +39,6 @@ export class CustomNodeComponent extends DefaultNodeModel implements OnInit, OnD
 	}
 
 	generatePort(port: PortModel) {
-		this.diagramEngine.generateWidgetForPort(port, this.portsLayer);
+		this.getDiagramEngine().generateWidgetForPort(port, this.portsLayer);
 	}
 }
