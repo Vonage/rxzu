@@ -1,20 +1,18 @@
 # [3.3.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.2.0...v3.3.0) (2020-11-15)
 
-
 ### Features
 
-* **angular 11:** updated library, storybook to angular 11 ([d67fd6b](https://github.com/DanielNetzer/ngx-diagrams/commit/d67fd6b63acc9d77837bbcb5482038feb82c17ff))
+- **angular 11:** updated library, storybook to angular 11 ([d67fd6b](https://github.com/DanielNetzer/ngx-diagrams/commit/d67fd6b63acc9d77837bbcb5482038feb82c17ff))
 
 # [3.2.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.1.1...v3.2.0) (2020-11-15)
 
-
 ### Features
 
-* **logger:** every event changes can be monitored using log level info ([d7b217d](https://github.com/DanielNetzer/ngx-diagrams/commit/d7b217dfa292f3d0876a5c7a583ddba7cca3c2cb))
-* **no zone:** everything rx with proper pipes ([fa400a2](https://github.com/DanielNetzer/ngx-diagrams/commit/fa400a2c398ff6d37cf65334263dc96c11057d08))
-* **smart routing:** mid implementation of smart links ([a074ac2](https://github.com/DanielNetzer/ngx-diagrams/commit/a074ac27fec3698cf889343b8fddd7779b1d646e))
-* **smart routing:** working, now to optmizations ([ea301f5](https://github.com/DanielNetzer/ngx-diagrams/commit/ea301f5e14aa3a8135c04b60eeb72440d80c548d))
-* **smart-routing:** working, still have to restrict canvas limits ([d82479e](https://github.com/DanielNetzer/ngx-diagrams/commit/d82479e8e59609feaa49450561421be1ce7fb7cf))
+- **logger:** every event changes can be monitored using log level info ([d7b217d](https://github.com/DanielNetzer/ngx-diagrams/commit/d7b217dfa292f3d0876a5c7a583ddba7cca3c2cb))
+- **no zone:** everything rx with proper pipes ([fa400a2](https://github.com/DanielNetzer/ngx-diagrams/commit/fa400a2c398ff6d37cf65334263dc96c11057d08))
+- **smart routing:** mid implementation of smart links ([a074ac2](https://github.com/DanielNetzer/ngx-diagrams/commit/a074ac27fec3698cf889343b8fddd7779b1d646e))
+- **smart routing:** working, now to optmizations ([ea301f5](https://github.com/DanielNetzer/ngx-diagrams/commit/ea301f5e14aa3a8135c04b60eeb72440d80c548d))
+- **smart-routing:** working, still have to restrict canvas limits ([d82479e](https://github.com/DanielNetzer/ngx-diagrams/commit/d82479e8e59609feaa49450561421be1ce7fb7cf))
 
 ## [3.1.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.1.0...v3.1.1) (2020-11-14)
 
