@@ -58,9 +58,6 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	private nodesRendered$: BehaviorSubject<boolean>;
 	private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-	private mouseUpListener = () => {};
-	private mouseMoveListener = () => {};
-
 	constructor(private renderer: Renderer2, private cdRef: ChangeDetectorRef) {}
 
 	// TODO: handle destruction of container, resseting all observables to avoid memory leaks!
@@ -220,7 +217,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			const element = this.getMouseElement(event);
 			action.selectionModels.forEach(model => {
 				// only care about points connecting to things
-				if (!(model.model instanceof PointModel)) {
+				if (!model || !(model.model instanceof PointModel)) {
 					return;
 				}
 
@@ -271,7 +268,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			if (!this.allowLooseLinks) {
 				action.selectionModels.forEach(model => {
 					// only care about points connecting to things
-					if (!(model.model instanceof PointModel)) {
+					if (!model || !(model.model instanceof PointModel)) {
 						return;
 					}
 
@@ -287,7 +284,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			// destroy any invalid links
 			action.selectionModels.forEach(model => {
 				// only care about points connecting to things
-				if (!(model.model instanceof PointModel)) {
+				if (!model || !(model.model instanceof PointModel)) {
 					return;
 				}
 
@@ -551,4 +548,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			this.diagramModel.setOffset(updatedXOffset, updatedYOffset);
 		}
 	}
+
+	private mouseUpListener = () => {};
+	private mouseMoveListener = () => {};
 }
