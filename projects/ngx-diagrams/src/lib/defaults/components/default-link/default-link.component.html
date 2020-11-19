@@ -27,7 +27,7 @@
 	</g>
 
 	<!-- Points -->
-	<g *ngFor="let point of getPoints()" [id]="point.id">
+	<g *ngFor="let point of getPoints(); trackBy: trackByPoints" [id]="point.id">
 		<circle
 			fill="currentColor"
 			[attr.cx]="point.selectX() | async"

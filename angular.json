@@ -1,70 +1,72 @@
 {
-	"$schema": "./node_modules/@angular/cli/lib/config/schema.json",
-	"version": 1,
-	"newProjectRoot": "projects",
-	"projects": {
-		"ngx-diagrams": {
-			"root": "projects/ngx-diagrams",
-			"sourceRoot": "projects/ngx-diagrams/src",
-			"projectType": "library",
-			"prefix": "ngdx",
-			"schematics": {
-				"@schematics/angular:component": {
-					"style": "scss",
-					"skipTests": true
-				},
-				"@schematics/angular:class": {
-					"skipTests": true
-				},
-				"@schematics/angular:directive": {
-					"skipTests": true
-				},
-				"@schematics/angular:guard": {
-					"skipTests": true
-				},
-				"@schematics/angular:module": {
-					"skipTests": true
-				},
-				"@schematics/angular:pipe": {
-					"skipTests": true
-				},
-				"@schematics/angular:service": {
-					"skipTests": true
-				}
-			},
-			"architect": {
-				"build": {
-					"builder": "@angular-devkit/build-ng-packagr:build",
-					"options": {
-						"tsConfig": "projects/ngx-diagrams/tsconfig.lib.json",
-						"project": "projects/ngx-diagrams/ng-package.json"
-					},
-					"configurations": {
-						"production": {
-							"tsConfig": "projects/ngx-diagrams/tsconfig.lib.prod.json"
-						}
-					}
-				},
-				"test": {
-					"builder": "@angular-devkit/build-angular:karma",
-					"options": {
-						"main": "projects/ngx-diagrams/src/test.ts",
-						"tsConfig": "projects/ngx-diagrams/tsconfig.spec.json",
-						"karmaConfig": "projects/ngx-diagrams/karma.conf.js"
-					}
-				},
-				"lint": {
-					"builder": "@angular-devkit/build-angular:tslint",
-					"options": {
-						"tsConfig": ["projects/ngx-diagrams/tsconfig.lib.json", "projects/ngx-diagrams/tsconfig.spec.json"],
-						"exclude": ["**/node_modules/**"]
-					}
-				}
-			}
-		}
-	},
-	"defaultProject": "ngx-diagrams",
-	"cli": {
-		"analytics": "5c1508b8-b700-41c8-bb2c-f01e746ccb20"
-	}
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "ngx-diagrams": {
+      "root": "projects/ngx-diagrams",
+      "sourceRoot": "projects/ngx-diagrams/src",
+      "projectType": "library",
+      "prefix": "ngdx",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss",
+          "skipTests": true
+        },
+        "@schematics/angular:class": {
+          "skipTests": true
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true
+        },
+        "@schematics/angular:guard": {
+          "skipTests": true
+        },
+        "@schematics/angular:module": {
+          "skipTests": true
+        },
+        "@schematics/angular:pipe": {
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "tsConfig": "projects/ngx-diagrams/tsconfig.lib.json",
+            "project": "projects/ngx-diagrams/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-diagrams/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-diagrams/src/test.ts",
+            "tsConfig": "projects/ngx-diagrams/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-diagrams/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/ngx-diagrams/**/*.ts",
+              "projects/ngx-diagrams/**/*.html"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "ngx-diagrams",
+  "cli": {
+    "analytics": "5c1508b8-b700-41c8-bb2c-f01e746ccb20"
+  }
 }

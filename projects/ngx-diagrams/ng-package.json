@@ -4,8 +4,10 @@
 	"lib": {
 		"entryFile": "src/public-api.ts",
 		"umdModuleIds": {
-			"dagre": "dagre"
+			"dagre": "dagre",
+			"paths-js": "paths-js",
+			"pathfinding": "pathfinding"
 		}
 	},
-	"whitelistedNonPeerDependencies": ["dagre"]
+	"whitelistedNonPeerDependencies": ["dagre", "paths-js", "pathfinding"]
 }

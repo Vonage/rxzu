@@ -12,43 +12,43 @@ import { SelectOptions } from '../interfaces/select-options.interface';
 import { SerializedDiagramModel } from '../interfaces/serialization.interface';
 
 export class DiagramModel extends BaseEntity {
-	links$: BehaviorSubject<{ [s: string]: LinkModel }>;
-	nodes$: BehaviorSubject<{ [s: string]: NodeModel }>;
-	zoom$: BehaviorSubject<number>;
-	offsetX$: BehaviorSubject<number>;
-	offsetY$: BehaviorSubject<number>;
-	gridSize$: BehaviorSubject<number>;
-	maxZoomOut$: BehaviorSubject<number>;
-	maxZoomIn$: BehaviorSubject<number>;
+	private _links$: BehaviorSubject<{ [s: string]: LinkModel }> = new BehaviorSubject<{ [s: string]: LinkModel }>({});
+	private _nodes$: BehaviorSubject<{ [s: string]: NodeModel }> = new BehaviorSubject<{ [s: string]: NodeModel }>({});
+	private _zoom$: BehaviorSubject<number> = new BehaviorSubject(100);
+	private _offsetX$: BehaviorSubject<number> = new BehaviorSubject(0);
+	private _offsetY$: BehaviorSubject<number> = new BehaviorSubject(0);
+	private _gridSize$: BehaviorSubject<number> = new BehaviorSubject(0);
+	private _maxZoomOut$: BehaviorSubject<number> = new BehaviorSubject(null);
+	private _maxZoomIn$: BehaviorSubject<number> = new BehaviorSubject(null);
 
-	constructor(private diagramEngine: DiagramEngine, id?: string) {
-		super(id);
-		this.nodes$ = new BehaviorSubject<{ [s: string]: NodeModel }>({});
-		this.links$ = new BehaviorSubject<{ [s: string]: LinkModel }>({});
-		this.zoom$ = new BehaviorSubject(100);
-		this.offsetX$ = new BehaviorSubject(0);
-		this.offsetY$ = new BehaviorSubject(0);
-		this.gridSize$ = new BehaviorSubject(0);
-		this.maxZoomIn$ = new BehaviorSubject(null);
-		this.maxZoomOut$ = new BehaviorSubject(null);
+	private nodes$: Observable<{ [s: string]: NodeModel }> = this._nodes$.pipe(this.entityPipe('nodes'));
+
+	private links$: Observable<{ [s: string]: LinkModel }> = this._links$.pipe(this.entityPipe('links'));
+
+	private offsetX$: Observable<number> = this._offsetX$.pipe(this.entityPipe('offsetX'));
+	private offsetY$: Observable<number> = this._offsetY$.pipe(this.entityPipe('offsetY'));
+	private zoom$: Observable<number> = this._zoom$.pipe(this.entityPipe('zoom'));
+
+	constructor(private diagramEngine: DiagramEngine, id?: string, logPrefix: string = '[Diagram]') {
+		super(id, logPrefix);
 	}
 
 	// TODO: support the following events for links and nodes
 	// removed, updated<positionChanged/dataChanged>, added
 	getNodes(): { [s: string]: NodeModel } {
-		return this.nodes$.getValue();
+		return this._nodes$.getValue();
 	}
 
 	getNode(id: ID): NodeModel | null {
-		return this.nodes$.getValue()[id];
+		return this._nodes$.getValue()[id];
 	}
 
 	getLink(id: ID): LinkModel | null {
-		return this.links$.getValue()[id];
+		return this._links$.getValue()[id];
 	}
 
 	getLinks(): { [s: string]: LinkModel } {
-		return this.links$.getValue();
+		return this._links$.getValue();
 	}
 
 	getAllPorts(options?: SelectOptions<PortModel>): Map<string, PortModel> {
@@ -73,7 +73,7 @@ export class DiagramModel extends BaseEntity {
 	 * @returns Inserted Node
 	 */
 	addNode(node: NodeModel): NodeModel {
-		this.nodes$.next({ ...this.nodes$.value, [node.id]: node });
+		this._nodes$.next({ ...this._nodes$.value, [node.id]: node });
 		return node;
 	}
 
@@ -91,18 +91,18 @@ export class DiagramModel extends BaseEntity {
 			});
 		});
 
-		const updNodes = { ...this.nodes$.value };
+		const updNodes = { ...this.getNodes() };
 		delete updNodes[nodeID];
-		this.nodes$.next(updNodes);
+		this._nodes$.next(updNodes);
 
 		node.destroy();
 	}
 
 	/**
-	 * Get nodes behaviour subject, use `.getValue()` for snapshot
+	 * Get nodes as observable, use `.getValue()` for snapshot
 	 */
 	selectNodes(): Observable<{ [s: string]: NodeModel }> {
-		return this.nodes$.asObservable();
+		return this.nodes$;
 	}
 
 	/**
@@ -110,7 +110,7 @@ export class DiagramModel extends BaseEntity {
 	 * @returns Newly created link
 	 */
 	addLink(link: LinkModel): LinkModel {
-		this.links$.next({ ...this.links$.value, [link.id]: link });
+		this._links$.next({ ...this.getLinks(), [link.id]: link });
 		return link;
 	}
 
@@ -121,10 +121,10 @@ export class DiagramModel extends BaseEntity {
 		const linkID: ID = typeof linkOrId === 'string' ? linkOrId : linkOrId.id;
 		const link = this.getLink(linkID);
 
-		const updLinks = { ...this.links$.value };
+		const updLinks = { ...this.getLinks() };
 		delete updLinks[linkID];
 
-		this.links$.next(updLinks);
+		this._links$.next(updLinks);
 		link.destroy();
 	}
 
@@ -138,7 +138,7 @@ export class DiagramModel extends BaseEntity {
 	 * Get links behaviour subject, use `.getValue()` for snapshot
 	 */
 	selectLinks(): Observable<{ [s: string]: LinkModel }> {
-		return this.links$.asObservable();
+		return this.links$;
 	}
 
 	// /**
@@ -146,92 +146,74 @@ export class DiagramModel extends BaseEntity {
 	//  * @returns diagram model as a string
 	//  */
 	serialize(): SerializedDiagramModel {
-		const serializedNodes = Object.values(this.nodes$.getValue()).map(node => node.serialize());
-		const serializedLinks = Object.values(this.links$.getValue()).map(link => link.serialize());
+		const serializedNodes = Object.values(this.getNodes()).map(node => node.serialize());
+		const serializedLinks = Object.values(this.getLinks()).map(link => link.serialize());
 		return { ...super.serialize(), nodes: serializedNodes, links: serializedLinks };
 	}
 
-	// /**
-	//  * Load diagram from JSON
-	//  */
-	// deserialize(serializedModel: SerializedDiagramModel) {
-	// 	const nodes: DefaultNodeModel[] = [];
-	// 	Object.values(serializedModel.nodes).forEach(node => {
-	// 		const nodeModel = new DefaultNodeModel(node);
-	// 		console.log(nodeModel);
-	// 		nodes.push(nodeModel);
-	// 	});
-
-	// 	this.addAll(...nodes);
-	// Object.values(serializedModel.links).forEach(link => {
-	// 	const linkModel = new DefaultLinkModel(link);
-	// 	this.addLink(linkModel);
-	// });
-	// }
-
 	setMaxZoomOut(maxZoomOut: number) {
-		this.maxZoomOut$.next(maxZoomOut);
+		this._maxZoomOut$.next(maxZoomOut);
 	}
 
 	setMaxZoomIn(maxZoomIn: number) {
-		this.maxZoomIn$.next(maxZoomIn);
+		this._maxZoomIn$.next(maxZoomIn);
 	}
 
 	getMaxZoomOut() {
-		return this.maxZoomOut$.getValue();
+		return this._maxZoomOut$.getValue();
 	}
 
 	getMaxZoomIn() {
-		return this.maxZoomIn$.getValue();
+		return this._maxZoomIn$.getValue();
 	}
 
 	setOffset(x: number, y: number) {
-		this.offsetX$.next(x);
-		this.offsetY$.next(y);
+		this._offsetX$.next(x);
+		this._offsetY$.next(y);
 	}
 
 	setOffsetX(x: number) {
-		this.offsetX$.next(x);
+		this._offsetX$.next(x);
 	}
 
 	getOffsetX(): number {
-		return this.offsetX$.getValue();
+		return this._offsetX$.getValue();
 	}
 
 	selectOffsetX(): Observable<number> {
-		return this.offsetX$.asObservable();
+		return this.offsetX$;
 	}
 
 	setOffsetY(y: number) {
-		this.offsetY$.next(y);
+		this._offsetY$.next(y);
 	}
 
 	getOffsetY(): number {
-		return this.offsetY$.getValue();
+		return this._offsetY$.getValue();
 	}
 
 	selectOffsetY(): Observable<number> {
-		return this.offsetY$.asObservable();
+		return this.offsetY$;
 	}
 
 	setZoomLevel(z: number) {
-		const maxZoomIn = this.maxZoomIn$.getValue();
-		const maxZoomOut = this.maxZoomOut$.getValue();
+		const maxZoomIn = this._maxZoomIn$.getValue();
+		const maxZoomOut = this._maxZoomOut$.getValue();
 
 		// check if zoom levels exceeded defined boundaries
 		if ((maxZoomIn && z > maxZoomIn) || (maxZoomOut && z < maxZoomOut)) {
 			return;
 		}
 
-		this.zoom$.next(z);
+		this._zoom$.next(z);
 	}
 
 	getZoomLevel(): number {
-		return this.zoom$.getValue();
+		return this._zoom$.getValue();
 	}
 
 	selectZoomLevel(): Observable<number> {
-		return this.zoom$.asObservable();
+		return this.zoom$;
 	}
 
 	getDiagramEngine(): DiagramEngine {
@@ -248,7 +230,7 @@ export class DiagramModel extends BaseEntity {
 	}
 
 	getGridPosition({ x, y }: Coords): Coords {
-		const gridSize = this.gridSize$.getValue();
+		const gridSize = this._gridSize$.getValue();
 		if (gridSize === 0) {
 			return { x, y };
 		}
@@ -265,14 +247,14 @@ export class DiagramModel extends BaseEntity {
 		let items: BaseModel[] = [];
 
 		// run through nodes
-		items = items.concat(Object.values(this.nodes$.getValue()).flatMap(node => node.getSelectedEntities()));
+		items = items.concat(Object.values(this.getNodes()).flatMap(node => node.getSelectedEntities()));
 
 		// find all the links
-		items = items.concat(Object.values(this.links$.getValue()).flatMap(link => link.getSelectedEntities()));
+		items = items.concat(Object.values(this.getLinks()).flatMap(link => link.getSelectedEntities()));
 
 		// find all points
 		items = items.concat(
-			Object.values(this.links$.getValue()).flatMap(link => {
+			Object.values(this.getLinks()).flatMap(link => {
 				return link.getPoints().flatMap(point => point.getSelectedEntities());
 			})
 		);

@@ -1,27 +1,39 @@
-import { Component, AfterViewInit, ChangeDetectorRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectorRef, ViewChild, ViewContainerRef, OnInit } from '@angular/core';
 import { DefaultLinkModel } from '../../models/default-link.model';
-import { generateCurvePath } from '../../../utils/tool-kit.util';
+import { generateCurvePath, generateDynamicPath } from '../../../utils/tool-kit.util';
 import { combineLatest, BehaviorSubject, Observable } from 'rxjs';
 import { PointModel } from '../../../models/point.model';
 import { LabelModel } from '../../../models/label.model';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Coords } from '../../../interfaces';
+import { PathFinding } from '../../../plugins/smart-routing.plugin';
 
 @Component({
 	selector: 'ngdx-default-link',
 	templateUrl: './default-link.component.html',
 	styleUrls: ['./default-link.component.scss'],
 })
-export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewInit {
+export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewInit, OnInit {
 	@ViewChild('labelLayer', { read: ViewContainerRef, static: true }) labelLayer: ViewContainerRef;
 
 	_path$: BehaviorSubject<string> = new BehaviorSubject(null);
-	path$: Observable<string> = this._path$.asObservable();
+	path$: Observable<string> = this._path$.pipe(this.entityPipe('path'));
 	points$: BehaviorSubject<PointModel[]> = new BehaviorSubject([]);
 	label$: Observable<LabelModel>;
+	pathFinding: PathFinding; // only set when smart routing is active
 
 	constructor(private cdRef: ChangeDetectorRef) {
 		super({ type: 'ngdx-default-link' });
+	}
+
+	trackByPoints(i: number, point: PointModel) {
+		return point.id;
+	}
+
+	ngOnInit() {
+		if (this.diagramEngine.getSmartRouting()) {
+			this.pathFinding = this.diagramEngine.getPathfinding();
+		}
 	}
 
 	ngAfterViewInit() {
@@ -34,18 +46,36 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 			.subscribe(([firstPCoords, lastPCoords]) => {
 				const points = [firstPCoords, lastPCoords];
 
-				const isHorizontal = Math.abs(firstPCoords.x - lastPCoords.x) > Math.abs(firstPCoords.y - lastPCoords.y);
-				const xOrY = isHorizontal ? 'x' : 'y';
+				if (this.diagramEngine.getSmartRouting()) {
+					// first step: calculate a direct path between the points being linked
+					const directPathCoords = this.pathFinding.calculateDirectPath(firstPCoords, lastPCoords);
+					const routingMatrix = this.diagramEngine.getRoutingMatrix();
 
-				// draw the smoothing
-				// if the points are too close, just draw a straight line
-				let isStraight = false;
-				if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 50) {
-					isStraight = true;
+					// now we need to extract, from the routing matrix, the very first walkable points
+					// so they can be used as origin and destination of the link to be created
+					const smartLink = this.pathFinding.calculateLinkStartEndCoords(routingMatrix, directPathCoords);
+
+					if (smartLink) {
+						const { start, end, pathToStart, pathToEnd } = smartLink;
+						// second step: calculate a path avoiding hitting other elements
+						const simplifiedPath = this.pathFinding.calculateDynamicPath(routingMatrix, start, end, pathToStart, pathToEnd);
+						const smartPath = generateDynamicPath(simplifiedPath);
+						this._path$.next(smartPath);
+					}
+				} else {
+					// handle regular links
+					// draw the smoothing
+					// if the points are too close, just draw a straight line
+					const isHorizontal = Math.abs(firstPCoords.x - lastPCoords.x) > Math.abs(firstPCoords.y - lastPCoords.y);
+					const xOrY = isHorizontal ? 'x' : 'y';
+					let isStraight = false;
+					if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 50) {
+						isStraight = true;
+					}
+
+					const path = generateCurvePath(firstPCoords, lastPCoords, isStraight ? 0 : this.curvyness);
+					this._path$.next(path);
 				}
-
-				const path = generateCurvePath(firstPCoords, lastPCoords, isStraight ? 0 : this.curvyness);
-				this._path$.next(path);
 
 				const label = this.getLabel();
 				// update label position

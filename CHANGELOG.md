@@ -1,214 +1,202 @@
-## [3.1.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.1.0...v3.1.1) (2020-11-14)
+# [3.3.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.2.0...v3.3.0) (2020-11-15)
 
+### Features
+
+- **angular 11:** updated library, storybook to angular 11 ([d67fd6b](https://github.com/DanielNetzer/ngx-diagrams/commit/d67fd6b63acc9d77837bbcb5482038feb82c17ff))
+
+# [3.2.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.1.1...v3.2.0) (2020-11-15)
+
+### Features
+
+- **logger:** every event changes can be monitored using log level info ([d7b217d](https://github.com/DanielNetzer/ngx-diagrams/commit/d7b217dfa292f3d0876a5c7a583ddba7cca3c2cb))
+- **no zone:** everything rx with proper pipes ([fa400a2](https://github.com/DanielNetzer/ngx-diagrams/commit/fa400a2c398ff6d37cf65334263dc96c11057d08))
+- **smart routing:** mid implementation of smart links ([a074ac2](https://github.com/DanielNetzer/ngx-diagrams/commit/a074ac27fec3698cf889343b8fddd7779b1d646e))
+- **smart routing:** working, now to optmizations ([ea301f5](https://github.com/DanielNetzer/ngx-diagrams/commit/ea301f5e14aa3a8135c04b60eeb72440d80c548d))
+- **smart-routing:** working, still have to restrict canvas limits ([d82479e](https://github.com/DanielNetzer/ngx-diagrams/commit/d82479e8e59609feaa49450561421be1ce7fb7cf))
+
+## [3.1.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.1.0...v3.1.1) (2020-11-14)
 
 ### Bug Fixes
 
-* upgrade snyk from 1.415.0 to 1.419.1 ([d7e38df](https://github.com/DanielNetzer/ngx-diagrams/commit/d7e38df9ef538904b2fa619121f78d17db2adc7d))
+- upgrade snyk from 1.415.0 to 1.419.1 ([d7e38df](https://github.com/DanielNetzer/ngx-diagrams/commit/d7e38df9ef538904b2fa619121f78d17db2adc7d))
 
 # [3.1.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.0.1...v3.1.0) (2020-11-12)
 
-
 ### Features
 
-* **serialization:** from and to json ([6fbd0be](https://github.com/DanielNetzer/ngx-diagrams/commit/6fbd0bea4009b3add591df80ff2e1143f1066e90))
-* **serialization:** interface for all serialized models ([4a3539a](https://github.com/DanielNetzer/ngx-diagrams/commit/4a3539a0a9b9c51d1dd0ce6da02b6aabffece70a))
-* **serialization:** serialize graph to json ([df6aa19](https://github.com/DanielNetzer/ngx-diagrams/commit/df6aa193f4a9ea1f8d886272e05756a622a56137)), closes [#17](https://github.com/DanielNetzer/ngx-diagrams/issues/17)
+- **serialization:** from and to json ([6fbd0be](https://github.com/DanielNetzer/ngx-diagrams/commit/6fbd0bea4009b3add591df80ff2e1143f1066e90))
+- **serialization:** interface for all serialized models ([4a3539a](https://github.com/DanielNetzer/ngx-diagrams/commit/4a3539a0a9b9c51d1dd0ce6da02b6aabffece70a))
+- **serialization:** serialize graph to json ([df6aa19](https://github.com/DanielNetzer/ngx-diagrams/commit/df6aa193f4a9ea1f8d886272e05756a622a56137)), closes [#17](https://github.com/DanielNetzer/ngx-diagrams/issues/17)
 
 ## [3.0.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.0.0...v3.0.1) (2020-11-12)
 
-
 ### Bug Fixes
 
-* upgrade multiple dependencies with Snyk ([fec3a5b](https://github.com/DanielNetzer/ngx-diagrams/commit/fec3a5bbe919348f4aaad8ae6c214232b5cd856d))
-* upgrade snyk from 1.414.1 to 1.415.0 ([3ed91ef](https://github.com/DanielNetzer/ngx-diagrams/commit/3ed91ef88f1cca8fb2b0035a96fec6cc2d81248b))
+- upgrade multiple dependencies with Snyk ([fec3a5b](https://github.com/DanielNetzer/ngx-diagrams/commit/fec3a5bbe919348f4aaad8ae6c214232b5cd856d))
+- upgrade snyk from 1.414.1 to 1.415.0 ([3ed91ef](https://github.com/DanielNetzer/ngx-diagrams/commit/3ed91ef88f1cca8fb2b0035a96fec6cc2d81248b))
 
 # [3.0.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.7...v3.0.0) (2020-11-07)
 
-
 ### Bug Fixes
 
-* **links model:** auto resolve the correct model for ports links ([cf6d074](https://github.com/DanielNetzer/ngx-diagrams/commit/cf6d0740e8c0177af38c50b85ce9c991daddd8e0))
-* **magnets:** resseting all previously defined magnets on selection models ([63d17f8](https://github.com/DanielNetzer/ngx-diagrams/commit/63d17f80a52b826444a253cf7c08dcedc91fb6d9))
-* **points:** reselecting points and moving links ([f123e05](https://github.com/DanielNetzer/ngx-diagrams/commit/f123e05ba2ca97bb9b17d1bce0e5b9443cf4c03e))
-* **ports:** multiple bugs and rendering races ([636aa39](https://github.com/DanielNetzer/ngx-diagrams/commit/636aa394af6dea42e7ba46b10bbb62d3150e9bc7))
-* **ports coords:** on initialization ports coords will align based on their true position ([22dd4bd](https://github.com/DanielNetzer/ngx-diagrams/commit/22dd4bd8ed710386d4be70ad26cf675868d3fc1b))
-
+- **links model:** auto resolve the correct model for ports links ([cf6d074](https://github.com/DanielNetzer/ngx-diagrams/commit/cf6d0740e8c0177af38c50b85ce9c991daddd8e0))
+- **magnets:** resseting all previously defined magnets on selection models ([63d17f8](https://github.com/DanielNetzer/ngx-diagrams/commit/63d17f80a52b826444a253cf7c08dcedc91fb6d9))
+- **points:** reselecting points and moving links ([f123e05](https://github.com/DanielNetzer/ngx-diagrams/commit/f123e05ba2ca97bb9b17d1bce0e5b9443cf4c03e))
+- **ports:** multiple bugs and rendering races ([636aa39](https://github.com/DanielNetzer/ngx-diagrams/commit/636aa394af6dea42e7ba46b10bbb62d3150e9bc7))
+- **ports coords:** on initialization ports coords will align based on their true position ([22dd4bd](https://github.com/DanielNetzer/ngx-diagrams/commit/22dd4bd8ed710386d4be70ad26cf675868d3fc1b))
 
 ### Documentation
 
-* **changelog:** added to stories ([c43b109](https://github.com/DanielNetzer/ngx-diagrams/commit/c43b109d8c943308f804dbf1e88874ba271cd4ec))
-* **custom link:** updated models and template according to changes ([1d09e0f](https://github.com/DanielNetzer/ngx-diagrams/commit/1d09e0f8a1347a9c4b7d2f6295cd1802eb57a0b0))
-
+- **changelog:** added to stories ([c43b109](https://github.com/DanielNetzer/ngx-diagrams/commit/c43b109d8c943308f804dbf1e88874ba271cd4ec))
+- **custom link:** updated models and template according to changes ([1d09e0f](https://github.com/DanielNetzer/ngx-diagrams/commit/1d09e0f8a1347a9c4b7d2f6295cd1802eb57a0b0))
 
 ### Features
 
-* **magnetic ports:** on link drag when getting to 30px proximity, magnetize ([a696474](https://github.com/DanielNetzer/ngx-diagrams/commit/a696474c69538ec04d84f5aa7ca0672da48ef264))
-
+- **magnetic ports:** on link drag when getting to 30px proximity, magnetize ([a696474](https://github.com/DanielNetzer/ngx-diagrams/commit/a696474c69538ec04d84f5aa7ca0672da48ef264))
 
 ### BREAKING CHANGES
 
-* **changelog:** models changes
-* **custom link:** models changes
-* **magnets:** models changes
-* **points:** models changes
+- **changelog:** models changes
+- **custom link:** models changes
+- **magnets:** models changes
+- **points:** models changes
 
 ## [2.18.7](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.6...v2.18.7) (2020-10-25)
 
-
 ### Bug Fixes
 
-* **default link:** using public members selectColor ([99f5ab9](https://github.com/DanielNetzer/ngx-diagrams/commit/99f5ab987d33d9caff341603b6a9075b14582db4))
+- **default link:** using public members selectColor ([99f5ab9](https://github.com/DanielNetzer/ngx-diagrams/commit/99f5ab987d33d9caff341603b6a9075b14582db4))
 
 ## [2.18.6](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.5...v2.18.6) (2020-06-10)
 
-
 ### Bug Fixes
 
-* upgrade multiple dependencies with Snyk ([6b502d8](https://github.com/DanielNetzer/ngx-diagrams/commit/6b502d85fec81eb886d75a66d02928e5db2b6779))
-* upgrade snyk from 1.317.0 to 1.319.0 ([5e12d4a](https://github.com/DanielNetzer/ngx-diagrams/commit/5e12d4a31f897bed7080fc8c313e8a8ec2fc4bbb))
-* upgrade snyk from 1.317.0 to 1.319.0 ([a81d4aa](https://github.com/DanielNetzer/ngx-diagrams/commit/a81d4aacc0a3a30e92411909db030c99b28d4a87))
-* upgrade tslib from 1.11.1 to 1.11.2 ([48dbaf7](https://github.com/DanielNetzer/ngx-diagrams/commit/48dbaf7956c4e5173f0f97e0e6a627bf8de23034))
-* upgrade tslib from 1.11.1 to 1.11.2 ([98c84ca](https://github.com/DanielNetzer/ngx-diagrams/commit/98c84caadfd54a74ab224f720bf3a188848191bf))
+- upgrade multiple dependencies with Snyk ([6b502d8](https://github.com/DanielNetzer/ngx-diagrams/commit/6b502d85fec81eb886d75a66d02928e5db2b6779))
+- upgrade snyk from 1.317.0 to 1.319.0 ([5e12d4a](https://github.com/DanielNetzer/ngx-diagrams/commit/5e12d4a31f897bed7080fc8c313e8a8ec2fc4bbb))
+- upgrade snyk from 1.317.0 to 1.319.0 ([a81d4aa](https://github.com/DanielNetzer/ngx-diagrams/commit/a81d4aacc0a3a30e92411909db030c99b28d4a87))
+- upgrade tslib from 1.11.1 to 1.11.2 ([48dbaf7](https://github.com/DanielNetzer/ngx-diagrams/commit/48dbaf7956c4e5173f0f97e0e6a627bf8de23034))
+- upgrade tslib from 1.11.1 to 1.11.2 ([98c84ca](https://github.com/DanielNetzer/ngx-diagrams/commit/98c84caadfd54a74ab224f720bf3a188848191bf))
 
 ## [2.18.5](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.4...v2.18.5) (2020-06-10)
 
-
 ### Bug Fixes
 
-* upgrade ngx-markdown from 9.0.0 to 9.1.0 ([bc89e53](https://github.com/DanielNetzer/ngx-diagrams/commit/bc89e53ed6a238f817812e3b03d8549217d8bc2f))
+- upgrade ngx-markdown from 9.0.0 to 9.1.0 ([bc89e53](https://github.com/DanielNetzer/ngx-diagrams/commit/bc89e53ed6a238f817812e3b03d8549217d8bc2f))
 
 ## [2.18.4](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.3...v2.18.4) (2020-06-02)
 
-
 ### Bug Fixes
 
-* **link model:** lock child points when locking link ([c07cf37](https://github.com/DanielNetzer/ngx-diagrams/commit/c07cf374b906240a3d1368cf1639c2c78c09c2d5))
+- **link model:** lock child points when locking link ([c07cf37](https://github.com/DanielNetzer/ngx-diagrams/commit/c07cf374b906240a3d1368cf1639c2c78c09c2d5))
 
 ## [2.18.3](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.2...v2.18.3) (2020-06-02)
 
-
 ### Bug Fixes
 
-* upgrade multiple dependencies with Snyk ([55fd568](https://github.com/DanielNetzer/ngx-diagrams/commit/55fd568e9d20a719b9308ea15eb9288b69346ded))
-* upgrade multiple dependencies with Snyk ([b62f06b](https://github.com/DanielNetzer/ngx-diagrams/commit/b62f06bd15724d2fc118d250d429d0e320cbfd6a))
+- upgrade multiple dependencies with Snyk ([55fd568](https://github.com/DanielNetzer/ngx-diagrams/commit/55fd568e9d20a719b9308ea15eb9288b69346ded))
+- upgrade multiple dependencies with Snyk ([b62f06b](https://github.com/DanielNetzer/ngx-diagrams/commit/b62f06bd15724d2fc118d250d429d0e320cbfd6a))
 
 ## [2.18.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.1...v2.18.2) (2020-05-07)
 
-
 ### Bug Fixes
 
-* **links:** new links wont be created if canLinkToPort fail ([2a1ea0f](https://github.com/DanielNetzer/ngx-diagrams/commit/2a1ea0fba7b6ded4197b6de5f18187b6c0dee16e))
+- **links:** new links wont be created if canLinkToPort fail ([2a1ea0f](https://github.com/DanielNetzer/ngx-diagrams/commit/2a1ea0fba7b6ded4197b6de5f18187b6c0dee16e))
 
 ## [2.18.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.18.0...v2.18.1) (2020-05-04)
 
-
 ### Bug Fixes
 
-* **zoom:** fixed issue with zoom to fit ([62777c7](https://github.com/DanielNetzer/ngx-diagrams/commit/62777c7a98a84152e77f5e9fc10d9bf47be82839))
+- **zoom:** fixed issue with zoom to fit ([62777c7](https://github.com/DanielNetzer/ngx-diagrams/commit/62777c7a98a84152e77f5e9fc10d9bf47be82839))
 
 # [2.18.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.17.0...v2.18.0) (2020-05-04)
 
-
 ### Features
 
-* **zoom to fit:** taking under consideration min/max zoom ([2adc18d](https://github.com/DanielNetzer/ngx-diagrams/commit/2adc18db3747323823acf3b28cfd98abcf24e8eb))
+- **zoom to fit:** taking under consideration min/max zoom ([2adc18d](https://github.com/DanielNetzer/ngx-diagrams/commit/2adc18db3747323823acf3b28cfd98abcf24e8eb))
 
 # [2.17.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.16.0...v2.17.0) (2020-05-04)
 
-
 ### Bug Fixes
 
-* package.json, package-lock.json & .snyk to reduce vulnerabilities ([71edd1e](https://github.com/DanielNetzer/ngx-diagrams/commit/71edd1e051ad2270536a6bb8edaf06abf8be0177))
-* package.json, package-lock.json & .snyk to reduce vulnerabilities ([8f4613d](https://github.com/DanielNetzer/ngx-diagrams/commit/8f4613d2ca2ec7ac2ff967e601be2939bfe0f726))
-* package.json, package-lock.json & .snyk to reduce vulnerabilities ([4da388b](https://github.com/DanielNetzer/ngx-diagrams/commit/4da388b98f39e5d44212dc9684a386ed1c64159c))
-* upgrade multiple dependencies with Snyk ([35e5380](https://github.com/DanielNetzer/ngx-diagrams/commit/35e5380bc92b86a20e36dd3c7c4f26c9c43a28f3))
-* upgrade rxjs from 6.5.4 to 6.5.5 ([59483a1](https://github.com/DanielNetzer/ngx-diagrams/commit/59483a16d26af5f633f7dc804a6d39cee711f898))
-* upgrade rxjs from 6.5.4 to 6.5.5 ([275b457](https://github.com/DanielNetzer/ngx-diagrams/commit/275b4575cf383322c315dc3b1c24d298d48f0313))
-* **deps:** updated all deps to address vuln ([e2323d1](https://github.com/DanielNetzer/ngx-diagrams/commit/e2323d1d25dfb8f15f6f9a88b1eff8b8f8159b6a))
-
+- package.json, package-lock.json & .snyk to reduce vulnerabilities ([71edd1e](https://github.com/DanielNetzer/ngx-diagrams/commit/71edd1e051ad2270536a6bb8edaf06abf8be0177))
+- package.json, package-lock.json & .snyk to reduce vulnerabilities ([8f4613d](https://github.com/DanielNetzer/ngx-diagrams/commit/8f4613d2ca2ec7ac2ff967e601be2939bfe0f726))
+- package.json, package-lock.json & .snyk to reduce vulnerabilities ([4da388b](https://github.com/DanielNetzer/ngx-diagrams/commit/4da388b98f39e5d44212dc9684a386ed1c64159c))
+- upgrade multiple dependencies with Snyk ([35e5380](https://github.com/DanielNetzer/ngx-diagrams/commit/35e5380bc92b86a20e36dd3c7c4f26c9c43a28f3))
+- upgrade rxjs from 6.5.4 to 6.5.5 ([59483a1](https://github.com/DanielNetzer/ngx-diagrams/commit/59483a16d26af5f633f7dc804a6d39cee711f898))
+- upgrade rxjs from 6.5.4 to 6.5.5 ([275b457](https://github.com/DanielNetzer/ngx-diagrams/commit/275b4575cf383322c315dc3b1c24d298d48f0313))
+- **deps:** updated all deps to address vuln ([e2323d1](https://github.com/DanielNetzer/ngx-diagrams/commit/e2323d1d25dfb8f15f6f9a88b1eff8b8f8159b6a))
 
 ### Features
 
-* **zoom:** min and max zoom levels properties ([f8470cb](https://github.com/DanielNetzer/ngx-diagrams/commit/f8470cbe8ba55a8421ed9af4cfb2fa52aa9fc721))
+- **zoom:** min and max zoom levels properties ([f8470cb](https://github.com/DanielNetzer/ngx-diagrams/commit/f8470cbe8ba55a8421ed9af4cfb2fa52aa9fc721))
 
 # [2.16.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.15.0...v2.16.0) (2020-04-12)
 
-
 ### Features
 
-* **links:** canCreateLinks property on ports ([73eba4b](https://github.com/DanielNetzer/ngx-diagrams/commit/73eba4b334c5cab50ad00f49754f94124b4d090e))
+- **links:** canCreateLinks property on ports ([73eba4b](https://github.com/DanielNetzer/ngx-diagrams/commit/73eba4b334c5cab50ad00f49754f94124b4d090e))
 
 # [2.15.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.14.0...v2.15.0) (2020-04-12)
 
-
 ### Features
 
-* **actions:** invalid link destroyed action dispatched ([d942119](https://github.com/DanielNetzer/ngx-diagrams/commit/d942119f5fe59045ed01191559ad79c994c90ca4))
+- **actions:** invalid link destroyed action dispatched ([d942119](https://github.com/DanielNetzer/ngx-diagrams/commit/d942119f5fe59045ed01191559ad79c994c90ca4))
 
 # [2.14.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.13.2...v2.14.0) (2020-03-29)
 
-
 ### Features
 
-* **actions:** loose link destroyed action ([4b47147](https://github.com/DanielNetzer/ngx-diagrams/commit/4b47147e07f9a152e36b3848f425f0d633513a44))
-* **colors:** links colors are now subscribable ([face093](https://github.com/DanielNetzer/ngx-diagrams/commit/face093b405cfa1d575b5da4abe1e4ce96b81e0c))
+- **actions:** loose link destroyed action ([4b47147](https://github.com/DanielNetzer/ngx-diagrams/commit/4b47147e07f9a152e36b3848f425f0d633513a44))
+- **colors:** links colors are now subscribable ([face093](https://github.com/DanielNetzer/ngx-diagrams/commit/face093b405cfa1d575b5da4abe1e4ce96b81e0c))
 
 ## [2.13.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.13.1...v2.13.2) (2020-02-09)
 
-
 ### Bug Fixes
 
-* **imports:** coords interface import ([7b649a7](https://github.com/DanielNetzer/ngx-diagrams/commit/7b649a7e69ad7b570d05cfe9f12842fe43098f00))
+- **imports:** coords interface import ([7b649a7](https://github.com/DanielNetzer/ngx-diagrams/commit/7b649a7e69ad7b570d05cfe9f12842fe43098f00))
 
 ## [2.13.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.13.0...v2.13.1) (2020-02-09)
 
-
 ### Bug Fixes
 
-* **imports:** bad imports naming ([014f17a](https://github.com/DanielNetzer/ngx-diagrams/commit/014f17a4f3dbd8e4b166e072a67918a46c9760c3))
+- **imports:** bad imports naming ([014f17a](https://github.com/DanielNetzer/ngx-diagrams/commit/014f17a4f3dbd8e4b166e072a67918a46c9760c3))
 
 # [2.13.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.12.1...v2.13.0) (2019-12-25)
 
-
 ### Features
 
-* **node model:** remove, update, add ports ([e334267](https://github.com/DanielNetzer/ngx-diagrams/commit/e3342674a5aad82d2e5e4c0839a989c2d371abb0))
+- **node model:** remove, update, add ports ([e334267](https://github.com/DanielNetzer/ngx-diagrams/commit/e3342674a5aad82d2e5e4c0839a989c2d371abb0))
 
 ## [2.12.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.12.0...v2.12.1) (2019-12-25)
 
-
 ### Bug Fixes
 
-* **base event:** null reference in options for event ([8a69a51](https://github.com/DanielNetzer/ngx-diagrams/commit/8a69a51f16a172514030c20f2c628fd5aec31206))
+- **base event:** null reference in options for event ([8a69a51](https://github.com/DanielNetzer/ngx-diagrams/commit/8a69a51f16a172514030c20f2c628fd5aec31206))
 
 # [2.12.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.11.2...v2.12.0) (2019-12-25)
 
-
 ### Features
 
-* **base entity:** passing options to constructor ([5cd07d9](https://github.com/DanielNetzer/ngx-diagrams/commit/5cd07d956528d4a26c708ab45ae8b933ad76ebda))
+- **base entity:** passing options to constructor ([5cd07d9](https://github.com/DanielNetzer/ngx-diagrams/commit/5cd07d956528d4a26c708ab45ae8b933ad76ebda))
 
 ## [2.11.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.11.1...v2.11.2) (2019-12-19)
 
-
 ### Bug Fixes
 
-* **on entity destroyed:** reverted the filtering ([2b92467](https://github.com/DanielNetzer/ngx-diagrams/commit/2b92467c29907c489b958abef84e47c1470a5265))
+- **on entity destroyed:** reverted the filtering ([2b92467](https://github.com/DanielNetzer/ngx-diagrams/commit/2b92467c29907c489b958abef84e47c1470a5265))
 
 ## [2.11.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.11.0...v2.11.1) (2019-12-19)
 
-
 ### Performance Improvements
 
-* **destroy options:** moved interface to a their right place ([c032bd5](https://github.com/DanielNetzer/ngx-diagrams/commit/c032bd5e0829d734ed125dd4c4d093a391a54132))
+- **destroy options:** moved interface to a their right place ([c032bd5](https://github.com/DanielNetzer/ngx-diagrams/commit/c032bd5e0829d734ed125dd4c4d093a391a54132))
 
 # [2.11.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.10.0...v2.11.0) (2019-12-19)
 
-
 ### Features
 
-* **destroy options:** allowing to pass options to destroy method ([06373bf](https://github.com/DanielNetzer/ngx-diagrams/commit/06373bf193f8fcf42b4156bdb651dae42698ec85))
-* **destroy-options:** emit property ([16a4a2e](https://github.com/DanielNetzer/ngx-diagrams/commit/16a4a2e7585b680aff81fb70bfae29cba55a8bad))
+- **destroy options:** allowing to pass options to destroy method ([06373bf](https://github.com/DanielNetzer/ngx-diagrams/commit/06373bf193f8fcf42b4156bdb651dae42698ec85))
+- **destroy-options:** emit property ([16a4a2e](https://github.com/DanielNetzer/ngx-diagrams/commit/16a4a2e7585b680aff81fb70bfae29cba55a8bad))
 
 # [2.10.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v2.9.0...v2.10.0) (2019-11-21)
 

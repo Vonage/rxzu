@@ -19,10 +19,11 @@ export class LinkModel extends BaseModel<DiagramModel> {
 	private points: PointModel[];
 	private extras: any;
 
-	private readonly label: BehaviorSubject<LabelModel> = new BehaviorSubject(null);
+	private readonly _label$: BehaviorSubject<LabelModel> = new BehaviorSubject(null);
+	label$: Observable<LabelModel> = this._label$.pipe(this.entityPipe('label'));
 
-	constructor(linkType: string = 'default', id?: string) {
-		super(linkType, id);
+	constructor(linkType: string = 'default', id?: string, logPrefix: string = '[Link]') {
+		super(linkType, id, logPrefix);
 		this.points = [new PointModel(this, { x: 0, y: 0 }), new PointModel(this, { x: 0, y: 0 })];
 		this.extras = {};
 		this.sourcePort = null;
@@ -176,26 +177,26 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
 	setLabel(label: LabelModel) {
 		label.setParent(this);
-		this.label.next(label);
+		this._label$.next(label);
 	}
 
 	selectLabel(): Observable<LabelModel | null> {
-		return this.label.asObservable();
+		return this.label$;
 	}
 
 	getLabel(): LabelModel {
-		return this.label.getValue();
+		return this._label$.getValue();
 	}
 
 	resetLabel() {
-		const currentLabel = this.label.getValue();
+		const currentLabel = this._label$.getValue();
 
 		if (currentLabel) {
 			currentLabel.setParent(null);
 			currentLabel.setPainted(false);
 		}
 
-		this.label.next(null);
+		this._label$.next(null);
 	}
 
 	removePoint(pointModel: PointModel) {

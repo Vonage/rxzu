@@ -33,7 +33,7 @@ import { LooseLinkDestroyed } from '../../actions/loose-link-destroyed.action';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
-	// tslint:disable-next-line:no-input-rename
+	// eslint-disable-next-line @angular-eslint/no-input-rename
 	@Input('model') diagramModel: DiagramModel;
 	@Input() allowCanvasZoom = true;
 	@Input() allowCanvasTranslation = true;
@@ -42,6 +42,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	@Input() maxZoomOut: number = null;
 	@Input() maxZoomIn: number = null;
 	@Input() portMagneticRadius = 30;
+	@Input() smartRouting = false;
 
 	@Output() actionStartedFiring: EventEmitter<BaseAction> = new EventEmitter();
 	@Output() actionStillFiring: EventEmitter<BaseAction> = new EventEmitter();
@@ -57,15 +58,13 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	private nodesRendered$: BehaviorSubject<boolean>;
 	private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-	private mouseUpListener = () => {};
-	private mouseMoveListener = () => {};
-
 	constructor(private renderer: Renderer2, private cdRef: ChangeDetectorRef) {}
 
 	// TODO: handle destruction of container, resseting all observables to avoid memory leaks!
 	ngOnInit() {
 		if (this.diagramModel) {
 			this.diagramModel.getDiagramEngine().setCanvas(this.canvas.nativeElement);
+			this.diagramModel.getDiagramEngine().setSmartRoutingStatus(this.smartRouting);
 
 			this.nodes$ = this.diagramModel.selectNodes();
 			this.links$ = this.diagramModel.selectLinks();
@@ -218,7 +217,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			const element = this.getMouseElement(event);
 			action.selectionModels.forEach(model => {
 				// only care about points connecting to things
-				if (!(model.model instanceof PointModel)) {
+				if (!model || !(model.model instanceof PointModel)) {
 					return;
 				}
 
@@ -269,7 +268,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			if (!this.allowLooseLinks) {
 				action.selectionModels.forEach(model => {
 					// only care about points connecting to things
-					if (!(model.model instanceof PointModel)) {
+					if (!model || !(model.model instanceof PointModel)) {
 						return;
 					}
 
@@ -285,7 +284,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			// destroy any invalid links
 			action.selectionModels.forEach(model => {
 				// only care about points connecting to things
-				if (!(model.model instanceof PointModel)) {
+				if (!model || !(model.model instanceof PointModel)) {
 					return;
 				}
 
@@ -406,6 +405,12 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(port);
 							port.updateCoords(portCoords);
 						});
+					}
+
+					if (this.diagramModel.getDiagramEngine().getSmartRouting()) {
+						setTimeout(() => {
+							this.diagramModel.getDiagramEngine().calculateRoutingMatrix();
+						}, 1);
 					}
 				} else if (selectionModel.model instanceof PointModel) {
 					// will only run here when trying to create a point on an existing link
@@ -543,4 +548,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 			this.diagramModel.setOffset(updatedXOffset, updatedYOffset);
 		}
 	}
+
+	private mouseUpListener = () => {};
+	private mouseMoveListener = () => {};
 }
