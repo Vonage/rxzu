@@ -224,7 +224,7 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 				let el: BaseModel;
 				if (model.magnet) {
 					el = model.magnet;
-				} else {
+				} else if (element && element.model) {
 					el = element.model;
 				}
 

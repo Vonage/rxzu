@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { CustomPortComponent } from './custom.component';
 
-export class CustomPortFactory extends AbstractPortFactory<DefaultPortModel> {
+export class CustomPortFactory extends AbstractPortFactory<CustomPortComponent> {
 	constructor(private resolver: ComponentFactoryResolver, private renderer: Renderer2) {
 		super('custom-port');
 	}
