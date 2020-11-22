@@ -1,3 +1,10 @@
+## [3.3.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.3.1...v3.3.2) (2020-11-22)
+
+
+### Bug Fixes
+
+* **links:** unfound model errors, links layer position ([431c282](https://github.com/DanielNetzer/ngx-diagrams/commit/431c282dd4bccc2584701b29e0461c128260e8f2))
+
 ## [3.3.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.3.0...v3.3.1) (2020-11-19)
 
 
