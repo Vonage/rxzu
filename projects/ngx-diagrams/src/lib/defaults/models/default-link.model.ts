@@ -2,9 +2,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { LinkModel } from '../../models/link.model';
 
 export class DefaultLinkModel extends LinkModel {
-	private _width$ = new BehaviorSubject(3);
-	private _color$ = new BehaviorSubject('rgba(255,255,255,0.5)');
-	private _curvyness$ = new BehaviorSubject(50);
+	protected _width$ = new BehaviorSubject(3);
+	protected _color$ = new BehaviorSubject('rgba(255,255,255,0.5)');
+	protected _curvyness$ = new BehaviorSubject(50);
 
 	width$ = this._width$.asObservable().pipe(this.entityPipe('width'));
 	color$ = this._color$.asObservable().pipe(this.entityPipe('color'));
