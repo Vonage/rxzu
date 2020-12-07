@@ -1,31 +1,28 @@
-import { BaseModel } from './base.model';
-import { NodeModel } from './node.model';
-import { LinkModel } from './link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, shareReplay, takeUntil } from 'rxjs/operators';
+import { HashMap } from '../utils/types';
+import { BaseModel } from './base.model';
+import { LinkModel } from './link.model';
+import { NodeModel } from './node.model';
 
 export class PortModel extends BaseModel<NodeModel> {
 	// TODO: convert all primitives to subjects
-	private name: string;
-	private maximumLinks: number;
-	private linkType: string;
+	protected name: string;
+	protected maximumLinks: number;
+	protected linkType: string;
 
-	private _links$: BehaviorSubject<{ [id: string]: LinkModel }> = new BehaviorSubject({});
-	private _x$: BehaviorSubject<number> = new BehaviorSubject(0);
-	private _y$: BehaviorSubject<number> = new BehaviorSubject(0);
-	private _magnetic$: BehaviorSubject<boolean> = new BehaviorSubject(true);
-	private _width$: BehaviorSubject<number> = new BehaviorSubject(0);
-	private _height$: BehaviorSubject<number> = new BehaviorSubject(0);
-	private _canCreateLinks$: BehaviorSubject<boolean> = new BehaviorSubject(true);
+	protected _links$ = new BehaviorSubject<HashMap<LinkModel>>({});
+	protected _x$ = new BehaviorSubject(0);
+	protected _y$ = new BehaviorSubject(0);
+	protected _magnetic$ = new BehaviorSubject(true);
+	protected _width$ = new BehaviorSubject(0);
+	protected _height$ = new BehaviorSubject(0);
+	protected _canCreateLinks$ = new BehaviorSubject(true);
 
-	private links$: Observable<{ [id: string]: LinkModel }> = this._links$.pipe(
-		takeUntil(this.onEntityDestroy()),
-		distinctUntilChanged(),
-		shareReplay(1)
-	);
-	private x$: Observable<number> = this._x$.pipe(this.entityPipe('x'));
-	private y$: Observable<number> = this._y$.pipe(this.entityPipe('y'));
-	private magnetic$: Observable<boolean> = this._magnetic$.pipe(this.entityPipe('magnetic'));
+	protected links$ = this._links$.asObservable().pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
+	protected x$ = this._x$.pipe(this.entityPipe('x'));
+	protected y$ = this._y$.pipe(this.entityPipe('y'));
+	protected magnetic$ = this._magnetic$.pipe(this.entityPipe('magnetic'));
 
 	constructor(
 		name: string,
@@ -150,11 +147,11 @@ export class PortModel extends BaseModel<NodeModel> {
 		this._links$.next({ ...this._links$.value, [link.id]: link });
 	}
 
-	getLinks(): { [id: string]: LinkModel } {
+	getLinks(): HashMap<LinkModel> {
 		return this._links$.getValue();
 	}
 
-	selectLinks(): Observable<{ [id: string]: LinkModel }> {
+	selectLinks(): Observable<HashMap<LinkModel>> {
 		return this.links$;
 	}
 

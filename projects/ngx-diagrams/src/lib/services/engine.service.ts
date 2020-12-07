@@ -1,31 +1,32 @@
-import { Injectable, ComponentFactoryResolver, ViewContainerRef, ComponentRef, Renderer2, RendererFactory2 } from '@angular/core';
-import { AbstractNodeFactory } from '../factories/node.factory';
-import { DiagramModel } from '../models/diagram.model';
-import { DefaultNodeFactory } from '../defaults/factories/default-node.factory';
-import { NodeModel } from '../models/node.model';
-import { AbstractLinkFactory } from '../factories/link.factory';
-import { AbstractPortFactory } from '../factories/port.factory';
-import { DefaultPortFactory } from '../defaults/factories/default-port.factory';
-import { LinkModel } from '../models/link.model';
-import { PortModel } from '../models/port.model';
+import { ComponentFactoryResolver, ComponentRef, Injectable, Renderer2, RendererFactory2, ViewContainerRef } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { take, delay, filter } from 'rxjs/operators';
-import { DefaultLinkFactory } from '../defaults/factories/default-link.factory';
+import { delay, filter, take } from 'rxjs/operators';
 import { BaseEntity } from '../base.entity';
-import { NgxDiagramsModule } from '../ngx-diagrams.module';
-import { AbstractLabelFactory } from '../factories/label.factory';
-import { LabelModel } from '../models/label.model';
 import { DefaultLabelFactory } from '../defaults/factories/default-label.factory';
+import { DefaultLinkFactory } from '../defaults/factories/default-link.factory';
+import { DefaultNodeFactory } from '../defaults/factories/default-node.factory';
+import { DefaultPortFactory } from '../defaults/factories/default-port.factory';
+import { AbstractLabelFactory } from '../factories/label.factory';
+import { AbstractLinkFactory } from '../factories/link.factory';
+import { AbstractNodeFactory } from '../factories/node.factory';
+import { AbstractPortFactory } from '../factories/port.factory';
+import { DiagramModel } from '../models/diagram.model';
+import { LabelModel } from '../models/label.model';
+import { LinkModel } from '../models/link.model';
+import { NodeModel } from '../models/node.model';
+import { PortModel } from '../models/port.model';
+import { NgxDiagramsModule } from '../ngx-diagrams.module';
 import { PathFinding, ROUTING_SCALING_FACTOR } from '../plugins/smart-routing.plugin';
+import { HashMap } from '../utils/types';
 
 @Injectable({ providedIn: NgxDiagramsModule })
 export class DiagramEngine {
-	private _renderer: Renderer2;
-	private nodeFactories: { [s: string]: AbstractNodeFactory };
-	private labelFactories: { [s: string]: AbstractLabelFactory };
-	private linkFactories: { [s: string]: AbstractLinkFactory };
-	private portFactories: { [s: string]: AbstractPortFactory };
-	private canvas$: BehaviorSubject<Element>;
+	protected _renderer: Renderer2;
+	protected nodeFactories: HashMap<AbstractNodeFactory>;
+	protected labelFactories: HashMap<AbstractLabelFactory>;
+	protected linkFactories: HashMap<AbstractLinkFactory>;
+	protected portFactories: HashMap<AbstractPortFactory>;
+	protected canvas$: BehaviorSubject<Element>;
 
 	// smart routing related properties
 	smartRouting: boolean;
@@ -41,7 +42,7 @@ export class DiagramEngine {
 
 	diagramModel: DiagramModel;
 
-	constructor(private resolver: ComponentFactoryResolver, private rendererFactory: RendererFactory2) {
+	constructor(protected resolver: ComponentFactoryResolver, protected rendererFactory: RendererFactory2) {
 		this._renderer = this.rendererFactory.createRenderer(null, null);
 		this.nodeFactories = {};
 		this.linkFactories = {};
@@ -68,7 +69,7 @@ export class DiagramEngine {
 		this.labelFactories[labelFactory.type] = labelFactory;
 	}
 
-	getLabelFactories(): { [s: string]: AbstractLabelFactory } {
+	getLabelFactories(): HashMap<AbstractLabelFactory> {
 		return this.labelFactories;
 	}
 
@@ -96,7 +97,7 @@ export class DiagramEngine {
 		this.nodeFactories[nodeFactory.type] = nodeFactory;
 	}
 
-	getNodeFactories(): { [s: string]: AbstractNodeFactory } {
+	getNodeFactories(): HashMap<AbstractNodeFactory> {
 		return this.nodeFactories;
 	}
 
@@ -148,7 +149,7 @@ export class DiagramEngine {
 	}
 
 	// LINKS
-	getLinkFactories(): { [s: string]: AbstractLinkFactory } {
+	getLinkFactories(): HashMap<AbstractLinkFactory> {
 		return this.linkFactories;
 	}
 

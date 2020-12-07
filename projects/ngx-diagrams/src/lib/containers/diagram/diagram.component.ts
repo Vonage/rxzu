@@ -1,30 +1,31 @@
 import {
-	Component,
-	OnInit,
-	Input,
-	Renderer2,
-	Output,
-	EventEmitter,
-	ViewChild,
-	ViewContainerRef,
-	ElementRef,
 	AfterViewInit,
 	ChangeDetectionStrategy,
 	ChangeDetectorRef,
+	Component,
+	ElementRef,
+	EventEmitter,
+	Input,
 	OnDestroy,
+	OnInit,
+	Output,
+	Renderer2,
+	ViewChild,
+	ViewContainerRef,
 } from '@angular/core';
-import { DiagramModel } from '../../models/diagram.model';
-import { NodeModel } from '../../models/node.model';
-import { LinkModel } from '../../models/link.model';
-import { BehaviorSubject, Observable, combineLatest, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, ReplaySubject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
-import { BaseAction, MoveCanvasAction, SelectingAction, LinkCreatedAction, InvalidLinkDestroyed } from '../../actions';
-import { BaseModel } from '../../models/base.model';
-import { MoveItemsAction } from '../../actions/move-items.action';
-import { PointModel } from '../../models/point.model';
-import { Coords } from '../../interfaces/coords.interface';
-import { PortModel } from '../../models/port.model';
+import { BaseAction, InvalidLinkDestroyed, LinkCreatedAction, MoveCanvasAction, SelectingAction } from '../../actions';
 import { LooseLinkDestroyed } from '../../actions/loose-link-destroyed.action';
+import { MoveItemsAction } from '../../actions/move-items.action';
+import { Coords } from '../../interfaces/coords.interface';
+import { BaseModel } from '../../models/base.model';
+import { DiagramModel } from '../../models/diagram.model';
+import { LinkModel } from '../../models/link.model';
+import { NodeModel } from '../../models/node.model';
+import { PointModel } from '../../models/point.model';
+import { PortModel } from '../../models/port.model';
+import { HashMap } from '../../utils/types';
 
 @Component({
 	selector: 'ngdx-diagram',
@@ -44,21 +45,26 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	@Input() portMagneticRadius = 30;
 	@Input() smartRouting = false;
 
-	@Output() actionStartedFiring: EventEmitter<BaseAction> = new EventEmitter();
-	@Output() actionStillFiring: EventEmitter<BaseAction> = new EventEmitter();
-	@Output() actionStoppedFiring: EventEmitter<BaseAction> = new EventEmitter();
+	@Output() actionStartedFiring = new EventEmitter<BaseAction>();
+	@Output() actionStillFiring = new EventEmitter<BaseAction>();
+	@Output() actionStoppedFiring = new EventEmitter<BaseAction>();
 
-	@ViewChild('nodesLayer', { read: ViewContainerRef, static: true }) nodesLayer: ViewContainerRef;
-	@ViewChild('linksLayer', { read: ViewContainerRef, static: true }) linksLayer: ViewContainerRef;
-	@ViewChild('canvas', { read: ElementRef, static: true }) canvas: ElementRef;
+	@ViewChild('nodesLayer', { read: ViewContainerRef, static: true })
+	nodesLayer: ViewContainerRef;
 
-	private nodes$: Observable<{ [s: string]: NodeModel }>;
-	private links$: Observable<{ [s: string]: LinkModel }>;
-	private action$: BehaviorSubject<BaseAction> = new BehaviorSubject(null);
-	private nodesRendered$: BehaviorSubject<boolean>;
-	private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
+	@ViewChild('linksLayer', { read: ViewContainerRef, static: true })
+	linksLayer: ViewContainerRef;
 
-	constructor(private renderer: Renderer2, private cdRef: ChangeDetectorRef) {}
+	@ViewChild('canvas', { read: ElementRef, static: true })
+	canvas: ElementRef;
+
+	protected nodes$: Observable<HashMap<NodeModel>>;
+	protected links$: Observable<HashMap<LinkModel>>;
+	protected action$ = new BehaviorSubject<BaseAction>(null);
+	protected nodesRendered$: BehaviorSubject<boolean>;
+	protected destroyed$ = new ReplaySubject<boolean>(1);
+
+	constructor(protected renderer: Renderer2, protected cdRef: ChangeDetectorRef) {}
 
 	// TODO: handle destruction of container, resseting all observables to avoid memory leaks!
 	ngOnInit() {
@@ -549,6 +555,6 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 		}
 	}
 
-	private mouseUpListener = () => {};
-	private mouseMoveListener = () => {};
+	protected mouseUpListener = () => {};
+	protected mouseMoveListener = () => {};
 }

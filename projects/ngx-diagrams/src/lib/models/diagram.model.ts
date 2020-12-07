@@ -1,41 +1,41 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { NodeModel } from './node.model';
-import { LinkModel } from './link.model';
 import { BaseEntity, BaseEntityType } from '../base.entity';
-import { DiagramEngine } from '../services/engine.service';
-import { BaseModel } from './base.model';
-import { PortModel } from './port.model';
-import { PointModel } from './point.model';
 import { Coords } from '../interfaces/coords.interface';
-import { ID } from '../utils/tool-kit.util';
 import { SelectOptions } from '../interfaces/select-options.interface';
 import { SerializedDiagramModel } from '../interfaces/serialization.interface';
+import { DiagramEngine } from '../services/engine.service';
+import { ID } from '../utils/tool-kit.util';
+import { HashMap } from '../utils/types';
+import { BaseModel } from './base.model';
+import { LinkModel } from './link.model';
+import { NodeModel } from './node.model';
+import { PointModel } from './point.model';
+import { PortModel } from './port.model';
 
 export class DiagramModel extends BaseEntity {
-	private _links$: BehaviorSubject<{ [s: string]: LinkModel }> = new BehaviorSubject<{ [s: string]: LinkModel }>({});
-	private _nodes$: BehaviorSubject<{ [s: string]: NodeModel }> = new BehaviorSubject<{ [s: string]: NodeModel }>({});
-	private _zoom$: BehaviorSubject<number> = new BehaviorSubject(100);
-	private _offsetX$: BehaviorSubject<number> = new BehaviorSubject(0);
-	private _offsetY$: BehaviorSubject<number> = new BehaviorSubject(0);
-	private _gridSize$: BehaviorSubject<number> = new BehaviorSubject(0);
-	private _maxZoomOut$: BehaviorSubject<number> = new BehaviorSubject(null);
-	private _maxZoomIn$: BehaviorSubject<number> = new BehaviorSubject(null);
+	protected _links$ = new BehaviorSubject<HashMap<LinkModel>>({});
+	protected _nodes$ = new BehaviorSubject<HashMap<NodeModel>>({});
+	protected _zoom$ = new BehaviorSubject(100);
+	protected _offsetX$ = new BehaviorSubject(0);
+	protected _offsetY$ = new BehaviorSubject(0);
+	protected _gridSize$ = new BehaviorSubject(0);
+	protected _maxZoomOut$ = new BehaviorSubject(null);
+	protected _maxZoomIn$ = new BehaviorSubject(null);
 
-	private nodes$: Observable<{ [s: string]: NodeModel }> = this._nodes$.pipe(this.entityPipe('nodes'));
+	protected nodes$ = this._nodes$.asObservable().pipe(this.entityPipe('nodes'));
+	protected links$ = this._links$.asObservable().pipe(this.entityPipe('links'));
 
-	private links$: Observable<{ [s: string]: LinkModel }> = this._links$.pipe(this.entityPipe('links'));
+	protected offsetX$ = this._offsetX$.asObservable().pipe(this.entityPipe('offsetX'));
+	protected offsetY$ = this._offsetY$.asObservable().pipe(this.entityPipe('offsetY'));
+	protected zoom$ = this._zoom$.asObservable().pipe(this.entityPipe('zoom'));
 
-	private offsetX$: Observable<number> = this._offsetX$.pipe(this.entityPipe('offsetX'));
-	private offsetY$: Observable<number> = this._offsetY$.pipe(this.entityPipe('offsetY'));
-	private zoom$: Observable<number> = this._zoom$.pipe(this.entityPipe('zoom'));
-
-	constructor(private diagramEngine: DiagramEngine, id?: string, logPrefix: string = '[Diagram]') {
+	constructor(protected diagramEngine: DiagramEngine, id?: string, logPrefix: string = '[Diagram]') {
 		super(id, logPrefix);
 	}
 
 	// TODO: support the following events for links and nodes
 	// removed, updated<positionChanged/dataChanged>, added
-	getNodes(): { [s: string]: NodeModel } {
+	getNodes(): HashMap<NodeModel> {
 		return this._nodes$.getValue();
 	}
 
@@ -47,7 +47,7 @@ export class DiagramModel extends BaseEntity {
 		return this._links$.getValue()[id];
 	}
 
-	getLinks(): { [s: string]: LinkModel } {
+	getLinks(): HashMap<LinkModel> {
 		return this._links$.getValue();
 	}
 
@@ -101,7 +101,7 @@ export class DiagramModel extends BaseEntity {
 	/**
 	 * Get nodes as observable, use `.getValue()` for snapshot
 	 */
-	selectNodes(): Observable<{ [s: string]: NodeModel }> {
+	selectNodes(): Observable<HashMap<NodeModel>> {
 		return this.nodes$;
 	}
 
@@ -137,7 +137,7 @@ export class DiagramModel extends BaseEntity {
 	/**
 	 * Get links behaviour subject, use `.getValue()` for snapshot
 	 */
-	selectLinks(): Observable<{ [s: string]: LinkModel }> {
+	selectLinks(): Observable<HashMap<LinkModel>> {
 		return this.links$;
 	}
 

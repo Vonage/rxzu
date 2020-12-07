@@ -1,5 +1,5 @@
-import { ID, UID } from '../utils/tool-kit.util';
 import { BaseEntity } from '../base.entity';
+import { ID, UID } from '../utils/tool-kit.util';
 
 // region events
 export class BaseEvent<T extends BaseEntity> {
@@ -8,7 +8,7 @@ export class BaseEvent<T extends BaseEntity> {
 	stopPropagation: () => any;
 	firing: boolean;
 	id: ID;
-	propogate: boolean;
+	propagate: boolean;
 
 	constructor(entity: T, options?: any) {
 		this.id = UID();
@@ -16,7 +16,7 @@ export class BaseEvent<T extends BaseEntity> {
 		this.entityId = entity.id;
 		this.firing = true;
 		this.stopPropagation = () => (this.firing = false);
-		this.propogate = options ? options.propagate : null;
+		this.propagate = options ? options.propagate : null;
 	}
 }
 export class LockEvent<T extends BaseEntity = BaseEntity> extends BaseEvent<T> {

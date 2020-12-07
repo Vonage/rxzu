@@ -1,13 +1,14 @@
-import { LinkModel } from '../../models/link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { LinkModel } from '../../models/link.model';
 
 export class DefaultLinkModel extends LinkModel {
-	private _width$: BehaviorSubject<number> = new BehaviorSubject(3);
-	private _color$: BehaviorSubject<string> = new BehaviorSubject('rgba(255,255,255,0.5)');
-	private _curvyness$: BehaviorSubject<number> = new BehaviorSubject(50);
-	width$: Observable<number> = this._width$.pipe(this.entityPipe('width'));
-	color$: Observable<string> = this._color$.pipe(this.entityPipe('color'));
-	curvyness$: Observable<number> = this._curvyness$.pipe(this.entityPipe('curvyness'));
+	private _width$ = new BehaviorSubject(3);
+	private _color$ = new BehaviorSubject('rgba(255,255,255,0.5)');
+	private _curvyness$ = new BehaviorSubject(50);
+
+	width$ = this._width$.asObservable().pipe(this.entityPipe('width'));
+	color$ = this._color$.asObservable().pipe(this.entityPipe('color'));
+	curvyness$ = this._curvyness$.asObservable().pipe(this.entityPipe('curvyness'));
 
 	constructor({ type = 'default', id, logPrefix = '[DefaultLink]' }: { type?: string; id?: string; logPrefix?: string } = {}) {
 		super(type, id, logPrefix);
