@@ -18,10 +18,12 @@ export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewI
 	labelLayer: ViewContainerRef;
 
 	protected _path$ = new BehaviorSubject(null);
+	protected _points$ = new BehaviorSubject<PointModel[]>([]);
 
-	path$ = this._path$.pipe(this.entityPipe('path'));
-	points$ = new BehaviorSubject<PointModel[]>([]);
 	label$: Observable<LabelModel>;
+	path$ = this._path$.pipe(this.entityPipe('path'));
+	points$ = this._points$.pipe(this.entityPipe('points'));
+
 	pathFinding: PathFinding; // only set when smart routing is active
 
 	constructor(private cdRef: ChangeDetectorRef) {
