@@ -6,9 +6,9 @@ export class DefaultLinkModel extends LinkModel {
 	protected _color$ = new BehaviorSubject('rgba(255,255,255,0.5)');
 	protected _curvyness$ = new BehaviorSubject(50);
 
-	width$ = this._width$.asObservable().pipe(this.entityPipe('width'));
-	color$ = this._color$.asObservable().pipe(this.entityPipe('color'));
-	curvyness$ = this._curvyness$.asObservable().pipe(this.entityPipe('curvyness'));
+	width$ = this._width$.pipe(this.entityPipe('width'));
+	color$ = this._color$.pipe(this.entityPipe('color'));
+	curvyness$ = this._curvyness$.pipe(this.entityPipe('curvyness'));
 
 	constructor({ type = 'default', id, logPrefix = '[DefaultLink]' }: { type?: string; id?: string; logPrefix?: string } = {}) {
 		super(type, id, logPrefix);

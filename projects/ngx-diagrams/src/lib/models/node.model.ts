@@ -17,11 +17,11 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 	protected readonly _coords$ = new BehaviorSubject<Coords>({ x: 0, y: 0 });
 	protected readonly _dimensions$ = new BehaviorSubject<Dimensions>({ width: 0, height: 0 });
 
-	protected readonly diagramEngine$ = this._diagramEngine$.asObservable().pipe(this.entityPipe('diagramEngine'));
-	protected readonly extras$ = this._extras$.asObservable().pipe(this.entityPipe('extras'));
-	protected readonly ports$ = this._ports$.asObservable().pipe(this.entityPipe('ports'));
-	protected readonly coords$ = this._coords$.asObservable().pipe(this.entityPipe('coords'));
-	protected readonly dimensions$ = this._dimensions$.asObservable().pipe(this.entityPipe('dimensions'));
+	protected readonly diagramEngine$ = this._diagramEngine$.pipe(this.entityPipe('diagramEngine'));
+	protected readonly extras$ = this._extras$.pipe(this.entityPipe('extras'));
+	protected readonly ports$ = this._ports$.pipe(this.entityPipe('ports'));
+	protected readonly coords$ = this._coords$.pipe(this.entityPipe('coords'));
+	protected readonly dimensions$ = this._dimensions$.pipe(this.entityPipe('dimensions'));
 
 	constructor(
 		nodeType: string = 'default',

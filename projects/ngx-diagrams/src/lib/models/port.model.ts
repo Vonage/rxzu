@@ -19,7 +19,7 @@ export class PortModel extends BaseModel<NodeModel> {
 	protected _height$ = new BehaviorSubject(0);
 	protected _canCreateLinks$ = new BehaviorSubject(true);
 
-	protected links$ = this._links$.asObservable().pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
+	protected links$ = this._links$.pipe(takeUntil(this.onEntityDestroy()), distinctUntilChanged(), shareReplay(1));
 	protected x$ = this._x$.pipe(this.entityPipe('x'));
 	protected y$ = this._y$.pipe(this.entityPipe('y'));
 	protected magnetic$ = this._magnetic$.pipe(this.entityPipe('magnetic'));

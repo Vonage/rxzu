@@ -22,12 +22,12 @@ export class DiagramModel extends BaseEntity {
 	protected _maxZoomOut$ = new BehaviorSubject(null);
 	protected _maxZoomIn$ = new BehaviorSubject(null);
 
-	protected nodes$ = this._nodes$.asObservable().pipe(this.entityPipe('nodes'));
-	protected links$ = this._links$.asObservable().pipe(this.entityPipe('links'));
+	protected nodes$ = this._nodes$.pipe(this.entityPipe('nodes'));
+	protected links$ = this._links$.pipe(this.entityPipe('links'));
 
-	protected offsetX$ = this._offsetX$.asObservable().pipe(this.entityPipe('offsetX'));
-	protected offsetY$ = this._offsetY$.asObservable().pipe(this.entityPipe('offsetY'));
-	protected zoom$ = this._zoom$.asObservable().pipe(this.entityPipe('zoom'));
+	protected offsetX$ = this._offsetX$.pipe(this.entityPipe('offsetX'));
+	protected offsetY$ = this._offsetY$.pipe(this.entityPipe('offsetY'));
+	protected zoom$ = this._zoom$.pipe(this.entityPipe('zoom'));
 
 	constructor(protected diagramEngine: DiagramEngine, id?: string, logPrefix: string = '[Diagram]') {
 		super(id, logPrefix);

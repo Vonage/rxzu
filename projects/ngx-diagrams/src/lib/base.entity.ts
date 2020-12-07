@@ -13,7 +13,7 @@ export class BaseEntity {
 	 */
 	private _logPrefix: string;
 	private _destroyed: Subject<null> = new Subject();
-	private _destroyed$: Observable<null> = this._destroyed.asObservable();
+	private _destroyed$: Observable<null> = this._destroyed;
 	private _locked: BehaviorSubject<boolean> = new BehaviorSubject(false);
 	private _locked$: Observable<LockEvent> = this._locked.pipe(
 		this.entityPipe('locked'),

@@ -8,8 +8,8 @@ export class LabelModel extends BaseModel<LinkModel> {
 	protected readonly _coords = new BehaviorSubject<Coords>({ x: 0, y: 0 });
 	protected readonly _rotation = new BehaviorSubject(0);
 
-	protected readonly coords$ = this._coords.asObservable().pipe(this.entityPipe('coords'));
-	protected readonly rotation$ = this._rotation.asObservable().pipe(this.entityPipe('rotation'));
+	protected readonly coords$ = this._coords.pipe(this.entityPipe('coords'));
+	protected readonly rotation$ = this._rotation.pipe(this.entityPipe('rotation'));
 
 	constructor(type?: string, id?: string, logPrefix: string = '[Label]') {
 		super(type, id, logPrefix);

@@ -21,7 +21,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
 	protected readonly _label$ = new BehaviorSubject<LabelModel>(null);
 
-	label$ = this._label$.asObservable().pipe(this.entityPipe('label'));
+	label$ = this._label$.pipe(this.entityPipe('label'));
 
 	constructor(linkType: string = 'default', id?: string, logPrefix: string = '[Link]') {
 		super(linkType, id, logPrefix);
