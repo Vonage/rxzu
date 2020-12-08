@@ -1,5 +1,5 @@
-import { ID, UID } from '../utils/tool-kit.util';
 import { BaseEntity } from '../base.entity';
+import { ID, UID } from '../utils/tool-kit.util';
 
 // region events
 export class BaseEvent<T extends BaseEntity> {

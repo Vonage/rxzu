@@ -1,15 +1,15 @@
-import { BaseModel } from './base.model';
-import { LinkModel } from './link.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Coords } from '../interfaces/coords.interface';
 import { SerializedLabelModel } from '../interfaces/serialization.interface';
+import { BaseModel } from './base.model';
+import { LinkModel } from './link.model';
 
 export class LabelModel extends BaseModel<LinkModel> {
-	private readonly _coords: BehaviorSubject<Coords> = new BehaviorSubject<Coords>({ x: 0, y: 0 });
-	private readonly _rotation: BehaviorSubject<number> = new BehaviorSubject(0);
+	protected readonly _coords = new BehaviorSubject<Coords>({ x: 0, y: 0 });
+	protected readonly _rotation = new BehaviorSubject(0);
 
-	private readonly coords$: Observable<Coords> = this._coords.pipe(this.entityPipe('coords'));
-	private readonly rotation$: Observable<number> = this._rotation.pipe(this.entityPipe('rotation'));
+	protected readonly coords$ = this._coords.pipe(this.entityPipe('coords'));
+	protected readonly rotation$ = this._rotation.pipe(this.entityPipe('rotation'));
 
 	constructor(type?: string, id?: string, logPrefix: string = '[Label]') {
 		super(type, id, logPrefix);

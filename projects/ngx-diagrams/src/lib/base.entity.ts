@@ -1,7 +1,8 @@
-import { ID, log as _log, withLog as _withLog, entityProperty as _entityProperty, UID, LOG_LEVEL } from './utils/tool-kit.util';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseEvent, LockEvent } from './interfaces/event.interface';
+import { entityProperty as _entityProperty, ID, log as _log, LOG_LEVEL, UID, withLog as _withLog } from './utils/tool-kit.util';
+import { HashMap } from './utils/types';
 
 export type BaseEntityType = 'node' | 'link' | 'port' | 'point';
 
@@ -12,7 +13,7 @@ export class BaseEntity {
 	 */
 	private _logPrefix: string;
 	private _destroyed: Subject<null> = new Subject();
-	private _destroyed$: Observable<null> = this._destroyed.asObservable();
+	private _destroyed$: Observable<null> = this._destroyed;
 	private _locked: BehaviorSubject<boolean> = new BehaviorSubject(false);
 	private _locked$: Observable<LockEvent> = this._locked.pipe(
 		this.entityPipe('locked'),
@@ -53,11 +54,11 @@ export class BaseEntity {
 	}
 
 	// eslint-disable-next-line
-	doClone(lookupTable: { [s: string]: any } = {}, clone: any) {
+	doClone(lookupTable: HashMap<any> = {}, clone: any) {
 		/*noop*/
 	}
 
-	public clone(lookupTable: { [s: string]: any } = {}) {
+	public clone(lookupTable: HashMap<any> = {}) {
 		// try and use an existing clone first
 		if (lookupTable[this.id]) {
 			return lookupTable[this.id];

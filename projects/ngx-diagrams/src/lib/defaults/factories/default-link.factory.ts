@@ -5,7 +5,7 @@ import { ViewContainerRef, ComponentRef, ComponentFactoryResolver, ComponentFact
 import { DiagramEngine } from '../../services/engine.service';
 
 export class DefaultLinkFactory extends AbstractLinkFactory<DefaultLinkModel> {
-	constructor(private resolver: ComponentFactoryResolver, private renderer: Renderer2) {
+	constructor(protected resolver: ComponentFactoryResolver, protected renderer: Renderer2) {
 		super('default');
 	}
 

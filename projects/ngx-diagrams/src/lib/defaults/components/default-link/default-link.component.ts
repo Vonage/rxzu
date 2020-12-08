@@ -1,12 +1,12 @@
-import { Component, AfterViewInit, ChangeDetectorRef, ViewChild, ViewContainerRef, OnInit } from '@angular/core';
-import { DefaultLinkModel } from '../../models/default-link.model';
-import { generateCurvePath, generateDynamicPath } from '../../../utils/tool-kit.util';
-import { combineLatest, BehaviorSubject, Observable } from 'rxjs';
-import { PointModel } from '../../../models/point.model';
-import { LabelModel } from '../../../models/label.model';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Coords } from '../../../interfaces';
+import { LabelModel } from '../../../models/label.model';
+import { PointModel } from '../../../models/point.model';
 import { PathFinding } from '../../../plugins/smart-routing.plugin';
+import { generateCurvePath, generateDynamicPath } from '../../../utils/tool-kit.util';
+import { DefaultLinkModel } from '../../models/default-link.model';
 
 @Component({
 	selector: 'ngdx-default-link',
@@ -14,12 +14,16 @@ import { PathFinding } from '../../../plugins/smart-routing.plugin';
 	styleUrls: ['./default-link.component.scss'],
 })
 export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewInit, OnInit {
-	@ViewChild('labelLayer', { read: ViewContainerRef, static: true }) labelLayer: ViewContainerRef;
+	@ViewChild('labelLayer', { read: ViewContainerRef, static: true })
+	labelLayer: ViewContainerRef;
 
-	_path$: BehaviorSubject<string> = new BehaviorSubject(null);
-	path$: Observable<string> = this._path$.pipe(this.entityPipe('path'));
-	points$: BehaviorSubject<PointModel[]> = new BehaviorSubject([]);
+	protected _path$ = new BehaviorSubject(null);
+	protected _points$ = new BehaviorSubject<PointModel[]>([]);
+
 	label$: Observable<LabelModel>;
+	path$ = this._path$.pipe(this.entityPipe('path'));
+	points$ = this._points$.pipe(this.entityPipe('points'));
+
 	pathFinding: PathFinding; // only set when smart routing is active
 
 	constructor(private cdRef: ChangeDetectorRef) {

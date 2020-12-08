@@ -1,30 +1,30 @@
 import {
-	Component,
-	OnInit,
-	Input,
-	Renderer2,
-	Output,
-	EventEmitter,
-	ViewChild,
-	ViewContainerRef,
-	ElementRef,
 	AfterViewInit,
 	ChangeDetectionStrategy,
 	ChangeDetectorRef,
+	Component,
+	ElementRef,
+	EventEmitter,
+	Input,
 	OnDestroy,
+	Output,
+	Renderer2,
+	ViewChild,
+	ViewContainerRef,
 } from '@angular/core';
-import { DiagramModel } from '../../models/diagram.model';
-import { NodeModel } from '../../models/node.model';
-import { LinkModel } from '../../models/link.model';
-import { BehaviorSubject, Observable, combineLatest, ReplaySubject } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
-import { BaseAction, MoveCanvasAction, SelectingAction, LinkCreatedAction, InvalidLinkDestroyed } from '../../actions';
-import { BaseModel } from '../../models/base.model';
-import { MoveItemsAction } from '../../actions/move-items.action';
-import { PointModel } from '../../models/point.model';
-import { Coords } from '../../interfaces/coords.interface';
-import { PortModel } from '../../models/port.model';
+import { BehaviorSubject, combineLatest, defer, Observable, ReplaySubject } from 'rxjs';
+import { filter, map, takeUntil } from 'rxjs/operators';
+import { BaseAction, InvalidLinkDestroyed, LinkCreatedAction, MoveCanvasAction, SelectingAction } from '../../actions';
 import { LooseLinkDestroyed } from '../../actions/loose-link-destroyed.action';
+import { MoveItemsAction } from '../../actions/move-items.action';
+import { Coords } from '../../interfaces/coords.interface';
+import { BaseModel } from '../../models/base.model';
+import { DiagramModel } from '../../models/diagram.model';
+import { LinkModel } from '../../models/link.model';
+import { NodeModel } from '../../models/node.model';
+import { PointModel } from '../../models/point.model';
+import { PortModel } from '../../models/port.model';
+import { HashMap } from '../../utils/types';
 
 @Component({
 	selector: 'ngdx-diagram',
@@ -32,7 +32,7 @@ import { LooseLinkDestroyed } from '../../actions/loose-link-destroyed.action';
 	styleUrls: ['diagram.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
+export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 	// eslint-disable-next-line @angular-eslint/no-input-rename
 	@Input('model') diagramModel: DiagramModel;
 	@Input() allowCanvasZoom = true;
@@ -44,84 +44,44 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 	@Input() portMagneticRadius = 30;
 	@Input() smartRouting = false;
 
-	@Output() actionStartedFiring: EventEmitter<BaseAction> = new EventEmitter();
-	@Output() actionStillFiring: EventEmitter<BaseAction> = new EventEmitter();
-	@Output() actionStoppedFiring: EventEmitter<BaseAction> = new EventEmitter();
+	@Output() actionStartedFiring = new EventEmitter<BaseAction>();
+	@Output() actionStillFiring = new EventEmitter<BaseAction>();
+	@Output() actionStoppedFiring = new EventEmitter<BaseAction>();
 
-	@ViewChild('nodesLayer', { read: ViewContainerRef, static: true }) nodesLayer: ViewContainerRef;
-	@ViewChild('linksLayer', { read: ViewContainerRef, static: true }) linksLayer: ViewContainerRef;
-	@ViewChild('canvas', { read: ElementRef, static: true }) canvas: ElementRef;
+	@ViewChild('nodesLayer', { read: ViewContainerRef })
+	nodesLayer: ViewContainerRef;
 
-	private nodes$: Observable<{ [s: string]: NodeModel }>;
-	private links$: Observable<{ [s: string]: LinkModel }>;
-	private action$: BehaviorSubject<BaseAction> = new BehaviorSubject(null);
-	private nodesRendered$: BehaviorSubject<boolean>;
-	private destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
+	@ViewChild('linksLayer', { read: ViewContainerRef })
+	linksLayer: ViewContainerRef;
 
-	constructor(private renderer: Renderer2, private cdRef: ChangeDetectorRef) {}
+	@ViewChild('canvas', { read: ElementRef })
+	canvas: ElementRef;
 
-	// TODO: handle destruction of container, resseting all observables to avoid memory leaks!
-	ngOnInit() {
+	layerStyles$ = defer(() =>
+		combineLatest([this.diagramModel.selectOffsetX(), this.diagramModel.selectOffsetY(), this.diagramModel.selectZoomLevel()]).pipe(
+			map(([x, y, zoom]) => this.createLayerStyle(x, y, zoom))
+		)
+	);
+
+	protected nodes$: Observable<HashMap<NodeModel>>;
+	protected links$: Observable<HashMap<LinkModel>>;
+	protected action$ = new BehaviorSubject<BaseAction>(null);
+	protected nodesRendered$: BehaviorSubject<boolean>;
+	protected destroyed$ = new ReplaySubject<boolean>(1);
+
+	constructor(protected renderer: Renderer2, protected cdRef: ChangeDetectorRef) {}
+
+	// TODO: handle destruction of container, resetting all observables to avoid memory leaks!
+	ngAfterViewInit() {
 		if (this.diagramModel) {
-			this.diagramModel.getDiagramEngine().setCanvas(this.canvas.nativeElement);
-			this.diagramModel.getDiagramEngine().setSmartRoutingStatus(this.smartRouting);
-
-			this.nodes$ = this.diagramModel.selectNodes();
-			this.links$ = this.diagramModel.selectLinks();
-			this.nodesRendered$ = new BehaviorSubject(false);
-
-			this.diagramModel.setMaxZoomIn(this.maxZoomIn);
-			this.diagramModel.setMaxZoomOut(this.maxZoomOut);
-
-			this.nodes$.pipe(takeUntil(this.destroyed$)).subscribe(nodes => {
-				this.nodesRendered$.next(false);
-				Object.values(nodes).forEach(node => {
-					if (!node.getPainted()) {
-						this.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);
-						this.cdRef.detectChanges();
-					}
-				});
-
-				this.nodesRendered$.next(true);
-			});
+			this.initNodes();
+			this.initLinks();
 		}
 	}
 
 	ngOnDestroy() {
 		this.destroyed$.next(true);
 		this.destroyed$.complete();
-	}
-
-	ngAfterViewInit() {
-		combineLatest([this.nodesRendered$, this.links$])
-			.pipe(
-				takeUntil(this.destroyed$),
-				filter(([nodesRendered, _]) => !!nodesRendered)
-			)
-			.subscribe(([_, links]) => {
-				Object.values(links).forEach(link => {
-					if (!link.getPainted() && link.getSourcePort().getPainted()) {
-						if (link.getSourcePort() !== null) {
-							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getSourcePort());
-							link.getPoints()[0].setCoords(portCenter);
-
-							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getSourcePort());
-							link.getSourcePort().updateCoords(portCoords);
-						}
-
-						if (link.getTargetPort() !== null) {
-							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getTargetPort());
-							link.getPoints()[link.getPoints().length - 1].setCoords(portCenter);
-
-							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getTargetPort());
-							link.getTargetPort().updateCoords(portCoords);
-						}
-
-						this.diagramModel.getDiagramEngine().generateWidgetForLink(link, this.linksLayer);
-						this.cdRef.detectChanges();
-					}
-				});
-			});
 	}
 
 	/**
@@ -549,6 +509,67 @@ export class NgxDiagramComponent implements OnInit, AfterViewInit, OnDestroy {
 		}
 	}
 
-	private mouseUpListener = () => {};
-	private mouseMoveListener = () => {};
+	protected mouseUpListener = () => {};
+	protected mouseMoveListener = () => {};
+
+	protected createLayerStyle(x: number, y: number, zoom: number): HashMap<string> {
+		return { transform: `translate(${x}px, ${y}px) scale(${zoom / 100.0})` };
+	}
+
+	protected initNodes() {
+		this.diagramModel.getDiagramEngine().setCanvas(this.canvas.nativeElement);
+		this.diagramModel.getDiagramEngine().setSmartRoutingStatus(this.smartRouting);
+
+		this.nodes$ = this.diagramModel.selectNodes();
+		this.links$ = this.diagramModel.selectLinks();
+		this.nodesRendered$ = new BehaviorSubject(false);
+
+		this.diagramModel.setMaxZoomIn(this.maxZoomIn);
+		this.diagramModel.setMaxZoomOut(this.maxZoomOut);
+
+		this.nodes$.pipe(takeUntil(this.destroyed$)).subscribe(nodes => {
+			this.nodesRendered$.next(false);
+
+			Object.values(nodes).forEach(node => {
+				if (!node.getPainted()) {
+					this.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);
+					this.cdRef.detectChanges();
+				}
+			});
+
+			this.nodesRendered$.next(true);
+		});
+	}
+
+	protected initLinks() {
+		combineLatest([this.nodesRendered$, this.links$])
+			.pipe(
+				filter(([nodesRendered, _]) => !!nodesRendered),
+				takeUntil(this.destroyed$)
+			)
+			.subscribe(([_, links]) => {
+				Object.values(links).forEach(link => {
+					if (!link.getPainted() && link.getSourcePort().getPainted()) {
+						if (link.getSourcePort() !== null) {
+							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getSourcePort());
+							link.getPoints()[0].setCoords(portCenter);
+
+							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getSourcePort());
+							link.getSourcePort().updateCoords(portCoords);
+						}
+
+						if (link.getTargetPort() !== null) {
+							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getTargetPort());
+							link.getPoints()[link.getPoints().length - 1].setCoords(portCenter);
+
+							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getTargetPort());
+							link.getTargetPort().updateCoords(portCoords);
+						}
+
+						this.diagramModel.getDiagramEngine().generateWidgetForLink(link, this.linksLayer);
+						this.cdRef.detectChanges();
+					}
+				});
+			});
+	}
 }

@@ -5,7 +5,7 @@ import { DiagramEngine } from '../../services/engine.service';
 import { DefaultNodeModel } from '../models/default-node.model';
 
 export class DefaultNodeFactory extends AbstractNodeFactory<DefaultNodeModel> {
-	constructor(private resolver: ComponentFactoryResolver, private renderer: Renderer2) {
+	constructor(protected resolver: ComponentFactoryResolver, protected renderer: Renderer2) {
 		super('default');
 	}
 
