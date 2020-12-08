@@ -24,7 +24,7 @@ import { LinkModel } from '../../models/link.model';
 import { NodeModel } from '../../models/node.model';
 import { PointModel } from '../../models/point.model';
 import { PortModel } from '../../models/port.model';
-import { HashMap } from '../../utils/types';
+import { HashMap, TypedMap } from '../../utils/types';
 
 @Component({
 	selector: 'ngdx-diagram',
@@ -64,7 +64,7 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 	);
 
 	protected nodes$: Observable<HashMap<NodeModel>>;
-	protected links$: Observable<HashMap<LinkModel>>;
+	protected links$: Observable<TypedMap<LinkModel>>;
 	protected action$ = new BehaviorSubject<BaseAction>(null);
 	protected nodesRendered$: BehaviorSubject<boolean>;
 	protected destroyed$ = new ReplaySubject<boolean>(1);
@@ -544,11 +544,11 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 	protected initLinks() {
 		combineLatest([this.nodesRendered$, this.links$])
 			.pipe(
-				filter(([nodesRendered, _]) => !!nodesRendered),
+				filter(([nodesRendered]) => !!nodesRendered),
 				takeUntil(this.destroyed$)
 			)
-			.subscribe(([_, links]) => {
-				Object.values(links).forEach(link => {
+			.subscribe(([, links]) => {
+				for (const link of links.values()) {
 					if (!link.getPainted() && link.getSourcePort().getPainted()) {
 						if (link.getSourcePort() !== null) {
 							const portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getSourcePort());
@@ -569,7 +569,7 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 						this.diagramModel.getDiagramEngine().generateWidgetForLink(link, this.linksLayer);
 						this.cdRef.detectChanges();
 					}
-				});
+				}
 			});
 	}
 }

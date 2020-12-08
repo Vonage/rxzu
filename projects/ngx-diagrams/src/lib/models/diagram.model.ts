@@ -5,7 +5,7 @@ import { SelectOptions } from '../interfaces/select-options.interface';
 import { SerializedDiagramModel } from '../interfaces/serialization.interface';
 import { DiagramEngine } from '../services/engine.service';
 import { arrayToMap, ID, isArray } from '../utils/tool-kit.util';
-import { HashMap } from '../utils/types';
+import { HashMap, TypedMap } from '../utils/types';
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { NodeModel } from './node.model';
@@ -13,7 +13,7 @@ import { PointModel } from './point.model';
 import { PortModel } from './port.model';
 
 export class DiagramModel extends BaseEntity {
-	protected _links$ = new BehaviorSubject<HashMap<LinkModel>>({});
+	protected _links$ = new BehaviorSubject<TypedMap<LinkModel>>(new TypedMap());
 	protected _nodes$ = new BehaviorSubject<HashMap<NodeModel>>({});
 	protected _zoom$ = new BehaviorSubject(100);
 	protected _offsetX$ = new BehaviorSubject(0);
@@ -43,11 +43,11 @@ export class DiagramModel extends BaseEntity {
 		return this._nodes$.getValue()[id];
 	}
 
-	getLink(id: ID): LinkModel | null {
-		return this._links$.getValue()[id];
+	getLink(id: ID): LinkModel | undefined {
+		return this._links$.getValue().get(id);
 	}
 
-	getLinks(): HashMap<LinkModel> {
+	getLinks(): TypedMap<LinkModel> {
 		return this._links$.getValue();
 	}
 
@@ -110,7 +110,8 @@ export class DiagramModel extends BaseEntity {
 	 * @returns Newly created link
 	 */
 	addLink(link: LinkModel): LinkModel {
-		this._links$.next({ ...this.getLinks(), [link.id]: link });
+		this.getLinks().set(link.id, link);
+		this._links$.next(this.getLinks());
 		return link;
 	}
 
@@ -118,13 +119,9 @@ export class DiagramModel extends BaseEntity {
 	 * Delete link
 	 */
 	deleteLink(linkOrId: LinkModel | string) {
-		const linkID: ID = typeof linkOrId === 'string' ? linkOrId : linkOrId.id;
-		const link = this.getLink(linkID);
-
-		const updLinks = { ...this.getLinks() };
-		delete updLinks[linkID];
-
-		this._links$.next(updLinks);
+		const linkId: ID = typeof linkOrId === 'string' ? linkOrId : linkOrId.id;
+		const link = this.getLink(linkId);
+		this.getLinks().delete(linkId);
 		link.destroy();
 	}
 
@@ -146,13 +143,15 @@ export class DiagramModel extends BaseEntity {
 		}
 
 		this._nodes$.next({});
-		this._links$.next({});
+
+		this.getLinks().clear();
+		this._links$.next(this.getLinks());
 	}
 
 	/**
 	 * Get links behaviour subject, use `.getValue()` for snapshot
 	 */
-	selectLinks(): Observable<HashMap<LinkModel>> {
+	selectLinks(): Observable<TypedMap<LinkModel>> {
 		return this.links$;
 	}
 
@@ -315,9 +314,12 @@ export class DiagramModel extends BaseEntity {
 		return models;
 	}
 
-	addLinks(links: LinkModel[] | HashMap<LinkModel>) {
-		const added = isArray(links) ? arrayToMap(links) : links;
-		this._links$.next({ ...this.getLinks(), ...added });
+	addLinks(links: LinkModel[]) {
+		for (const link of links) {
+			this.getLinks().set(link.id, link);
+		}
+
+		this._links$.next(this.getLinks());
 	}
 
 	addNodes(nodes: NodeModel[] | HashMap<NodeModel>) {

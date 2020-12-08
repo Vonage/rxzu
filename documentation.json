@@ -149,14 +149,14 @@
         },
         {
             "name": "HashMap",
-            "id": "interface-HashMap-1ba62388158200c10cdfdcf266495026",
+            "id": "interface-HashMap-37c16e407c0ce2d154a38eed57dd5a92",
             "file": "projects/ngx-diagrams/src/lib/utils/types.ts",
             "type": "interface",
-            "sourceCode": "export interface HashMap<T> {\r\n\t[key: string]: T;\r\n}\r\n",
+            "sourceCode": "import { ID } from 'ngx-diagrams';\n\nexport interface HashMap<T> {\n\t[key: string]: T;\n}\n\nexport class TypedMap<T> extends Map<ID, T> {\n\tvaluesArray(): T[] {\n\t\treturn Array.from(this.values());\n\t}\n}\n",
             "properties": [],
             "indexSignatures": [
                 {
-                    "id": "index-declaration-1ba62388158200c10cdfdcf266495026",
+                    "id": "index-declaration-37c16e407c0ce2d154a38eed57dd5a92",
                     "args": [
                         {
                             "name": "key",
@@ -164,7 +164,7 @@
                         }
                     ],
                     "returnType": "T",
-                    "line": 1
+                    "line": 3
                 }
             ],
             "kind": 159,
@@ -2723,10 +2723,10 @@
         },
         {
             "name": "BaseModel",
-            "id": "class-BaseModel-a97dd78c4cb459c9937be25c7c81bd5f",
+            "id": "class-BaseModel-4bbd050c6e1dc20c83d55a267c1e8bff",
             "file": "projects/ngx-diagrams/src/lib/models/base.model.ts",
             "type": "class",
-            "sourceCode": "import { BaseEntity } from '../base.entity';\r\nimport { BehaviorSubject, Observable } from 'rxjs';\r\nimport { map } from 'rxjs/operators';\r\nimport { PaintedEvent, ParentChangeEvent, SelectionEvent } from '../interfaces/event.interface';\r\n\r\nexport class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {\r\n\tprotected readonly _type: string;\r\n\tprotected readonly _parent$: BehaviorSubject<X> = new BehaviorSubject(null);\r\n\tprotected readonly _selected$: BehaviorSubject<boolean> = new BehaviorSubject(false);\r\n\tprotected readonly _painted$: BehaviorSubject<boolean> = new BehaviorSubject(false);\r\n\tprotected readonly _hovered$: BehaviorSubject<boolean> = new BehaviorSubject(false);\r\n\r\n\tprotected readonly parent$: Observable<ParentChangeEvent<X>> = this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t);\r\n\tprotected readonly selected$: Observable<SelectionEvent>;\r\n\tprotected readonly painted$: Observable<PaintedEvent>;\r\n\tprotected readonly hovered$: Observable<boolean>;\r\n\r\n\tconstructor(type?: string, id?: string, logPrefix = '[Base]') {\r\n\t\tsuper(id, logPrefix);\r\n\t\tthis._type = type;\r\n\t\tthis.selected$ = this._selected$.pipe(\r\n\t\t\tthis.entityPipe('SelectedChange'),\r\n\t\t\tmap(s => new SelectionEvent(this, s))\r\n\t\t);\r\n\r\n\t\tthis.painted$ = this._painted$.pipe(\r\n\t\t\tthis.entityPipe('PaintedChange'),\r\n\t\t\tmap(p => new PaintedEvent(this, p))\r\n\t\t);\r\n\r\n\t\tthis.hovered$ = this._hovered$.pipe(this.entityPipe('HoveredChange'));\r\n\t}\r\n\r\n\tserialize() {\r\n\t\treturn {\r\n\t\t\t...super.serialize(),\r\n\t\t\ttype: this.getType(),\r\n\t\t};\r\n\t}\r\n\r\n\tgetParent(): X {\r\n\t\treturn this._parent$.getValue();\r\n\t}\r\n\r\n\tsetParent(parent: X): void {\r\n\t\tthis._parent$.next(parent);\r\n\t}\r\n\r\n\tparentChanges(): Observable<ParentChangeEvent<X>> {\r\n\t\treturn this.parent$;\r\n\t}\r\n\r\n\tgetPainted(): boolean {\r\n\t\treturn this._painted$.getValue();\r\n\t}\r\n\r\n\tsetPainted(painted: boolean = true) {\r\n\t\tthis._painted$.next(painted);\r\n\t}\r\n\r\n\tgetHovered(): boolean {\r\n\t\treturn this._hovered$.getValue();\r\n\t}\r\n\r\n\tsetHovered(painted: boolean = true) {\r\n\t\tthis._hovered$.next(painted);\r\n\t}\r\n\r\n\tselectHovered() {\r\n\t\treturn this.hovered$;\r\n\t}\r\n\r\n\tpaintChanges(): Observable<PaintedEvent> {\r\n\t\treturn this.painted$;\r\n\t}\r\n\r\n\tgetType(): string {\r\n\t\treturn this._type;\r\n\t}\r\n\r\n\tgetSelected(): boolean {\r\n\t\treturn this._selected$.getValue();\r\n\t}\r\n\r\n\tselectSelected(): Observable<boolean> {\r\n\t\treturn this.selected$.pipe(map(e => e.isSelected));\r\n\t}\r\n\r\n\tsetSelected(selected: boolean = true) {\r\n\t\tthis._selected$.next(selected);\r\n\t}\r\n\r\n\tselectionChanges(): Observable<SelectionEvent> {\r\n\t\treturn this.selected$;\r\n\t}\r\n\r\n\tgetSelectedEntities(): BaseModel[] {\r\n\t\treturn this._selected$.value ? [this] : [];\r\n\t}\r\n}\r\n",
+            "sourceCode": "import { BaseEntity } from '../base.entity';\r\nimport { BehaviorSubject, Observable } from 'rxjs';\r\nimport { map } from 'rxjs/operators';\r\nimport { PaintedEvent, ParentChangeEvent, SelectionEvent } from '../interfaces/event.interface';\r\n\r\nexport class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {\r\n\tprotected readonly _type: string;\r\n\tprotected readonly _parent$ = new BehaviorSubject<X>(null);\r\n\tprotected readonly _selected$ = new BehaviorSubject(false);\r\n\tprotected readonly _painted$ = new BehaviorSubject(false);\r\n\tprotected readonly _hovered$ = new BehaviorSubject(false);\r\n\r\n\tprotected readonly parent$ = this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t);\r\n\tprotected readonly selected$: Observable<SelectionEvent>;\r\n\tprotected readonly painted$: Observable<PaintedEvent>;\r\n\tprotected readonly hovered$: Observable<boolean>;\r\n\r\n\tconstructor(type?: string, id?: string, logPrefix = '[Base]') {\r\n\t\tsuper(id, logPrefix);\r\n\t\tthis._type = type;\r\n\t\tthis.selected$ = this._selected$.pipe(\r\n\t\t\tthis.entityPipe('SelectedChange'),\r\n\t\t\tmap(s => new SelectionEvent(this, s))\r\n\t\t);\r\n\r\n\t\tthis.painted$ = this._painted$.pipe(\r\n\t\t\tthis.entityPipe('PaintedChange'),\r\n\t\t\tmap(p => new PaintedEvent(this, p))\r\n\t\t);\r\n\r\n\t\tthis.hovered$ = this._hovered$.pipe(this.entityPipe('HoveredChange'));\r\n\t}\r\n\r\n\tserialize() {\r\n\t\treturn {\r\n\t\t\t...super.serialize(),\r\n\t\t\ttype: this.getType(),\r\n\t\t};\r\n\t}\r\n\r\n\tgetParent(): X {\r\n\t\treturn this._parent$.getValue();\r\n\t}\r\n\r\n\tsetParent(parent: X): void {\r\n\t\tthis._parent$.next(parent);\r\n\t}\r\n\r\n\tparentChanges(): Observable<ParentChangeEvent<X>> {\r\n\t\treturn this.parent$;\r\n\t}\r\n\r\n\tgetPainted(): boolean {\r\n\t\treturn this._painted$.getValue();\r\n\t}\r\n\r\n\tsetPainted(painted: boolean = true) {\r\n\t\tthis._painted$.next(painted);\r\n\t}\r\n\r\n\tgetHovered(): boolean {\r\n\t\treturn this._hovered$.getValue();\r\n\t}\r\n\r\n\tsetHovered(painted: boolean = true) {\r\n\t\tthis._hovered$.next(painted);\r\n\t}\r\n\r\n\tselectHovered() {\r\n\t\treturn this.hovered$;\r\n\t}\r\n\r\n\tpaintChanges(): Observable<PaintedEvent> {\r\n\t\treturn this.painted$;\r\n\t}\r\n\r\n\tgetType(): string {\r\n\t\treturn this._type;\r\n\t}\r\n\r\n\tgetSelected(): boolean {\r\n\t\treturn this._selected$.getValue();\r\n\t}\r\n\r\n\tselectSelected(): Observable<boolean> {\r\n\t\treturn this.selected$.pipe(map(e => e.isSelected));\r\n\t}\r\n\r\n\tsetSelected(selected: boolean = true) {\r\n\t\tthis._selected$.next(selected);\r\n\t}\r\n\r\n\tselectionChanges(): Observable<SelectionEvent> {\r\n\t\treturn this.selected$;\r\n\t}\r\n\r\n\tgetSelectedEntities(): BaseModel[] {\r\n\t\treturn this._selected$.value ? [this] : [];\r\n\t}\r\n}\r\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -2779,7 +2779,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -2791,7 +2791,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -2802,8 +2802,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -2815,7 +2815,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -2860,7 +2860,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -3800,7 +3800,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -3815,7 +3815,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -3829,8 +3829,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -3845,7 +3845,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -3902,7 +3902,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -4097,7 +4097,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -4112,7 +4112,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -4126,8 +4126,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -4142,7 +4142,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -4199,7 +4199,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -6523,7 +6523,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -6538,7 +6538,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -6552,8 +6552,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -6568,7 +6568,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -6625,7 +6625,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -6820,7 +6820,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -6835,7 +6835,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -6849,8 +6849,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -6865,7 +6865,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -6922,7 +6922,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -9883,7 +9883,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -9898,7 +9898,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -9912,8 +9912,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -9928,7 +9928,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -9985,7 +9985,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -10180,7 +10180,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -10195,7 +10195,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -10209,8 +10209,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -10225,7 +10225,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -10282,7 +10282,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -13030,7 +13030,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -13045,7 +13045,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -13059,8 +13059,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -13075,7 +13075,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -13132,7 +13132,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -13327,7 +13327,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -13342,7 +13342,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -13356,8 +13356,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -13372,7 +13372,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -13429,7 +13429,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -15650,10 +15650,10 @@
         },
         {
             "name": "DiagramModel",
-            "id": "class-DiagramModel-32d1fab14b3e2da1be65703cd38a7c2c",
+            "id": "class-DiagramModel-a9f906bda737bca4b255a6b4366be97f",
             "file": "projects/ngx-diagrams/src/lib/models/diagram.model.ts",
             "type": "class",
-            "sourceCode": "import { BehaviorSubject, Observable } from 'rxjs';\nimport { BaseEntity, BaseEntityType } from '../base.entity';\nimport { Coords } from '../interfaces/coords.interface';\nimport { SelectOptions } from '../interfaces/select-options.interface';\nimport { SerializedDiagramModel } from '../interfaces/serialization.interface';\nimport { DiagramEngine } from '../services/engine.service';\nimport { arrayToMap, ID, isArray } from '../utils/tool-kit.util';\nimport { HashMap } from '../utils/types';\nimport { BaseModel } from './base.model';\nimport { LinkModel } from './link.model';\nimport { NodeModel } from './node.model';\nimport { PointModel } from './point.model';\nimport { PortModel } from './port.model';\n\nexport class DiagramModel extends BaseEntity {\n\tprotected _links$ = new BehaviorSubject<HashMap<LinkModel>>({});\n\tprotected _nodes$ = new BehaviorSubject<HashMap<NodeModel>>({});\n\tprotected _zoom$ = new BehaviorSubject(100);\n\tprotected _offsetX$ = new BehaviorSubject(0);\n\tprotected _offsetY$ = new BehaviorSubject(0);\n\tprotected _gridSize$ = new BehaviorSubject(0);\n\tprotected _maxZoomOut$ = new BehaviorSubject(null);\n\tprotected _maxZoomIn$ = new BehaviorSubject(null);\n\n\tprotected nodes$ = this._nodes$.pipe(this.entityPipe('nodes'));\n\tprotected links$ = this._links$.pipe(this.entityPipe('links'));\n\n\tprotected offsetX$ = this._offsetX$.pipe(this.entityPipe('offsetX'));\n\tprotected offsetY$ = this._offsetY$.pipe(this.entityPipe('offsetY'));\n\tprotected zoom$ = this._zoom$.pipe(this.entityPipe('zoom'));\n\n\tconstructor(protected diagramEngine: DiagramEngine, id?: string, logPrefix: string = '[Diagram]') {\n\t\tsuper(id, logPrefix);\n\t}\n\n\t// TODO: support the following events for links and nodes\n\t// removed, updated<positionChanged/dataChanged>, added\n\tgetNodes(): HashMap<NodeModel> {\n\t\treturn this._nodes$.getValue();\n\t}\n\n\tgetNode(id: ID): NodeModel | null {\n\t\treturn this._nodes$.getValue()[id];\n\t}\n\n\tgetLink(id: ID): LinkModel | null {\n\t\treturn this._links$.getValue()[id];\n\t}\n\n\tgetLinks(): HashMap<LinkModel> {\n\t\treturn this._links$.getValue();\n\t}\n\n\tgetAllPorts(options?: SelectOptions<PortModel>): Map<string, PortModel> {\n\t\tconst portsMap = new Map();\n\t\t// TODO: optimize!\n\t\tObject.values(this.getNodes()).forEach(node => {\n\t\t\tfor (const [key, port] of Object.entries(node.getPorts())) {\n\t\t\t\tif (options.filter) {\n\t\t\t\t\tif (options.filter(port as PortModel)) {\n\t\t\t\t\t\tportsMap.set(key, port);\n\t\t\t\t\t}\n\t\t\t\t} else {\n\t\t\t\t\tportsMap.set(key, port);\n\t\t\t\t}\n\t\t\t}\n\t\t});\n\t\treturn portsMap;\n\t}\n\n\t/**\n\t * Add a node to the diagram\n\t * @returns Inserted Node\n\t */\n\taddNode(node: NodeModel): NodeModel {\n\t\tthis._nodes$.next({ ...this._nodes$.value, [node.id]: node });\n\t\treturn node;\n\t}\n\n\t/**\n\t * Delete a node from the diagram\n\t */\n\tdeleteNode(nodeOrId: NodeModel | string): void {\n\t\tconst nodeID: ID = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;\n\t\tconst node = this.getNode(nodeID);\n\n\t\t// delete all related links\n\t\tObject.values(node.getPorts()).forEach((port: PortModel) => {\n\t\t\tObject.values(port.getLinks()).forEach(link => {\n\t\t\t\tthis.deleteLink(link);\n\t\t\t});\n\t\t});\n\n\t\tconst updNodes = { ...this.getNodes() };\n\t\tdelete updNodes[nodeID];\n\t\tthis._nodes$.next(updNodes);\n\n\t\tnode.destroy();\n\t}\n\n\t/**\n\t * Get nodes as observable, use `.getValue()` for snapshot\n\t */\n\tselectNodes(): Observable<HashMap<NodeModel>> {\n\t\treturn this.nodes$;\n\t}\n\n\t/**\n\t * Add link\n\t * @returns Newly created link\n\t */\n\taddLink(link: LinkModel): LinkModel {\n\t\tthis._links$.next({ ...this.getLinks(), [link.id]: link });\n\t\treturn link;\n\t}\n\n\t/**\n\t * Delete link\n\t */\n\tdeleteLink(linkOrId: LinkModel | string) {\n\t\tconst linkID: ID = typeof linkOrId === 'string' ? linkOrId : linkOrId.id;\n\t\tconst link = this.getLink(linkID);\n\n\t\tconst updLinks = { ...this.getLinks() };\n\t\tdelete updLinks[linkID];\n\n\t\tthis._links$.next(updLinks);\n\t\tlink.destroy();\n\t}\n\n\treset() {\n\t\tconst ports = Array.from(this.getAllPorts().values());\n\t\tconst links = Object.values(this.getLinks());\n\t\tconst nodes = Object.values(this.getNodes());\n\n\t\tfor (const node of nodes) {\n\t\t\tnode.destroy();\n\t\t}\n\n\t\tfor (const port of ports) {\n\t\t\tport.destroy();\n\t\t}\n\n\t\tfor (const link of links) {\n\t\t\tlink.destroy();\n\t\t}\n\n\t\tthis._nodes$.next({});\n\t\tthis._links$.next({});\n\t}\n\n\t/**\n\t * Get links behaviour subject, use `.getValue()` for snapshot\n\t */\n\tselectLinks(): Observable<HashMap<LinkModel>> {\n\t\treturn this.links$;\n\t}\n\n\t// /**\n\t//  * Serialize the diagram model to JSON\n\t//  * @returns diagram model as a string\n\t//  */\n\tserialize(): SerializedDiagramModel {\n\t\tconst serializedNodes = Object.values(this.getNodes()).map(node => node.serialize());\n\t\tconst serializedLinks = Object.values(this.getLinks()).map(link => link.serialize());\n\t\treturn { ...super.serialize(), nodes: serializedNodes, links: serializedLinks };\n\t}\n\n\tsetMaxZoomOut(maxZoomOut: number) {\n\t\tthis._maxZoomOut$.next(maxZoomOut);\n\t}\n\n\tsetMaxZoomIn(maxZoomIn: number) {\n\t\tthis._maxZoomIn$.next(maxZoomIn);\n\t}\n\n\tgetMaxZoomOut() {\n\t\treturn this._maxZoomOut$.getValue();\n\t}\n\n\tgetMaxZoomIn() {\n\t\treturn this._maxZoomIn$.getValue();\n\t}\n\n\tsetOffset(x: number, y: number) {\n\t\tthis._offsetX$.next(x);\n\t\tthis._offsetY$.next(y);\n\t}\n\n\tsetOffsetX(x: number) {\n\t\tthis._offsetX$.next(x);\n\t}\n\n\tgetOffsetX(): number {\n\t\treturn this._offsetX$.getValue();\n\t}\n\n\tselectOffsetX(): Observable<number> {\n\t\treturn this.offsetX$;\n\t}\n\n\tsetOffsetY(y: number) {\n\t\tthis._offsetY$.next(y);\n\t}\n\n\tgetOffsetY(): number {\n\t\treturn this._offsetY$.getValue();\n\t}\n\n\tselectOffsetY(): Observable<number> {\n\t\treturn this.offsetY$;\n\t}\n\n\tsetZoomLevel(z: number) {\n\t\tconst maxZoomIn = this._maxZoomIn$.getValue();\n\t\tconst maxZoomOut = this._maxZoomOut$.getValue();\n\n\t\t// check if zoom levels exceeded defined boundaries\n\t\tif ((maxZoomIn && z > maxZoomIn) || (maxZoomOut && z < maxZoomOut)) {\n\t\t\treturn;\n\t\t}\n\n\t\tthis._zoom$.next(z);\n\t}\n\n\tgetZoomLevel(): number {\n\t\treturn this._zoom$.getValue();\n\t}\n\n\tselectZoomLevel(): Observable<number> {\n\t\treturn this.zoom$;\n\t}\n\n\tgetDiagramEngine(): DiagramEngine {\n\t\treturn this.diagramEngine;\n\t}\n\n\tclearSelection(ignore: BaseModel | null = null) {\n\t\tthis.getSelectedItems().forEach(element => {\n\t\t\tif (ignore && ignore.id === element.id) {\n\t\t\t\treturn;\n\t\t\t}\n\t\t\telement.setSelected(false);\n\t\t});\n\t}\n\n\tgetGridPosition({ x, y }: Coords): Coords {\n\t\tconst gridSize = this._gridSize$.getValue();\n\t\tif (gridSize === 0) {\n\t\t\treturn { x, y };\n\t\t}\n\t\treturn {\n\t\t\tx: gridSize * Math.floor((x + gridSize / 2) / gridSize),\n\t\t\ty: gridSize * Math.floor((y + gridSize / 2) / gridSize),\n\t\t};\n\t}\n\n\tgetSelectedItems(...filters: BaseEntityType[]): BaseModel[] {\n\t\tif (!Array.isArray(filters)) {\n\t\t\tfilters = [filters];\n\t\t}\n\t\tlet items: BaseModel[] = [];\n\n\t\t// run through nodes\n\t\titems = items.concat(Object.values(this.getNodes()).flatMap(node => node.getSelectedEntities()));\n\n\t\t// find all the links\n\t\titems = items.concat(Object.values(this.getLinks()).flatMap(link => link.getSelectedEntities()));\n\n\t\t// find all points\n\t\titems = items.concat(\n\t\t\tObject.values(this.getLinks()).flatMap(link => {\n\t\t\t\treturn link.getPoints().flatMap(point => point.getSelectedEntities());\n\t\t\t})\n\t\t);\n\n\t\titems = [...new Set(items)];\n\n\t\tif (filters.length > 0) {\n\t\t\titems = items.filter((item: BaseModel) => {\n\t\t\t\tif (filters.includes('node') && item instanceof NodeModel) {\n\t\t\t\t\treturn true;\n\t\t\t\t}\n\t\t\t\tif (filters.includes('link') && item instanceof LinkModel) {\n\t\t\t\t\treturn true;\n\t\t\t\t}\n\t\t\t\tif (filters.includes('port') && item instanceof PortModel) {\n\t\t\t\t\treturn true;\n\t\t\t\t}\n\t\t\t\tif (filters.includes('point') && item instanceof PointModel) {\n\t\t\t\t\treturn true;\n\t\t\t\t}\n\t\t\t\treturn false;\n\t\t\t});\n\t\t}\n\n\t\treturn items;\n\t}\n\n\taddAll(...models: BaseModel[]) {\n\t\tconst links: LinkModel[] = [];\n\t\tconst nodes: NodeModel[] = [];\n\n\t\tfor (const model of models) {\n\t\t\tif (model instanceof LinkModel) {\n\t\t\t\tlinks.push(model);\n\t\t\t} else if (model instanceof NodeModel) {\n\t\t\t\tnodes.push(model);\n\t\t\t}\n\t\t}\n\n\t\tthis.addLinks(links);\n\t\tthis.addNodes(nodes);\n\n\t\treturn models;\n\t}\n\n\taddLinks(links: LinkModel[] | HashMap<LinkModel>) {\n\t\tconst added = isArray(links) ? arrayToMap(links) : links;\n\t\tthis._links$.next({ ...this.getLinks(), ...added });\n\t}\n\n\taddNodes(nodes: NodeModel[] | HashMap<NodeModel>) {\n\t\tconst added = isArray(nodes) ? arrayToMap(nodes) : nodes;\n\t\tthis._nodes$.next({ ...this.getNodes(), ...added });\n\t}\n}\n",
+            "sourceCode": "import { BehaviorSubject, Observable } from 'rxjs';\nimport { BaseEntity, BaseEntityType } from '../base.entity';\nimport { Coords } from '../interfaces/coords.interface';\nimport { SelectOptions } from '../interfaces/select-options.interface';\nimport { SerializedDiagramModel } from '../interfaces/serialization.interface';\nimport { DiagramEngine } from '../services/engine.service';\nimport { arrayToMap, ID, isArray } from '../utils/tool-kit.util';\nimport { HashMap, TypedMap } from '../utils/types';\nimport { BaseModel } from './base.model';\nimport { LinkModel } from './link.model';\nimport { NodeModel } from './node.model';\nimport { PointModel } from './point.model';\nimport { PortModel } from './port.model';\n\nexport class DiagramModel extends BaseEntity {\n\tprotected _links$ = new BehaviorSubject<TypedMap<LinkModel>>(new TypedMap());\n\tprotected _nodes$ = new BehaviorSubject<HashMap<NodeModel>>({});\n\tprotected _zoom$ = new BehaviorSubject(100);\n\tprotected _offsetX$ = new BehaviorSubject(0);\n\tprotected _offsetY$ = new BehaviorSubject(0);\n\tprotected _gridSize$ = new BehaviorSubject(0);\n\tprotected _maxZoomOut$ = new BehaviorSubject(null);\n\tprotected _maxZoomIn$ = new BehaviorSubject(null);\n\n\tprotected nodes$ = this._nodes$.pipe(this.entityPipe('nodes'));\n\tprotected links$ = this._links$.pipe(this.entityPipe('links'));\n\n\tprotected offsetX$ = this._offsetX$.pipe(this.entityPipe('offsetX'));\n\tprotected offsetY$ = this._offsetY$.pipe(this.entityPipe('offsetY'));\n\tprotected zoom$ = this._zoom$.pipe(this.entityPipe('zoom'));\n\n\tconstructor(protected diagramEngine: DiagramEngine, id?: string, logPrefix: string = '[Diagram]') {\n\t\tsuper(id, logPrefix);\n\t}\n\n\t// TODO: support the following events for links and nodes\n\t// removed, updated<positionChanged/dataChanged>, added\n\tgetNodes(): HashMap<NodeModel> {\n\t\treturn this._nodes$.getValue();\n\t}\n\n\tgetNode(id: ID): NodeModel | null {\n\t\treturn this._nodes$.getValue()[id];\n\t}\n\n\tgetLink(id: ID): LinkModel | undefined {\n\t\treturn this._links$.getValue().get(id);\n\t}\n\n\tgetLinks(): TypedMap<LinkModel> {\n\t\treturn this._links$.getValue();\n\t}\n\n\tgetAllPorts(options?: SelectOptions<PortModel>): Map<string, PortModel> {\n\t\tconst portsMap = new Map();\n\t\t// TODO: optimize!\n\t\tObject.values(this.getNodes()).forEach(node => {\n\t\t\tfor (const [key, port] of Object.entries(node.getPorts())) {\n\t\t\t\tif (options.filter) {\n\t\t\t\t\tif (options.filter(port as PortModel)) {\n\t\t\t\t\t\tportsMap.set(key, port);\n\t\t\t\t\t}\n\t\t\t\t} else {\n\t\t\t\t\tportsMap.set(key, port);\n\t\t\t\t}\n\t\t\t}\n\t\t});\n\t\treturn portsMap;\n\t}\n\n\t/**\n\t * Add a node to the diagram\n\t * @returns Inserted Node\n\t */\n\taddNode(node: NodeModel): NodeModel {\n\t\tthis._nodes$.next({ ...this._nodes$.value, [node.id]: node });\n\t\treturn node;\n\t}\n\n\t/**\n\t * Delete a node from the diagram\n\t */\n\tdeleteNode(nodeOrId: NodeModel | string): void {\n\t\tconst nodeID: ID = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;\n\t\tconst node = this.getNode(nodeID);\n\n\t\t// delete all related links\n\t\tObject.values(node.getPorts()).forEach((port: PortModel) => {\n\t\t\tObject.values(port.getLinks()).forEach(link => {\n\t\t\t\tthis.deleteLink(link);\n\t\t\t});\n\t\t});\n\n\t\tconst updNodes = { ...this.getNodes() };\n\t\tdelete updNodes[nodeID];\n\t\tthis._nodes$.next(updNodes);\n\n\t\tnode.destroy();\n\t}\n\n\t/**\n\t * Get nodes as observable, use `.getValue()` for snapshot\n\t */\n\tselectNodes(): Observable<HashMap<NodeModel>> {\n\t\treturn this.nodes$;\n\t}\n\n\t/**\n\t * Add link\n\t * @returns Newly created link\n\t */\n\taddLink(link: LinkModel): LinkModel {\n\t\tthis.getLinks().set(link.id, link);\n\t\tthis._links$.next(this.getLinks()); \n\t\treturn link;\n\t}\n\n\t/**\n\t * Delete link\n\t */\n\tdeleteLink(linkOrId: LinkModel | string) {\n\t\tconst linkId: ID = typeof linkOrId === 'string' ? linkOrId : linkOrId.id;\n\t\tconst link = this.getLink(linkId);\n\t\tthis.getLinks().delete(linkId);\n\t\tlink.destroy();\n\t}\n\n\treset() {\n\t\tconst ports = Array.from(this.getAllPorts().values());\n\t\tconst links = Object.values(this.getLinks());\n\t\tconst nodes = Object.values(this.getNodes());\n\n\t\tfor (const node of nodes) {\n\t\t\tnode.destroy();\n\t\t}\n\n\t\tfor (const port of ports) {\n\t\t\tport.destroy();\n\t\t}\n\n\t\tfor (const link of links) {\n\t\t\tlink.destroy();\n\t\t}\n\n\t\tthis._nodes$.next({});\n\n\t\tthis.getLinks().clear();\n\t\tthis._links$.next(this.getLinks());\n\t}\n\n\t/**\n\t * Get links behaviour subject, use `.getValue()` for snapshot\n\t */\n\tselectLinks(): Observable<TypedMap<LinkModel>> {\n\t\treturn this.links$;\n\t}\n\n\t// /**\n\t//  * Serialize the diagram model to JSON\n\t//  * @returns diagram model as a string\n\t//  */\n\tserialize(): SerializedDiagramModel {\n\t\tconst serializedNodes = Object.values(this.getNodes()).map(node => node.serialize());\n\t\tconst serializedLinks = Object.values(this.getLinks()).map(link => link.serialize());\n\t\treturn { ...super.serialize(), nodes: serializedNodes, links: serializedLinks };\n\t}\n\n\tsetMaxZoomOut(maxZoomOut: number) {\n\t\tthis._maxZoomOut$.next(maxZoomOut);\n\t}\n\n\tsetMaxZoomIn(maxZoomIn: number) {\n\t\tthis._maxZoomIn$.next(maxZoomIn);\n\t}\n\n\tgetMaxZoomOut() {\n\t\treturn this._maxZoomOut$.getValue();\n\t}\n\n\tgetMaxZoomIn() {\n\t\treturn this._maxZoomIn$.getValue();\n\t}\n\n\tsetOffset(x: number, y: number) {\n\t\tthis._offsetX$.next(x);\n\t\tthis._offsetY$.next(y);\n\t}\n\n\tsetOffsetX(x: number) {\n\t\tthis._offsetX$.next(x);\n\t}\n\n\tgetOffsetX(): number {\n\t\treturn this._offsetX$.getValue();\n\t}\n\n\tselectOffsetX(): Observable<number> {\n\t\treturn this.offsetX$;\n\t}\n\n\tsetOffsetY(y: number) {\n\t\tthis._offsetY$.next(y);\n\t}\n\n\tgetOffsetY(): number {\n\t\treturn this._offsetY$.getValue();\n\t}\n\n\tselectOffsetY(): Observable<number> {\n\t\treturn this.offsetY$;\n\t}\n\n\tsetZoomLevel(z: number) {\n\t\tconst maxZoomIn = this._maxZoomIn$.getValue();\n\t\tconst maxZoomOut = this._maxZoomOut$.getValue();\n\n\t\t// check if zoom levels exceeded defined boundaries\n\t\tif ((maxZoomIn && z > maxZoomIn) || (maxZoomOut && z < maxZoomOut)) {\n\t\t\treturn;\n\t\t}\n\n\t\tthis._zoom$.next(z);\n\t}\n\n\tgetZoomLevel(): number {\n\t\treturn this._zoom$.getValue();\n\t}\n\n\tselectZoomLevel(): Observable<number> {\n\t\treturn this.zoom$;\n\t}\n\n\tgetDiagramEngine(): DiagramEngine {\n\t\treturn this.diagramEngine;\n\t}\n\n\tclearSelection(ignore: BaseModel | null = null) {\n\t\tthis.getSelectedItems().forEach(element => {\n\t\t\tif (ignore && ignore.id === element.id) {\n\t\t\t\treturn;\n\t\t\t}\n\t\t\telement.setSelected(false);\n\t\t});\n\t}\n\n\tgetGridPosition({ x, y }: Coords): Coords {\n\t\tconst gridSize = this._gridSize$.getValue();\n\t\tif (gridSize === 0) {\n\t\t\treturn { x, y };\n\t\t}\n\t\treturn {\n\t\t\tx: gridSize * Math.floor((x + gridSize / 2) / gridSize),\n\t\t\ty: gridSize * Math.floor((y + gridSize / 2) / gridSize),\n\t\t};\n\t}\n\n\tgetSelectedItems(...filters: BaseEntityType[]): BaseModel[] {\n\t\tif (!Array.isArray(filters)) {\n\t\t\tfilters = [filters];\n\t\t}\n\t\tlet items: BaseModel[] = [];\n\n\t\t// run through nodes\n\t\titems = items.concat(Object.values(this.getNodes()).flatMap(node => node.getSelectedEntities()));\n\n\t\t// find all the links\n\t\titems = items.concat(Object.values(this.getLinks()).flatMap(link => link.getSelectedEntities()));\n\n\t\t// find all points\n\t\titems = items.concat(\n\t\t\tObject.values(this.getLinks()).flatMap(link => {\n\t\t\t\treturn link.getPoints().flatMap(point => point.getSelectedEntities());\n\t\t\t})\n\t\t);\n\n\t\titems = [...new Set(items)];\n\n\t\tif (filters.length > 0) {\n\t\t\titems = items.filter((item: BaseModel) => {\n\t\t\t\tif (filters.includes('node') && item instanceof NodeModel) {\n\t\t\t\t\treturn true;\n\t\t\t\t}\n\t\t\t\tif (filters.includes('link') && item instanceof LinkModel) {\n\t\t\t\t\treturn true;\n\t\t\t\t}\n\t\t\t\tif (filters.includes('port') && item instanceof PortModel) {\n\t\t\t\t\treturn true;\n\t\t\t\t}\n\t\t\t\tif (filters.includes('point') && item instanceof PointModel) {\n\t\t\t\t\treturn true;\n\t\t\t\t}\n\t\t\t\treturn false;\n\t\t\t});\n\t\t}\n\n\t\treturn items;\n\t}\n\n\taddAll(...models: BaseModel[]) {\n\t\tconst links: LinkModel[] = [];\n\t\tconst nodes: NodeModel[] = [];\n\n\t\tfor (const model of models) {\n\t\t\tif (model instanceof LinkModel) {\n\t\t\t\tlinks.push(model);\n\t\t\t} else if (model instanceof NodeModel) {\n\t\t\t\tnodes.push(model);\n\t\t\t}\n\t\t}\n\n\t\tthis.addLinks(links);\n\t\tthis.addNodes(nodes);\n\n\t\treturn models;\n\t}\n\n\taddLinks(links: LinkModel[]) {\n\t\tfor (const link of links) {\n\t\t\tthis.getLinks().set(link.id, link);\n\t\t}\n\n\t\tthis._links$.next(this.getLinks());\n\t}\n\n\taddNodes(nodes: NodeModel[] | HashMap<NodeModel>) {\n\t\tconst added = isArray(nodes) ? arrayToMap(nodes) : nodes;\n\t\tthis._nodes$.next({ ...this.getNodes(), ...added });\n\t}\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -15714,7 +15714,7 @@
                 },
                 {
                     "name": "_links$",
-                    "defaultValue": "new BehaviorSubject<HashMap<LinkModel>>({})",
+                    "defaultValue": "new BehaviorSubject<TypedMap<LinkModel>>(new TypedMap())",
                     "type": "",
                     "optional": false,
                     "description": "",
@@ -15941,7 +15941,7 @@
                     "optional": false,
                     "returnType": "{}",
                     "typeParameters": [],
-                    "line": 300,
+                    "line": 299,
                     "jsdoctags": [
                         {
                             "name": "models",
@@ -15976,8 +15976,8 @@
                         },
                         {
                             "tagName": {
-                                "pos": 3371,
-                                "end": 3378,
+                                "pos": 3404,
+                                "end": 3411,
                                 "flags": 0,
                                 "escapedText": "returns"
                             },
@@ -15990,17 +15990,17 @@
                     "args": [
                         {
                             "name": "links",
-                            "type": "LinkModel[] | HashMap<LinkModel>"
+                            "type": "LinkModel[]"
                         }
                     ],
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 318,
+                    "line": 317,
                     "jsdoctags": [
                         {
                             "name": "links",
-                            "type": "LinkModel[] | HashMap<LinkModel>",
+                            "type": "LinkModel[]",
                             "tagName": {
                                 "text": "param"
                             }
@@ -16030,8 +16030,8 @@
                         },
                         {
                             "tagName": {
-                                "pos": 2533,
-                                "end": 2540,
+                                "pos": 2566,
+                                "end": 2573,
                                 "flags": 0,
                                 "escapedText": "returns"
                             },
@@ -16050,7 +16050,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 323,
+                    "line": 325,
                     "jsdoctags": [
                         {
                             "name": "nodes",
@@ -16073,7 +16073,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 238,
+                    "line": 237,
                     "jsdoctags": [
                         {
                             "name": "ignore",
@@ -16096,7 +16096,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 120,
+                    "line": 121,
                     "description": "<p>Delete link</p>\n",
                     "jsdoctags": [
                         {
@@ -16161,7 +16161,7 @@
                     "optional": false,
                     "returnType": "DiagramEngine",
                     "typeParameters": [],
-                    "line": 234
+                    "line": 233
                 },
                 {
                     "name": "getGridPosition",
@@ -16173,7 +16173,7 @@
                     "optional": false,
                     "returnType": "Coords",
                     "typeParameters": [],
-                    "line": 247,
+                    "line": 246,
                     "jsdoctags": [
                         {
                             "type": "Coords",
@@ -16192,7 +16192,7 @@
                         }
                     ],
                     "optional": false,
-                    "returnType": "LinkModel | null",
+                    "returnType": "LinkModel | undefined",
                     "typeParameters": [],
                     "line": 46,
                     "jsdoctags": [
@@ -16209,7 +16209,7 @@
                     "name": "getLinks",
                     "args": [],
                     "optional": false,
-                    "returnType": "HashMap<LinkModel>",
+                    "returnType": "TypedMap<LinkModel>",
                     "typeParameters": [],
                     "line": 50
                 },
@@ -16219,7 +16219,7 @@
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 181
+                    "line": 180
                 },
                 {
                     "name": "getMaxZoomOut",
@@ -16227,7 +16227,7 @@
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 177
+                    "line": 176
                 },
                 {
                     "name": "getNode",
@@ -16265,7 +16265,7 @@
                     "optional": false,
                     "returnType": "number",
                     "typeParameters": [],
-                    "line": 194
+                    "line": 193
                 },
                 {
                     "name": "getOffsetY",
@@ -16273,7 +16273,7 @@
                     "optional": false,
                     "returnType": "number",
                     "typeParameters": [],
-                    "line": 206
+                    "line": 205
                 },
                 {
                     "name": "getSelectedItems",
@@ -16287,7 +16287,7 @@
                     "optional": false,
                     "returnType": "BaseModel[]",
                     "typeParameters": [],
-                    "line": 258,
+                    "line": 257,
                     "jsdoctags": [
                         {
                             "name": "filters",
@@ -16305,7 +16305,7 @@
                     "optional": false,
                     "returnType": "number",
                     "typeParameters": [],
-                    "line": 226
+                    "line": 225
                 },
                 {
                     "name": "reset",
@@ -16313,15 +16313,15 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 131
+                    "line": 128
                 },
                 {
                     "name": "selectLinks",
                     "args": [],
                     "optional": false,
-                    "returnType": "Observable<HashMap<LinkModel>>",
+                    "returnType": "Observable<TypedMap<LinkModel>>",
                     "typeParameters": [],
-                    "line": 155,
+                    "line": 154,
                     "description": "<p>Get links behaviour subject, use <code>.getValue()</code> for snapshot</p>\n"
                 },
                 {
@@ -16339,7 +16339,7 @@
                     "optional": false,
                     "returnType": "Observable<number>",
                     "typeParameters": [],
-                    "line": 198
+                    "line": 197
                 },
                 {
                     "name": "selectOffsetY",
@@ -16347,7 +16347,7 @@
                     "optional": false,
                     "returnType": "Observable<number>",
                     "typeParameters": [],
-                    "line": 210
+                    "line": 209
                 },
                 {
                     "name": "selectZoomLevel",
@@ -16355,7 +16355,7 @@
                     "optional": false,
                     "returnType": "Observable<number>",
                     "typeParameters": [],
-                    "line": 230
+                    "line": 229
                 },
                 {
                     "name": "serialize",
@@ -16363,7 +16363,7 @@
                     "optional": false,
                     "returnType": "SerializedDiagramModel",
                     "typeParameters": [],
-                    "line": 163
+                    "line": 162
                 },
                 {
                     "name": "setMaxZoomIn",
@@ -16376,7 +16376,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 173,
+                    "line": 172,
                     "jsdoctags": [
                         {
                             "name": "maxZoomIn",
@@ -16398,7 +16398,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 169,
+                    "line": 168,
                     "jsdoctags": [
                         {
                             "name": "maxZoomOut",
@@ -16424,7 +16424,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 185,
+                    "line": 184,
                     "jsdoctags": [
                         {
                             "name": "x",
@@ -16453,7 +16453,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 190,
+                    "line": 189,
                     "jsdoctags": [
                         {
                             "name": "x",
@@ -16475,7 +16475,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 202,
+                    "line": 201,
                     "jsdoctags": [
                         {
                             "name": "y",
@@ -16497,7 +16497,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 214,
+                    "line": 213,
                     "jsdoctags": [
                         {
                             "name": "z",
@@ -16998,7 +16998,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -17013,7 +17013,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -17027,8 +17027,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -17043,7 +17043,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -17100,7 +17100,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -18423,7 +18423,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -18438,7 +18438,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -18452,8 +18452,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -18468,7 +18468,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -18525,7 +18525,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -20717,7 +20717,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -20732,7 +20732,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -20746,8 +20746,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -20762,7 +20762,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -20819,7 +20819,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -22704,7 +22704,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -22719,7 +22719,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -22733,8 +22733,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -22749,7 +22749,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -22806,7 +22806,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -24121,7 +24121,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -24136,7 +24136,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -24150,8 +24150,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -24166,7 +24166,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -24223,7 +24223,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -25815,6 +25815,30 @@
             "outputsClass": [],
             "hostBindings": [],
             "hostListeners": []
+        },
+        {
+            "name": "TypedMap",
+            "id": "class-TypedMap-37c16e407c0ce2d154a38eed57dd5a92",
+            "file": "projects/ngx-diagrams/src/lib/utils/types.ts",
+            "type": "class",
+            "sourceCode": "import { ID } from 'ngx-diagrams';\n\nexport interface HashMap<T> {\n\t[key: string]: T;\n}\n\nexport class TypedMap<T> extends Map<ID, T> {\n\tvaluesArray(): T[] {\n\t\treturn Array.from(this.values());\n\t}\n}\n",
+            "properties": [],
+            "methods": [
+                {
+                    "name": "valuesArray",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "T[]",
+                    "typeParameters": [],
+                    "line": 8
+                }
+            ],
+            "indexSignatures": [],
+            "extends": "Map",
+            "inputsClass": [],
+            "outputsClass": [],
+            "hostBindings": [],
+            "hostListeners": []
         }
     ],
     "directives": [
@@ -26036,7 +26060,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -26051,7 +26075,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -26065,8 +26089,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -26081,7 +26105,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -26138,7 +26162,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -27204,7 +27228,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -27219,7 +27243,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -27233,8 +27257,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -27249,7 +27273,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -27306,7 +27330,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -29045,7 +29069,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -29060,7 +29084,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -29074,8 +29098,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -29090,7 +29114,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -29147,7 +29171,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -30599,7 +30623,7 @@
                 {
                     "name": "_hovered$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 11,
@@ -30614,7 +30638,7 @@
                 {
                     "name": "_painted$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 10,
@@ -30628,8 +30652,8 @@
                 },
                 {
                     "name": "_parent$",
-                    "defaultValue": "new BehaviorSubject(null)",
-                    "type": "BehaviorSubject<X>",
+                    "defaultValue": "new BehaviorSubject<X>(null)",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 8,
@@ -30644,7 +30668,7 @@
                 {
                     "name": "_selected$",
                     "defaultValue": "new BehaviorSubject(false)",
-                    "type": "BehaviorSubject<boolean>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 9,
@@ -30701,7 +30725,7 @@
                 {
                     "name": "parent$",
                     "defaultValue": "this._parent$.pipe(\r\n\t\tthis.entityPipe('ParentsChange'),\r\n\t\tmap(p => new ParentChangeEvent<X>(this, p))\r\n\t)",
-                    "type": "Observable<ParentChangeEvent<X>>",
+                    "type": "",
                     "optional": false,
                     "description": "",
                     "line": 13,
@@ -31831,7 +31855,7 @@
         },
         {
             "name": "NgxDiagramComponent",
-            "id": "component-NgxDiagramComponent-fbac0d676430cc99084f99cf1ed8bfc3",
+            "id": "component-NgxDiagramComponent-ea36cdcba40be00bc0fd1268ea1ea9c7",
             "file": "projects/ngx-diagrams/src/lib/containers/diagram/diagram.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -31955,7 +31979,7 @@
                 },
                 {
                     "name": "layerStyles$",
-                    "defaultValue": "defer(() =>\r\n\t\tcombineLatest([this.diagramModel.selectOffsetX(), this.diagramModel.selectOffsetY(), this.diagramModel.selectZoomLevel()]).pipe(\r\n\t\t\tmap(([x, y, zoom]) => this.createLayerStyle(x, y, zoom))\r\n\t\t)\r\n\t)",
+                    "defaultValue": "defer(() =>\n\t\tcombineLatest([this.diagramModel.selectOffsetX(), this.diagramModel.selectOffsetY(), this.diagramModel.selectZoomLevel()]).pipe(\n\t\t\tmap(([x, y, zoom]) => this.createLayerStyle(x, y, zoom))\n\t\t)\n\t)",
                     "type": "",
                     "optional": false,
                     "description": "",
@@ -31963,7 +31987,7 @@
                 },
                 {
                     "name": "links$",
-                    "type": "Observable<HashMap<LinkModel>>",
+                    "type": "Observable<TypedMap<LinkModel>>",
                     "optional": false,
                     "description": "",
                     "line": 67,
@@ -32048,44 +32072,44 @@
                     "line": 285,
                     "jsdoctags": [
                         {
-                            "pos": 8960,
-                            "end": 8973,
+                            "pos": 8690,
+                            "end": 8703,
                             "flags": 0,
                             "kind": 288,
                             "atToken": {
-                                "pos": 8960,
-                                "end": 8961,
+                                "pos": 8690,
+                                "end": 8691,
                                 "flags": 0,
                                 "kind": 57
                             },
                             "tagName": {
-                                "pos": 8961,
-                                "end": 8972,
+                                "pos": 8691,
+                                "end": 8702,
                                 "flags": 0,
                                 "escapedText": "description"
                             },
                             "comment": "<p>Mouse Move Event Handler</p>\n"
                         },
                         {
-                            "pos": 9003,
-                            "end": 9030,
+                            "pos": 8732,
+                            "end": 8758,
                             "flags": 0,
                             "kind": 292,
                             "atToken": {
-                                "pos": 9003,
-                                "end": 9004,
+                                "pos": 8732,
+                                "end": 8733,
                                 "flags": 0,
                                 "kind": 57
                             },
                             "tagName": {
-                                "pos": 9004,
-                                "end": 9009,
+                                "pos": 8733,
+                                "end": 8738,
                                 "flags": 0,
                                 "escapedText": "param"
                             },
                             "name": {
-                                "pos": 9010,
-                                "end": 9015,
+                                "pos": 8739,
+                                "end": 8744,
                                 "flags": 0,
                                 "escapedText": "event"
                             },
@@ -32335,7 +32359,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\r\n\tAfterViewInit,\r\n\tChangeDetectionStrategy,\r\n\tChangeDetectorRef,\r\n\tComponent,\r\n\tElementRef,\r\n\tEventEmitter,\r\n\tInput,\r\n\tOnDestroy,\r\n\tOutput,\r\n\tRenderer2,\r\n\tViewChild,\r\n\tViewContainerRef,\r\n} from '@angular/core';\r\nimport { BehaviorSubject, combineLatest, defer, Observable, ReplaySubject } from 'rxjs';\r\nimport { filter, map, takeUntil } from 'rxjs/operators';\r\nimport { BaseAction, InvalidLinkDestroyed, LinkCreatedAction, MoveCanvasAction, SelectingAction } from '../../actions';\r\nimport { LooseLinkDestroyed } from '../../actions/loose-link-destroyed.action';\r\nimport { MoveItemsAction } from '../../actions/move-items.action';\r\nimport { Coords } from '../../interfaces/coords.interface';\r\nimport { BaseModel } from '../../models/base.model';\r\nimport { DiagramModel } from '../../models/diagram.model';\r\nimport { LinkModel } from '../../models/link.model';\r\nimport { NodeModel } from '../../models/node.model';\r\nimport { PointModel } from '../../models/point.model';\r\nimport { PortModel } from '../../models/port.model';\r\nimport { HashMap } from '../../utils/types';\r\n\r\n@Component({\r\n\tselector: 'ngdx-diagram',\r\n\ttemplateUrl: 'diagram.component.html',\r\n\tstyleUrls: ['diagram.component.scss'],\r\n\tchangeDetection: ChangeDetectionStrategy.OnPush,\r\n})\r\nexport class NgxDiagramComponent implements AfterViewInit, OnDestroy {\r\n\t// eslint-disable-next-line @angular-eslint/no-input-rename\r\n\t@Input('model') diagramModel: DiagramModel;\r\n\t@Input() allowCanvasZoom = true;\r\n\t@Input() allowCanvasTranslation = true;\r\n\t@Input() inverseZoom = true;\r\n\t@Input() allowLooseLinks = true;\r\n\t@Input() maxZoomOut: number = null;\r\n\t@Input() maxZoomIn: number = null;\r\n\t@Input() portMagneticRadius = 30;\r\n\t@Input() smartRouting = false;\r\n\r\n\t@Output() actionStartedFiring = new EventEmitter<BaseAction>();\r\n\t@Output() actionStillFiring = new EventEmitter<BaseAction>();\r\n\t@Output() actionStoppedFiring = new EventEmitter<BaseAction>();\r\n\r\n\t@ViewChild('nodesLayer', { read: ViewContainerRef })\r\n\tnodesLayer: ViewContainerRef;\r\n\r\n\t@ViewChild('linksLayer', { read: ViewContainerRef })\r\n\tlinksLayer: ViewContainerRef;\r\n\r\n\t@ViewChild('canvas', { read: ElementRef })\r\n\tcanvas: ElementRef;\r\n\r\n\tlayerStyles$ = defer(() =>\r\n\t\tcombineLatest([this.diagramModel.selectOffsetX(), this.diagramModel.selectOffsetY(), this.diagramModel.selectZoomLevel()]).pipe(\r\n\t\t\tmap(([x, y, zoom]) => this.createLayerStyle(x, y, zoom))\r\n\t\t)\r\n\t);\r\n\r\n\tprotected nodes$: Observable<HashMap<NodeModel>>;\r\n\tprotected links$: Observable<HashMap<LinkModel>>;\r\n\tprotected action$ = new BehaviorSubject<BaseAction>(null);\r\n\tprotected nodesRendered$: BehaviorSubject<boolean>;\r\n\tprotected destroyed$ = new ReplaySubject<boolean>(1);\r\n\r\n\tconstructor(protected renderer: Renderer2, protected cdRef: ChangeDetectorRef) {}\r\n\r\n\t// TODO: handle destruction of container, resetting all observables to avoid memory leaks!\r\n\tngAfterViewInit() {\r\n\t\tif (this.diagramModel) {\r\n\t\t\tthis.initNodes();\r\n\t\t\tthis.initLinks();\r\n\t\t}\r\n\t}\r\n\r\n\tngOnDestroy() {\r\n\t\tthis.destroyed$.next(true);\r\n\t\tthis.destroyed$.complete();\r\n\t}\r\n\r\n\t/**\r\n\t * fire the action registered and notify subscribers\r\n\t */\r\n\tfireAction() {\r\n\t\tif (this.action$.value) {\r\n\t\t\tthis.actionStillFiring.emit(this.action$.value);\r\n\t\t}\r\n\t}\r\n\r\n\t/**\r\n\t * Unregister the action, post firing and notify subscribers\r\n\t */\r\n\tstopFiringAction(shouldSkipEvent?: boolean) {\r\n\t\tif (!shouldSkipEvent) {\r\n\t\t\tthis.actionStoppedFiring.emit(this.action$.value);\r\n\t\t}\r\n\t\tthis.action$.next(null);\r\n\t}\r\n\r\n\t/**\r\n\t * Register the new action, pre firing and notify subscribers\r\n\t */\r\n\tstartFiringAction(action: BaseAction) {\r\n\t\tthis.action$.next(action);\r\n\t\tthis.actionStartedFiring.emit(action);\r\n\t}\r\n\r\n\tselectAction() {\r\n\t\treturn this.action$ as BehaviorSubject<SelectingAction>;\r\n\t}\r\n\r\n\tshouldDrawSelectionBox() {\r\n\t\tconst action = this.action$.getValue();\r\n\t\tif (action instanceof SelectingAction) {\r\n\t\t\taction.getBoxDimensions();\r\n\t\t\treturn true;\r\n\t\t}\r\n\t\treturn false;\r\n\t}\r\n\r\n\tgetMouseElement(event: MouseEvent): { model: BaseModel; element: Element } {\r\n\t\tconst target = event.target as Element;\r\n\r\n\t\t// is it a port?\r\n\t\tlet element = target.closest('[data-portid]');\r\n\t\tif (element) {\r\n\t\t\t// get the relevant node and return the port.\r\n\t\t\tconst nodeEl = target.closest('[data-nodeid]');\r\n\t\t\treturn {\r\n\t\t\t\tmodel: this.diagramModel.getNode(nodeEl.getAttribute('data-nodeid')).getPort(element.getAttribute('data-portid')),\r\n\t\t\t\telement,\r\n\t\t\t};\r\n\t\t}\r\n\r\n\t\t// look for a point\r\n\t\telement = target.closest('[data-pointid]');\r\n\t\tif (element) {\r\n\t\t\treturn {\r\n\t\t\t\tmodel: this.diagramModel.getLink(element.getAttribute('data-linkid')).getPointModel(element.getAttribute('data-pointid')),\r\n\t\t\t\telement,\r\n\t\t\t};\r\n\t\t}\r\n\r\n\t\t// look for a link\r\n\t\telement = target.closest('[data-linkid]');\r\n\t\tif (element) {\r\n\t\t\treturn {\r\n\t\t\t\tmodel: this.diagramModel.getLink(element.getAttribute('data-linkid')),\r\n\t\t\t\telement,\r\n\t\t\t};\r\n\t\t}\r\n\r\n\t\t// a node maybe\r\n\t\telement = target.closest('[data-nodeid]');\r\n\t\tif (element) {\r\n\t\t\treturn {\r\n\t\t\t\tmodel: this.diagramModel.getNode(element.getAttribute('data-nodeid')),\r\n\t\t\t\telement,\r\n\t\t\t};\r\n\t\t}\r\n\r\n\t\t// just the canvas\r\n\t\treturn null;\r\n\t}\r\n\r\n\tonMouseUp = (event: MouseEvent) => {\r\n\t\tconst diagramEngine = this.diagramModel.getDiagramEngine();\r\n\t\tconst action = this.action$.getValue();\r\n\t\t// are we going to connect a link to something?\r\n\t\tif (action instanceof MoveItemsAction) {\r\n\t\t\tconst element = this.getMouseElement(event);\r\n\t\t\taction.selectionModels.forEach(model => {\r\n\t\t\t\t// only care about points connecting to things\r\n\t\t\t\tif (!model || !(model.model instanceof PointModel)) {\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tlet el: BaseModel;\r\n\t\t\t\tif (model.magnet) {\r\n\t\t\t\t\tel = model.magnet;\r\n\t\t\t\t} else if (element && element.model) {\r\n\t\t\t\t\tel = element.model;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (el instanceof PortModel && !diagramEngine.isModelLocked(el)) {\r\n\t\t\t\t\tconst link = model.model.getLink();\r\n\t\t\t\t\tif (link.getTargetPort() !== null) {\r\n\t\t\t\t\t\t// if this was a valid link already and we are adding a node in the middle, create 2 links from the original\r\n\t\t\t\t\t\tif (link.getTargetPort() !== el && link.getSourcePort() !== el) {\r\n\t\t\t\t\t\t\tconst targetPort = link.getTargetPort();\r\n\t\t\t\t\t\t\tconst newLink = link.clone({});\r\n\t\t\t\t\t\t\tnewLink.setSourcePort(el);\r\n\t\t\t\t\t\t\tnewLink.setTargetPort(targetPort);\r\n\t\t\t\t\t\t\tlink.setTargetPort(el);\r\n\t\t\t\t\t\t\ttargetPort.removeLink(link);\r\n\t\t\t\t\t\t\tnewLink.removePointsBefore(newLink.getPoints()[link.getPointIndex(model.model)]);\r\n\t\t\t\t\t\t\tlink.removePointsAfter(model.model);\r\n\t\t\t\t\t\t\tdiagramEngine.getDiagramModel().addLink(newLink);\r\n\t\t\t\t\t\t\t// if we are connecting to the same target or source, destroy tweener points\r\n\t\t\t\t\t\t} else if (link.getTargetPort() === el) {\r\n\t\t\t\t\t\t\tlink.removePointsAfter(model.model);\r\n\t\t\t\t\t\t} else if (link.getSourcePort() === el) {\r\n\t\t\t\t\t\t\tlink.removePointsBefore(model.model);\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t} else {\r\n\t\t\t\t\t\tlink.setTargetPort(el);\r\n\t\t\t\t\t\tconst targetPort = link.getTargetPort();\r\n\t\t\t\t\t\tconst srcPort = link.getSourcePort();\r\n\r\n\t\t\t\t\t\tif (targetPort.id !== srcPort.id && srcPort.canLinkToPort(targetPort)) {\r\n\t\t\t\t\t\t\t// link is valid, fire the event\r\n\t\t\t\t\t\t\tthis.startFiringAction(new LinkCreatedAction(event.clientX, event.clientY, link));\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\t// reset current magent\r\n\t\t\t\tmodel.magnet = undefined;\r\n\t\t\t});\r\n\r\n\t\t\t// check for / destroy any loose links in any models which have been moved\r\n\t\t\tif (!this.allowLooseLinks) {\r\n\t\t\t\taction.selectionModels.forEach(model => {\r\n\t\t\t\t\t// only care about points connecting to things\r\n\t\t\t\t\tif (!model || !(model.model instanceof PointModel)) {\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\tconst selectedPoint: PointModel = model.model;\r\n\t\t\t\t\tconst link: LinkModel = selectedPoint.getLink();\r\n\t\t\t\t\tif (link.getSourcePort() === null || link.getTargetPort() === null) {\r\n\t\t\t\t\t\tlink.destroy();\r\n\t\t\t\t\t\tthis.startFiringAction(new LooseLinkDestroyed(event.clientX, event.clientY, link));\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\t// destroy any invalid links\r\n\t\t\taction.selectionModels.forEach(model => {\r\n\t\t\t\t// only care about points connecting to things\r\n\t\t\t\tif (!model || !(model.model instanceof PointModel)) {\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst link: LinkModel = model.model.getLink();\r\n\t\t\t\tconst sourcePort: PortModel = link.getSourcePort();\r\n\t\t\t\tconst targetPort: PortModel = link.getTargetPort();\r\n\r\n\t\t\t\tif (sourcePort !== null && targetPort !== null) {\r\n\t\t\t\t\tif (!sourcePort.canLinkToPort(targetPort)) {\r\n\t\t\t\t\t\t// link not allowed\r\n\t\t\t\t\t\tlink.destroy();\r\n\t\t\t\t\t\tthis.startFiringAction(new InvalidLinkDestroyed(event.clientX, event.clientY, link));\r\n\t\t\t\t\t} else if (\r\n\t\t\t\t\t\tObject.values(targetPort.getLinks()).some(\r\n\t\t\t\t\t\t\t(l: LinkModel) => l !== link && (l.getSourcePort() === sourcePort || l.getTargetPort() === sourcePort)\r\n\t\t\t\t\t\t)\r\n\t\t\t\t\t) {\r\n\t\t\t\t\t\t// link is a duplicate\r\n\t\t\t\t\t\tlink.destroy();\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tthis.stopFiringAction();\r\n\t\t} else {\r\n\t\t\tthis.stopFiringAction();\r\n\t\t}\r\n\r\n\t\tthis.mouseUpListener();\r\n\t\tthis.mouseMoveListener();\r\n\t\tthis.action$.next(null);\r\n\t};\r\n\r\n\t/**\r\n\t * @description Mouse Move Event Handler\r\n\t * @param event MouseEvent\r\n\t */\r\n\tonMouseMove = (event: MouseEvent) => {\r\n\t\tconst action = this.action$.getValue();\r\n\r\n\t\tif (action === null || action === undefined) {\r\n\t\t\treturn;\r\n\t\t}\r\n\r\n\t\tif (action instanceof SelectingAction) {\r\n\t\t\tconst relative = this.diagramModel.getDiagramEngine().getRelativePoint(event.clientX, event.clientY);\r\n\r\n\t\t\tObject.values(this.diagramModel.getNodes()).forEach(node => {\r\n\t\t\t\tif ((action as SelectingAction).containsElement(node.getCoords(), this.diagramModel)) {\r\n\t\t\t\t\tnode.setSelected();\r\n\t\t\t\t} else {\r\n\t\t\t\t\tnode.setSelected(false);\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tObject.values(this.diagramModel.getLinks()).forEach(link => {\r\n\t\t\t\tlet allSelected = true;\r\n\t\t\t\tlink.getPoints().forEach(point => {\r\n\t\t\t\t\tif ((action as SelectingAction).containsElement(point.getCoords(), this.diagramModel)) {\r\n\t\t\t\t\t\tpoint.setSelected();\r\n\t\t\t\t\t} else {\r\n\t\t\t\t\t\tpoint.setSelected(false);\r\n\t\t\t\t\t\tallSelected = false;\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\r\n\t\t\t\tif (allSelected) {\r\n\t\t\t\t\tlink.setSelected();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\taction.mouseX2 = relative.x;\r\n\t\t\taction.mouseY2 = relative.y;\r\n\r\n\t\t\tthis.fireAction();\r\n\t\t\tthis.action$.next(action);\r\n\t\t\treturn;\r\n\t\t} else if (action instanceof MoveItemsAction) {\r\n\t\t\tconst coords: Coords = {\r\n\t\t\t\tx: event.clientX - action.mouseX,\r\n\t\t\t\ty: event.clientY - action.mouseY,\r\n\t\t\t};\r\n\t\t\tconst amountZoom = this.diagramModel.getZoomLevel() / 100;\r\n\t\t\taction.selectionModels.forEach(selectionModel => {\r\n\t\t\t\t// reset all previous magnets if any\r\n\t\t\t\tselectionModel.magnet = undefined;\r\n\r\n\t\t\t\t// in this case we need to also work out the relative grid position\r\n\t\t\t\tif (\r\n\t\t\t\t\tselectionModel.model instanceof NodeModel ||\r\n\t\t\t\t\t(selectionModel.model instanceof PointModel && !selectionModel.model.isConnectedToPort())\r\n\t\t\t\t) {\r\n\t\t\t\t\tconst newCoords = { x: selectionModel.initialX + coords.x / amountZoom, y: selectionModel.initialY + coords.y / amountZoom };\r\n\t\t\t\t\tconst gridRelativeCoords = this.diagramModel.getGridPosition(newCoords);\r\n\r\n\t\t\t\t\t// magnetic inputs handling\r\n\t\t\t\t\tif (selectionModel.model instanceof PointModel && this.portMagneticRadius) {\r\n\t\t\t\t\t\t// get all ports on canvas, check distances, if smaller then defined radius, magnetize!\r\n\t\t\t\t\t\tconst portsMap = this.diagramModel.getAllPorts({ filter: p => p.getMagnetic() });\r\n\r\n\t\t\t\t\t\tfor (const port of portsMap.values()) {\r\n\t\t\t\t\t\t\tconst portCoords = port.getCoords();\r\n\t\t\t\t\t\t\tconst distance = Math.hypot(portCoords.x - newCoords.x, portCoords.y - newCoords.y);\r\n\t\t\t\t\t\t\tif (distance <= this.portMagneticRadius) {\r\n\t\t\t\t\t\t\t\tconst portCenter = this.diagramModel.getDiagramEngine().getPortCenter(port);\r\n\t\t\t\t\t\t\t\tselectionModel.model.setCoords(portCenter);\r\n\t\t\t\t\t\t\t\tselectionModel.magnet = port;\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\tselectionModel.model.setCoords(gridRelativeCoords);\r\n\r\n\t\t\t\t\tif (selectionModel.model instanceof NodeModel) {\r\n\t\t\t\t\t\t// update port coordinates as well\r\n\t\t\t\t\t\tObject.values(selectionModel.model.getPorts()).forEach(port => {\r\n\t\t\t\t\t\t\tconst portCoords = this.diagramModel.getDiagramEngine().getPortCoords(port);\r\n\t\t\t\t\t\t\tport.updateCoords(portCoords);\r\n\t\t\t\t\t\t});\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\tif (this.diagramModel.getDiagramEngine().getSmartRouting()) {\r\n\t\t\t\t\t\tsetTimeout(() => {\r\n\t\t\t\t\t\t\tthis.diagramModel.getDiagramEngine().calculateRoutingMatrix();\r\n\t\t\t\t\t\t}, 1);\r\n\t\t\t\t\t}\r\n\t\t\t\t} else if (selectionModel.model instanceof PointModel) {\r\n\t\t\t\t\t// will only run here when trying to create a point on an existing link\r\n\t\t\t\t\t// we want points that are connected to ports, to not necessarily snap to grid\r\n\t\t\t\t\t// this stuff needs to be pixel perfect, dont touch it\r\n\t\t\t\t\tconst newCoords = this.diagramModel.getGridPosition({ x: coords.x / amountZoom, y: coords.y / amountZoom });\r\n\t\t\t\t\tselectionModel.model.setCoords({ x: selectionModel.initialX + newCoords.x, y: selectionModel.initialY + newCoords.y });\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tthis.fireAction();\r\n\t\t} else if (action instanceof MoveCanvasAction) {\r\n\t\t\tif (this.allowCanvasTranslation) {\r\n\t\t\t\tthis.diagramModel.setOffset(\r\n\t\t\t\t\taction.initialOffsetX + (event.clientX - action.mouseX),\r\n\t\t\t\t\taction.initialOffsetY + (event.clientY - action.mouseY)\r\n\t\t\t\t);\r\n\t\t\t\tthis.fireAction();\r\n\t\t\t}\r\n\t\t}\r\n\t};\r\n\r\n\tonMouseDown(event: MouseEvent) {\r\n\t\tif (event.button === 3) {\r\n\t\t\treturn;\r\n\t\t}\r\n\r\n\t\tconst selectedModel = this.getMouseElement(event);\r\n\r\n\t\t// canvas selected\r\n\t\tif (selectedModel === null) {\r\n\t\t\t// multiple selection\r\n\t\t\tif (event.shiftKey) {\r\n\t\t\t\t// initiate multiple selection selector\r\n\t\t\t\tconst relative = this.diagramModel.getDiagramEngine().getRelativePoint(event.clientX, event.clientY);\r\n\t\t\t\tthis.startFiringAction(new SelectingAction(relative.x, relative.y));\r\n\t\t\t} else {\r\n\t\t\t\t// drag canvas action\r\n\t\t\t\tthis.diagramModel.clearSelection();\r\n\t\t\t\tthis.startFiringAction(new MoveCanvasAction(event.clientX, event.clientY, this.diagramModel));\r\n\t\t\t}\r\n\t\t} else if (selectedModel.model instanceof PortModel) {\r\n\t\t\t// its a port element, we want to drag a link\r\n\t\t\tif (!selectedModel.model.isLocked() && selectedModel.model.getCanCreateLinks()) {\r\n\t\t\t\tconst relative = this.diagramModel.getDiagramEngine().getRelativeMousePoint(event);\r\n\t\t\t\tconst sourcePort = selectedModel.model;\r\n\t\t\t\tconst link = sourcePort.createLinkModel();\r\n\r\n\t\t\t\t// if we don't have a link then we have reached the max amount, or we cannot create new ones\r\n\t\t\t\tif (link) {\r\n\t\t\t\t\tlink.setSourcePort(sourcePort);\r\n\t\t\t\t\tlink.removeMiddlePoints();\r\n\t\t\t\t\tif (link.getSourcePort() !== sourcePort) {\r\n\t\t\t\t\t\tlink.setSourcePort(sourcePort);\r\n\t\t\t\t\t}\r\n\t\t\t\t\tlink.setTargetPort(null);\r\n\r\n\t\t\t\t\tlink.getFirstPoint().setCoords(relative);\r\n\t\t\t\t\tlink.getLastPoint().setCoords(relative);\r\n\r\n\t\t\t\t\tthis.diagramModel.clearSelection();\r\n\t\t\t\t\tlink.getLastPoint().setSelected();\r\n\t\t\t\t\tthis.diagramModel.addLink(link);\r\n\r\n\t\t\t\t\tthis.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));\r\n\t\t\t\t}\r\n\t\t\t} else {\r\n\t\t\t\tthis.diagramModel.clearSelection();\r\n\t\t\t}\r\n\t\t} else if (selectedModel.model instanceof PointModel && selectedModel.model.isConnectedToPort()) {\r\n\t\t\tthis.diagramModel.clearSelection();\r\n\t\t} else {\r\n\t\t\t// its some other element, probably want to move it\r\n\t\t\tif (!event.shiftKey && !selectedModel.model.getSelected()) {\r\n\t\t\t\tthis.diagramModel.clearSelection();\r\n\t\t\t}\r\n\r\n\t\t\tselectedModel.model.setSelected();\r\n\r\n\t\t\tthis.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));\r\n\t\t}\r\n\r\n\t\t// create mouseMove and mouseUp listeners\r\n\t\tthis.mouseMoveListener = this.renderer.listen(document, 'mousemove', this.onMouseMove);\r\n\t\tthis.mouseUpListener = this.renderer.listen(document, 'mouseup', this.onMouseUp);\r\n\t}\r\n\r\n\tonMouseWheel(event: WheelEvent) {\r\n\t\tif (this.allowCanvasZoom) {\r\n\t\t\tevent.preventDefault();\r\n\t\t\tevent.stopPropagation();\r\n\t\t\tconst currentZoomLevel = this.diagramModel.getZoomLevel();\r\n\r\n\t\t\tconst oldZoomFactor = currentZoomLevel / 100;\r\n\t\t\tlet scrollDelta = this.inverseZoom ? -event.deltaY : event.deltaY;\r\n\r\n\t\t\t// check if it is pinch gesture\r\n\t\t\tif (event.ctrlKey && scrollDelta % 1 !== 0) {\r\n\t\t\t\t/* Chrome and Firefox sends wheel event with deltaY that\r\n\t\t\t\t   have fractional part, also `ctrlKey` prop of the event is true\r\n\t\t\t\t   though ctrl isn't pressed\r\n\t\t\t\t*/\r\n\t\t\t\tscrollDelta /= 3;\r\n\t\t\t} else {\r\n\t\t\t\tscrollDelta /= 60;\r\n\t\t\t}\r\n\r\n\t\t\tif (currentZoomLevel + scrollDelta > 10) {\r\n\t\t\t\tconst newZoomLvl = currentZoomLevel + scrollDelta;\r\n\t\t\t\tthis.diagramModel.setZoomLevel(newZoomLvl);\r\n\t\t\t}\r\n\r\n\t\t\tconst updatedZoomLvl = this.diagramModel.getZoomLevel();\r\n\t\t\tconst zoomFactor = updatedZoomLvl / 100;\r\n\r\n\t\t\tconst boundingRect = (event.currentTarget as Element).getBoundingClientRect();\r\n\t\t\tconst clientWidth = boundingRect.width;\r\n\t\t\tconst clientHeight = boundingRect.height;\r\n\r\n\t\t\t// compute difference between rect before and after scroll\r\n\t\t\tconst widthDiff = clientWidth * zoomFactor - clientWidth * oldZoomFactor;\r\n\t\t\tconst heightDiff = clientHeight * zoomFactor - clientHeight * oldZoomFactor;\r\n\r\n\t\t\t// compute mouse coords relative to canvas\r\n\t\t\tconst clientX = event.clientX - boundingRect.left;\r\n\t\t\tconst clientY = event.clientY - boundingRect.top;\r\n\r\n\t\t\t// compute width and height increment factor\r\n\t\t\tconst xFactor = (clientX - this.diagramModel.getOffsetX()) / oldZoomFactor / clientWidth;\r\n\t\t\tconst yFactor = (clientY - this.diagramModel.getOffsetY()) / oldZoomFactor / clientHeight;\r\n\r\n\t\t\tconst updatedXOffset = this.diagramModel.getOffsetX() - widthDiff * xFactor;\r\n\t\t\tconst updatedYOffset = this.diagramModel.getOffsetY() - heightDiff * yFactor;\r\n\r\n\t\t\tthis.diagramModel.setOffset(updatedXOffset, updatedYOffset);\r\n\t\t}\r\n\t}\r\n\r\n\tprotected mouseUpListener = () => {};\r\n\tprotected mouseMoveListener = () => {};\r\n\r\n\tprotected createLayerStyle(x: number, y: number, zoom: number): HashMap<string> {\r\n\t\treturn { transform: `translate(${x}px, ${y}px) scale(${zoom / 100.0})` };\r\n\t}\r\n\r\n\tprotected initNodes() {\r\n\t\tthis.diagramModel.getDiagramEngine().setCanvas(this.canvas.nativeElement);\r\n\t\tthis.diagramModel.getDiagramEngine().setSmartRoutingStatus(this.smartRouting);\r\n\r\n\t\tthis.nodes$ = this.diagramModel.selectNodes();\r\n\t\tthis.links$ = this.diagramModel.selectLinks();\r\n\t\tthis.nodesRendered$ = new BehaviorSubject(false);\r\n\r\n\t\tthis.diagramModel.setMaxZoomIn(this.maxZoomIn);\r\n\t\tthis.diagramModel.setMaxZoomOut(this.maxZoomOut);\r\n\r\n\t\tthis.nodes$.pipe(takeUntil(this.destroyed$)).subscribe(nodes => {\r\n\t\t\tthis.nodesRendered$.next(false);\r\n\r\n\t\t\tObject.values(nodes).forEach(node => {\r\n\t\t\t\tif (!node.getPainted()) {\r\n\t\t\t\t\tthis.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);\r\n\t\t\t\t\tthis.cdRef.detectChanges();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tthis.nodesRendered$.next(true);\r\n\t\t});\r\n\t}\r\n\r\n\tprotected initLinks() {\r\n\t\tcombineLatest([this.nodesRendered$, this.links$])\r\n\t\t\t.pipe(\r\n\t\t\t\tfilter(([nodesRendered, _]) => !!nodesRendered),\r\n\t\t\t\ttakeUntil(this.destroyed$)\r\n\t\t\t)\r\n\t\t\t.subscribe(([_, links]) => {\r\n\t\t\t\tObject.values(links).forEach(link => {\r\n\t\t\t\t\tif (!link.getPainted() && link.getSourcePort().getPainted()) {\r\n\t\t\t\t\t\tif (link.getSourcePort() !== null) {\r\n\t\t\t\t\t\t\tconst portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getSourcePort());\r\n\t\t\t\t\t\t\tlink.getPoints()[0].setCoords(portCenter);\r\n\r\n\t\t\t\t\t\t\tconst portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getSourcePort());\r\n\t\t\t\t\t\t\tlink.getSourcePort().updateCoords(portCoords);\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tif (link.getTargetPort() !== null) {\r\n\t\t\t\t\t\t\tconst portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getTargetPort());\r\n\t\t\t\t\t\t\tlink.getPoints()[link.getPoints().length - 1].setCoords(portCenter);\r\n\r\n\t\t\t\t\t\t\tconst portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getTargetPort());\r\n\t\t\t\t\t\t\tlink.getTargetPort().updateCoords(portCoords);\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tthis.diagramModel.getDiagramEngine().generateWidgetForLink(link, this.linksLayer);\r\n\t\t\t\t\t\tthis.cdRef.detectChanges();\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t});\r\n\t}\r\n}\r\n",
+            "sourceCode": "import {\n\tAfterViewInit,\n\tChangeDetectionStrategy,\n\tChangeDetectorRef,\n\tComponent,\n\tElementRef,\n\tEventEmitter,\n\tInput,\n\tOnDestroy,\n\tOutput,\n\tRenderer2,\n\tViewChild,\n\tViewContainerRef,\n} from '@angular/core';\nimport { BehaviorSubject, combineLatest, defer, Observable, ReplaySubject } from 'rxjs';\nimport { filter, map, takeUntil } from 'rxjs/operators';\nimport { BaseAction, InvalidLinkDestroyed, LinkCreatedAction, MoveCanvasAction, SelectingAction } from '../../actions';\nimport { LooseLinkDestroyed } from '../../actions/loose-link-destroyed.action';\nimport { MoveItemsAction } from '../../actions/move-items.action';\nimport { Coords } from '../../interfaces/coords.interface';\nimport { BaseModel } from '../../models/base.model';\nimport { DiagramModel } from '../../models/diagram.model';\nimport { LinkModel } from '../../models/link.model';\nimport { NodeModel } from '../../models/node.model';\nimport { PointModel } from '../../models/point.model';\nimport { PortModel } from '../../models/port.model';\nimport { HashMap, TypedMap } from '../../utils/types';\n\n@Component({\n\tselector: 'ngdx-diagram',\n\ttemplateUrl: 'diagram.component.html',\n\tstyleUrls: ['diagram.component.scss'],\n\tchangeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class NgxDiagramComponent implements AfterViewInit, OnDestroy {\n\t// eslint-disable-next-line @angular-eslint/no-input-rename\n\t@Input('model') diagramModel: DiagramModel;\n\t@Input() allowCanvasZoom = true;\n\t@Input() allowCanvasTranslation = true;\n\t@Input() inverseZoom = true;\n\t@Input() allowLooseLinks = true;\n\t@Input() maxZoomOut: number = null;\n\t@Input() maxZoomIn: number = null;\n\t@Input() portMagneticRadius = 30;\n\t@Input() smartRouting = false;\n\n\t@Output() actionStartedFiring = new EventEmitter<BaseAction>();\n\t@Output() actionStillFiring = new EventEmitter<BaseAction>();\n\t@Output() actionStoppedFiring = new EventEmitter<BaseAction>();\n\n\t@ViewChild('nodesLayer', { read: ViewContainerRef })\n\tnodesLayer: ViewContainerRef;\n\n\t@ViewChild('linksLayer', { read: ViewContainerRef })\n\tlinksLayer: ViewContainerRef;\n\n\t@ViewChild('canvas', { read: ElementRef })\n\tcanvas: ElementRef;\n\n\tlayerStyles$ = defer(() =>\n\t\tcombineLatest([this.diagramModel.selectOffsetX(), this.diagramModel.selectOffsetY(), this.diagramModel.selectZoomLevel()]).pipe(\n\t\t\tmap(([x, y, zoom]) => this.createLayerStyle(x, y, zoom))\n\t\t)\n\t);\n\n\tprotected nodes$: Observable<HashMap<NodeModel>>;\n\tprotected links$: Observable<TypedMap<LinkModel>>;\n\tprotected action$ = new BehaviorSubject<BaseAction>(null);\n\tprotected nodesRendered$: BehaviorSubject<boolean>;\n\tprotected destroyed$ = new ReplaySubject<boolean>(1);\n\n\tconstructor(protected renderer: Renderer2, protected cdRef: ChangeDetectorRef) {}\n\n\t// TODO: handle destruction of container, resetting all observables to avoid memory leaks!\n\tngAfterViewInit() {\n\t\tif (this.diagramModel) {\n\t\t\tthis.initNodes();\n\t\t\tthis.initLinks();\n\t\t}\n\t}\n\n\tngOnDestroy() {\n\t\tthis.destroyed$.next(true);\n\t\tthis.destroyed$.complete();\n\t}\n\n\t/**\n\t * fire the action registered and notify subscribers\n\t */\n\tfireAction() {\n\t\tif (this.action$.value) {\n\t\t\tthis.actionStillFiring.emit(this.action$.value);\n\t\t}\n\t}\n\n\t/**\n\t * Unregister the action, post firing and notify subscribers\n\t */\n\tstopFiringAction(shouldSkipEvent?: boolean) {\n\t\tif (!shouldSkipEvent) {\n\t\t\tthis.actionStoppedFiring.emit(this.action$.value);\n\t\t}\n\t\tthis.action$.next(null);\n\t}\n\n\t/**\n\t * Register the new action, pre firing and notify subscribers\n\t */\n\tstartFiringAction(action: BaseAction) {\n\t\tthis.action$.next(action);\n\t\tthis.actionStartedFiring.emit(action);\n\t}\n\n\tselectAction() {\n\t\treturn this.action$ as BehaviorSubject<SelectingAction>;\n\t}\n\n\tshouldDrawSelectionBox() {\n\t\tconst action = this.action$.getValue();\n\t\tif (action instanceof SelectingAction) {\n\t\t\taction.getBoxDimensions();\n\t\t\treturn true;\n\t\t}\n\t\treturn false;\n\t}\n\n\tgetMouseElement(event: MouseEvent): { model: BaseModel; element: Element } {\n\t\tconst target = event.target as Element;\n\n\t\t// is it a port?\n\t\tlet element = target.closest('[data-portid]');\n\t\tif (element) {\n\t\t\t// get the relevant node and return the port.\n\t\t\tconst nodeEl = target.closest('[data-nodeid]');\n\t\t\treturn {\n\t\t\t\tmodel: this.diagramModel.getNode(nodeEl.getAttribute('data-nodeid')).getPort(element.getAttribute('data-portid')),\n\t\t\t\telement,\n\t\t\t};\n\t\t}\n\n\t\t// look for a point\n\t\telement = target.closest('[data-pointid]');\n\t\tif (element) {\n\t\t\treturn {\n\t\t\t\tmodel: this.diagramModel.getLink(element.getAttribute('data-linkid')).getPointModel(element.getAttribute('data-pointid')),\n\t\t\t\telement,\n\t\t\t};\n\t\t}\n\n\t\t// look for a link\n\t\telement = target.closest('[data-linkid]');\n\t\tif (element) {\n\t\t\treturn {\n\t\t\t\tmodel: this.diagramModel.getLink(element.getAttribute('data-linkid')),\n\t\t\t\telement,\n\t\t\t};\n\t\t}\n\n\t\t// a node maybe\n\t\telement = target.closest('[data-nodeid]');\n\t\tif (element) {\n\t\t\treturn {\n\t\t\t\tmodel: this.diagramModel.getNode(element.getAttribute('data-nodeid')),\n\t\t\t\telement,\n\t\t\t};\n\t\t}\n\n\t\t// just the canvas\n\t\treturn null;\n\t}\n\n\tonMouseUp = (event: MouseEvent) => {\n\t\tconst diagramEngine = this.diagramModel.getDiagramEngine();\n\t\tconst action = this.action$.getValue();\n\t\t// are we going to connect a link to something?\n\t\tif (action instanceof MoveItemsAction) {\n\t\t\tconst element = this.getMouseElement(event);\n\t\t\taction.selectionModels.forEach(model => {\n\t\t\t\t// only care about points connecting to things\n\t\t\t\tif (!model || !(model.model instanceof PointModel)) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tlet el: BaseModel;\n\t\t\t\tif (model.magnet) {\n\t\t\t\t\tel = model.magnet;\n\t\t\t\t} else if (element && element.model) {\n\t\t\t\t\tel = element.model;\n\t\t\t\t}\n\n\t\t\t\tif (el instanceof PortModel && !diagramEngine.isModelLocked(el)) {\n\t\t\t\t\tconst link = model.model.getLink();\n\t\t\t\t\tif (link.getTargetPort() !== null) {\n\t\t\t\t\t\t// if this was a valid link already and we are adding a node in the middle, create 2 links from the original\n\t\t\t\t\t\tif (link.getTargetPort() !== el && link.getSourcePort() !== el) {\n\t\t\t\t\t\t\tconst targetPort = link.getTargetPort();\n\t\t\t\t\t\t\tconst newLink = link.clone({});\n\t\t\t\t\t\t\tnewLink.setSourcePort(el);\n\t\t\t\t\t\t\tnewLink.setTargetPort(targetPort);\n\t\t\t\t\t\t\tlink.setTargetPort(el);\n\t\t\t\t\t\t\ttargetPort.removeLink(link);\n\t\t\t\t\t\t\tnewLink.removePointsBefore(newLink.getPoints()[link.getPointIndex(model.model)]);\n\t\t\t\t\t\t\tlink.removePointsAfter(model.model);\n\t\t\t\t\t\t\tdiagramEngine.getDiagramModel().addLink(newLink);\n\t\t\t\t\t\t\t// if we are connecting to the same target or source, destroy tweener points\n\t\t\t\t\t\t} else if (link.getTargetPort() === el) {\n\t\t\t\t\t\t\tlink.removePointsAfter(model.model);\n\t\t\t\t\t\t} else if (link.getSourcePort() === el) {\n\t\t\t\t\t\t\tlink.removePointsBefore(model.model);\n\t\t\t\t\t\t}\n\t\t\t\t\t} else {\n\t\t\t\t\t\tlink.setTargetPort(el);\n\t\t\t\t\t\tconst targetPort = link.getTargetPort();\n\t\t\t\t\t\tconst srcPort = link.getSourcePort();\n\n\t\t\t\t\t\tif (targetPort.id !== srcPort.id && srcPort.canLinkToPort(targetPort)) {\n\t\t\t\t\t\t\t// link is valid, fire the event\n\t\t\t\t\t\t\tthis.startFiringAction(new LinkCreatedAction(event.clientX, event.clientY, link));\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\t// reset current magent\n\t\t\t\tmodel.magnet = undefined;\n\t\t\t});\n\n\t\t\t// check for / destroy any loose links in any models which have been moved\n\t\t\tif (!this.allowLooseLinks) {\n\t\t\t\taction.selectionModels.forEach(model => {\n\t\t\t\t\t// only care about points connecting to things\n\t\t\t\t\tif (!model || !(model.model instanceof PointModel)) {\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\n\t\t\t\t\tconst selectedPoint: PointModel = model.model;\n\t\t\t\t\tconst link: LinkModel = selectedPoint.getLink();\n\t\t\t\t\tif (link.getSourcePort() === null || link.getTargetPort() === null) {\n\t\t\t\t\t\tlink.destroy();\n\t\t\t\t\t\tthis.startFiringAction(new LooseLinkDestroyed(event.clientX, event.clientY, link));\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\t// destroy any invalid links\n\t\t\taction.selectionModels.forEach(model => {\n\t\t\t\t// only care about points connecting to things\n\t\t\t\tif (!model || !(model.model instanceof PointModel)) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tconst link: LinkModel = model.model.getLink();\n\t\t\t\tconst sourcePort: PortModel = link.getSourcePort();\n\t\t\t\tconst targetPort: PortModel = link.getTargetPort();\n\n\t\t\t\tif (sourcePort !== null && targetPort !== null) {\n\t\t\t\t\tif (!sourcePort.canLinkToPort(targetPort)) {\n\t\t\t\t\t\t// link not allowed\n\t\t\t\t\t\tlink.destroy();\n\t\t\t\t\t\tthis.startFiringAction(new InvalidLinkDestroyed(event.clientX, event.clientY, link));\n\t\t\t\t\t} else if (\n\t\t\t\t\t\tObject.values(targetPort.getLinks()).some(\n\t\t\t\t\t\t\t(l: LinkModel) => l !== link && (l.getSourcePort() === sourcePort || l.getTargetPort() === sourcePort)\n\t\t\t\t\t\t)\n\t\t\t\t\t) {\n\t\t\t\t\t\t// link is a duplicate\n\t\t\t\t\t\tlink.destroy();\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tthis.stopFiringAction();\n\t\t} else {\n\t\t\tthis.stopFiringAction();\n\t\t}\n\n\t\tthis.mouseUpListener();\n\t\tthis.mouseMoveListener();\n\t\tthis.action$.next(null);\n\t};\n\n\t/**\n\t * @description Mouse Move Event Handler\n\t * @param event MouseEvent\n\t */\n\tonMouseMove = (event: MouseEvent) => {\n\t\tconst action = this.action$.getValue();\n\n\t\tif (action === null || action === undefined) {\n\t\t\treturn;\n\t\t}\n\n\t\tif (action instanceof SelectingAction) {\n\t\t\tconst relative = this.diagramModel.getDiagramEngine().getRelativePoint(event.clientX, event.clientY);\n\n\t\t\tObject.values(this.diagramModel.getNodes()).forEach(node => {\n\t\t\t\tif ((action as SelectingAction).containsElement(node.getCoords(), this.diagramModel)) {\n\t\t\t\t\tnode.setSelected();\n\t\t\t\t} else {\n\t\t\t\t\tnode.setSelected(false);\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tObject.values(this.diagramModel.getLinks()).forEach(link => {\n\t\t\t\tlet allSelected = true;\n\t\t\t\tlink.getPoints().forEach(point => {\n\t\t\t\t\tif ((action as SelectingAction).containsElement(point.getCoords(), this.diagramModel)) {\n\t\t\t\t\t\tpoint.setSelected();\n\t\t\t\t\t} else {\n\t\t\t\t\t\tpoint.setSelected(false);\n\t\t\t\t\t\tallSelected = false;\n\t\t\t\t\t}\n\t\t\t\t});\n\n\t\t\t\tif (allSelected) {\n\t\t\t\t\tlink.setSelected();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\taction.mouseX2 = relative.x;\n\t\t\taction.mouseY2 = relative.y;\n\n\t\t\tthis.fireAction();\n\t\t\tthis.action$.next(action);\n\t\t\treturn;\n\t\t} else if (action instanceof MoveItemsAction) {\n\t\t\tconst coords: Coords = {\n\t\t\t\tx: event.clientX - action.mouseX,\n\t\t\t\ty: event.clientY - action.mouseY,\n\t\t\t};\n\t\t\tconst amountZoom = this.diagramModel.getZoomLevel() / 100;\n\t\t\taction.selectionModels.forEach(selectionModel => {\n\t\t\t\t// reset all previous magnets if any\n\t\t\t\tselectionModel.magnet = undefined;\n\n\t\t\t\t// in this case we need to also work out the relative grid position\n\t\t\t\tif (\n\t\t\t\t\tselectionModel.model instanceof NodeModel ||\n\t\t\t\t\t(selectionModel.model instanceof PointModel && !selectionModel.model.isConnectedToPort())\n\t\t\t\t) {\n\t\t\t\t\tconst newCoords = { x: selectionModel.initialX + coords.x / amountZoom, y: selectionModel.initialY + coords.y / amountZoom };\n\t\t\t\t\tconst gridRelativeCoords = this.diagramModel.getGridPosition(newCoords);\n\n\t\t\t\t\t// magnetic inputs handling\n\t\t\t\t\tif (selectionModel.model instanceof PointModel && this.portMagneticRadius) {\n\t\t\t\t\t\t// get all ports on canvas, check distances, if smaller then defined radius, magnetize!\n\t\t\t\t\t\tconst portsMap = this.diagramModel.getAllPorts({ filter: p => p.getMagnetic() });\n\n\t\t\t\t\t\tfor (const port of portsMap.values()) {\n\t\t\t\t\t\t\tconst portCoords = port.getCoords();\n\t\t\t\t\t\t\tconst distance = Math.hypot(portCoords.x - newCoords.x, portCoords.y - newCoords.y);\n\t\t\t\t\t\t\tif (distance <= this.portMagneticRadius) {\n\t\t\t\t\t\t\t\tconst portCenter = this.diagramModel.getDiagramEngine().getPortCenter(port);\n\t\t\t\t\t\t\t\tselectionModel.model.setCoords(portCenter);\n\t\t\t\t\t\t\t\tselectionModel.magnet = port;\n\t\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\n\t\t\t\t\tselectionModel.model.setCoords(gridRelativeCoords);\n\n\t\t\t\t\tif (selectionModel.model instanceof NodeModel) {\n\t\t\t\t\t\t// update port coordinates as well\n\t\t\t\t\t\tObject.values(selectionModel.model.getPorts()).forEach(port => {\n\t\t\t\t\t\t\tconst portCoords = this.diagramModel.getDiagramEngine().getPortCoords(port);\n\t\t\t\t\t\t\tport.updateCoords(portCoords);\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\n\t\t\t\t\tif (this.diagramModel.getDiagramEngine().getSmartRouting()) {\n\t\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\t\tthis.diagramModel.getDiagramEngine().calculateRoutingMatrix();\n\t\t\t\t\t\t}, 1);\n\t\t\t\t\t}\n\t\t\t\t} else if (selectionModel.model instanceof PointModel) {\n\t\t\t\t\t// will only run here when trying to create a point on an existing link\n\t\t\t\t\t// we want points that are connected to ports, to not necessarily snap to grid\n\t\t\t\t\t// this stuff needs to be pixel perfect, dont touch it\n\t\t\t\t\tconst newCoords = this.diagramModel.getGridPosition({ x: coords.x / amountZoom, y: coords.y / amountZoom });\n\t\t\t\t\tselectionModel.model.setCoords({ x: selectionModel.initialX + newCoords.x, y: selectionModel.initialY + newCoords.y });\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tthis.fireAction();\n\t\t} else if (action instanceof MoveCanvasAction) {\n\t\t\tif (this.allowCanvasTranslation) {\n\t\t\t\tthis.diagramModel.setOffset(\n\t\t\t\t\taction.initialOffsetX + (event.clientX - action.mouseX),\n\t\t\t\t\taction.initialOffsetY + (event.clientY - action.mouseY)\n\t\t\t\t);\n\t\t\t\tthis.fireAction();\n\t\t\t}\n\t\t}\n\t};\n\n\tonMouseDown(event: MouseEvent) {\n\t\tif (event.button === 3) {\n\t\t\treturn;\n\t\t}\n\n\t\tconst selectedModel = this.getMouseElement(event);\n\n\t\t// canvas selected\n\t\tif (selectedModel === null) {\n\t\t\t// multiple selection\n\t\t\tif (event.shiftKey) {\n\t\t\t\t// initiate multiple selection selector\n\t\t\t\tconst relative = this.diagramModel.getDiagramEngine().getRelativePoint(event.clientX, event.clientY);\n\t\t\t\tthis.startFiringAction(new SelectingAction(relative.x, relative.y));\n\t\t\t} else {\n\t\t\t\t// drag canvas action\n\t\t\t\tthis.diagramModel.clearSelection();\n\t\t\t\tthis.startFiringAction(new MoveCanvasAction(event.clientX, event.clientY, this.diagramModel));\n\t\t\t}\n\t\t} else if (selectedModel.model instanceof PortModel) {\n\t\t\t// its a port element, we want to drag a link\n\t\t\tif (!selectedModel.model.isLocked() && selectedModel.model.getCanCreateLinks()) {\n\t\t\t\tconst relative = this.diagramModel.getDiagramEngine().getRelativeMousePoint(event);\n\t\t\t\tconst sourcePort = selectedModel.model;\n\t\t\t\tconst link = sourcePort.createLinkModel();\n\n\t\t\t\t// if we don't have a link then we have reached the max amount, or we cannot create new ones\n\t\t\t\tif (link) {\n\t\t\t\t\tlink.setSourcePort(sourcePort);\n\t\t\t\t\tlink.removeMiddlePoints();\n\t\t\t\t\tif (link.getSourcePort() !== sourcePort) {\n\t\t\t\t\t\tlink.setSourcePort(sourcePort);\n\t\t\t\t\t}\n\t\t\t\t\tlink.setTargetPort(null);\n\n\t\t\t\t\tlink.getFirstPoint().setCoords(relative);\n\t\t\t\t\tlink.getLastPoint().setCoords(relative);\n\n\t\t\t\t\tthis.diagramModel.clearSelection();\n\t\t\t\t\tlink.getLastPoint().setSelected();\n\t\t\t\t\tthis.diagramModel.addLink(link);\n\n\t\t\t\t\tthis.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tthis.diagramModel.clearSelection();\n\t\t\t}\n\t\t} else if (selectedModel.model instanceof PointModel && selectedModel.model.isConnectedToPort()) {\n\t\t\tthis.diagramModel.clearSelection();\n\t\t} else {\n\t\t\t// its some other element, probably want to move it\n\t\t\tif (!event.shiftKey && !selectedModel.model.getSelected()) {\n\t\t\t\tthis.diagramModel.clearSelection();\n\t\t\t}\n\n\t\t\tselectedModel.model.setSelected();\n\n\t\t\tthis.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));\n\t\t}\n\n\t\t// create mouseMove and mouseUp listeners\n\t\tthis.mouseMoveListener = this.renderer.listen(document, 'mousemove', this.onMouseMove);\n\t\tthis.mouseUpListener = this.renderer.listen(document, 'mouseup', this.onMouseUp);\n\t}\n\n\tonMouseWheel(event: WheelEvent) {\n\t\tif (this.allowCanvasZoom) {\n\t\t\tevent.preventDefault();\n\t\t\tevent.stopPropagation();\n\t\t\tconst currentZoomLevel = this.diagramModel.getZoomLevel();\n\n\t\t\tconst oldZoomFactor = currentZoomLevel / 100;\n\t\t\tlet scrollDelta = this.inverseZoom ? -event.deltaY : event.deltaY;\n\n\t\t\t// check if it is pinch gesture\n\t\t\tif (event.ctrlKey && scrollDelta % 1 !== 0) {\n\t\t\t\t/* Chrome and Firefox sends wheel event with deltaY that\n\t\t\t\t   have fractional part, also `ctrlKey` prop of the event is true\n\t\t\t\t   though ctrl isn't pressed\n\t\t\t\t*/\n\t\t\t\tscrollDelta /= 3;\n\t\t\t} else {\n\t\t\t\tscrollDelta /= 60;\n\t\t\t}\n\n\t\t\tif (currentZoomLevel + scrollDelta > 10) {\n\t\t\t\tconst newZoomLvl = currentZoomLevel + scrollDelta;\n\t\t\t\tthis.diagramModel.setZoomLevel(newZoomLvl);\n\t\t\t}\n\n\t\t\tconst updatedZoomLvl = this.diagramModel.getZoomLevel();\n\t\t\tconst zoomFactor = updatedZoomLvl / 100;\n\n\t\t\tconst boundingRect = (event.currentTarget as Element).getBoundingClientRect();\n\t\t\tconst clientWidth = boundingRect.width;\n\t\t\tconst clientHeight = boundingRect.height;\n\n\t\t\t// compute difference between rect before and after scroll\n\t\t\tconst widthDiff = clientWidth * zoomFactor - clientWidth * oldZoomFactor;\n\t\t\tconst heightDiff = clientHeight * zoomFactor - clientHeight * oldZoomFactor;\n\n\t\t\t// compute mouse coords relative to canvas\n\t\t\tconst clientX = event.clientX - boundingRect.left;\n\t\t\tconst clientY = event.clientY - boundingRect.top;\n\n\t\t\t// compute width and height increment factor\n\t\t\tconst xFactor = (clientX - this.diagramModel.getOffsetX()) / oldZoomFactor / clientWidth;\n\t\t\tconst yFactor = (clientY - this.diagramModel.getOffsetY()) / oldZoomFactor / clientHeight;\n\n\t\t\tconst updatedXOffset = this.diagramModel.getOffsetX() - widthDiff * xFactor;\n\t\t\tconst updatedYOffset = this.diagramModel.getOffsetY() - heightDiff * yFactor;\n\n\t\t\tthis.diagramModel.setOffset(updatedXOffset, updatedYOffset);\n\t\t}\n\t}\n\n\tprotected mouseUpListener = () => {};\n\tprotected mouseMoveListener = () => {};\n\n\tprotected createLayerStyle(x: number, y: number, zoom: number): HashMap<string> {\n\t\treturn { transform: `translate(${x}px, ${y}px) scale(${zoom / 100.0})` };\n\t}\n\n\tprotected initNodes() {\n\t\tthis.diagramModel.getDiagramEngine().setCanvas(this.canvas.nativeElement);\n\t\tthis.diagramModel.getDiagramEngine().setSmartRoutingStatus(this.smartRouting);\n\n\t\tthis.nodes$ = this.diagramModel.selectNodes();\n\t\tthis.links$ = this.diagramModel.selectLinks();\n\t\tthis.nodesRendered$ = new BehaviorSubject(false);\n\n\t\tthis.diagramModel.setMaxZoomIn(this.maxZoomIn);\n\t\tthis.diagramModel.setMaxZoomOut(this.maxZoomOut);\n\n\t\tthis.nodes$.pipe(takeUntil(this.destroyed$)).subscribe(nodes => {\n\t\t\tthis.nodesRendered$.next(false);\n\n\t\t\tObject.values(nodes).forEach(node => {\n\t\t\t\tif (!node.getPainted()) {\n\t\t\t\t\tthis.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);\n\t\t\t\t\tthis.cdRef.detectChanges();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tthis.nodesRendered$.next(true);\n\t\t});\n\t}\n\n\tprotected initLinks() {\n\t\tcombineLatest([this.nodesRendered$, this.links$])\n\t\t\t.pipe(\n\t\t\t\tfilter(([nodesRendered]) => !!nodesRendered),\n\t\t\t\ttakeUntil(this.destroyed$)\n\t\t\t)\n\t\t\t.subscribe(([, links]) => {\n\t\t\t\tfor (const link of links.values()) {\n\t\t\t\t\tif (!link.getPainted() && link.getSourcePort().getPainted()) {\n\t\t\t\t\t\tif (link.getSourcePort() !== null) {\n\t\t\t\t\t\t\tconst portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getSourcePort());\n\t\t\t\t\t\t\tlink.getPoints()[0].setCoords(portCenter);\n\n\t\t\t\t\t\t\tconst portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getSourcePort());\n\t\t\t\t\t\t\tlink.getSourcePort().updateCoords(portCoords);\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tif (link.getTargetPort() !== null) {\n\t\t\t\t\t\t\tconst portCenter = this.diagramModel.getDiagramEngine().getPortCenter(link.getTargetPort());\n\t\t\t\t\t\t\tlink.getPoints()[link.getPoints().length - 1].setCoords(portCenter);\n\n\t\t\t\t\t\t\tconst portCoords = this.diagramModel.getDiagramEngine().getPortCoords(link.getTargetPort());\n\t\t\t\t\t\t\tlink.getTargetPort().updateCoords(portCoords);\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tthis.diagramModel.getDiagramEngine().generateWidgetForLink(link, this.linksLayer);\n\t\t\t\t\t\tthis.cdRef.detectChanges();\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\t}\n}\n\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -34270,6 +34294,15 @@
                 "name": "__LOG__",
                 "coveragePercent": 0,
                 "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "projects/ngx-diagrams/src/lib/utils/types.ts",
+                "type": "class",
+                "linktype": "classe",
+                "name": "TypedMap",
+                "coveragePercent": 0,
+                "coverageCount": "0/2",
                 "status": "low"
             },
             {
