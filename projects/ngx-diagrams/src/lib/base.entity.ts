@@ -7,18 +7,19 @@ import { HashMap } from './utils/types';
 export type BaseEntityType = 'node' | 'link' | 'port' | 'point';
 
 export class BaseEntity {
-	private _id: ID;
+	protected _id: ID;
 	/**
 	 * a prefix to make logs more easier
 	 */
-	private _logPrefix: string;
-	private _destroyed: Subject<null> = new Subject();
-	private _destroyed$: Observable<null> = this._destroyed;
-	private _locked: BehaviorSubject<boolean> = new BehaviorSubject(false);
-	private _locked$: Observable<LockEvent> = this._locked.pipe(
+	protected _destroyed = new Subject<void>();
+	protected _destroyed$ = this._destroyed.asObservable();
+	protected _locked = new BehaviorSubject(false);
+	protected _locked$ = this._locked.pipe(
 		this.entityPipe('locked'),
 		map(locked => new LockEvent(this, locked))
 	);
+
+	protected readonly _logPrefix: string;
 
 	constructor(id?: ID, logPrefix = '') {
 		this._id = id || UID();
