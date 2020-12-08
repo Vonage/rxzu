@@ -1,5 +1,6 @@
 import { PortModel } from '../../models/port.model';
 import { LinkModel } from '../../models/link.model';
+import { HashMap } from '../../utils/types';
 import { DefaultLinkModel } from './default-link.model';
 
 export interface DefaultPortModelConfig {
@@ -15,7 +16,7 @@ export interface DefaultPortModelConfig {
 export class DefaultPortModel extends PortModel {
 	in: boolean;
 	label: string;
-	links: { [id: string]: any };
+	links: HashMap<any>;
 
 	constructor({
 		isInput = true,

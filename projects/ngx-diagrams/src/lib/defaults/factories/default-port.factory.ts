@@ -4,7 +4,7 @@ import { ViewContainerRef, ComponentRef, ComponentFactory, ComponentFactoryResol
 import { DefaultPortComponent } from '../components/default-port/default-port.component';
 
 export class DefaultPortFactory extends AbstractPortFactory<DefaultPortModel> {
-	constructor(private resolver: ComponentFactoryResolver, private renderer: Renderer2) {
+	constructor(protected resolver: ComponentFactoryResolver, protected renderer: Renderer2) {
 		super('default');
 	}
 

@@ -4,19 +4,19 @@ import { map } from 'rxjs/operators';
 import { PaintedEvent, ParentChangeEvent, SelectionEvent } from '../interfaces/event.interface';
 
 export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
-	private readonly _type: string;
-	private readonly _parent$: BehaviorSubject<X> = new BehaviorSubject(null);
-	private readonly _selected$: BehaviorSubject<boolean> = new BehaviorSubject(false);
-	private readonly _painted$: BehaviorSubject<boolean> = new BehaviorSubject(false);
-	private readonly _hovered$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+	protected readonly _type: string;
+	protected readonly _parent$: BehaviorSubject<X> = new BehaviorSubject(null);
+	protected readonly _selected$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+	protected readonly _painted$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+	protected readonly _hovered$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-	private readonly parent$: Observable<ParentChangeEvent<X>> = this._parent$.pipe(
+	protected readonly parent$: Observable<ParentChangeEvent<X>> = this._parent$.pipe(
 		this.entityPipe('ParentsChange'),
 		map(p => new ParentChangeEvent<X>(this, p))
 	);
-	private readonly selected$: Observable<SelectionEvent>;
-	private readonly painted$: Observable<PaintedEvent>;
-	private readonly hovered$: Observable<boolean>;
+	protected readonly selected$: Observable<SelectionEvent>;
+	protected readonly painted$: Observable<PaintedEvent>;
+	protected readonly hovered$: Observable<boolean>;
 
 	constructor(type?: string, id?: string, logPrefix = '[Base]') {
 		super(id, logPrefix);

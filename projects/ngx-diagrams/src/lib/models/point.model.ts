@@ -6,8 +6,8 @@ import { map } from 'rxjs/operators';
 import { SerializedPointModel } from '../interfaces/serialization.interface';
 
 export class PointModel extends BaseModel<LinkModel> {
-	private readonly _coords: BehaviorSubject<Coords>;
-	private readonly coords$: Observable<Coords>;
+	protected readonly _coords: BehaviorSubject<Coords>;
+	protected readonly coords$: Observable<Coords>;
 
 	constructor(link: LinkModel, { x, y }: Coords, id?: string, logPrefix: string = '[Point]') {
 		super(link.getType(), id, logPrefix);

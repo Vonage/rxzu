@@ -4,7 +4,7 @@ import { DefaultLabelComponent } from '../components/default-label/default-label
 import { DefaultLabelModel } from '../models/default-label.model';
 
 export class DefaultLabelFactory extends AbstractLabelFactory<DefaultLabelModel> {
-	constructor(private resolver: ComponentFactoryResolver, private renderer: Renderer2) {
+	constructor(protected resolver: ComponentFactoryResolver, protected renderer: Renderer2) {
 		super('default');
 	}
 

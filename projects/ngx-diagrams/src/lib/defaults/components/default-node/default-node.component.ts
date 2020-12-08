@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
-import { DefaultNodeModel } from '../../models/default-node.model';
-import { DefaultPortModel } from '../../models';
 import { filter, switchMap } from 'rxjs/operators';
+import { DefaultPortModel } from '../../models';
+import { DefaultNodeModel } from '../../models/default-node.model';
 
 @Component({
 	selector: 'ngdx-default-node',
@@ -9,7 +9,8 @@ import { filter, switchMap } from 'rxjs/operators';
 	styleUrls: ['./default-node.component.scss'],
 })
 export class DefaultNodeComponent extends DefaultNodeModel implements OnInit {
-	@ViewChild('portsLayer', { read: ViewContainerRef, static: true }) portsLayer: ViewContainerRef;
+	@ViewChild('portsLayer', { read: ViewContainerRef, static: true })
+	portsLayer: ViewContainerRef;
 
 	constructor() {
 		super({ type: 'ngdx-default-node' });
