@@ -222,14 +222,14 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 		return this.extras$;
 	}
 
+	destroy() {
+		this.removeAllPorts();
+		super.destroy();
+	}
+
 	removeAllPorts(): void {
 		for (const port of this.getPorts().values()) {
 			this.removePort(port);
 		}
-	}
-
-	destroy() {
-		this.removeAllPorts();
-		super.destroy();
 	}
 }
