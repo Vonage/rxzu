@@ -33,11 +33,11 @@ export class DagreEngine {
 		const processedlinks: { [id: string]: boolean } = {};
 
 		// set nodes
-		Object.values(model.getNodes()).forEach(node => {
+		model.getNodes().forEach(node => {
 			this.g.setNode(node.id, { width: node.getWidth(), height: node.getHeight() });
 		});
 
-		Object.values(model.getLinks()).forEach(link => {
+		model.getLinks().forEach(link => {
 			// set edges
 			if (link.getSourcePort() && link.getTargetPort()) {
 				processedlinks[link.id] = true;

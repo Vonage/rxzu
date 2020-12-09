@@ -61,7 +61,7 @@ export class DiagramEngine {
 	//#region Factories
 	// LABELS
 	registerLabelFactory(labelFactory: AbstractLabelFactory) {
-		this.labelFactories[labelFactory.type] = labelFactory;
+		this.labelFactories.set(labelFactory.type, labelFactory);
 	}
 
 	getLabelFactories(): TypedMap<AbstractLabelFactory> {
