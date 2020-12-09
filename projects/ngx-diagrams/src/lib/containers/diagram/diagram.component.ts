@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import {
 	AfterViewInit,
 	ChangeDetectionStrategy,
@@ -5,15 +6,17 @@ import {
 	Component,
 	ElementRef,
 	EventEmitter,
+	Inject,
 	Input,
+	NgZone,
 	OnDestroy,
 	Output,
 	Renderer2,
 	ViewChild,
 	ViewContainerRef,
 } from '@angular/core';
-import { BehaviorSubject, combineLatest, defer, Observable, ReplaySubject } from 'rxjs';
-import { filter, map, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, ReplaySubject } from 'rxjs';
+import { filter, take, takeUntil, tap } from 'rxjs/operators';
 import { BaseAction, InvalidLinkDestroyed, LinkCreatedAction, MoveCanvasAction, SelectingAction } from '../../actions';
 import { LooseLinkDestroyed } from '../../actions/loose-link-destroyed.action';
 import { MoveItemsAction } from '../../actions/move-items.action';
@@ -24,7 +27,8 @@ import { LinkModel } from '../../models/link.model';
 import { NodeModel } from '../../models/node.model';
 import { PointModel } from '../../models/point.model';
 import { PortModel } from '../../models/port.model';
-import { HashMap, TypedMap } from '../../utils/types';
+import { OutsideZone, ZonedClass } from '../../utils/decorators';
+import { TypedMap } from '../../utils/types';
 
 @Component({
 	selector: 'ngdx-diagram',
@@ -32,7 +36,7 @@ import { HashMap, TypedMap } from '../../utils/types';
 	styleUrls: ['diagram.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
+export class NgxDiagramComponent implements AfterViewInit, OnDestroy, ZonedClass {
 	// eslint-disable-next-line @angular-eslint/no-input-rename
 	@Input('model') diagramModel: DiagramModel;
 	@Input() allowCanvasZoom = true;
@@ -57,25 +61,30 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 	@ViewChild('canvas', { read: ElementRef })
 	canvas: ElementRef;
 
-	layerStyles$ = defer(() =>
-		combineLatest([this.diagramModel.selectOffsetX(), this.diagramModel.selectOffsetY(), this.diagramModel.selectZoomLevel()]).pipe(
-			map(([x, y, zoom]) => this.createLayerStyle(x, y, zoom))
-		)
-	);
-
 	protected nodes$: Observable<TypedMap<NodeModel>>;
 	protected links$: Observable<TypedMap<LinkModel>>;
 	protected action$ = new BehaviorSubject<BaseAction>(null);
 	protected nodesRendered$: BehaviorSubject<boolean>;
 	protected destroyed$ = new ReplaySubject<boolean>(1);
 
-	constructor(protected renderer: Renderer2, protected cdRef: ChangeDetectorRef) {}
+	get host(): HTMLElement {
+		return this.elRef.nativeElement;
+	}
+
+	constructor(
+		@Inject(DOCUMENT) protected document: any,
+		public ngZone: NgZone,
+		protected renderer: Renderer2,
+		protected cdRef: ChangeDetectorRef,
+		protected elRef: ElementRef<HTMLElement>
+	) {}
 
 	// TODO: handle destruction of container, resetting all observables to avoid memory leaks!
 	ngAfterViewInit() {
 		if (this.diagramModel) {
 			this.initNodes();
 			this.initLinks();
+			this.initSubs();
 		}
 	}
 
@@ -169,7 +178,8 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 		return null;
 	}
 
-	onMouseUp = (event: MouseEvent) => {
+	@OutsideZone
+	onMouseUp(event: MouseEvent) {
 		const diagramEngine = this.diagramModel.getDiagramEngine();
 		const action = this.action$.getValue();
 		// are we going to connect a link to something?
@@ -274,16 +284,15 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 			this.stopFiringAction();
 		}
 
-		this.mouseUpListener();
-		this.mouseMoveListener();
 		this.action$.next(null);
-	};
+	}
 
 	/**
 	 * @description Mouse Move Event Handler
 	 * @param event MouseEvent
 	 */
-	onMouseMove = (event: MouseEvent) => {
+	@OutsideZone
+	onMouseMove(event: MouseEvent) {
 		const action = this.action$.getValue();
 
 		if (action === null || action === undefined) {
@@ -393,8 +402,9 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 				this.fireAction();
 			}
 		}
-	};
+	}
 
+	@OutsideZone
 	onMouseDown(event: MouseEvent) {
 		if (event.button === 3) {
 			return;
@@ -455,67 +465,73 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 			this.startFiringAction(new MoveItemsAction(event.clientX, event.clientY, this.diagramModel.getDiagramEngine()));
 		}
 
-		// create mouseMove and mouseUp listeners
-		this.mouseMoveListener = this.renderer.listen(document, 'mousemove', this.onMouseMove);
-		this.mouseUpListener = this.renderer.listen(document, 'mouseup', this.onMouseUp);
+		this.createMouseListeners();
 	}
 
+	@OutsideZone
 	onMouseWheel(event: WheelEvent) {
-		if (this.allowCanvasZoom) {
-			event.preventDefault();
-			event.stopPropagation();
-			const currentZoomLevel = this.diagramModel.getZoomLevel();
-
-			const oldZoomFactor = currentZoomLevel / 100;
-			let scrollDelta = this.inverseZoom ? -event.deltaY : event.deltaY;
-
-			// check if it is pinch gesture
-			if (event.ctrlKey && scrollDelta % 1 !== 0) {
-				/* Chrome and Firefox sends wheel event with deltaY that
-				   have fractional part, also `ctrlKey` prop of the event is true
-				   though ctrl isn't pressed
-				*/
-				scrollDelta /= 3;
-			} else {
-				scrollDelta /= 60;
-			}
-
-			if (currentZoomLevel + scrollDelta > 10) {
-				const newZoomLvl = currentZoomLevel + scrollDelta;
-				this.diagramModel.setZoomLevel(newZoomLvl);
-			}
-
-			const updatedZoomLvl = this.diagramModel.getZoomLevel();
-			const zoomFactor = updatedZoomLvl / 100;
-
-			const boundingRect = (event.currentTarget as Element).getBoundingClientRect();
-			const clientWidth = boundingRect.width;
-			const clientHeight = boundingRect.height;
-
-			// compute difference between rect before and after scroll
-			const widthDiff = clientWidth * zoomFactor - clientWidth * oldZoomFactor;
-			const heightDiff = clientHeight * zoomFactor - clientHeight * oldZoomFactor;
-
-			// compute mouse coords relative to canvas
-			const clientX = event.clientX - boundingRect.left;
-			const clientY = event.clientY - boundingRect.top;
-
-			// compute width and height increment factor
-			const xFactor = (clientX - this.diagramModel.getOffsetX()) / oldZoomFactor / clientWidth;
-			const yFactor = (clientY - this.diagramModel.getOffsetY()) / oldZoomFactor / clientHeight;
-
-			const updatedXOffset = this.diagramModel.getOffsetX() - widthDiff * xFactor;
-			const updatedYOffset = this.diagramModel.getOffsetY() - heightDiff * yFactor;
-
-			this.diagramModel.setOffset(updatedXOffset, updatedYOffset);
+		if (!this.allowCanvasZoom) {
+			return;
 		}
+
+		event.preventDefault();
+		event.stopPropagation();
+		const currentZoomLevel = this.diagramModel.getZoomLevel();
+
+		const oldZoomFactor = currentZoomLevel / 100;
+		let scrollDelta = this.inverseZoom ? -event.deltaY : event.deltaY;
+
+		// check if it is pinch gesture
+		if (event.ctrlKey && scrollDelta % 1 !== 0) {
+			/* Chrome and Firefox sends wheel event with deltaY that
+						 have fractional part, also `ctrlKey` prop of the event is true
+						 though ctrl isn't pressed
+					*/
+			scrollDelta /= 3;
+		} else {
+			scrollDelta /= 60;
+		}
+
+		if (currentZoomLevel + scrollDelta > 10) {
+			const newZoomLvl = currentZoomLevel + scrollDelta;
+			this.diagramModel.setZoomLevel(newZoomLvl);
+		}
+
+		const updatedZoomLvl = this.diagramModel.getZoomLevel();
+		const zoomFactor = updatedZoomLvl / 100;
+
+		const boundingRect = (event.currentTarget as Element).getBoundingClientRect();
+		const clientWidth = boundingRect.width;
+		const clientHeight = boundingRect.height;
+
+		// compute difference between rect before and after scroll
+		const widthDiff = clientWidth * zoomFactor - clientWidth * oldZoomFactor;
+		const heightDiff = clientHeight * zoomFactor - clientHeight * oldZoomFactor;
+
+		// compute mouse coords relative to canvas
+		const clientX = event.clientX - boundingRect.left;
+		const clientY = event.clientY - boundingRect.top;
+
+		// compute width and height increment factor
+		const xFactor = (clientX - this.diagramModel.getOffsetX()) / oldZoomFactor / clientWidth;
+		const yFactor = (clientY - this.diagramModel.getOffsetY()) / oldZoomFactor / clientHeight;
+
+		const updatedXOffset = this.diagramModel.getOffsetX() - widthDiff * xFactor;
+		const updatedYOffset = this.diagramModel.getOffsetY() - heightDiff * yFactor;
+
+		this.diagramModel.setOffset(updatedXOffset, updatedYOffset);
 	}
 
-	protected mouseUpListener = () => {};
-	protected mouseMoveListener = () => {};
+	@OutsideZone
+	protected setLayerStyles(x: number, y: number, zoom: number): void {
+		const nodesLayer = this.getNodesLayer();
+		const linksLayer = this.getLinksLayer();
 
-	protected createLayerStyle(x: number, y: number, zoom: number): HashMap<string> {
-		return { transform: `translate(${x}px, ${y}px) scale(${zoom / 100.0})` };
+		const style = 'transform';
+		const value = `translate(${x}px, ${y}px) scale(${zoom / 100.0})`;
+
+		this.renderer.setStyle(nodesLayer, style, value);
+		this.renderer.setStyle(linksLayer, style, value);
 	}
 
 	protected initNodes() {
@@ -573,5 +589,36 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 					}
 				}
 			});
+	}
+
+	protected initSubs() {
+		combineLatest([this.diagramModel.selectOffsetX(), this.diagramModel.selectOffsetY(), this.diagramModel.selectZoomLevel()])
+			.pipe(
+				tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),
+				takeUntil(this.destroyed$)
+			)
+			.subscribe();
+	}
+
+	protected getNodesLayer(): HTMLDivElement {
+		return this.host.querySelector('.ngdx-nodes-layer');
+	}
+
+	protected getLinksLayer(): HTMLDivElement {
+		return this.host.querySelector('.ngdx-links-layer');
+	}
+
+	protected createMouseListeners() {
+		const mouseUp$ = fromEvent<MouseEvent>(this.document, 'mouseup').pipe(
+			tap(e => this.onMouseUp(e)),
+			take(1)
+		);
+
+		const mouseMove$ = fromEvent<MouseEvent>(this.document, 'mousemove').pipe(
+			tap(e => this.onMouseMove(e)),
+			takeUntil(mouseUp$)
+		);
+
+		merge(mouseMove$, mouseUp$).subscribe();
 	}
 }

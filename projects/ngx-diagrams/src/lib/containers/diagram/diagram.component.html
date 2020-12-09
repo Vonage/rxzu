@@ -1,10 +1,4 @@
-<div
-	class="ngdx-diagram"
-	*templateVar="layerStyles$ | async as layerStyles"
-	#canvas
-	(mousedown)="onMouseDown($event)"
-	(wheel)="onMouseWheel($event)"
->
+<div class="ngdx-diagram" #canvas (mousedown)="onMouseDown($event)" (wheel)="onMouseWheel($event)">
 	<!-- Nodes Layer -->
 	<div class="ngdx-nodes-layer" [ngStyle]="layerStyles">
 		<ng-template #nodesLayer></ng-template>
