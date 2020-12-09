@@ -129,16 +129,11 @@ export class DiagramModel extends BaseEntity {
 	}
 
 	reset() {
-		const ports = Array.from(this.getAllPorts().values());
 		const links = Object.values(this.getLinks());
 		const nodes = Object.values(this.getNodes());
 
 		for (const node of nodes) {
 			node.destroy();
-		}
-
-		for (const port of ports) {
-			port.destroy();
 		}
 
 		for (const link of links) {
