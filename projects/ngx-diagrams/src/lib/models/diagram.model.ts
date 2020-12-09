@@ -4,17 +4,16 @@ import { Coords } from '../interfaces/coords.interface';
 import { SelectOptions } from '../interfaces/select-options.interface';
 import { SerializedDiagramModel } from '../interfaces/serialization.interface';
 import { DiagramEngine } from '../services/engine.service';
-import { arrayToMap, ID, isArray } from '../utils/tool-kit.util';
-import { HashMap, TypedMap } from '../utils/types';
+import { coerceArray, ID, isEmptyArray, unique } from '../utils/tool-kit.util';
+import { TypedMap } from '../utils/types';
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { NodeModel } from './node.model';
-import { PointModel } from './point.model';
 import { PortModel } from './port.model';
 
 export class DiagramModel extends BaseEntity {
 	protected _links$ = new BehaviorSubject<TypedMap<LinkModel>>(new TypedMap());
-	protected _nodes$ = new BehaviorSubject<HashMap<NodeModel>>({});
+	protected _nodes$ = new BehaviorSubject<TypedMap<NodeModel>>(new TypedMap());
 	protected _zoom$ = new BehaviorSubject(100);
 	protected _offsetX$ = new BehaviorSubject(0);
 	protected _offsetY$ = new BehaviorSubject(0);
@@ -35,12 +34,12 @@ export class DiagramModel extends BaseEntity {
 
 	// TODO: support the following events for links and nodes
 	// removed, updated<positionChanged/dataChanged>, added
-	getNodes(): HashMap<NodeModel> {
+	getNodes(): TypedMap<NodeModel> {
 		return this._nodes$.getValue();
 	}
 
-	getNode(id: ID): NodeModel | null {
-		return this._nodes$.getValue()[id];
+	getNode(id: ID): NodeModel | undefined {
+		return this._nodes$.getValue().get(id);
 	}
 
 	getLink(id: ID): LinkModel | undefined {
@@ -51,21 +50,15 @@ export class DiagramModel extends BaseEntity {
 		return this._links$.getValue();
 	}
 
-	getAllPorts(options?: SelectOptions<PortModel>): Map<string, PortModel> {
-		const portsMap = new Map();
-		// TODO: optimize!
-		Object.values(this.getNodes()).forEach(node => {
-			for (const [key, port] of Object.entries(node.getPorts())) {
-				if (options.filter) {
-					if (options.filter(port as PortModel)) {
-						portsMap.set(key, port);
-					}
-				} else {
-					portsMap.set(key, port);
-				}
-			}
-		});
-		return portsMap;
+	getAllPorts(options: SelectOptions<PortModel> = {}): Map<string, PortModel> {
+		const result = new Map<string, PortModel>();
+
+		for (const node of this.getNodes().values()) {
+			const ports = options.filter ? node.getPorts().valuesArray().filter(options.filter) : node.getPorts().valuesArray();
+			ports.forEach(port => result.set(port.id, port));
+		}
+
+		return result;
 	}
 
 	/**
@@ -73,7 +66,8 @@ export class DiagramModel extends BaseEntity {
 	 * @returns Inserted Node
 	 */
 	addNode(node: NodeModel): NodeModel {
-		this._nodes$.next({ ...this._nodes$.value, [node.id]: node });
+		this.getNodes().set(node.id, node);
+		this._nodes$.next(this.getNodes());
 		return node;
 	}
 
@@ -81,27 +75,23 @@ export class DiagramModel extends BaseEntity {
 	 * Delete a node from the diagram
 	 */
 	deleteNode(nodeOrId: NodeModel | string): void {
-		const nodeID: ID = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
-		const node = this.getNode(nodeID);
+		const nodeId: ID = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
+		const node = this.getNode(nodeId);
 
-		// delete all related links
-		Object.values(node.getPorts()).forEach((port: PortModel) => {
-			Object.values(port.getLinks()).forEach(link => {
+		for (const port of node.getPorts().values()) {
+			for (const link of port.getLinks().values()) {
 				this.deleteLink(link);
-			});
-		});
+			}
+		}
 
-		const updNodes = { ...this.getNodes() };
-		delete updNodes[nodeID];
-		this._nodes$.next(updNodes);
-
+		this.getNodes().delete(nodeId);
 		node.destroy();
 	}
 
 	/**
 	 * Get nodes as observable, use `.getValue()` for snapshot
 	 */
-	selectNodes(): Observable<HashMap<NodeModel>> {
+	selectNodes(): Observable<TypedMap<NodeModel>> {
 		return this.nodes$;
 	}
 
@@ -126,23 +116,19 @@ export class DiagramModel extends BaseEntity {
 	}
 
 	reset() {
-		const ports = Array.from(this.getAllPorts().values());
-		const links = Object.values(this.getLinks());
-		const nodes = Object.values(this.getNodes());
+		const links = this.getLinks().values();
+		const nodes = this.getNodes().values();
 
 		for (const node of nodes) {
 			node.destroy();
-		}
-
-		for (const port of ports) {
-			port.destroy();
 		}
 
 		for (const link of links) {
 			link.destroy();
 		}
 
-		this._nodes$.next({});
+		this.getNodes().clear();
+		this._nodes$.next(this.getNodes());
 
 		this.getLinks().clear();
 		this._links$.next(this.getLinks());
@@ -160,8 +146,13 @@ export class DiagramModel extends BaseEntity {
 	//  * @returns diagram model as a string
 	//  */
 	serialize(): SerializedDiagramModel {
-		const serializedNodes = Object.values(this.getNodes()).map(node => node.serialize());
-		const serializedLinks = Object.values(this.getLinks()).map(link => link.serialize());
+		const serializedNodes = this.getNodes()
+			.valuesArray()
+			.map(node => node.serialize());
+		const serializedLinks = this.getLinks()
+			.valuesArray()
+			.map(link => link.serialize());
+
 		return { ...super.serialize(), nodes: serializedNodes, links: serializedLinks };
 	}
 
@@ -236,7 +227,7 @@ export class DiagramModel extends BaseEntity {
 
 	clearSelection(ignore: BaseModel | null = null) {
 		this.getSelectedItems().forEach(element => {
-			if (ignore && ignore.id === element.id) {
+			if (ignore?.id === element.id) {
 				return;
 			}
 			element.setSelected(false);
@@ -255,45 +246,39 @@ export class DiagramModel extends BaseEntity {
 	}
 
 	getSelectedItems(...filters: BaseEntityType[]): BaseModel[] {
-		if (!Array.isArray(filters)) {
-			filters = [filters];
-		}
-		let items: BaseModel[] = [];
+		filters = coerceArray(filters);
 
-		// run through nodes
-		items = items.concat(Object.values(this.getNodes()).flatMap(node => node.getSelectedEntities()));
+		const items: BaseModel[] = [];
+		const nodes = this.getNodes().valuesArray();
+		const links = this.getLinks().valuesArray();
 
-		// find all the links
-		items = items.concat(Object.values(this.getLinks()).flatMap(link => link.getSelectedEntities()));
+		const selectedNodes = () => nodes.flatMap(node => node.getSelectedEntities());
+		const selectedPorts = () =>
+			nodes.flatMap(node =>
+				node
+					.getPorts()
+					.valuesArray()
+					.flatMap((port: PortModel) => port.getSelectedEntities())
+			);
+		const selectedLinks = () => links.flatMap(link => link.getSelectedEntities());
+		const selectedPoints = () => links.flatMap(link => link.getPoints().flatMap(point => point.getSelectedEntities()));
 
-		// find all points
-		items = items.concat(
-			Object.values(this.getLinks()).flatMap(link => {
-				return link.getPoints().flatMap(point => point.getSelectedEntities());
-			})
-		);
+		if (isEmptyArray(filters)) {
+			items.push(...selectedNodes(), ...selectedPorts(), ...selectedLinks(), ...selectedPoints());
+		} else {
+			const byType: Record<BaseEntityType, () => BaseModel[]> = {
+				node: selectedNodes,
+				port: selectedPorts,
+				link: selectedLinks,
+				point: selectedPoints,
+			};
 
-		items = [...new Set(items)];
-
-		if (filters.length > 0) {
-			items = items.filter((item: BaseModel) => {
-				if (filters.includes('node') && item instanceof NodeModel) {
-					return true;
-				}
-				if (filters.includes('link') && item instanceof LinkModel) {
-					return true;
-				}
-				if (filters.includes('port') && item instanceof PortModel) {
-					return true;
-				}
-				if (filters.includes('point') && item instanceof PointModel) {
-					return true;
-				}
-				return false;
-			});
+			for (const type of filters) {
+				items.push(...byType[type]());
+			}
 		}
 
-		return items;
+		return unique(items);
 	}
 
 	addAll(...models: BaseModel[]) {
@@ -322,8 +307,10 @@ export class DiagramModel extends BaseEntity {
 		this._links$.next(this.getLinks());
 	}
 
-	addNodes(nodes: NodeModel[] | HashMap<NodeModel>) {
-		const added = isArray(nodes) ? arrayToMap(nodes) : nodes;
-		this._nodes$.next({ ...this.getNodes(), ...added });
+	addNodes(nodes: NodeModel[]) {
+		for (const node of nodes) {
+			this.getNodes().set(node.id, node);
+		}
+		this._nodes$.next(this.getNodes());
 	}
 }

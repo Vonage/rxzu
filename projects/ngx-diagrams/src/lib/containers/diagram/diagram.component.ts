@@ -63,7 +63,7 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 		)
 	);
 
-	protected nodes$: Observable<HashMap<NodeModel>>;
+	protected nodes$: Observable<TypedMap<NodeModel>>;
 	protected links$: Observable<TypedMap<LinkModel>>;
 	protected action$ = new BehaviorSubject<BaseAction>(null);
 	protected nodesRendered$: BehaviorSubject<boolean>;
@@ -258,9 +258,10 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 						link.destroy();
 						this.startFiringAction(new InvalidLinkDestroyed(event.clientX, event.clientY, link));
 					} else if (
-						Object.values(targetPort.getLinks()).some(
-							(l: LinkModel) => l !== link && (l.getSourcePort() === sourcePort || l.getTargetPort() === sourcePort)
-						)
+						targetPort
+							.getLinks()
+							.valuesArray()
+							.some(link => link !== link && (link.getSourcePort() === sourcePort || link.getTargetPort() === sourcePort))
 					) {
 						// link is a duplicate
 						link.destroy();
@@ -292,7 +293,7 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 		if (action instanceof SelectingAction) {
 			const relative = this.diagramModel.getDiagramEngine().getRelativePoint(event.clientX, event.clientY);
 
-			Object.values(this.diagramModel.getNodes()).forEach(node => {
+			this.diagramModel.getNodes().forEach(node => {
 				if ((action as SelectingAction).containsElement(node.getCoords(), this.diagramModel)) {
 					node.setSelected();
 				} else {
@@ -300,8 +301,9 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 				}
 			});
 
-			Object.values(this.diagramModel.getLinks()).forEach(link => {
+			this.diagramModel.getLinks().forEach(link => {
 				let allSelected = true;
+
 				link.getPoints().forEach(point => {
 					if ((action as SelectingAction).containsElement(point.getCoords(), this.diagramModel)) {
 						point.setSelected();
@@ -361,7 +363,7 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 
 					if (selectionModel.model instanceof NodeModel) {
 						// update port coordinates as well
-						Object.values(selectionModel.model.getPorts()).forEach(port => {
+						selectionModel.model.getPorts().forEach(port => {
 							const portCoords = this.diagramModel.getDiagramEngine().getPortCoords(port);
 							port.updateCoords(portCoords);
 						});
@@ -530,12 +532,12 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
 		this.nodes$.pipe(takeUntil(this.destroyed$)).subscribe(nodes => {
 			this.nodesRendered$.next(false);
 
-			Object.values(nodes).forEach(node => {
+			for (const node of nodes.values()) {
 				if (!node.getPainted()) {
 					this.diagramModel.getDiagramEngine().generateWidgetForNode(node, this.nodesLayer);
 					this.cdRef.detectChanges();
 				}
-			});
+			}
 
 			this.nodesRendered$.next(true);
 		});

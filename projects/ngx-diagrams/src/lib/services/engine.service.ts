@@ -17,16 +17,16 @@ import { NodeModel } from '../models/node.model';
 import { PortModel } from '../models/port.model';
 import { NgxDiagramsModule } from '../ngx-diagrams.module';
 import { PathFinding, ROUTING_SCALING_FACTOR } from '../plugins/smart-routing.plugin';
-import { HashMap } from '../utils/types';
+import { TypedMap } from '../utils/types';
 
 @Injectable({ providedIn: NgxDiagramsModule })
 export class DiagramEngine {
 	protected _renderer: Renderer2;
-	protected nodeFactories: HashMap<AbstractNodeFactory>;
-	protected labelFactories: HashMap<AbstractLabelFactory>;
-	protected linkFactories: HashMap<AbstractLinkFactory>;
-	protected portFactories: HashMap<AbstractPortFactory>;
-	protected canvas$: BehaviorSubject<Element>;
+	protected nodeFactories = new TypedMap<AbstractNodeFactory>();
+	protected labelFactories = new TypedMap<AbstractLabelFactory>();
+	protected linkFactories = new TypedMap<AbstractLinkFactory>();
+	protected portFactories = new TypedMap<AbstractPortFactory>();
+	protected canvas$ = new BehaviorSubject<Element>(null);
 
 	// smart routing related properties
 	smartRouting: boolean;
@@ -44,11 +44,6 @@ export class DiagramEngine {
 
 	constructor(protected resolver: ComponentFactoryResolver, protected rendererFactory: RendererFactory2) {
 		this._renderer = this.rendererFactory.createRenderer(null, null);
-		this.nodeFactories = {};
-		this.linkFactories = {};
-		this.portFactories = {};
-		this.labelFactories = {};
-		this.canvas$ = new BehaviorSubject<Element>(null);
 	}
 
 	createDiagram() {
@@ -69,13 +64,13 @@ export class DiagramEngine {
 		this.labelFactories[labelFactory.type] = labelFactory;
 	}
 
-	getLabelFactories(): HashMap<AbstractLabelFactory> {
+	getLabelFactories(): TypedMap<AbstractLabelFactory> {
 		return this.labelFactories;
 	}
 
 	getLabelFactory(type: string): AbstractLabelFactory {
-		if (this.labelFactories[type]) {
-			return this.labelFactories[type];
+		if (this.labelFactories.has(type)) {
+			return this.labelFactories.get(type);
 		}
 		throw new Error(`cannot find factory for node of type: [${type}]`);
 	}
@@ -94,16 +89,16 @@ export class DiagramEngine {
 
 	// NODES
 	registerNodeFactory(nodeFactory: AbstractNodeFactory) {
-		this.nodeFactories[nodeFactory.type] = nodeFactory;
+		this.nodeFactories.set(nodeFactory.type, nodeFactory);
 	}
 
-	getNodeFactories(): HashMap<AbstractNodeFactory> {
+	getNodeFactories(): TypedMap<AbstractNodeFactory> {
 		return this.nodeFactories;
 	}
 
 	getNodeFactory(type: string): AbstractNodeFactory {
-		if (this.nodeFactories[type]) {
-			return this.nodeFactories[type];
+		if (this.nodeFactories.has(type)) {
+			return this.nodeFactories.get(type);
 		}
 		throw new Error(`cannot find factory for node of type: [${type}]`);
 	}
@@ -122,7 +117,7 @@ export class DiagramEngine {
 
 	// PORTS
 	registerPortFactory(factory: AbstractPortFactory) {
-		this.portFactories[factory.type] = factory;
+		this.portFactories.set(factory.type, factory);
 	}
 
 	getPortFactories() {
@@ -130,8 +125,8 @@ export class DiagramEngine {
 	}
 
 	getPortFactory(type: string): AbstractPortFactory {
-		if (this.portFactories[type]) {
-			return this.portFactories[type];
+		if (this.portFactories.has(type)) {
+			return this.portFactories.get(type);
 		}
 		throw new Error(`cannot find factory for port of type: [${type}]`);
 	}
@@ -149,17 +144,17 @@ export class DiagramEngine {
 	}
 
 	// LINKS
-	getLinkFactories(): HashMap<AbstractLinkFactory> {
+	getLinkFactories(): TypedMap<AbstractLinkFactory> {
 		return this.linkFactories;
 	}
 
 	registerLinkFactory(factory: AbstractLinkFactory) {
-		this.linkFactories[factory.type] = factory;
+		this.linkFactories.set(factory.type, factory);
 	}
 
 	getLinkFactory(type: string): AbstractLinkFactory {
-		if (this.linkFactories[type]) {
-			return this.linkFactories[type];
+		if (this.linkFactories.has(type)) {
+			return this.linkFactories.get(type);
 		}
 		throw new Error(`cannot find factory for link of type: [${type}]`);
 	}
@@ -340,14 +335,17 @@ export class DiagramEngine {
 		height: number;
 		vAdjustmentFactor: number;
 	} {
-		const allNodesCoords = Object.values(this.diagramModel.getNodes()).map(item => ({
-			x: item.getCoords().x,
-			width: item.getWidth(),
-			y: item.getCoords().y,
-			height: item.getHeight(),
-		}));
+		const allNodesCoords = this.diagramModel
+			.getNodes()
+			.valuesArray()
+			.map(item => ({
+				x: item.getCoords().x,
+				width: item.getWidth(),
+				y: item.getCoords().y,
+				height: item.getHeight(),
+			}));
 
-		const allLinks = Object.values(this.diagramModel.getLinks());
+		const allLinks = this.diagramModel.getLinks().valuesArray();
 
 		const allPortsCoords = allLinks
 			.flatMap(link => [link.getSourcePort(), link.getTargetPort()])
@@ -492,7 +490,7 @@ export class DiagramEngine {
 	 * Updates (by reference) where nodes will be drawn on the matrix passed in.
 	 */
 	markNodes(matrix: number[][]): void {
-		Object.values(this.diagramModel.getNodes()).forEach(node => {
+		this.diagramModel.getNodes().forEach(node => {
 			const startX = Math.floor(node.getCoords().x / ROUTING_SCALING_FACTOR);
 			const endX = Math.ceil((node.getCoords().x + node.getWidth()) / ROUTING_SCALING_FACTOR);
 			const startY = Math.floor(node.getCoords().y / ROUTING_SCALING_FACTOR);
@@ -510,14 +508,18 @@ export class DiagramEngine {
 	 * Updates (by reference) where ports will be drawn on the matrix passed in.
 	 */
 	markPorts(matrix: number[][]): void {
-		const allElements = Object.values(this.diagramModel.getLinks()).flatMap(link => [].concat(link.getSourcePort(), link.getTargetPort()));
+		const allElements = this.diagramModel
+			.getLinks()
+			.valuesArray()
+			.flatMap(link => [link.getSourcePort(), link.getTargetPort()]);
+
 		allElements
 			.filter(port => port !== null)
 			.forEach(port => {
-				const startX = Math.floor(port.x / ROUTING_SCALING_FACTOR);
-				const endX = Math.ceil((port.x + port.width) / ROUTING_SCALING_FACTOR);
-				const startY = Math.floor(port.y / ROUTING_SCALING_FACTOR);
-				const endY = Math.ceil((port.y + port.height) / ROUTING_SCALING_FACTOR);
+				const startX = Math.floor(port.getX() / ROUTING_SCALING_FACTOR);
+				const endX = Math.ceil((port.getX() + port.getWidth()) / ROUTING_SCALING_FACTOR);
+				const startY = Math.floor(port.getY() / ROUTING_SCALING_FACTOR);
+				const endY = Math.ceil((port.getY() + port.getHeight()) / ROUTING_SCALING_FACTOR);
 
 				for (let x = startX - 1; x <= endX + 1; x++) {
 					for (let y = startY - 1; y < endY + 1; y++) {

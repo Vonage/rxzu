@@ -1,6 +1,7 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, shareReplay, takeUntil } from 'rxjs/operators';
-import { HashMap } from '../utils/types';
+import { ID, isString } from '../utils';
+import { TypedMap } from '../utils/types';
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { NodeModel } from './node.model';
@@ -11,7 +12,7 @@ export class PortModel extends BaseModel<NodeModel> {
 	protected maximumLinks: number;
 	protected linkType: string;
 
-	protected _links$ = new BehaviorSubject<HashMap<LinkModel>>({});
+	protected _links$ = new BehaviorSubject<TypedMap<LinkModel>>(new TypedMap());
 	protected _x$ = new BehaviorSubject(0);
 	protected _y$ = new BehaviorSubject(0);
 	protected _magnetic$ = new BehaviorSubject(true);
@@ -64,7 +65,7 @@ export class PortModel extends BaseModel<NodeModel> {
 	}
 
 	getCanCreateLinks(): boolean {
-		const numberOfLinks: number = Object.keys(this._links$.getValue()).length;
+		const numberOfLinks = this.getLinks().size;
 
 		if (this.maximumLinks && numberOfLinks >= this.maximumLinks) {
 			return false;
@@ -137,21 +138,23 @@ export class PortModel extends BaseModel<NodeModel> {
 		this.linkType = type;
 	}
 
-	removeLink(link: LinkModel) {
-		const links = this._links$.getValue();
-		delete links[link.id];
-		this._links$.next({ ...links });
+	removeLink(linkOrId: ID | LinkModel) {
+		const linkId = isString(linkOrId) ? linkOrId : linkOrId.id;
+
+		this.getLinks().delete(linkId);
+		this._links$.next(this.getLinks());
 	}
 
 	addLink(link: LinkModel) {
-		this._links$.next({ ...this._links$.value, [link.id]: link });
+		this.getLinks().set(link.id, link);
+		this._links$.next(this.getLinks());
 	}
 
-	getLinks(): HashMap<LinkModel> {
+	getLinks(): TypedMap<LinkModel> {
 		return this._links$.getValue();
 	}
 
-	selectLinks(): Observable<HashMap<LinkModel>> {
+	selectLinks(): Observable<TypedMap<LinkModel>> {
 		return this.links$;
 	}
 
@@ -179,8 +182,8 @@ export class PortModel extends BaseModel<NodeModel> {
 	destroy() {
 		super.destroy();
 
-		Object.values(this.getLinks()).forEach(link => {
+		for (const link of this.getLinks().values()) {
 			link.destroy();
-		});
+		}
 	}
 }

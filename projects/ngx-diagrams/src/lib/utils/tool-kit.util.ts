@@ -57,7 +57,12 @@ export function withLog(message: string, level: LOG_LEVEL = LOG_LEVEL.LOG, ...ar
  */
 export function entityProperty<Y>(destroyedNotifier: Observable<Y>, replayBy: number = 1, logMessage: string = '') {
 	return <T>(source: Observable<T>) =>
-		source.pipe(takeUntil(destroyedNotifier), distinctUntilChanged(), shareReplay(replayBy), withLog(logMessage));
+		source.pipe(
+			distinctUntilChanged((a, b) => (a instanceof Map || b instanceof Map ? false : a === b)),
+			shareReplay(replayBy),
+			withLog(logMessage),
+			takeUntil(destroyedNotifier)
+		);
 }
 
 export type ID = string;
@@ -97,6 +102,10 @@ export function coerceArray<T>(value: T | T[]): T[] {
 	return Array.isArray(value) ? value : [value];
 }
 
+export function isEmptyArray<T>(arr: T[]): boolean {
+	return !arr || !isArray(arr) || arr.length === 0;
+}
+
 export function mapToArray<T>(map: HashMap<T>): T[] {
 	const result = [];
 	for (const key in map) {
@@ -117,6 +126,10 @@ export function arrayToMap<T>(arr: Array<{ id: ID } & T>): HashMap<T> {
 	}
 
 	return result;
+}
+
+export function unique<T>(arr: T[]): T[] {
+	return [...new Set<T>(arr)];
 }
 
 export function generateLinePath(firstPoint: any, lastPoint: any): string {

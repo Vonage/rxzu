@@ -119,9 +119,11 @@ export class LinkModel extends BaseModel<DiagramModel> {
 		if (this.sourcePort !== null && this.sourcePort.id === port.id) {
 			return this.getFirstPoint();
 		}
+
 		if (this.targetPort !== null && this.targetPort.id === port.id) {
 			return this.getLastPoint();
 		}
+
 		return null;
 	}
 

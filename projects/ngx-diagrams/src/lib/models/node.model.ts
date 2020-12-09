@@ -4,8 +4,8 @@ import { Coords } from '../interfaces/coords.interface';
 import { Dimensions } from '../interfaces/dimensions.interface';
 import { SerializedNodeModel } from '../interfaces/serialization.interface';
 import { DiagramEngine } from '../services/engine.service';
-import { ID, mapToArray } from '../utils/tool-kit.util';
-import { HashMap } from '../utils/types';
+import { ID } from '../utils/tool-kit.util';
+import { HashMap, TypedMap } from '../utils/types';
 import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
 import { PortModel } from './port.model';
@@ -13,7 +13,7 @@ import { PortModel } from './port.model';
 export class NodeModel<P extends PortModel = PortModel> extends BaseModel<DiagramModel> {
 	protected readonly _diagramEngine$ = new BehaviorSubject<DiagramEngine>(null);
 	protected readonly _extras$ = new BehaviorSubject<HashMap<any>>({});
-	protected readonly _ports$ = new BehaviorSubject<HashMap<P>>({});
+	protected readonly _ports$ = new BehaviorSubject<TypedMap<P>>(new TypedMap());
 	protected readonly _coords$ = new BehaviorSubject<Coords>({ x: 0, y: 0 });
 	protected readonly _dimensions$ = new BehaviorSubject<Dimensions>({ width: 0, height: 0 });
 
@@ -58,19 +58,27 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 	setCoords({ x, y }: Coords) {
 		const { x: oldX, y: oldY } = this.getCoords();
 
-		Object.values(this._ports$.getValue()).forEach(port => {
-			Object.values(port.getLinks()).forEach(link => {
-				const point = link.getPointForPort(port);
-				const { x: pointX, y: pointY } = point.getCoords();
-				point.setCoords({ x: pointX + x - oldX, y: pointY + y - oldY });
+		this.getPorts()
+			.valuesArray()
+			.forEach(port => {
+				port
+					.getLinks()
+					.valuesArray()
+					.forEach(link => {
+						const point = link.getPointForPort(port);
+						const { x: pointX, y: pointY } = point.getCoords();
+						point.setCoords({ x: pointX + x - oldX, y: pointY + y - oldY });
+					});
 			});
-		});
 
 		this._coords$.next({ x, y });
 	}
 
 	serialize(): SerializedNodeModel {
-		const serializedPorts = Object.values(this.getPorts()).map((port: P) => port.serialize());
+		const serializedPorts = this.getPorts()
+			.valuesArray()
+			.map((port: P) => port.serialize());
+
 		return {
 			...super.serialize(),
 			nodeType: this.getType(),
@@ -88,14 +96,15 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 
 		// add the points of each link that are selected here
 		if (this.getSelected()) {
-			Object.values(this._ports$.getValue()).forEach(port => {
-				const links = Object.values(port.getLinks());
-				entities = entities.concat(
-					links.map(link => {
-						return link.getPointForPort(port);
-					})
-				);
-			});
+			this.getPorts()
+				.valuesArray()
+				.forEach(port => {
+					const points = port
+						.getLinks()
+						.valuesArray()
+						.map(link => link.getPointForPort(port));
+					entities = entities.concat(points);
+				});
 		}
 
 		this.log('selectedEntities', entities);
@@ -125,35 +134,35 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 	 */
 	addPort(port: P): P {
 		port.setParent(this);
-		this._ports$.next({ ...this._ports$.getValue(), [port.id]: port });
+		this.getPorts().set(port.id, port);
+		this._ports$.next(this.getPorts());
 		return port;
 	}
 
-	removePort(port: P): string {
-		const updatedPorts = this._ports$.getValue();
-
-		delete updatedPorts[port.id];
-		this._ports$.next({ ...updatedPorts });
+	removePort(portOrId: ID | P): string {
+		const portId = typeof portOrId === 'string' ? portOrId : portOrId.id;
+		const port = this.getPorts().get(portId);
 
 		port.destroy();
+		this.getPorts().delete(portId);
 
 		return port.id;
 	}
 
 	getPort(id: ID): P {
-		return this._ports$.value[id];
+		return this.getPorts().get(id);
 	}
 
 	selectPorts(selector?: () => boolean | ID | ID[]): Observable<P[]> {
 		// TODO: implement selector
 		// TODO: create coerce func
 		return this.ports$.pipe(
-			map(ports => mapToArray(ports)),
+			map(ports => ports.valuesArray()),
 			this.withLog('selectPorts')
 		);
 	}
 
-	getPorts(): HashMap<P | P[]> {
+	getPorts(): TypedMap<P> {
 		return this._ports$.getValue();
 	}
 
@@ -211,5 +220,16 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 	selectExtras<E = any>(selector?: (extra: E) => E[keyof E] | string | string[]) {
 		// TODO: impl selector
 		return this.extras$;
+	}
+
+	removeAllPorts(): void {
+		for (const port of this.getPorts().values()) {
+			this.removePort(port);
+		}
+	}
+
+	destroy() {
+		this.removeAllPorts();
+		super.destroy();
 	}
 }
