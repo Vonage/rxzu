@@ -1,11 +1,11 @@
 <div class="ngdx-diagram" #canvas (mousedown)="onMouseDown($event)" (wheel)="onMouseWheel($event)">
 	<!-- Nodes Layer -->
-	<div class="ngdx-nodes-layer" [ngStyle]="layerStyles">
+	<div class="ngdx-nodes-layer">
 		<ng-template #nodesLayer></ng-template>
 	</div>
 
 	<!-- Links Layer -->
-	<div class="ngdx-links-layer" [ngStyle]="layerStyles">
+	<div class="ngdx-links-layer">
 		<ng-template #linksLayer></ng-template>
 	</div>
 
