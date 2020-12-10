@@ -115,7 +115,6 @@ export class DiagramModel extends BaseEntity {
 	reset() {
 		this.nodes$.clear().emit();
 		this.links$.clear().emit();
-		console.log(this);
 	}
 
 	/**
