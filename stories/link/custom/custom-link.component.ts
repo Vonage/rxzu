@@ -1,21 +1,27 @@
-import { Component, AfterViewInit, ViewChild, ViewContainerRef } from '@angular/core';
-import { DefaultLinkModel, generateCurvePath, Coords } from 'ngx-diagrams';
-import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, ViewContainerRef } from '@angular/core';
+import { Coords, DefaultLinkModel, generateCurvePath } from 'ngx-diagrams';
+import { BehaviorSubject, combineLatest } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Component({
 	selector: 'custom-link',
 	templateUrl: './custom-link.component.html',
 	styleUrls: ['./custom-link.component.scss'],
+	changeDetection: ChangeDetectionStrategy.Default,
 })
 export class CustomLinkComponent extends DefaultLinkModel implements AfterViewInit {
-	@ViewChild('labelLayer', { read: ViewContainerRef, static: true }) labelLayer: ViewContainerRef;
+	@ViewChild('labelLayer', { read: ViewContainerRef, static: true })
+	labelLayer: ViewContainerRef;
 
-	_path$: BehaviorSubject<string> = new BehaviorSubject(null);
-	path$: Observable<string> = this._path$.pipe(this.entityPipe('path'));
+	_path$: BehaviorSubject<string> = new BehaviorSubject('');
+	path$ = this._path$.pipe(
+		this.entityPipe('path'),
+		tap(() => this.cd.detectChanges())
+	);
 
 	hover = false;
 
-	constructor() {
+	constructor(private cd: ChangeDetectorRef) {
 		super({ type: 'custom-link', logPrefix: '[CustomLink]' });
 	}
 

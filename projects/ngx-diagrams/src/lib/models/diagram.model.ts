@@ -1,9 +1,10 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { BaseEntity, BaseEntityType } from '../base.entity';
 import { Coords } from '../interfaces/coords.interface';
 import { SelectOptions } from '../interfaces/select-options.interface';
 import { SerializedDiagramModel } from '../interfaces/serialization.interface';
 import { DiagramEngine } from '../services/engine.service';
+import { createEntityState, createValueState } from '../utils/state';
 import { coerceArray, ID, isEmptyArray, unique } from '../utils/tool-kit.util';
 import { TypedMap } from '../utils/types';
 import { BaseModel } from './base.model';
@@ -12,21 +13,14 @@ import { NodeModel } from './node.model';
 import { PortModel } from './port.model';
 
 export class DiagramModel extends BaseEntity {
-	protected _links$ = new BehaviorSubject<TypedMap<LinkModel>>(new TypedMap());
-	protected _nodes$ = new BehaviorSubject<TypedMap<NodeModel>>(new TypedMap());
-	protected _zoom$ = new BehaviorSubject(100);
-	protected _offsetX$ = new BehaviorSubject(0);
-	protected _offsetY$ = new BehaviorSubject(0);
-	protected _gridSize$ = new BehaviorSubject(0);
-	protected _maxZoomOut$ = new BehaviorSubject(null);
-	protected _maxZoomIn$ = new BehaviorSubject(null);
-
-	protected nodes$ = this._nodes$.pipe(this.entityPipe('nodes'));
-	protected links$ = this._links$.pipe(this.entityPipe('links'));
-
-	protected offsetX$ = this._offsetX$.pipe(this.entityPipe('offsetX'));
-	protected offsetY$ = this._offsetY$.pipe(this.entityPipe('offsetY'));
-	protected zoom$ = this._zoom$.pipe(this.entityPipe('zoom'));
+	protected nodes$ = createEntityState<NodeModel>([], this.entityPipe('nodes'));
+	protected links$ = createEntityState<LinkModel>([], this.entityPipe('links'));
+	protected offsetX$ = createValueState(0, this.entityPipe('offsetX'));
+	protected offsetY$ = createValueState(0, this.entityPipe('offsetY'));
+	protected zoom$ = createValueState(100, this.entityPipe('zoom'));
+	protected maxZoomOut$ = createValueState<number>(null);
+	protected maxZoomIn$ = createValueState<number>(null);
+	protected gridSize$ = createValueState<number>(0);
 
 	constructor(protected diagramEngine: DiagramEngine, id?: string, logPrefix: string = '[Diagram]') {
 		super(id, logPrefix);
@@ -35,28 +29,28 @@ export class DiagramModel extends BaseEntity {
 	// TODO: support the following events for links and nodes
 	// removed, updated<positionChanged/dataChanged>, added
 	getNodes(): TypedMap<NodeModel> {
-		return this._nodes$.getValue();
+		return this.nodes$.value;
 	}
 
 	getNode(id: ID): NodeModel | undefined {
-		return this._nodes$.getValue().get(id);
+		return this.nodes$.get(id);
 	}
 
 	getLink(id: ID): LinkModel | undefined {
-		return this._links$.getValue().get(id);
+		return this.links$.get(id);
 	}
 
 	getLinks(): TypedMap<LinkModel> {
-		return this._links$.getValue();
+		return this.links$.value;
 	}
 
 	getAllPorts(options: SelectOptions<PortModel> = {}): Map<string, PortModel> {
-		const result = new Map<string, PortModel>();
+		const result = new TypedMap<PortModel>();
 
-		for (const node of this.getNodes().values()) {
+		this.getNodes().forEach(node => {
 			const ports = options.filter ? node.getPorts().valuesArray().filter(options.filter) : node.getPorts().valuesArray();
 			ports.forEach(port => result.set(port.id, port));
-		}
+		});
 
 		return result;
 	}
@@ -66,8 +60,7 @@ export class DiagramModel extends BaseEntity {
 	 * @returns Inserted Node
 	 */
 	addNode(node: NodeModel): NodeModel {
-		this.getNodes().set(node.id, node);
-		this._nodes$.next(this.getNodes());
+		this.nodes$.add(node).emit();
 		return node;
 	}
 
@@ -84,15 +77,14 @@ export class DiagramModel extends BaseEntity {
 			}
 		}
 
-		this.getNodes().delete(nodeId);
-		node.destroy();
+		this.nodes$.remove(nodeId).emit();
 	}
 
 	/**
 	 * Get nodes as observable, use `.getValue()` for snapshot
 	 */
 	selectNodes(): Observable<TypedMap<NodeModel>> {
-		return this.nodes$;
+		return this.nodes$.value$;
 	}
 
 	/**
@@ -100,8 +92,7 @@ export class DiagramModel extends BaseEntity {
 	 * @returns Newly created link
 	 */
 	addLink(link: LinkModel): LinkModel {
-		this.getLinks().set(link.id, link);
-		this._links$.next(this.getLinks());
+		this.links$.add(link).emit();
 		return link;
 	}
 
@@ -110,35 +101,20 @@ export class DiagramModel extends BaseEntity {
 	 */
 	deleteLink(linkOrId: LinkModel | string) {
 		const linkId: ID = typeof linkOrId === 'string' ? linkOrId : linkOrId.id;
-		const link = this.getLink(linkId);
-		this.getLinks().delete(linkId);
-		link.destroy();
+		this.links$.remove(linkId).emit();
 	}
 
 	reset() {
-		const links = this.getLinks().values();
-		const nodes = this.getNodes().values();
-
-		for (const node of nodes) {
-			node.destroy();
-		}
-
-		for (const link of links) {
-			link.destroy();
-		}
-
-		this.getNodes().clear();
-		this._nodes$.next(this.getNodes());
-
-		this.getLinks().clear();
-		this._links$.next(this.getLinks());
+		this.nodes$.clear().emit();
+		this.links$.clear().emit();
+		console.log(this);
 	}
 
 	/**
 	 * Get links behaviour subject, use `.getValue()` for snapshot
 	 */
 	selectLinks(): Observable<TypedMap<LinkModel>> {
-		return this.links$;
+		return this.links$.value$;
 	}
 
 	// /**
@@ -146,79 +122,75 @@ export class DiagramModel extends BaseEntity {
 	//  * @returns diagram model as a string
 	//  */
 	serialize(): SerializedDiagramModel {
-		const serializedNodes = this.getNodes()
-			.valuesArray()
-			.map(node => node.serialize());
-		const serializedLinks = this.getLinks()
-			.valuesArray()
-			.map(link => link.serialize());
+		const serializedNodes = this.nodes$.map(node => node.serialize());
+		const serializedLinks = this.links$.map(link => link.serialize());
 
 		return { ...super.serialize(), nodes: serializedNodes, links: serializedLinks };
 	}
 
 	setMaxZoomOut(maxZoomOut: number) {
-		this._maxZoomOut$.next(maxZoomOut);
+		this.maxZoomOut$.set(maxZoomOut).emit();
 	}
 
 	setMaxZoomIn(maxZoomIn: number) {
-		this._maxZoomIn$.next(maxZoomIn);
+		this.maxZoomIn$.set(maxZoomIn).emit();
 	}
 
 	getMaxZoomOut() {
-		return this._maxZoomOut$.getValue();
+		return this.maxZoomOut$.value;
 	}
 
 	getMaxZoomIn() {
-		return this._maxZoomIn$.getValue();
+		return this.maxZoomIn$.value;
 	}
 
 	setOffset(x: number, y: number) {
-		this._offsetX$.next(x);
-		this._offsetY$.next(y);
+		this.offsetX$.set(x).emit();
+		this.offsetY$.set(y).emit();
 	}
 
 	setOffsetX(x: number) {
-		this._offsetX$.next(x);
+		this.offsetX$.set(x).emit();
 	}
 
 	getOffsetX(): number {
-		return this._offsetX$.getValue();
+		return this.offsetX$.value;
 	}
 
 	selectOffsetX(): Observable<number> {
-		return this.offsetX$;
+		return this.offsetX$.value$;
 	}
 
 	setOffsetY(y: number) {
-		this._offsetY$.next(y);
+		this.offsetY$.set(y).emit();
 	}
 
 	getOffsetY(): number {
-		return this._offsetY$.getValue();
+		return this.offsetY$.value;
 	}
 
 	selectOffsetY(): Observable<number> {
-		return this.offsetY$;
+		return this.offsetY$.value$;
 	}
 
 	setZoomLevel(z: number) {
-		const maxZoomIn = this._maxZoomIn$.getValue();
-		const maxZoomOut = this._maxZoomOut$.getValue();
+		const maxZoomIn = this.getMaxZoomIn();
+		const maxZoomOut = this.getMaxZoomOut();
 
 		// check if zoom levels exceeded defined boundaries
 		if ((maxZoomIn && z > maxZoomIn) || (maxZoomOut && z < maxZoomOut)) {
 			return;
 		}
 
-		this._zoom$.next(z);
+		this.zoom$.set(z).emit();
 	}
 
 	getZoomLevel(): number {
-		return this._zoom$.getValue();
+		return this.zoom$.value;
 	}
 
 	selectZoomLevel(): Observable<number> {
-		return this.zoom$;
+		return this.zoom$.value$;
 	}
 
 	getDiagramEngine(): DiagramEngine {
@@ -235,10 +207,11 @@ export class DiagramModel extends BaseEntity {
 	}
 
 	getGridPosition({ x, y }: Coords): Coords {
-		const gridSize = this._gridSize$.getValue();
+		const gridSize = this.gridSize$.value;
 		if (gridSize === 0) {
 			return { x, y };
 		}
+
 		return {
 			x: gridSize * Math.floor((x + gridSize / 2) / gridSize),
 			y: gridSize * Math.floor((y + gridSize / 2) / gridSize),
@@ -249,8 +222,8 @@ export class DiagramModel extends BaseEntity {
 		filters = coerceArray(filters);
 
 		const items: BaseModel[] = [];
-		const nodes = this.getNodes().valuesArray();
-		const links = this.getLinks().valuesArray();
+		const nodes = this.nodes$.array();
+		const links = this.links$.array();
 
 		const selectedNodes = () => nodes.flatMap(node => node.getSelectedEntities());
 		const selectedPorts = () =>
@@ -300,17 +273,16 @@ export class DiagramModel extends BaseEntity {
 	}
 
 	addLinks(links: LinkModel[]) {
-		for (const link of links) {
-			this.getLinks().set(link.id, link);
-		}
-
-		this._links$.next(this.getLinks());
+		this.links$.addMany(links).emit();
 	}
 
 	addNodes(nodes: NodeModel[]) {
-		for (const node of nodes) {
-			this.getNodes().set(node.id, node);
-		}
-		this._nodes$.next(this.getNodes());
+		this.nodes$.addMany(nodes).emit();
+	}
+
+	destroy() {
+		super.destroy();
+		this.nodes$.destroy();
+		this.links$.destroy();
 	}
 }

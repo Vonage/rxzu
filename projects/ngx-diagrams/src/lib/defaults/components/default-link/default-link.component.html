@@ -7,7 +7,7 @@
 		<path
 			[attr.stroke-width]="width"
 			[attr.stroke]="selectColor() | async"
-			[attr.d]="path$ | async"
+			[attr.d]="selectPath() | async"
 			class="default-link"
 			(mouseleave)="setHovered(false)"
 			(mouseenter)="setHovered()"
@@ -22,7 +22,7 @@
 			[attr.stroke-linecap]="'round'"
 			[attr.data-linkid]="id"
 			[attr.stroke-opacity]="(selectHovered() | async) ? '0.1' : '0'"
-			[attr.d]="path$ | async"
+			[attr.d]="selectPath() | async"
 		></path>
 	</g>
 

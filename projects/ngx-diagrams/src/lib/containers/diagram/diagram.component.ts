@@ -64,7 +64,7 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy, ZonedClass
 	protected nodes$: Observable<TypedMap<NodeModel>>;
 	protected links$: Observable<TypedMap<LinkModel>>;
 	protected action$ = new BehaviorSubject<BaseAction>(null);
-	protected nodesRendered$: BehaviorSubject<boolean>;
+	protected nodesRendered$ = new BehaviorSubject<boolean>(false);
 	protected destroyed$ = new ReplaySubject<boolean>(1);
 
 	get host(): HTMLElement {
@@ -535,12 +535,10 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy, ZonedClass
 	}
 
 	protected initNodes() {
+		this.nodes$ = this.diagramModel.selectNodes();
+
 		this.diagramModel.getDiagramEngine().setCanvas(this.canvas.nativeElement);
 		this.diagramModel.getDiagramEngine().setSmartRoutingStatus(this.smartRouting);
-
-		this.nodes$ = this.diagramModel.selectNodes();
-		this.links$ = this.diagramModel.selectLinks();
-		this.nodesRendered$ = new BehaviorSubject(false);
 
 		this.diagramModel.setMaxZoomIn(this.maxZoomIn);
 		this.diagramModel.setMaxZoomOut(this.maxZoomOut);
@@ -560,6 +558,8 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy, ZonedClass
 	}
 
 	protected initLinks() {
+		this.links$ = this.diagramModel.selectLinks();
+
 		combineLatest([this.nodesRendered$, this.links$])
 			.pipe(
 				filter(([nodesRendered]) => !!nodesRendered),

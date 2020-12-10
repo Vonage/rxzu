@@ -1,9 +1,9 @@
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { Coords } from '../interfaces/coords.interface';
 import { Dimensions } from '../interfaces/dimensions.interface';
 import { SerializedNodeModel } from '../interfaces/serialization.interface';
 import { DiagramEngine } from '../services/engine.service';
+import { createEntityState, createValueState } from '../utils';
 import { ID } from '../utils/tool-kit.util';
 import { HashMap, TypedMap } from '../utils/types';
 import { BaseModel } from './base.model';
@@ -11,17 +11,11 @@ import { DiagramModel } from './diagram.model';
 import { PortModel } from './port.model';
 
 export class NodeModel<P extends PortModel = PortModel> extends BaseModel<DiagramModel> {
-	protected readonly _diagramEngine$ = new BehaviorSubject<DiagramEngine>(null);
-	protected readonly _extras$ = new BehaviorSubject<HashMap<any>>({});
-	protected readonly _ports$ = new BehaviorSubject<TypedMap<P>>(new TypedMap());
-	protected readonly _coords$ = new BehaviorSubject<Coords>({ x: 0, y: 0 });
-	protected readonly _dimensions$ = new BehaviorSubject<Dimensions>({ width: 0, height: 0 });
-
-	protected readonly diagramEngine$ = this._diagramEngine$.pipe(this.entityPipe('diagramEngine'));
-	protected readonly extras$ = this._extras$.pipe(this.entityPipe('extras'));
-	protected readonly ports$ = this._ports$.pipe(this.entityPipe('ports'));
-	protected readonly coords$ = this._coords$.pipe(this.entityPipe('coords'));
-	protected readonly dimensions$ = this._dimensions$.pipe(this.entityPipe('dimensions'));
+	protected diagramEngine$ = createValueState<DiagramEngine>(null, this.entityPipe('diagramEngine'));
+	protected extras$ = createValueState<any>({}, this.entityPipe('extras'));
+	protected ports$ = createEntityState<P>([], this.entityPipe('ports'));
+	protected coords$ = createValueState<Coords>({ x: 0, y: 0 }, this.entityPipe('coords'));
+	protected dimensions$ = createValueState<Dimensions>({ width: 0, height: 0 }, this.entityPipe('dimensions'));
 
 	constructor(
 		nodeType: string = 'default',
@@ -39,20 +33,20 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 		this.setCoords({ x, y });
 	}
 
-	getDiagramEngine() {
-		return this._diagramEngine$.getValue();
+	getDiagramEngine(): DiagramEngine {
+		return this.diagramEngine$.value;
 	}
 
-	selectDiagramEngine() {
-		return this.diagramEngine$;
+	selectDiagramEngine(): Observable<DiagramEngine> {
+		return this.diagramEngine$.value$;
 	}
 
 	setDiagramEngine(diagramEngine: DiagramEngine) {
-		this._diagramEngine$.next(diagramEngine);
+		this.diagramEngine$.set(diagramEngine).emit();
 	}
 
 	getCoords(): Coords {
-		return this._coords$.getValue();
+		return this.coords$.value;
 	}
 
 	setCoords({ x, y }: Coords) {
@@ -71,7 +65,7 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 					});
 			});
 
-		this._coords$.next({ x, y });
+		this.coords$.set({ x, y }).emit();
 	}
 
 	serialize(): SerializedNodeModel {
@@ -113,19 +107,19 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 
 	// TODO: map to BaseEvent
 	coordsChanges(): Observable<Coords> {
-		return this.coords$;
+		return this.coords$.value$;
 	}
 
 	selectCoords(): Observable<Coords> {
-		return this.coords$;
+		return this.coords$.value$;
 	}
 
 	selectX(): Observable<number> {
-		return this.coords$.pipe(map(c => c.x));
+		return this.coords$.select(coords => coords.x);
 	}
 
 	selectY(): Observable<number> {
-		return this.coords$.pipe(map(c => c.y));
+		return this.coords$.select(coords => coords.y);
 	}
 
 	/**
@@ -134,102 +128,85 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 	 */
 	addPort(port: P): P {
 		port.setParent(this);
-		this.getPorts().set(port.id, port);
-		this._ports$.next(this.getPorts());
+		this.ports$.add(port).emit();
 		return port;
 	}
 
 	removePort(portOrId: ID | P): string {
 		const portId = typeof portOrId === 'string' ? portOrId : portOrId.id;
-		const port = this.getPorts().get(portId);
-
-		port.destroy();
-		this.getPorts().delete(portId);
-
-		return port.id;
+		this.ports$.remove(portId).emit();
+		return portId;
 	}
 
 	getPort(id: ID): P {
-		return this.getPorts().get(id);
+		return this.ports$.get(id);
 	}
 
 	selectPorts(selector?: () => boolean | ID | ID[]): Observable<P[]> {
 		// TODO: implement selector
 		// TODO: create coerce func
-		return this.ports$.pipe(
-			map(ports => ports.valuesArray()),
-			this.withLog('selectPorts')
-		);
+		return this.ports$.array$().pipe(this.withLog('selectPorts'));
 	}
 
 	getPorts(): TypedMap<P> {
-		return this._ports$.getValue();
+		return this.ports$.value;
 	}
 
-	setDimensions({ width, height }: Dimensions) {
-		this._dimensions$.next({ width, height });
+	setDimensions(dimensions: Partial<Dimensions>) {
+		this.dimensions$.set({ ...this.getDimensions(), ...dimensions }).emit();
 	}
 
 	getDimensions(): Dimensions {
-		return this._dimensions$.getValue();
+		return this.dimensions$.value;
 	}
 
 	// TODO: return BaseEvent extension
 	dimensionChanges(): Observable<Dimensions> {
-		return this.dimensions$;
+		return this.dimensions$.select();
 	}
 
 	getHeight(): number {
-		return this._dimensions$.getValue().height;
+		return this.getDimensions().height;
 	}
 
 	setHeight(height: number) {
-		return this._dimensions$.next({ width: this.getWidth(), height });
+		return this.setDimensions({ height });
 	}
 
 	getWidth(): number {
-		return this._dimensions$.getValue().width;
+		return this.getDimensions().width;
 	}
 
 	setWidth(width: number) {
-		return this._dimensions$.next({ width, height: this.getHeight() });
+		return this.setDimensions({ width });
 	}
 
 	selectWidth(): Observable<number> {
-		return this.dimensions$.pipe(
-			map(d => d.width),
-			this.withLog('selectWidth')
-		);
+		return this.dimensions$.select(d => d.width).pipe(this.withLog('selectWidth'));
 	}
 
 	selectHeight(): Observable<number> {
-		return this.dimensions$.pipe(
-			map(d => d.height),
-			this.withLog('selectHeight')
-		);
+		return this.dimensions$.select(d => d.height).pipe(this.withLog('selectHeight'));
 	}
 
 	setExtras(extras: any) {
-		this._extras$.next(extras);
+		this.extras$.set(extras).emit();
 	}
 
 	getExtras() {
-		return this._extras$.getValue();
+		return this.extras$.value;
 	}
 
-	selectExtras<E = any>(selector?: (extra: E) => E[keyof E] | string | string[]) {
-		// TODO: impl selector
-		return this.extras$;
+	selectExtras<E = any>(selector?: (extra: E) => E[keyof E] | string | string[]): Observable<E> {
+		return this.extras$.select(selector);
 	}
 
 	destroy() {
-		this.removeAllPorts();
 		super.destroy();
+		this.removeAllPorts();
 	}
 
 	removeAllPorts(): void {
-		for (const port of this.getPorts().values()) {
-			this.removePort(port);
-		}
+		this.ports$.clear().emit();
 	}
 }

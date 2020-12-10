@@ -1,37 +1,19 @@
+import { Observable } from 'rxjs';
 import { BaseEntity } from '../base.entity';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { PaintedEvent, ParentChangeEvent, SelectionEvent } from '../interfaces/event.interface';
+import { createValueState } from '../utils';
 
-export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
+export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
 	protected readonly _type: string;
-	protected readonly _parent$ = new BehaviorSubject<X>(null);
-	protected readonly _selected$ = new BehaviorSubject(false);
-	protected readonly _painted$ = new BehaviorSubject(false);
-	protected readonly _hovered$ = new BehaviorSubject(false);
 
-	protected readonly parent$ = this._parent$.pipe(
-		this.entityPipe('ParentsChange'),
-		map(p => new ParentChangeEvent<X>(this, p))
-	);
-	protected readonly selected$: Observable<SelectionEvent>;
-	protected readonly painted$: Observable<PaintedEvent>;
-	protected readonly hovered$: Observable<boolean>;
+	protected parent$ = createValueState<E>(null, this.entityPipe('ParentsChange'));
+	protected selected$ = createValueState<boolean>(false, this.entityPipe('SelectedChange'));
+	protected painted$ = createValueState(false, this.entityPipe('PaintedChange'));
+	protected hovered$ = createValueState(false, this.entityPipe('HoveredChange'));
 
 	constructor(type?: string, id?: string, logPrefix = '[Base]') {
 		super(id, logPrefix);
 		this._type = type;
-		this.selected$ = this._selected$.pipe(
-			this.entityPipe('SelectedChange'),
-			map(s => new SelectionEvent(this, s))
-		);
-
-		this.painted$ = this._painted$.pipe(
-			this.entityPipe('PaintedChange'),
-			map(p => new PaintedEvent(this, p))
-		);
-
-		this.hovered$ = this._hovered$.pipe(this.entityPipe('HoveredChange'));
 	}
 
 	serialize() {
@@ -41,40 +23,40 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 		};
 	}
 
-	getParent(): X {
-		return this._parent$.getValue();
+	getParent(): E {
+		return this.parent$.value;
 	}
 
-	setParent(parent: X): void {
-		this._parent$.next(parent);
+	setParent(parent: E): void {
+		this.parent$.set(parent).emit();
 	}
 
-	parentChanges(): Observable<ParentChangeEvent<X>> {
-		return this.parent$;
+	parentChanges(): Observable<ParentChangeEvent<E>> {
+		return this.parent$.select(p => new ParentChangeEvent(this, p));
 	}
 
 	getPainted(): boolean {
-		return this._painted$.getValue();
+		return this.painted$.value;
 	}
 
-	setPainted(painted: boolean = true) {
-		this._painted$.next(painted);
+	setPainted(painted: boolean = true): void {
+		this.painted$.set(painted).emit();
 	}
 
 	getHovered(): boolean {
-		return this._hovered$.getValue();
+		return this.hovered$.value;
 	}
 
-	setHovered(painted: boolean = true) {
-		this._hovered$.next(painted);
+	setHovered(painted: boolean = true): void {
+		this.hovered$.set(painted).emit();
 	}
 
-	selectHovered() {
-		return this.hovered$;
+	selectHovered(): Observable<boolean> {
+		return this.hovered$.value$;
 	}
 
 	paintChanges(): Observable<PaintedEvent> {
-		return this.painted$;
+		return this.painted$.select(p => new PaintedEvent(this, p));
 	}
 
 	getType(): string {
@@ -82,22 +64,22 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 	}
 
 	getSelected(): boolean {
-		return this._selected$.getValue();
+		return this.selected$.value;
 	}
 
 	selectSelected(): Observable<boolean> {
-		return this.selected$.pipe(map(e => e.isSelected));
+		return this.selected$.select();
 	}
 
-	setSelected(selected: boolean = true) {
-		this._selected$.next(selected);
+	setSelected(selected: boolean = true): void {
+		this.selected$.set(selected).emit();
 	}
 
 	selectionChanges(): Observable<SelectionEvent> {
-		return this.selected$;
+		return this.selected$.select(selected => new SelectionEvent(this, selected));
 	}
 
 	getSelectedEntities(): BaseModel[] {
-		return this._selected$.value ? [this] : [];
+		return this.getSelected() ? [this] : [];
 	}
 }

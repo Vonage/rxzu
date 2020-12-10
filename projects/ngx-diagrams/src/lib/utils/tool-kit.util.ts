@@ -3,11 +3,11 @@ import * as Path from 'paths-js/path';
 /**
  * Utility pathing and routing service
  */
-import { Observable } from 'rxjs';
+import { MonoTypeOperatorFunction, Observable } from 'rxjs';
 import { distinctUntilChanged, shareReplay, takeUntil, tap } from 'rxjs/operators';
 import { Coords } from '../interfaces/coords.interface';
 import { ROUTING_SCALING_FACTOR } from '../plugins/smart-routing.plugin';
-import { HashMap } from './types';
+import { Entries, HashMap } from './types';
 
 export enum LOG_LEVEL {
 	'LOG',
@@ -55,8 +55,12 @@ export function withLog(message: string, level: LOG_LEVEL = LOG_LEVEL.LOG, ...ar
  * rxjs entity properties operator
  * @internal
  */
-export function entityProperty<Y>(destroyedNotifier: Observable<Y>, replayBy: number = 1, logMessage: string = '') {
-	return <T>(source: Observable<T>) =>
+export function entityProperty<Y>(
+	destroyedNotifier: Observable<any>,
+	replayBy: number = 1,
+	logMessage: string = ''
+): MonoTypeOperatorFunction<Y> {
+	return <T>(source: Observable<T>): Observable<T> =>
 		source.pipe(
 			distinctUntilChanged((a, b) => (a instanceof Map || b instanceof Map ? false : a === b)),
 			shareReplay(replayBy),
@@ -112,6 +116,15 @@ export function mapToArray<T>(map: HashMap<T>): T[] {
 		if (!isNil(map[key])) {
 			result.push(map[key]);
 		}
+	}
+
+	return result;
+}
+
+export function mapToEntries<T>(map: HashMap<T>): Entries<T> {
+	const result = [];
+	for (const key in map) {
+		result.push([key, map[key]]);
 	}
 
 	return result;

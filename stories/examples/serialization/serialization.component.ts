@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { DiagramEngine, DiagramModel, DefaultNodeModel, SerializedDiagramModel } from 'ngx-diagrams';
+import { DefaultNodeModel, DiagramEngine, DiagramModel, SerializedDiagramModel } from 'ngx-diagrams';
 
 @Component({
 	selector: 'app-root',
@@ -7,6 +7,7 @@ import { DiagramEngine, DiagramModel, DefaultNodeModel, SerializedDiagramModel }
 		<div class="action-bar">
 			<button (click)="serialize()">Serialize Diagram Model</button>
 			<button (click)="clearGraph()">Clear Graph</button>
+			<button (click)="addNode()">Add node</button>
 		</div>
 		<ngdx-diagram class="demo-diagram" [model]="diagramModel"></ngdx-diagram>
 	`,

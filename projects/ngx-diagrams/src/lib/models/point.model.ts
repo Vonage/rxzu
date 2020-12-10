@@ -1,18 +1,16 @@
+import { Observable } from 'rxjs';
+import { Coords } from '../interfaces/coords.interface';
+import { SerializedPointModel } from '../interfaces/serialization.interface';
+import { createValueState, ValueState } from '../utils';
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Coords } from '../interfaces/coords.interface';
-import { map } from 'rxjs/operators';
-import { SerializedPointModel } from '../interfaces/serialization.interface';
 
 export class PointModel extends BaseModel<LinkModel> {
-	protected readonly _coords: BehaviorSubject<Coords>;
-	protected readonly coords$: Observable<Coords>;
+	protected coords$: ValueState<Coords>;
 
-	constructor(link: LinkModel, { x, y }: Coords, id?: string, logPrefix: string = '[Point]') {
+	constructor(link: LinkModel, coords: Coords, id?: string, logPrefix: string = '[Point]') {
 		super(link.getType(), id, logPrefix);
-		this._coords = new BehaviorSubject<Coords>({ x, y });
-		this.coords$ = this._coords.pipe(this.entityPipe('coords'));
+		this.coords$ = createValueState(coords, this.entityPipe('coords'));
 		this.setParent(link);
 	}
 
@@ -40,22 +38,22 @@ export class PointModel extends BaseModel<LinkModel> {
 	}
 
 	setCoords(newCoords: Partial<Coords>) {
-		this._coords.next({ ...this._coords.getValue(), ...newCoords });
+		this.coords$.set({ ...this.getCoords(), ...newCoords }).emit();
 	}
 
 	selectCoords(): Observable<Coords> {
-		return this.coords$;
+		return this.coords$.value$;
 	}
 
 	getCoords(): Coords {
-		return this._coords.getValue();
+		return this.coords$.value;
 	}
 
 	selectX(): Observable<number> {
-		return this.selectCoords().pipe(map(c => c.x));
+		return this.coords$.select(coords => coords.x);
 	}
 
 	selectY(): Observable<number> {
-		return this.selectCoords().pipe(map(c => c.y));
+		return this.coords$.select(coords => coords.y);
 	}
 }
