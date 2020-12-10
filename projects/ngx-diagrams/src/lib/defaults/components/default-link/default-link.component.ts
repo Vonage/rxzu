@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { combineLatest, Observable } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Coords } from '../../../interfaces';
@@ -13,6 +13,7 @@ import { DefaultLinkModel } from '../../models/default-link.model';
 	selector: 'ngdx-default-link',
 	templateUrl: './default-link.component.html',
 	styleUrls: ['./default-link.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DefaultLinkComponent extends DefaultLinkModel implements AfterViewInit, OnInit {
 	@ViewChild('labelLayer', { read: ViewContainerRef, static: true })
