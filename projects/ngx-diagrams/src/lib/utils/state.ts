@@ -2,7 +2,7 @@ import { BehaviorSubject, MonoTypeOperatorFunction, Observable, OperatorFunction
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { BaseEntity } from '../base.entity';
 import { ID, isArray, mapToEntries } from './tool-kit.util';
-import { Entries, HashMap, TypedMap } from './types';
+import { Entries, HashMap } from './types';
 
 export class ValueState<T> {
 	protected readonly stream$: BehaviorSubject<T>;
@@ -43,12 +43,12 @@ export function createValueState<T>(value: T, operator?: OperatorFunction<T, any
 	return new ValueState<T>(value, operator);
 }
 
-export class EntityState<T extends BaseEntity> extends ValueState<TypedMap<T>> {
-	protected stream$: BehaviorSubject<TypedMap<T>>;
+export class EntityState<T extends BaseEntity> extends ValueState<Map<ID, T>> {
+	protected stream$: BehaviorSubject<Map<ID, T>>;
 
-	value$: Observable<TypedMap<T>>;
+	value$: Observable<Map<ID, T>>;
 
-	constructor(value?: TypedMap<T>, entityPipe?: MonoTypeOperatorFunction<TypedMap<T>>) {
+	constructor(value?: Map<ID, T>, entityPipe?: MonoTypeOperatorFunction<Map<ID, T>>) {
 		super(value, entityPipe);
 	}
 
@@ -97,14 +97,14 @@ export class EntityState<T extends BaseEntity> extends ValueState<TypedMap<T>> {
 	}
 
 	array(): T[] {
-		return Array.from(this.value.valuesArray());
+		return Array.from(this.value.values());
 	}
 
 	array$(): Observable<T[]> {
-		return this.select(value => value.valuesArray());
+		return this.select(value => Array.from(value.values()));
 	}
 
-	forEach(cb: (value: T, key: string, map: TypedMap<T>) => void): void {
+	forEach(cb: (value: T, key: string, map: Map<ID, T>) => void): void {
 		this.value.forEach(cb);
 	}
 
@@ -115,11 +115,11 @@ export class EntityState<T extends BaseEntity> extends ValueState<TypedMap<T>> {
 
 export function createEntityState<T extends BaseEntity>(
 	value: HashMap<T> | Entries<T> = [],
-	entityPipe: MonoTypeOperatorFunction<TypedMap<T>>
+	entityPipe: MonoTypeOperatorFunction<Map<ID, T>>
 ): EntityState<T> {
 	if (isArray(value)) {
-		return new EntityState(new TypedMap(value), entityPipe);
+		return new EntityState(new Map(value), entityPipe);
 	} else {
-		return new EntityState(new TypedMap(mapToEntries(value)), entityPipe);
+		return new EntityState(new Map(mapToEntries(value)), entityPipe);
 	}
 }

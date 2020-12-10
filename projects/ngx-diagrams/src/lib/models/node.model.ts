@@ -5,7 +5,7 @@ import { SerializedNodeModel } from '../interfaces/serialization.interface';
 import { DiagramEngine } from '../services/engine.service';
 import { createEntityState, createValueState } from '../utils';
 import { ID } from '../utils/tool-kit.util';
-import { HashMap, TypedMap } from '../utils/types';
+import { EntityMap, HashMap } from '../utils/types';
 import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
 import { PortModel } from './port.model';
@@ -52,26 +52,19 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 	setCoords({ x, y }: Coords) {
 		const { x: oldX, y: oldY } = this.getCoords();
 
-		this.getPorts()
-			.valuesArray()
-			.forEach(port => {
-				port
-					.getLinks()
-					.valuesArray()
-					.forEach(link => {
-						const point = link.getPointForPort(port);
-						const { x: pointX, y: pointY } = point.getCoords();
-						point.setCoords({ x: pointX + x - oldX, y: pointY + y - oldY });
-					});
+		this.getPorts().forEach(port => {
+			port.getLinks().forEach(link => {
+				const point = link.getPointForPort(port);
+				const { x: pointX, y: pointY } = point.getCoords();
+				point.setCoords({ x: pointX + x - oldX, y: pointY + y - oldY });
 			});
+		});
 
 		this.coords$.set({ x, y }).emit();
 	}
 
 	serialize(): SerializedNodeModel {
-		const serializedPorts = this.getPorts()
-			.valuesArray()
-			.map((port: P) => port.serialize());
+		const serializedPorts = this.getPortsArray().map((port: P) => port.serialize());
 
 		return {
 			...super.serialize(),
@@ -90,15 +83,10 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 
 		// add the points of each link that are selected here
 		if (this.getSelected()) {
-			this.getPorts()
-				.valuesArray()
-				.forEach(port => {
-					const points = port
-						.getLinks()
-						.valuesArray()
-						.map(link => link.getPointForPort(port));
-					entities = entities.concat(points);
-				});
+			this.getPorts().forEach(port => {
+				const points = port.getLinksArray().map(link => link.getPointForPort(port));
+				entities = entities.concat(points);
+			});
 		}
 
 		this.log('selectedEntities', entities);
@@ -148,8 +136,12 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 		return this.ports$.array$().pipe(this.withLog('selectPorts'));
 	}
 
-	getPorts(): TypedMap<P> {
+	getPorts(): EntityMap<P> {
 		return this.ports$.value;
+	}
+
+	getPortsArray(): P[] {
+		return this.ports$.array();
 	}
 
 	setDimensions(dimensions: Partial<Dimensions>) {

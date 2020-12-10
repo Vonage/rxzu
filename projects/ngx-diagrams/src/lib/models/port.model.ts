@@ -1,6 +1,5 @@
 import { Observable } from 'rxjs';
-import { createEntityState, createValueState, ID, isString } from '../utils';
-import { TypedMap } from '../utils/types';
+import { createEntityState, createValueState, EntityMap, ID, isString } from '../utils';
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { NodeModel } from './node.model';
@@ -141,11 +140,15 @@ export class PortModel extends BaseModel<NodeModel> {
 		this.links$.add(link).emit();
 	}
 
-	getLinks(): TypedMap<LinkModel> {
+	getLinks(): EntityMap<LinkModel> {
 		return this.links$.value;
 	}
 
-	selectLinks(): Observable<TypedMap<LinkModel>> {
+	getLinksArray(): LinkModel[] {
+		return this.links$.array();
+	}
+
+	selectLinks(): Observable<EntityMap<LinkModel>> {
 		return this.links$.value$;
 	}
 

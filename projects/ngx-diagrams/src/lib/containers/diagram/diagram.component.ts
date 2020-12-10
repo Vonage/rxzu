@@ -27,8 +27,8 @@ import { LinkModel } from '../../models/link.model';
 import { NodeModel } from '../../models/node.model';
 import { PointModel } from '../../models/point.model';
 import { PortModel } from '../../models/port.model';
+import { EntityMap } from '../../utils';
 import { OutsideZone, ZonedClass } from '../../utils/decorators';
-import { TypedMap } from '../../utils/types';
 
 @Component({
 	selector: 'ngdx-diagram',
@@ -61,8 +61,8 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy, ZonedClass
 	@ViewChild('canvas', { read: ElementRef })
 	canvas: ElementRef;
 
-	protected nodes$: Observable<TypedMap<NodeModel>>;
-	protected links$: Observable<TypedMap<LinkModel>>;
+	protected nodes$: Observable<EntityMap<NodeModel>>;
+	protected links$: Observable<EntityMap<LinkModel>>;
 	protected action$ = new BehaviorSubject<BaseAction>(null);
 	protected nodesRendered$ = new BehaviorSubject<boolean>(false);
 	protected destroyed$ = new ReplaySubject<boolean>(1);
@@ -269,8 +269,7 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy, ZonedClass
 						this.startFiringAction(new InvalidLinkDestroyed(event.clientX, event.clientY, link));
 					} else if (
 						targetPort
-							.getLinks()
-							.valuesArray()
+							.getLinksArray()
 							.some(link => link !== link && (link.getSourcePort() === sourcePort || link.getTargetPort() === sourcePort))
 					) {
 						// link is a duplicate

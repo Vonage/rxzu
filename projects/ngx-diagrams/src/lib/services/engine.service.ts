@@ -17,15 +17,15 @@ import { NodeModel } from '../models/node.model';
 import { PortModel } from '../models/port.model';
 import { NgxDiagramsModule } from '../ngx-diagrams.module';
 import { PathFinding, ROUTING_SCALING_FACTOR } from '../plugins/smart-routing.plugin';
-import { TypedMap } from '../utils/types';
+import { EntityMap } from '../utils';
 
 @Injectable({ providedIn: NgxDiagramsModule })
 export class DiagramEngine {
 	protected _renderer: Renderer2;
-	protected nodeFactories = new TypedMap<AbstractNodeFactory>();
-	protected labelFactories = new TypedMap<AbstractLabelFactory>();
-	protected linkFactories = new TypedMap<AbstractLinkFactory>();
-	protected portFactories = new TypedMap<AbstractPortFactory>();
+	protected nodeFactories = new Map<string, AbstractNodeFactory>();
+	protected labelFactories = new Map<string, AbstractLabelFactory>();
+	protected linkFactories = new Map<string, AbstractLinkFactory>();
+	protected portFactories = new Map<string, AbstractPortFactory>();
 	protected canvas$ = new BehaviorSubject<Element>(null);
 
 	// smart routing related properties
@@ -64,7 +64,7 @@ export class DiagramEngine {
 		this.labelFactories.set(labelFactory.type, labelFactory);
 	}
 
-	getLabelFactories(): TypedMap<AbstractLabelFactory> {
+	getLabelFactories(): EntityMap<AbstractLabelFactory> {
 		return this.labelFactories;
 	}
 
@@ -92,7 +92,7 @@ export class DiagramEngine {
 		this.nodeFactories.set(nodeFactory.type, nodeFactory);
 	}
 
-	getNodeFactories(): TypedMap<AbstractNodeFactory> {
+	getNodeFactories(): EntityMap<AbstractNodeFactory> {
 		return this.nodeFactories;
 	}
 
@@ -144,7 +144,7 @@ export class DiagramEngine {
 	}
 
 	// LINKS
-	getLinkFactories(): TypedMap<AbstractLinkFactory> {
+	getLinkFactories(): EntityMap<AbstractLinkFactory> {
 		return this.linkFactories;
 	}
 
@@ -335,17 +335,14 @@ export class DiagramEngine {
 		height: number;
 		vAdjustmentFactor: number;
 	} {
-		const allNodesCoords = this.diagramModel
-			.getNodes()
-			.valuesArray()
-			.map(item => ({
-				x: item.getCoords().x,
-				width: item.getWidth(),
-				y: item.getCoords().y,
-				height: item.getHeight(),
-			}));
+		const allNodesCoords = this.diagramModel.getNodesArray().map(item => ({
+			x: item.getCoords().x,
+			width: item.getWidth(),
+			y: item.getCoords().y,
+			height: item.getHeight(),
+		}));
 
-		const allLinks = this.diagramModel.getLinks().valuesArray();
+		const allLinks = this.diagramModel.getLinksArray();
 
 		const allPortsCoords = allLinks
 			.flatMap(link => [link.getSourcePort(), link.getTargetPort()])
@@ -508,10 +505,7 @@ export class DiagramEngine {
 	 * Updates (by reference) where ports will be drawn on the matrix passed in.
 	 */
 	markPorts(matrix: number[][]): void {
-		const allElements = this.diagramModel
-			.getLinks()
-			.valuesArray()
-			.flatMap(link => [link.getSourcePort(), link.getTargetPort()]);
+		const allElements = this.diagramModel.getLinksArray().flatMap(link => [link.getSourcePort(), link.getTargetPort()]);
 
 		allElements
 			.filter(port => port !== null)

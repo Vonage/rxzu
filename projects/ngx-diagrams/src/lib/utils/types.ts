@@ -6,8 +6,4 @@ export interface HashMap<T> {
 
 export type Entries<T> = (readonly [string, T])[];
 
-export class TypedMap<T> extends Map<ID, T> {
-	valuesArray(): T[] {
-		return Array.from(this.values());
-	}
-}
+export type EntityMap<T> = Map<ID, T>;

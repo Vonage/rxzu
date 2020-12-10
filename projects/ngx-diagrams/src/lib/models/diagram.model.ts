@@ -6,7 +6,7 @@ import { SerializedDiagramModel } from '../interfaces/serialization.interface';
 import { DiagramEngine } from '../services/engine.service';
 import { createEntityState, createValueState } from '../utils/state';
 import { coerceArray, ID, isEmptyArray, unique } from '../utils/tool-kit.util';
-import { TypedMap } from '../utils/types';
+import { EntityMap } from '../utils/types';
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { NodeModel } from './node.model';
@@ -28,8 +28,12 @@ export class DiagramModel extends BaseEntity {
 
 	// TODO: support the following events for links and nodes
 	// removed, updated<positionChanged/dataChanged>, added
-	getNodes(): TypedMap<NodeModel> {
+	getNodes(): EntityMap<NodeModel> {
 		return this.nodes$.value;
+	}
+
+	getNodesArray(): NodeModel[] {
+		return this.nodes$.array();
 	}
 
 	getNode(id: ID): NodeModel | undefined {
@@ -40,15 +44,19 @@ export class DiagramModel extends BaseEntity {
 		return this.links$.get(id);
 	}
 
-	getLinks(): TypedMap<LinkModel> {
+	getLinks(): EntityMap<LinkModel> {
 		return this.links$.value;
 	}
 
+	getLinksArray(): LinkModel[] {
+		return this.links$.array();
+	}
+
 	getAllPorts(options: SelectOptions<PortModel> = {}): Map<string, PortModel> {
-		const result = new TypedMap<PortModel>();
+		const result = new Map<ID, PortModel>();
 
 		this.getNodes().forEach(node => {
-			const ports = options.filter ? node.getPorts().valuesArray().filter(options.filter) : node.getPorts().valuesArray();
+			const ports = options.filter ? node.getPortsArray().filter(options.filter) : node.getPortsArray();
 			ports.forEach(port => result.set(port.id, port));
 		});
 
@@ -83,7 +91,7 @@ export class DiagramModel extends BaseEntity {
 	/**
 	 * Get nodes as observable, use `.getValue()` for snapshot
 	 */
-	selectNodes(): Observable<TypedMap<NodeModel>> {
+	selectNodes(): Observable<EntityMap<NodeModel>> {
 		return this.nodes$.value$;
 	}
 
@@ -113,7 +121,7 @@ export class DiagramModel extends BaseEntity {
 	/**
 	 * Get links behaviour subject, use `.getValue()` for snapshot
 	 */
-	selectLinks(): Observable<TypedMap<LinkModel>> {
+	selectLinks(): Observable<EntityMap<LinkModel>> {
 		return this.links$.value$;
 	}
 
@@ -226,13 +234,7 @@ export class DiagramModel extends BaseEntity {
 		const links = this.links$.array();
 
 		const selectedNodes = () => nodes.flatMap(node => node.getSelectedEntities());
-		const selectedPorts = () =>
-			nodes.flatMap(node =>
-				node
-					.getPorts()
-					.valuesArray()
-					.flatMap((port: PortModel) => port.getSelectedEntities())
-			);
+		const selectedPorts = () => nodes.flatMap(node => node.getPortsArray().flatMap((port: PortModel) => port.getSelectedEntities()));
 		const selectedLinks = () => links.flatMap(link => link.getSelectedEntities());
 		const selectedPoints = () => links.flatMap(link => link.getPoints().flatMap(point => point.getSelectedEntities()));
 
