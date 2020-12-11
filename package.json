@@ -41,7 +41,7 @@
 		"tslib": "^2.0.3",
 		"paths-js": "0.4.11",
 		"pathfinding": "0.4.18",
-		"snyk": "^1.420.0",
+		"snyk": "^1.436.0",
 		"zone.js": "~0.10.3"
 	},
 	"devDependencies": {
@@ -80,7 +80,7 @@
 		"prettier": "^2.1.2",
 		"protractor": "~7.0.0",
 		"react-is": "^16.13.1",
-		"semantic-release": "^17.2.1",
+		"semantic-release": "^17.3.0",
 		"ts-node": "~9.0.0",
 		"tslint": "^6.1.0",
 		"tslint-config-prettier": "^1.18.0",
