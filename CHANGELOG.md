@@ -1,3 +1,10 @@
+## [3.3.3](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.3.2...v3.3.3) (2020-12-11)
+
+
+### Performance Improvements
+
+* **diagram:** improve reset and addAll performance ([d809b29](https://github.com/DanielNetzer/ngx-diagrams/commit/d809b298cd1c2be90c96500ec8594fceb44efdcf))
+
 ## [3.3.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.3.1...v3.3.2) (2020-11-22)
 
 
