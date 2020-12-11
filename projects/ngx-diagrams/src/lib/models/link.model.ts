@@ -1,26 +1,27 @@
+import { BehaviorSubject, Observable } from 'rxjs';
+import { Coords } from '../interfaces/coords.interface';
+import { SerializedLinkModel } from '../interfaces/serialization.interface';
+import { DiagramEngine } from '../services/engine.service';
+import { ID } from '../utils/tool-kit.util';
 import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
-import { PortModel } from './port.model';
-import { PointModel } from './point.model';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { ID } from '../utils/tool-kit.util';
-import { Coords } from '../interfaces/coords.interface';
 import { LabelModel } from './label.model';
-import { DiagramEngine } from '../services/engine.service';
-import { SerializedLinkModel } from '../interfaces/serialization.interface';
+import { PointModel } from './point.model';
+import { PortModel } from './port.model';
 
 export class LinkModel extends BaseModel<DiagramModel> {
 	diagramEngine: DiagramEngine;
 
 	// TODO: decide what should be reactive using RXJS
-	private name: string;
-	private sourcePort: PortModel | null;
-	private targetPort: PortModel | null;
-	private points: PointModel[];
-	private extras: any;
+	protected name: string;
+	protected sourcePort: PortModel | null;
+	protected targetPort: PortModel | null;
+	protected points: PointModel[];
+	protected extras: any;
 
-	private readonly _label$: BehaviorSubject<LabelModel> = new BehaviorSubject(null);
-	label$: Observable<LabelModel> = this._label$.pipe(this.entityPipe('label'));
+	protected readonly _label$ = new BehaviorSubject<LabelModel>(null);
+
+	label$ = this._label$.pipe(this.entityPipe('label'));
 
 	constructor(linkType: string = 'default', id?: string, logPrefix: string = '[Link]') {
 		super(linkType, id, logPrefix);

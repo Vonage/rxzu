@@ -1,35 +1,17 @@
-<div class="ngdx-diagram" #canvas (mousedown)="onMouseDown($event)" (wheel)="onMouseWheel($event)">
+<div
+	class="ngdx-diagram"
+	*templateVar="layerStyles$ | async as layerStyles"
+	#canvas
+	(mousedown)="onMouseDown($event)"
+	(wheel)="onMouseWheel($event)"
+>
 	<!-- Nodes Layer -->
-	<div
-		class="ngdx-nodes-layer"
-		[ngStyle]="{
-			transform:
-				'translate(' +
-				(diagramModel.selectOffsetX() | async) +
-				'px, ' +
-				(diagramModel.selectOffsetY() | async) +
-				'px) scale(' +
-				(diagramModel.selectZoomLevel() | async) / 100.0 +
-				')'
-		}"
-	>
+	<div class="ngdx-nodes-layer" [ngStyle]="layerStyles">
 		<ng-template #nodesLayer></ng-template>
 	</div>
 
 	<!-- Links Layer -->
-	<div
-		class="ngdx-links-layer"
-		[ngStyle]="{
-			transform:
-				'translate(' +
-				(diagramModel.selectOffsetX() | async) +
-				'px, ' +
-				(diagramModel.selectOffsetY() | async) +
-				'px) scale(' +
-				(diagramModel.selectZoomLevel() | async) / 100.0 +
-				')'
-		}"
-	>
+	<div class="ngdx-links-layer" [ngStyle]="layerStyles">
 		<ng-template #linksLayer></ng-template>
 	</div>
 

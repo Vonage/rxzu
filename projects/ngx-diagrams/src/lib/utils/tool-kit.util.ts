@@ -1,12 +1,13 @@
 // eslint-disable  no-bitwise
+import * as Path from 'paths-js/path';
 /**
  * Utility pathing and routing service
  */
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, shareReplay, takeUntil, tap } from 'rxjs/operators';
 import { Coords } from '../interfaces/coords.interface';
-import * as Path from 'paths-js/path';
 import { ROUTING_SCALING_FACTOR } from '../plugins/smart-routing.plugin';
+import { HashMap } from './types';
 
 export enum LOG_LEVEL {
 	'LOG',
@@ -96,7 +97,7 @@ export function coerceArray<T>(value: T | T[]): T[] {
 	return Array.isArray(value) ? value : [value];
 }
 
-export function mapToArray<T>(map: { [key: string]: T }): T[] {
+export function mapToArray<T>(map: HashMap<T>): T[] {
 	const result = [];
 	for (const key in map) {
 		if (!isNil(map[key])) {
@@ -107,7 +108,7 @@ export function mapToArray<T>(map: { [key: string]: T }): T[] {
 	return result;
 }
 
-export function arrayToMap<T>(arr: Array<{ id: ID } & T>): { [key: string]: T } {
+export function arrayToMap<T>(arr: Array<{ id: ID } & T>): HashMap<T> {
 	const result = {};
 	for (const val of arr) {
 		if (!isNil(val)) {

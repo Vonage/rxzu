@@ -1,31 +1,32 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { PortModel } from './port.model';
+import { map } from 'rxjs/operators';
+import { Coords } from '../interfaces/coords.interface';
+import { Dimensions } from '../interfaces/dimensions.interface';
+import { SerializedNodeModel } from '../interfaces/serialization.interface';
+import { DiagramEngine } from '../services/engine.service';
+import { ID, mapToArray } from '../utils/tool-kit.util';
+import { HashMap } from '../utils/types';
 import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
-import { Coords } from '../interfaces/coords.interface';
-import { DiagramEngine } from '../services/engine.service';
-import { map } from 'rxjs/operators';
-import { Dimensions } from '../interfaces/dimensions.interface';
-import { ID, mapToArray } from '../utils/tool-kit.util';
-import { SerializedNodeModel } from '../interfaces/serialization.interface';
+import { PortModel } from './port.model';
 
 export class NodeModel<P extends PortModel = PortModel> extends BaseModel<DiagramModel> {
-	private readonly _diagramEngine$: BehaviorSubject<DiagramEngine> = new BehaviorSubject<DiagramEngine>(null);
-	private readonly _extras$: BehaviorSubject<{ [s: string]: any }> = new BehaviorSubject({});
-	private readonly _ports$: BehaviorSubject<{ [s: string]: P }> = new BehaviorSubject({});
-	private readonly _coords$: BehaviorSubject<Coords> = new BehaviorSubject<Coords>({ x: 0, y: 0 });
-	private readonly _dimensions$: BehaviorSubject<Dimensions> = new BehaviorSubject<Dimensions>({ width: 0, height: 0 });
+	protected readonly _diagramEngine$ = new BehaviorSubject<DiagramEngine>(null);
+	protected readonly _extras$ = new BehaviorSubject<HashMap<any>>({});
+	protected readonly _ports$ = new BehaviorSubject<HashMap<P>>({});
+	protected readonly _coords$ = new BehaviorSubject<Coords>({ x: 0, y: 0 });
+	protected readonly _dimensions$ = new BehaviorSubject<Dimensions>({ width: 0, height: 0 });
 
-	private readonly diagramEngine$: Observable<{ [s: string]: any }> = this._diagramEngine$.pipe(this.entityPipe('diagramEngine'));
-	private readonly extras$: Observable<{ [s: string]: any }> = this._extras$.pipe(this.entityPipe('extras'));
-	private readonly ports$: Observable<{ [s: string]: P }> = this._ports$.pipe(this.entityPipe('ports'));
-	private readonly coords$: Observable<Coords> = this._coords$.pipe(this.entityPipe('coords'));
-	private readonly dimensions$: Observable<Dimensions> = this._dimensions$.pipe(this.entityPipe('dimensions'));
+	protected readonly diagramEngine$ = this._diagramEngine$.pipe(this.entityPipe('diagramEngine'));
+	protected readonly extras$ = this._extras$.pipe(this.entityPipe('extras'));
+	protected readonly ports$ = this._ports$.pipe(this.entityPipe('ports'));
+	protected readonly coords$ = this._coords$.pipe(this.entityPipe('coords'));
+	protected readonly dimensions$ = this._dimensions$.pipe(this.entityPipe('dimensions'));
 
 	constructor(
 		nodeType: string = 'default',
 		id?: string,
-		extras: { [s: string]: any } = {},
+		extras: HashMap<any> = {},
 		x: number = 0,
 		y: number = 0,
 		width: number = 0,
@@ -152,7 +153,7 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 		);
 	}
 
-	getPorts(ids?: ID[]): { [s: string]: P | P[] } {
+	getPorts(): HashMap<P | P[]> {
 		return this._ports$.getValue();
 	}
 
@@ -210,5 +211,16 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
 	selectExtras<E = any>(selector?: (extra: E) => E[keyof E] | string | string[]) {
 		// TODO: impl selector
 		return this.extras$;
+	}
+
+	destroy() {
+		this.removeAllPorts();
+		super.destroy();
+	}
+
+	removeAllPorts(): void {
+		for (const port of Object.values(this.getPorts())) {
+			this.removePort(port as P);
+		}
 	}
 }
