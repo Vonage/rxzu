@@ -4,7 +4,7 @@ import { Coords } from '../interfaces/coords.interface';
 import { SelectOptions } from '../interfaces/select-options.interface';
 import { SerializedDiagramModel } from '../interfaces/serialization.interface';
 import { DiagramEngine } from '../services/engine.service';
-import { ID } from '../utils/tool-kit.util';
+import { arrayToMap, ID, isArray } from '../utils/tool-kit.util';
 import { HashMap } from '../utils/types';
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
@@ -129,9 +129,19 @@ export class DiagramModel extends BaseEntity {
 	}
 
 	reset() {
-		Object.values(this.getNodes()).forEach(node => {
-			this.deleteNode(node);
-		});
+		const links = Object.values(this.getLinks());
+		const nodes = Object.values(this.getNodes());
+
+		for (const node of nodes) {
+			node.destroy();
+		}
+
+		for (const link of links) {
+			link.destroy();
+		}
+
+		this._nodes$.next({});
+		this._links$.next({});
 	}
 
 	/**
@@ -283,13 +293,30 @@ export class DiagramModel extends BaseEntity {
 	}
 
 	addAll(...models: BaseModel[]) {
-		models.forEach(model => {
+		const links: LinkModel[] = [];
+		const nodes: NodeModel[] = [];
+
+		for (const model of models) {
 			if (model instanceof LinkModel) {
-				this.addLink(model);
+				links.push(model);
 			} else if (model instanceof NodeModel) {
-				this.addNode(model);
+				nodes.push(model);
 			}
-		});
+		}
+
+		this.addLinks(links);
+		this.addNodes(nodes);
+
 		return models;
+	}
+
+	addLinks(links: LinkModel[] | HashMap<LinkModel>) {
+		const added = isArray(links) ? arrayToMap(links) : links;
+		this._links$.next({ ...this.getLinks(), ...added });
+	}
+
+	addNodes(nodes: NodeModel[] | HashMap<NodeModel>) {
+		const added = isArray(nodes) ? arrayToMap(nodes) : nodes;
+		this._nodes$.next({ ...this.getNodes(), ...added });
 	}
 }

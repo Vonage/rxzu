@@ -5,12 +5,12 @@ import { PaintedEvent, ParentChangeEvent, SelectionEvent } from '../interfaces/e
 
 export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
 	protected readonly _type: string;
-	protected readonly _parent$: BehaviorSubject<X> = new BehaviorSubject(null);
-	protected readonly _selected$: BehaviorSubject<boolean> = new BehaviorSubject(false);
-	protected readonly _painted$: BehaviorSubject<boolean> = new BehaviorSubject(false);
-	protected readonly _hovered$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+	protected readonly _parent$ = new BehaviorSubject<X>(null);
+	protected readonly _selected$ = new BehaviorSubject(false);
+	protected readonly _painted$ = new BehaviorSubject(false);
+	protected readonly _hovered$ = new BehaviorSubject(false);
 
-	protected readonly parent$: Observable<ParentChangeEvent<X>> = this._parent$.pipe(
+	protected readonly parent$ = this._parent$.pipe(
 		this.entityPipe('ParentsChange'),
 		map(p => new ParentChangeEvent<X>(this, p))
 	);
