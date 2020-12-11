@@ -73,7 +73,7 @@ export class DiagramModel extends BaseEntity {
 	 * @returns Inserted Node
 	 */
 	addNode(node: NodeModel): NodeModel {
-		this._nodes$.next({ ...this._nodes$.value, [node.id]: node });
+		this._nodes$.next({ ...this.getNodes(), [node.id]: node });
 		return node;
 	}
 
@@ -129,9 +129,16 @@ export class DiagramModel extends BaseEntity {
 	}
 
 	reset() {
-		Object.values(this.getNodes()).forEach(node => {
-			this.deleteNode(node);
+		Object.values(this.getLinks()).forEach(link => {
+			link.destroy();
 		});
+		this._links$.next({});
+
+		Object.values(this.getNodes()).forEach(node => {
+			node.destroy();
+		});
+
+		this._nodes$.next({});
 	}
 
 	/**

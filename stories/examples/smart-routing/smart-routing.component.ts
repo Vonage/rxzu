@@ -7,6 +7,7 @@ import { DiagramEngine, DiagramModel, DefaultNodeModel } from 'ngx-diagrams';
 	styleUrls: ['../demo-diagram.component.scss'],
 })
 export class SmartRoutingExampleStoryComponent implements OnInit {
+	// https://github.com/clientIO/joint/blob/1745414371e9e301610f7f49c1b9d7e7b91de12e/src/routers/manhattan.mjs
 	diagramModel: DiagramModel;
 
 	constructor(private diagramEngine: DiagramEngine) {}
