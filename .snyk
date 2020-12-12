@@ -1,18 +1,35 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
 version: v1.13.5
-ignore: {}
-# patches apply the minimum changes required to fix a vulnerability
-patch:
-  SNYK-JS-LODASH-567746:
-    - dagre > lodash:
-        patched: '2020-04-30T23:12:41.667Z'
-      dagre > graphlib > lodash:
-        patched: '2020-05-04T11:13:43.732Z'
-    - dagre > graphlib > lodash:
-        patched: '2020-04-30T23:12:41.667Z'
-      dagre > lodash:
-        patched: '2020-05-04T11:13:43.732Z'
-    - dagre > graphlib > lodash:
-        patched: '2020-05-04T10:59:41.360Z'
-    - dagre > lodash:
-        patched: '2020-05-04T10:59:41.360Z'
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  SNYK-JS-Y18N-1021887:
+    - '@iarna/cli > yargs > y18n':
+        reason: no fixes
+        expires: '2021-01-11T13:34:01.197Z'
+    - libcipm > lock-verify > @iarna/cli > yargs > y18n:
+        reason: no fixes
+        expires: '2021-01-11T13:34:01.197Z'
+    - libnpm > lock-verify > @iarna/cli > yargs > y18n:
+        reason: no fixes
+        expires: '2021-01-11T13:34:01.197Z'
+  SNYK-JS-YARGSPARSER-560381:
+    - '@iarna/cli > yargs > yargs-parser':
+        reason: no fixes
+        expires: '2021-01-11T13:34:01.197Z'
+    - libcipm > lock-verify > @iarna/cli > yargs > yargs-parser:
+        reason: no fixes
+        expires: '2021-01-11T13:34:01.197Z'
+    - libnpm > lock-verify > @iarna/cli > yargs > yargs-parser:
+        reason: no fixes
+        expires: '2021-01-11T13:34:01.197Z'
+  'npm:mem:20180117':
+    - '@iarna/cli > yargs > os-locale > mem':
+        reason: no fixes
+        expires: '2021-01-11T13:34:01.197Z'
+    - libcipm > lock-verify > @iarna/cli > yargs > os-locale > mem:
+        reason: no fixes
+        expires: '2021-01-11T13:34:01.197Z'
+    - libnpm > lock-verify > @iarna/cli > yargs > os-locale > mem:
+        reason: no fixe
+        expires: '2021-01-11T13:34:01.197Z'
+patch: {}
