@@ -7,10 +7,10 @@ export class DefaultLabelModel extends LabelModel {
   label$ = this._label.pipe(this.entityPipe('label'));
 
   constructor(
-    label: string = 'NO LABEL',
-    type: string = 'default',
+    label = 'NO LABEL',
+    type = 'default',
     id?: string,
-    logPrefix: string = '[DefaultLabel]'
+    logPrefix = '[DefaultLabel]'
   ) {
     super(type, id, logPrefix);
     this.setLabel(label);

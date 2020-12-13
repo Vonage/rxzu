@@ -73,8 +73,8 @@ export function withLog(
  */
 export function entityProperty<Y>(
   destroyedNotifier: Observable<Y>,
-  replayBy: number = 1,
-  logMessage: string = ''
+  replayBy = 1,
+  logMessage = ''
 ) {
   return <T>(source: Observable<T>) =>
     source.pipe(
@@ -151,7 +151,7 @@ export function generateLinePath(firstPoint: any, lastPoint: any): string {
 export function generateCurvePath(
   firstPoint: Coords,
   lastPoint: Coords,
-  curvy: number = 0
+  curvy = 0
 ): string {
   const isHorizontal =
     Math.abs(firstPoint.x - lastPoint.x) > Math.abs(firstPoint.y - lastPoint.y);

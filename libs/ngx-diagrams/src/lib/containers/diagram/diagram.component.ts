@@ -16,6 +16,7 @@ import {
   BehaviorSubject,
   combineLatest,
   defer,
+  noop,
   Observable,
   ReplaySubject,
 } from 'rxjs';
@@ -45,7 +46,6 @@ import { HashMap } from '../../utils/types';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
-  // eslint-disable-next-line @angular-eslint/no-input-rename
   @Input('model') diagramModel: DiagramModel;
   @Input() allowCanvasZoom = true;
   @Input() allowCanvasTranslation = true;
@@ -621,8 +621,12 @@ export class NgxDiagramComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  protected mouseUpListener = () => {};
-  protected mouseMoveListener = () => {};
+  protected mouseUpListener = () => {
+    noop();
+  };
+  protected mouseMoveListener = () => {
+    noop();
+  };
 
   protected createLayerStyle(
     x: number,

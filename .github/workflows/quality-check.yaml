@@ -42,8 +42,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Run linting
-        continue-on-error: true # temporary measurements until linting errors are fixed, see https://github.com/datorama/akita/issues/401
-        run: yarn nx run-many --target=lint --all
+        continue-on-error: true # temporary measurements until linting errors are fixed
+        run: yarn nx run-many --target=lint --all --linter=eslint
 
   test:
     name: Test applications & libraries
@@ -63,3 +63,14 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Run tests
         run: yarn nx run-many --target=test --all
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Run Snyk to check for vulnerabilities
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        command: monitor

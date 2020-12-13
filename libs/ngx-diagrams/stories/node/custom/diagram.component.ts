@@ -59,6 +59,9 @@ export class CustomNodeDiagramComponent implements OnInit, OnChanges {
       }
 
       if (e.nodeWidth) {
+        Object.values(this.diagramModel.getNodes()).forEach((node) => {
+          node.setWidth(e.nodeWidth.currentValue);
+        });
       }
     }
   }

@@ -33,13 +33,13 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<
   );
 
   constructor(
-    nodeType: string = 'default',
+    nodeType = 'default',
     id?: string,
     extras: HashMap<any> = {},
-    x: number = 0,
-    y: number = 0,
-    width: number = 0,
-    height: number = 0,
+    x = 0,
+    y = 0,
+    width = 0,
+    height = 0,
     logPrefix = '[Node]'
   ) {
     super(nodeType, id, logPrefix);

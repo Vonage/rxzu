@@ -24,9 +24,9 @@ export class LinkModel extends BaseModel<DiagramModel> {
   label$ = this._label$.pipe(this.entityPipe('label'));
 
   constructor(
-    linkType: string = 'default',
+    linkType = 'default',
     id?: string,
-    logPrefix: string = '[Link]'
+    logPrefix = '[Link]'
   ) {
     super(linkType, id, logPrefix);
     this.points = [
@@ -236,7 +236,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
     return new PointModel(this, { x, y });
   }
 
-  setLocked(locked: boolean = true) {
+  setLocked(locked = true) {
     super.setLocked(locked);
     this.points.forEach((point) => point.setLocked(locked));
   }

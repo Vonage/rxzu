@@ -49,7 +49,7 @@ export class BaseEntity {
     return _withLog(`${this._logPrefix} ${message}: `, LOG_LEVEL.LOG, ...args);
   }
 
-  entityPipe(logMessage: string = '') {
+  entityPipe(logMessage = '') {
     return _entityProperty(
       this.onEntityDestroy(),
       0,
@@ -61,7 +61,7 @@ export class BaseEntity {
     return this._locked.getValue();
   }
 
-  setLocked(locked: boolean = true) {
+  setLocked(locked = true) {
     this._locked.next(locked);
   }
 
