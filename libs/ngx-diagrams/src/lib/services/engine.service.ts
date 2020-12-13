@@ -348,7 +348,7 @@ export class DiagramEngine {
    * fit the canvas zoom levels to the elements contained.
    * @param additionalZoomFactor allow for further zooming out to make sure edges doesn't cut
    */
-  zoomToFit(additionalZoomFactor: number = 0.005) {
+  zoomToFit(additionalZoomFactor = 0.005) {
     this.canvas$
       .pipe(filter(Boolean), take(1), delay(0))
       .subscribe((canvas: HTMLElement) => {
@@ -530,10 +530,10 @@ export class DiagramEngine {
    * We use the functions below to translate back and forth between these coordinates, relying on the
    * calculated values of hAdjustmentFactor and vAdjustmentFactor.
    */
-  translateRoutingX(x: number, reverse: boolean = false) {
+  translateRoutingX(x: number, reverse = false) {
     return x + this.hAdjustmentFactor * (reverse ? -1 : 1);
   }
-  translateRoutingY(y: number, reverse: boolean = false) {
+  translateRoutingY(y: number, reverse = false) {
     return y + this.vAdjustmentFactor * (reverse ? -1 : 1);
   }
 

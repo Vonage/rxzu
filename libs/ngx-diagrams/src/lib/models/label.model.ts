@@ -13,7 +13,7 @@ export class LabelModel extends BaseModel<LinkModel> {
     this.entityPipe('rotation')
   );
 
-  constructor(type?: string, id?: string, logPrefix: string = '[Label]') {
+  constructor(type?: string, id?: string, logPrefix = '[Label]') {
     super(type, id, logPrefix);
   }
 

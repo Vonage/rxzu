@@ -61,7 +61,7 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
     return this._painted$.getValue();
   }
 
-  setPainted(painted: boolean = true) {
+  setPainted(painted = true) {
     this._painted$.next(painted);
   }
 
@@ -69,7 +69,7 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
     return this._hovered$.getValue();
   }
 
-  setHovered(painted: boolean = true) {
+  setHovered(painted = true) {
     this._hovered$.next(painted);
   }
 
@@ -93,7 +93,7 @@ export class BaseModel<X extends BaseEntity = BaseEntity> extends BaseEntity {
     return this.selected$.pipe(map((e) => e.isSelected));
   }
 
-  setSelected(selected: boolean = true) {
+  setSelected(selected = true) {
     this._selected$.next(selected);
   }
 

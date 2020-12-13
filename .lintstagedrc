@@ -1,8 +1,0 @@
-{
-	"projects/**/*.ts": [
-		"tslint --fix"
-	],
-	"**/*.{ts,js,html,scss,md}": [
-		"prettier --write"
-	]
-}

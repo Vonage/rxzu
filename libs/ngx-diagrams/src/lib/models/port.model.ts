@@ -34,8 +34,8 @@ export class PortModel extends BaseModel<NodeModel> {
     id?: string,
     maximumLinks?: number,
     linkType?: string,
-    magnetic: boolean = true,
-    logPrefix: string = '[Port]'
+    magnetic = true,
+    logPrefix = '[Port]'
   ) {
     super(type, id, logPrefix);
     this.name = name;
@@ -176,7 +176,7 @@ export class PortModel extends BaseModel<NodeModel> {
     this._height$.next(height);
   }
 
-  canLinkToPort(port: PortModel): boolean {
+  canLinkToPort(port?: PortModel): boolean {
     return true;
   }
 

@@ -22,7 +22,7 @@ export class BaseEvent<T extends BaseEntity> {
 export class LockEvent<T extends BaseEntity = BaseEntity> extends BaseEvent<T> {
   locked: boolean;
 
-  constructor(entity: T, locked: boolean = false) {
+  constructor(entity: T, locked = false) {
     super(entity);
     this.locked = locked;
   }
@@ -53,7 +53,7 @@ export class PaintedEvent<T extends BaseEntity = BaseEntity> extends BaseEvent<
 > {
   isPainted: boolean;
 
-  constructor(entity: T, painted: boolean = false) {
+  constructor(entity: T, painted = false) {
     super(entity);
     this.isPainted = painted;
   }

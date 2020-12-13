@@ -20,8 +20,10 @@
     "affected:build": "nx affected:build",
     "affected:e2e": "nx affected:e2e",
     "affected:test": "nx affected:test",
-    "affected:lint": "nx affected:lint",
+    "affected:lint": "nx affected:lint --fix --linter=eslint",
     "affected:dep-graph": "nx affected:dep-graph",
+    "lint:affected": "nx affected:lint --parallel --uncommitted --only-failed",
+    "lint:fix": "yarn lint --fix",
     "affected": "nx affected",
     "format": "nx format:write",
     "format:write": "nx format:write",
@@ -36,7 +38,8 @@
     "semantic-release": "npx semantic-release",
     "storybook": "yarn docs:json && nx run ngx-diagrams:storybook",
     "docs:json": "compodoc -p ./libs/ngx-diagrams/tsconfig.lib.prod.json -e json -d ./libs/ngx-diagrams",
-    "build-storybook": "yarn docs:json && nx run ngx-diagrams:build-storybook"
+    "build-storybook": "yarn docs:json && nx run ngx-diagrams:build-storybook",
+    "run-many": "nx run-many --target=build --configuration=production --projects=ngx-diagrams && yarn build-storybook"
   },
   "private": true,
   "dependencies": {
@@ -95,7 +98,6 @@
     "@types/pathfinding": "^0.0.4",
     "@typescript-eslint/eslint-plugin": "4.3.0",
     "@typescript-eslint/parser": "4.3.0",
-    "codelyzer": "~6.0.1",
     "cypress": "^5.5.0",
     "cz-customizable": "^6.3.0",
     "dotenv": "6.2.0",
@@ -106,12 +108,10 @@
     "husky": "^4.3.0",
     "jest": "26.2.2",
     "jest-preset-angular": "8.3.1",
-    "lint-staged": "^10.4.2",
     "prettier": "2.1.2",
     "semantic-release": "^17.3.0",
     "ts-jest": "26.4.0",
     "ts-node": "~7.0.0",
-    "tslint": "~6.0.0",
     "typescript": "~4.0.3"
   },
   "config": {

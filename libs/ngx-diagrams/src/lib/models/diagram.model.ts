@@ -32,7 +32,7 @@ export class DiagramModel extends BaseEntity {
   constructor(
     protected diagramEngine: DiagramEngine,
     id?: string,
-    logPrefix: string = '[Diagram]'
+    logPrefix = '[Diagram]'
   ) {
     super(id, logPrefix);
   }

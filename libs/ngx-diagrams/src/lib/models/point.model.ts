@@ -13,7 +13,7 @@ export class PointModel extends BaseModel<LinkModel> {
     link: LinkModel,
     { x, y }: Coords,
     id?: string,
-    logPrefix: string = '[Point]'
+    logPrefix = '[Point]'
   ) {
     super(link.getType(), id, logPrefix);
     this._coords = new BehaviorSubject<Coords>({ x, y });
