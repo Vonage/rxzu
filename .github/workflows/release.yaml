@@ -43,7 +43,7 @@ jobs:
       - name: Run builders
         run: yarn run-many
 
-  publish docs:
+  publish_docs:
     name: Publish storybook
     runs-on: ubuntu-latest
     steps:
@@ -52,7 +52,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist/storybook
 
-  publish lib:
+  publish_lib:
     name: Publish ngx-diagrams
     runs-on: ubuntu-latest
     steps:
