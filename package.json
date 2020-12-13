@@ -38,8 +38,8 @@
     "semantic-release": "npx semantic-release",
     "storybook": "yarn docs:json && nx run ngx-diagrams:storybook",
     "docs:json": "compodoc -p ./libs/ngx-diagrams/tsconfig.lib.prod.json -e json -d ./libs/ngx-diagrams",
-    "build-storybook": "yarn docs:json && nx run ngx-diagrams:build-storybook",
-    "run-many": "nx run-many --target=build --configuration=production --projects=ngx-diagrams && yarn build-storybook"
+    "build-storybook": "yarn docs:json && npx nx run ngx-diagrams:build-storybook",
+    "run-many": "npx nx run-many --target=build --configuration=production --projects=ngx-diagrams && yarn build-storybook"
   },
   "private": true,
   "dependencies": {
