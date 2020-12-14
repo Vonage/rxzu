@@ -57,6 +57,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: artifact
+          path: dist
       - name: Display structure of downloaded files
         run: ls -R
       - uses: peaceiris/actions-gh-pages@v3
@@ -79,5 +80,6 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: artifact
+          path: dist
       - name: Run semantic-release
         run: yarn semantic-release
