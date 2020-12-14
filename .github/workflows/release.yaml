@@ -7,13 +7,15 @@ on:
 
 jobs:
   dependencies:
-    name: Cache dependencies
+    name: Release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - uses: actions/setup-node@v1
         with:
           node-version: 12
+
       - uses: actions/cache@v1
         id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
         with:
@@ -21,40 +23,19 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
+
       - name: Yarn Install
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile
 
-  build:
-    name: Build storybook & library
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - name: Restore dependencies from cache
-        uses: actions/cache@v1
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
       - name: Run builders
         run: yarn run-many
 
-  publish_docs:
-    name: Publish storybook
-    runs-on: ubuntu-latest
-    steps:
-      - uses: peaceiris/actions-gh-pages@v3
+      - name: Publish Storybook
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist/storybook
 
-  publish_lib:
-    name: Publish ngx-diagrams
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run semantic-release
+      - name: Publish NGX-Diagrams
         run: yarn semantic-release
