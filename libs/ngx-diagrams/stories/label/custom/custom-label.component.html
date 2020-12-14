@@ -1,0 +1,15 @@
+<div
+  class="default-label"
+  [ngStyle]="{
+    transform:
+      'translate(' +
+      (selectCoords() | async).x +
+      'px, ' +
+      (selectCoords() | async).y +
+      'px)' +
+      'rotate(' +
+      (selectRotation() | async) +
+      'deg)'
+  }">
+  {{ selectLabel() | async }}
+</div>

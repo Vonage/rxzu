@@ -1,29 +1,7 @@
 {
-  "printWidth": 140,
   "singleQuote": true,
-  "useTabs": true,
+  "printWidth": 120,
+  "useTabs": false,
   "tabWidth": 2,
-  "semi": true,
-  "bracketSpacing": true,
-  "arrowParens": "avoid",
-  "overrides": [
-    {
-      "files": "*.scss",
-      "options": {
-        "parser": "scss"
-      }
-    },
-    {
-      "files": "*.html",
-      "options": {
-        "parser": "angular"
-      }
-    },
-    {
-      "files": "*.ts",
-      "options": {
-        "parser": "typescript"
-      }
-    }
-  ]
+  "trailingComma": "none"
 }

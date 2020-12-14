@@ -1,19 +1,23 @@
-## [3.3.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.3.1...v3.3.2) (2020-11-22)
+## [3.3.3](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.3.2...v3.3.3) (2020-12-11)
 
+### Performance Improvements
+
+- **diagram:** improve reset and addAll performance ([d809b29](https://github.com/DanielNetzer/ngx-diagrams/commit/d809b298cd1c2be90c96500ec8594fceb44efdcf))
+
+## [3.3.2](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.3.1...v3.3.2) (2020-11-22)
 
 ### Bug Fixes
 
-* **links:** unfound model errors, links layer position ([431c282](https://github.com/DanielNetzer/ngx-diagrams/commit/431c282dd4bccc2584701b29e0461c128260e8f2))
+- **links:** unfound model errors, links layer position ([431c282](https://github.com/DanielNetzer/ngx-diagrams/commit/431c282dd4bccc2584701b29e0461c128260e8f2))
 
 ## [3.3.1](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.3.0...v3.3.1) (2020-11-19)
 
-
 ### Bug Fixes
 
-* upgrade snyk from 1.419.1 to 1.420.0 ([4a49514](https://github.com/DanielNetzer/ngx-diagrams/commit/4a49514445bbbfd69cb62522e0b628b54f074209))
-* **dependencies:** updated all relevant dependencies ([dec8e9e](https://github.com/DanielNetzer/ngx-diagrams/commit/dec8e9e00537f261b2731b04d09ea6d4eaa2cc8d))
-* **merged:** lock file ([2182347](https://github.com/DanielNetzer/ngx-diagrams/commit/21823478f92a863ccf14e93d0c10c683a7d9e6d1))
-* **on mouse up:** handle edge cases where models cleared manually mid iteration ([a9d3603](https://github.com/DanielNetzer/ngx-diagrams/commit/a9d3603d03362189ade36740523cd57c2c123947))
+- upgrade snyk from 1.419.1 to 1.420.0 ([4a49514](https://github.com/DanielNetzer/ngx-diagrams/commit/4a49514445bbbfd69cb62522e0b628b54f074209))
+- **dependencies:** updated all relevant dependencies ([dec8e9e](https://github.com/DanielNetzer/ngx-diagrams/commit/dec8e9e00537f261b2731b04d09ea6d4eaa2cc8d))
+- **merged:** lock file ([2182347](https://github.com/DanielNetzer/ngx-diagrams/commit/21823478f92a863ccf14e93d0c10c683a7d9e6d1))
+- **on mouse up:** handle edge cases where models cleared manually mid iteration ([a9d3603](https://github.com/DanielNetzer/ngx-diagrams/commit/a9d3603d03362189ade36740523cd57c2c123947))
 
 # [3.3.0](https://github.com/DanielNetzer/ngx-diagrams/compare/v3.2.0...v3.3.0) (2020-11-15)
 

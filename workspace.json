@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "projects": {
+    "ngx-diagrams": {
+      "projectType": "library",
+      "root": "libs/ngx-diagrams",
+      "sourceRoot": "libs/ngx-diagrams/src",
+      "prefix": "ngx-diagrams",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "tsConfig": [
+              "libs/ngx-diagrams/tsconfig.lib.json",
+              "libs/ngx-diagrams/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/ngx-diagrams/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/ngx-diagrams"],
+          "options": {
+            "jestConfig": "libs/ngx-diagrams/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "tsConfig": "libs/ngx-diagrams/tsconfig.lib.json",
+            "project": "libs/ngx-diagrams/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "libs/ngx-diagrams/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "storybook": {
+          "builder": "@nrwl/storybook:storybook",
+          "options": {
+            "uiFramework": "@storybook/angular",
+            "port": 4400,
+            "config": {
+              "configFolder": "libs/ngx-diagrams/.storybook"
+            }
+          },
+          "configurations": {
+            "ci": {
+              "quiet": true
+            }
+          }
+        },
+        "build-storybook": {
+          "builder": "@nrwl/storybook:build",
+          "options": {
+            "uiFramework": "@storybook/angular",
+            "outputPath": "dist/storybook/ngx-diagrams",
+            "config": {
+              "configFolder": "libs/ngx-diagrams/.storybook"
+            }
+          },
+          "configurations": {
+            "ci": {
+              "quiet": true
+            }
+          }
+        }
+      }
+    },
+    "ngx-diagrams-e2e": {
+      "root": "apps/ngx-diagrams-e2e",
+      "sourceRoot": "apps/ngx-diagrams-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/ngx-diagrams-e2e/cypress.json",
+            "tsConfig": "apps/ngx-diagrams-e2e/tsconfig.e2e.json",
+            "devServerTarget": "ngx-diagrams:storybook"
+          },
+          "configurations": {
+            "ci": {
+              "devServerTarget": "ngx-diagrams:storybook:ci"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "tsConfig": ["apps/ngx-diagrams-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**", "!apps/ngx-diagrams-e2e/**"]
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/angular",
+    "analytics": "e315c558-e160-427f-a22e-090f79424ec8"
+  },
+  "schematics": {
+    "@nrwl/angular": {
+      "application": {
+        "linter": "eslint"
+      },
+      "library": {
+        "linter": "eslint"
+      },
+      "storybook-configuration": {
+        "linter": "eslint"
+      }
+    },
+    "@nrwl/angular:application": {
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
+    },
+    "@nrwl/angular:library": {
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
+    }
+  },
+  "defaultProject": "ngx-diagrams"
+}
