@@ -43,12 +43,22 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Run builders
         run: yarn run-many
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          path: ./dist
+          retention-days: 5
 
   publish_docs:
     needs: [build]
     name: Publish storybook
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
+      - name: Display structure of downloaded files
+        run: ls -R
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -59,5 +69,15 @@ jobs:
     name: Publish ngx-diagrams
     runs-on: ubuntu-latest
     steps:
+      - name: Restore dependencies from cache
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
       - name: Run semantic-release
         run: yarn semantic-release
