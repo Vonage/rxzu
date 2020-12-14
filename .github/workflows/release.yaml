@@ -58,8 +58,6 @@ jobs:
         with:
           name: artifact
           path: dist
-      - name: Display structure of downloaded files
-        run: ls -R
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -86,4 +84,7 @@ jobs:
           name: artifact
           path: dist
       - name: Run semantic-release
-        run: npm run semantic-release
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -35,7 +35,6 @@
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect",
     "pack-zip": "cd dist/libs/ngx-diagrams && npx bestzip ../ngx-diagrams.zip * && cd ../../",
-    "semantic-release": "npx semantic-release",
     "storybook": "yarn docs:json && nx run ngx-diagrams:storybook",
     "docs:json": "compodoc -p ./libs/ngx-diagrams/tsconfig.lib.prod.json -e json -d ./libs/ngx-diagrams",
     "build-storybook": "yarn docs:json && npx nx run ngx-diagrams:build-storybook",
