@@ -63,7 +63,7 @@ jobs:
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist/storybook
+          publish_dir: ./dist/storybook/ngx-diagrams
 
   publish_lib:
     needs: [build]
@@ -82,4 +82,4 @@ jobs:
           name: artifact
           path: dist
       - name: Run semantic-release
-        run: yarn semantic-release
+        run: npm run semantic-release
