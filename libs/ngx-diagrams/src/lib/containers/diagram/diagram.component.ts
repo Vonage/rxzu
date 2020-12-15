@@ -36,7 +36,6 @@ import { EntityMap, OutsideZone, ZonedClass } from '../../utils';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxDiagramComponent implements AfterViewInit, OnDestroy, ZonedClass {
-  // eslint-disable-next-line @angular-eslint/no-input-rename
   @Input('model') diagramModel: DiagramModel;
   @Input() allowCanvasZoom = true;
   @Input() allowCanvasTranslation = true;
