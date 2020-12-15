@@ -4,9 +4,8 @@ import {
   Injectable,
   Renderer2,
   RendererFactory2,
-  ViewContainerRef,
+  ViewContainerRef
 } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 import { delay, filter, take } from 'rxjs/operators';
 import { BaseEntity } from '../base.entity';
 import { DefaultLabelFactory } from '../defaults/factories/default-label.factory';
@@ -23,20 +22,18 @@ import { LinkModel } from '../models/link.model';
 import { NodeModel } from '../models/node.model';
 import { PortModel } from '../models/port.model';
 import { NgxDiagramsModule } from '../ngx-diagrams.module';
-import {
-  PathFinding,
-  ROUTING_SCALING_FACTOR,
-} from '../plugins/smart-routing.plugin';
-import { HashMap } from '../utils/types';
+import { PathFinding, ROUTING_SCALING_FACTOR } from '../plugins/smart-routing.plugin';
+import { createValueState } from '../state/state';
+import { EntityMap } from '../utils';
 
 @Injectable({ providedIn: NgxDiagramsModule })
 export class DiagramEngine {
   protected _renderer: Renderer2;
-  protected nodeFactories: HashMap<AbstractNodeFactory>;
-  protected labelFactories: HashMap<AbstractLabelFactory>;
-  protected linkFactories: HashMap<AbstractLinkFactory>;
-  protected portFactories: HashMap<AbstractPortFactory>;
-  protected canvas$: BehaviorSubject<Element>;
+  protected nodeFactories = new Map<string, AbstractNodeFactory>();
+  protected labelFactories = new Map<string, AbstractLabelFactory>();
+  protected linkFactories = new Map<string, AbstractLinkFactory>();
+  protected portFactories = new Map<string, AbstractPortFactory>();
+  protected canvas$ = createValueState<Element>(null);
 
   // smart routing related properties
   smartRouting: boolean;
@@ -52,16 +49,8 @@ export class DiagramEngine {
 
   diagramModel: DiagramModel;
 
-  constructor(
-    protected resolver: ComponentFactoryResolver,
-    protected rendererFactory: RendererFactory2
-  ) {
+  constructor(protected resolver: ComponentFactoryResolver, protected rendererFactory: RendererFactory2) {
     this._renderer = this.rendererFactory.createRenderer(null, null);
-    this.nodeFactories = {};
-    this.linkFactories = {};
-    this.portFactories = {};
-    this.labelFactories = {};
-    this.canvas$ = new BehaviorSubject<Element>(null);
   }
 
   createDiagram() {
@@ -70,33 +59,25 @@ export class DiagramEngine {
   }
 
   registerDefaultFactories() {
-    this.registerNodeFactory(
-      new DefaultNodeFactory(this.resolver, this._renderer)
-    );
-    this.registerPortFactory(
-      new DefaultPortFactory(this.resolver, this._renderer)
-    );
-    this.registerLinkFactory(
-      new DefaultLinkFactory(this.resolver, this._renderer)
-    );
-    this.registerLabelFactory(
-      new DefaultLabelFactory(this.resolver, this._renderer)
-    );
+    this.registerNodeFactory(new DefaultNodeFactory(this.resolver, this._renderer));
+    this.registerPortFactory(new DefaultPortFactory(this.resolver, this._renderer));
+    this.registerLinkFactory(new DefaultLinkFactory(this.resolver, this._renderer));
+    this.registerLabelFactory(new DefaultLabelFactory(this.resolver, this._renderer));
   }
 
   //#region Factories
   // LABELS
   registerLabelFactory(labelFactory: AbstractLabelFactory) {
-    this.labelFactories[labelFactory.type] = labelFactory;
+    this.labelFactories.set(labelFactory.type, labelFactory);
   }
 
-  getLabelFactories(): HashMap<AbstractLabelFactory> {
+  getLabelFactories(): EntityMap<AbstractLabelFactory> {
     return this.labelFactories;
   }
 
   getLabelFactory(type: string): AbstractLabelFactory {
-    if (this.labelFactories[type]) {
-      return this.labelFactories[type];
+    if (this.labelFactories.has(type)) {
+      return this.labelFactories.get(type);
     }
     throw new Error(`cannot find factory for node of type: [${type}]`);
   }
@@ -105,31 +86,26 @@ export class DiagramEngine {
     return this.getLabelFactory(label.getType());
   }
 
-  generateWidgetForLabel(
-    label: LabelModel,
-    labelHost: ViewContainerRef
-  ): ComponentRef<LabelModel> | null {
+  generateWidgetForLabel(label: LabelModel, labelHost: ViewContainerRef): ComponentRef<LabelModel> | null {
     const labelFactory = this.getFactoryForLabel(label);
     if (!labelFactory) {
-      throw new Error(
-        `Cannot find widget factory for node: ${label.getType()}`
-      );
+      throw new Error(`Cannot find widget factory for node: ${label.getType()}`);
     }
     return labelFactory.generateWidget(label, labelHost);
   }
 
   // NODES
   registerNodeFactory(nodeFactory: AbstractNodeFactory) {
-    this.nodeFactories[nodeFactory.type] = nodeFactory;
+    this.nodeFactories.set(nodeFactory.type, nodeFactory);
   }
 
-  getNodeFactories(): HashMap<AbstractNodeFactory> {
+  getNodeFactories(): EntityMap<AbstractNodeFactory> {
     return this.nodeFactories;
   }
 
   getNodeFactory(type: string): AbstractNodeFactory {
-    if (this.nodeFactories[type]) {
-      return this.nodeFactories[type];
+    if (this.nodeFactories.has(type)) {
+      return this.nodeFactories.get(type);
     }
     throw new Error(`cannot find factory for node of type: [${type}]`);
   }
@@ -138,10 +114,7 @@ export class DiagramEngine {
     return this.getNodeFactory(node.getType());
   }
 
-  generateWidgetForNode(
-    node: NodeModel,
-    nodesHost: ViewContainerRef
-  ): ComponentRef<NodeModel> | null {
+  generateWidgetForNode(node: NodeModel, nodesHost: ViewContainerRef): ComponentRef<NodeModel> | null {
     const nodeFactory = this.getFactoryForNode(node);
     if (!nodeFactory) {
       throw new Error(`Cannot find widget factory for node: ${node.getType()}`);
@@ -151,7 +124,7 @@ export class DiagramEngine {
 
   // PORTS
   registerPortFactory(factory: AbstractPortFactory) {
-    this.portFactories[factory.type] = factory;
+    this.portFactories.set(factory.type, factory);
   }
 
   getPortFactories() {
@@ -159,8 +132,8 @@ export class DiagramEngine {
   }
 
   getPortFactory(type: string): AbstractPortFactory {
-    if (this.portFactories[type]) {
-      return this.portFactories[type];
+    if (this.portFactories.has(type)) {
+      return this.portFactories.get(type);
     }
     throw new Error(`cannot find factory for port of type: [${type}]`);
   }
@@ -169,10 +142,7 @@ export class DiagramEngine {
     return this.getPortFactory(port.getType());
   }
 
-  generateWidgetForPort(
-    port: PortModel,
-    portsHost: ViewContainerRef
-  ): ComponentRef<PortModel> | null {
+  generateWidgetForPort(port: PortModel, portsHost: ViewContainerRef): ComponentRef<PortModel> | null {
     const portFactory = this.getFactoryForPort(port);
     if (!portFactory) {
       throw new Error(`Cannot find widget factory for port: ${port.getType()}`);
@@ -181,17 +151,17 @@ export class DiagramEngine {
   }
 
   // LINKS
-  getLinkFactories(): HashMap<AbstractLinkFactory> {
+  getLinkFactories(): EntityMap<AbstractLinkFactory> {
     return this.linkFactories;
   }
 
   registerLinkFactory(factory: AbstractLinkFactory) {
-    this.linkFactories[factory.type] = factory;
+    this.linkFactories.set(factory.type, factory);
   }
 
   getLinkFactory(type: string): AbstractLinkFactory {
-    if (this.linkFactories[type]) {
-      return this.linkFactories[type];
+    if (this.linkFactories.has(type)) {
+      return this.linkFactories.get(type);
     }
     throw new Error(`cannot find factory for link of type: [${type}]`);
   }
@@ -200,10 +170,7 @@ export class DiagramEngine {
     return this.getLinkFactory(link.getType());
   }
 
-  generateWidgetForLink(
-    link: LinkModel,
-    linksHost: ViewContainerRef
-  ): ComponentRef<LinkModel> | null {
+  generateWidgetForLink(link: LinkModel, linksHost: ViewContainerRef): ComponentRef<LinkModel> | null {
     const linkFactory = this.getFactoryForLink(link);
     if (!linkFactory) {
       throw new Error(`Cannot find link factory for link: ${link.getType()}`);
@@ -213,30 +180,20 @@ export class DiagramEngine {
   //#endregion
 
   getNodeElement(node: NodeModel): HTMLElement {
-    const selector = this.canvas$
-      .getValue()
-      .querySelector(`[data-nodeid="${node.id}"]`);
+    const selector = this.canvas$.value.querySelector(`[data-nodeid="${node.id}"]`);
     if (selector === null) {
-      throw new Error(
-        'Cannot find Node element with node id: [' + node.id + ']'
-      );
+      throw new Error('Cannot find Node element with node id: [' + node.id + ']');
     }
     return selector as HTMLElement;
   }
 
   getNodePortElement(port: PortModel): HTMLElement {
-    const selector = this.canvas$
-      .getValue()
-      .querySelector(
-        `[data-nodeid="${port.getParent().id}"] [data-portid="${port.id}"]`
-      );
+    const selector = this.canvas$.value.querySelector(
+      `[data-nodeid="${port.getParent().id}"] [data-portid="${port.id}"]`
+    );
     if (selector === null) {
       throw new Error(
-        'Cannot find Node Port element with node id: [' +
-          port.getParent().id +
-          '] and port id: [' +
-          port.id +
-          ']'
+        'Cannot find Node Port element with node id: [' + port.getParent().id + '] and port id: [' + port.id + ']'
       );
     }
     return selector as HTMLElement;
@@ -250,12 +207,10 @@ export class DiagramEngine {
     return {
       x:
         sourceElement.offsetWidth / 2 +
-        (rel.x - this.diagramModel.getOffsetX()) /
-          (this.diagramModel.getZoomLevel() / 100.0),
+        (rel.x - this.diagramModel.getOffsetX()) / (this.diagramModel.getZoomLevel() / 100.0),
       y:
         sourceElement.offsetHeight / 2 +
-        (rel.y - this.diagramModel.getOffsetY()) /
-          (this.diagramModel.getZoomLevel() / 100.0),
+        (rel.y - this.diagramModel.getOffsetY()) / (this.diagramModel.getZoomLevel() / 100.0)
     };
   }
 
@@ -272,21 +227,13 @@ export class DiagramEngine {
   } {
     const sourceElement = this.getNodePortElement(port);
     const sourceRect = sourceElement.getBoundingClientRect() as DOMRect;
-    const canvasRect = this.canvas$
-      .getValue()
-      .getBoundingClientRect() as ClientRect;
+    const canvasRect = this.canvas$.value.getBoundingClientRect() as ClientRect;
 
     return {
-      x:
-        (sourceRect.x - this.diagramModel.getOffsetX()) /
-          (this.diagramModel.getZoomLevel() / 100.0) -
-        canvasRect.left,
-      y:
-        (sourceRect.y - this.diagramModel.getOffsetY()) /
-          (this.diagramModel.getZoomLevel() / 100.0) -
-        canvasRect.top,
+      x: (sourceRect.x - this.diagramModel.getOffsetX()) / (this.diagramModel.getZoomLevel() / 100.0) - canvasRect.left,
+      y: (sourceRect.y - this.diagramModel.getOffsetY()) / (this.diagramModel.getZoomLevel() / 100.0) - canvasRect.top,
       width: sourceRect.width,
-      height: sourceRect.height,
+      height: sourceRect.height
     };
   }
 
@@ -295,10 +242,10 @@ export class DiagramEngine {
    * It currently assumes nodes have a rectangular shape, can be overriden for customised shapes.
    */
   getNodeDimensions(node: NodeModel): { width: number; height: number } {
-    if (!this.canvas$.getValue()) {
+    if (!this.canvas$.value) {
       return {
         width: 0,
-        height: 0,
+        height: 0
       };
     }
 
@@ -307,28 +254,24 @@ export class DiagramEngine {
 
     return {
       width: nodeRect.width,
-      height: nodeRect.height,
+      height: nodeRect.height
     };
   }
 
   setCanvas(canvas: Element) {
-    this.canvas$.next(canvas);
+    this.canvas$.set(canvas).emit();
   }
 
   getRelativeMousePoint(event: MouseEvent): { x: number; y: number } {
     const point = this.getRelativePoint(event.clientX, event.clientY);
     return {
-      x:
-        (point.x - this.diagramModel.getOffsetX()) /
-        (this.diagramModel.getZoomLevel() / 100.0),
-      y:
-        (point.y - this.diagramModel.getOffsetY()) /
-        (this.diagramModel.getZoomLevel() / 100.0),
+      x: (point.x - this.diagramModel.getOffsetX()) / (this.diagramModel.getZoomLevel() / 100.0),
+      y: (point.y - this.diagramModel.getOffsetY()) / (this.diagramModel.getZoomLevel() / 100.0)
     };
   }
 
   getRelativePoint(x: number, y: number) {
-    const canvasRect = this.canvas$.getValue().getBoundingClientRect();
+    const canvasRect = this.canvas$.value.getBoundingClientRect();
     return { x: x - canvasRect.left, y: y - canvasRect.top };
   }
 
@@ -349,27 +292,23 @@ export class DiagramEngine {
    * @param additionalZoomFactor allow for further zooming out to make sure edges doesn't cut
    */
   zoomToFit(additionalZoomFactor = 0.005) {
-    this.canvas$
-      .pipe(filter(Boolean), take(1), delay(0))
-      .subscribe((canvas: HTMLElement) => {
-        const xFactor = canvas.clientWidth / canvas.scrollWidth;
-        const yFactor = canvas.clientHeight / canvas.scrollHeight;
-        const zoomFactor = xFactor < yFactor ? xFactor : yFactor;
+    this.canvas$.value$.pipe(filter(Boolean), take(1), delay(0)).subscribe((canvas: HTMLElement) => {
+      const xFactor = canvas.clientWidth / canvas.scrollWidth;
+      const yFactor = canvas.clientHeight / canvas.scrollHeight;
+      const zoomFactor = xFactor < yFactor ? xFactor : yFactor;
 
-        let newZoomLvl =
-          this.diagramModel.getZoomLevel() *
-          (zoomFactor - additionalZoomFactor);
-        const maxZoomOut = this.diagramModel.getMaxZoomOut();
+      let newZoomLvl = this.diagramModel.getZoomLevel() * (zoomFactor - additionalZoomFactor);
+      const maxZoomOut = this.diagramModel.getMaxZoomOut();
 
-        if (maxZoomOut && newZoomLvl < maxZoomOut) {
-          newZoomLvl = maxZoomOut;
-        }
+      if (maxZoomOut && newZoomLvl < maxZoomOut) {
+        newZoomLvl = maxZoomOut;
+      }
 
-        this.diagramModel.setZoomLevel(newZoomLvl);
+      this.diagramModel.setZoomLevel(newZoomLvl);
 
-        // TODO: either block the canvas movement on 0,0 or detect the top left furthest element and set the offest to its edges
-        this.diagramModel.setOffset(0, 0);
-      });
+      // TODO: either block the canvas movement on 0,0 or detect the top left furthest element and set the offest to its edges
+      this.diagramModel.setOffset(0, 0);
+    });
   }
 
   // SMART ROUTING
@@ -392,7 +331,7 @@ export class DiagramEngine {
       width: canvasWidth,
       hAdjustmentFactor,
       height: canvasHeight,
-      vAdjustmentFactor,
+      vAdjustmentFactor
     } = this.calculateMatrixDimensions();
 
     this.hAdjustmentFactor = hAdjustmentFactor;
@@ -401,10 +340,7 @@ export class DiagramEngine {
     const matrixWidth = Math.ceil(canvasWidth / ROUTING_SCALING_FACTOR);
     const matrixHeight = Math.ceil(canvasHeight / ROUTING_SCALING_FACTOR);
 
-    this.canvasMatrix = Array.from(
-      { length: matrixHeight },
-      (_, i) => i + 1
-    ).map(() => {
+    this.canvasMatrix = Array.from({ length: matrixHeight }, (_, i) => i + 1).map(() => {
       return new Array(matrixWidth).fill(0);
     });
   }
@@ -419,16 +355,14 @@ export class DiagramEngine {
     height: number;
     vAdjustmentFactor: number;
   } {
-    const allNodesCoords = Object.values(this.diagramModel.getNodes()).map(
-      (item) => ({
-        x: item.getCoords().x,
-        width: item.getWidth(),
-        y: item.getCoords().y,
-        height: item.getHeight(),
-      })
-    );
+    const allNodesCoords = this.diagramModel.getNodesArray().map((item) => ({
+      x: item.getCoords().x,
+      width: item.getWidth(),
+      y: item.getCoords().y,
+      height: item.getHeight()
+    }));
 
-    const allLinks = Object.values(this.diagramModel.getLinks());
+    const allLinks = this.diagramModel.getLinksArray();
 
     const allPortsCoords = allLinks
       .flatMap((link) => [link.getSourcePort(), link.getTargetPort()])
@@ -437,7 +371,7 @@ export class DiagramEngine {
         x: item.getX(),
         width: item.getWidth(),
         y: item.getY(),
-        height: item.getHeight(),
+        height: item.getHeight()
       }));
 
     const allPointsCoords = allLinks
@@ -447,10 +381,10 @@ export class DiagramEngine {
         x: item.getCoords().x,
         width: 0,
         y: item.getCoords().y,
-        height: 0,
+        height: 0
       }));
 
-    const canvas = this.canvas$.getValue() as HTMLDivElement;
+    const canvas = this.canvas$.value as HTMLDivElement;
 
     const allElements = allNodesCoords.concat(allPortsCoords, allPointsCoords);
 
@@ -468,10 +402,7 @@ export class DiagramEngine {
       return a.x + a.width >= b.x + b.width ? a : b;
     });
 
-    const maxX = Math.max(
-      maxXElement.x + maxXElement.width,
-      canvas.offsetWidth
-    );
+    const maxX = Math.max(maxXElement.x + maxXElement.width, canvas.offsetWidth);
 
     const minY =
       Math.floor(
@@ -487,10 +418,7 @@ export class DiagramEngine {
       return a.y + a.height >= b.y + b.height ? a : b;
     });
 
-    const maxY = Math.max(
-      maxYElement.y + maxYElement.height,
-      canvas.offsetWidth
-    );
+    const maxY = Math.max(maxYElement.y + maxYElement.height, canvas.offsetWidth);
 
     const width = Math.ceil(Math.abs(minX) + maxX);
     const height = Math.ceil(Math.abs(minY) + maxY);
@@ -499,7 +427,7 @@ export class DiagramEngine {
       width,
       hAdjustmentFactor: Math.abs(minX) / ROUTING_SCALING_FACTOR + 1,
       height,
-      vAdjustmentFactor: Math.abs(minY) / ROUTING_SCALING_FACTOR + 1,
+      vAdjustmentFactor: Math.abs(minY) / ROUTING_SCALING_FACTOR + 1
     };
   }
 
@@ -579,23 +507,15 @@ export class DiagramEngine {
    * Updates (by reference) where nodes will be drawn on the matrix passed in.
    */
   markNodes(matrix: number[][]): void {
-    Object.values(this.diagramModel.getNodes()).forEach((node) => {
+    this.diagramModel.getNodes().forEach((node) => {
       const startX = Math.floor(node.getCoords().x / ROUTING_SCALING_FACTOR);
-      const endX = Math.ceil(
-        (node.getCoords().x + node.getWidth()) / ROUTING_SCALING_FACTOR
-      );
+      const endX = Math.ceil((node.getCoords().x + node.getWidth()) / ROUTING_SCALING_FACTOR);
       const startY = Math.floor(node.getCoords().y / ROUTING_SCALING_FACTOR);
-      const endY = Math.ceil(
-        (node.getCoords().y + node.getHeight()) / ROUTING_SCALING_FACTOR
-      );
+      const endY = Math.ceil((node.getCoords().y + node.getHeight()) / ROUTING_SCALING_FACTOR);
 
       for (let x = startX - 1; x <= endX + 1; x++) {
         for (let y = startY - 1; y < endY + 1; y++) {
-          this.markMatrixPoint(
-            matrix,
-            this.translateRoutingX(x),
-            this.translateRoutingY(y)
-          );
+          this.markMatrixPoint(matrix, this.translateRoutingX(x), this.translateRoutingY(y));
         }
       }
     });
@@ -605,24 +525,21 @@ export class DiagramEngine {
    * Updates (by reference) where ports will be drawn on the matrix passed in.
    */
   markPorts(matrix: number[][]): void {
-    const allElements = Object.values(
-      this.diagramModel.getLinks()
-    ).flatMap((link) => [].concat(link.getSourcePort(), link.getTargetPort()));
+    const allElements = this.diagramModel
+      .getLinksArray()
+      .flatMap((link) => [link.getSourcePort(), link.getTargetPort()]);
+
     allElements
       .filter((port) => port !== null)
       .forEach((port) => {
-        const startX = Math.floor(port.x / ROUTING_SCALING_FACTOR);
-        const endX = Math.ceil((port.x + port.width) / ROUTING_SCALING_FACTOR);
-        const startY = Math.floor(port.y / ROUTING_SCALING_FACTOR);
-        const endY = Math.ceil((port.y + port.height) / ROUTING_SCALING_FACTOR);
+        const startX = Math.floor(port.getX() / ROUTING_SCALING_FACTOR);
+        const endX = Math.ceil((port.getX() + port.getWidth()) / ROUTING_SCALING_FACTOR);
+        const startY = Math.floor(port.getY() / ROUTING_SCALING_FACTOR);
+        const endY = Math.ceil((port.getY() + port.getHeight()) / ROUTING_SCALING_FACTOR);
 
         for (let x = startX - 1; x <= endX + 1; x++) {
           for (let y = startY - 1; y < endY + 1; y++) {
-            this.markMatrixPoint(
-              matrix,
-              this.translateRoutingX(x),
-              this.translateRoutingY(y)
-            );
+            this.markMatrixPoint(matrix, this.translateRoutingX(x), this.translateRoutingY(y));
           }
         }
       });

@@ -64,7 +64,7 @@ export class AutoArrangeExampleStoryComponent implements OnInit {
 
   autoArrange() {
     this.dagreEngine.redistribute(this.diagramModel, {
-      graph: { align: 'DL', rankdir: 'LR' },
+      graph: { align: 'DL', rankdir: 'LR', ranksep: 150 },
     });
     this.diagramEngine.zoomToFit();
   }

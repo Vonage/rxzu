@@ -1,17 +1,13 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Coords } from '../interfaces/coords.interface';
 import { SerializedLabelModel } from '../interfaces/serialization.interface';
+import { createValueState } from '../state/state';
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 
 export class LabelModel extends BaseModel<LinkModel> {
-  protected readonly _coords = new BehaviorSubject<Coords>({ x: 0, y: 0 });
-  protected readonly _rotation = new BehaviorSubject(0);
-
-  protected readonly coords$ = this._coords.pipe(this.entityPipe('coords'));
-  protected readonly rotation$ = this._rotation.pipe(
-    this.entityPipe('rotation')
-  );
+  protected coords$ = createValueState<Coords>({ x: 0, y: 0 }, this.entityPipe('coords'));
+  protected rotation$ = createValueState<number>(0, this.entityPipe('rotation'));
 
   constructor(type?: string, id?: string, logPrefix = '[Label]') {
     super(type, id, logPrefix);
@@ -22,16 +18,16 @@ export class LabelModel extends BaseModel<LinkModel> {
       ...super.serialize(),
       type: this.getType(),
       rotation: this.getRotation(),
-      coords: this.getCoords(),
+      coords: this.getCoords()
     };
   }
 
   getRotation() {
-    return this._rotation.getValue();
+    return this.rotation$.value;
   }
 
   getCoords() {
-    return this._coords.getValue();
+    return this.coords$.value;
   }
 
   destroy() {
@@ -39,18 +35,18 @@ export class LabelModel extends BaseModel<LinkModel> {
   }
 
   setRotation(angle: number) {
-    this._rotation.next(angle);
+    this.rotation$.set(angle).emit();
   }
 
   selectRotation(): Observable<number> {
-    return this.rotation$;
+    return this.rotation$.value$;
   }
 
   setCoords(newCoords: Partial<Coords>) {
-    this._coords.next({ ...this._coords.getValue(), ...newCoords });
+    this.coords$.set({ ...this.coords$.value, ...newCoords }).emit();
   }
 
   selectCoords(): Observable<Coords> {
-    return this.coords$;
+    return this.coords$.value$;
   }
 }

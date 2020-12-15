@@ -3,16 +3,11 @@ import SVGPath from 'paths-js/path';
 /**
  * Utility pathing and routing service
  */
-import { Observable } from 'rxjs';
-import {
-  distinctUntilChanged,
-  shareReplay,
-  takeUntil,
-  tap,
-} from 'rxjs/operators';
+import { MonoTypeOperatorFunction, Observable } from 'rxjs';
+import { distinctUntilChanged, shareReplay, takeUntil, tap } from 'rxjs/operators';
 import { Coords } from '../interfaces/coords.interface';
 import { ROUTING_SCALING_FACTOR } from '../plugins/smart-routing.plugin';
-import { HashMap } from './types';
+import { Entries, HashMap } from './types';
 
 export enum LOG_LEVEL {
   'LOG',
@@ -71,17 +66,19 @@ export function withLog(
  * rxjs entity properties operator
  * @internal
  */
-export function entityProperty<Y>(
-  destroyedNotifier: Observable<Y>,
+export function entityProperty<T>(
+  destroyedNotifier: Observable<any>,
   replayBy = 1,
   logMessage = ''
-) {
-  return <T>(source: Observable<T>) =>
+): MonoTypeOperatorFunction<T> {
+  return <T>(source: Observable<T>): Observable<T> =>
     source.pipe(
-      takeUntil(destroyedNotifier),
-      distinctUntilChanged(),
+      distinctUntilChanged((a, b) =>
+        a instanceof Map || b instanceof Map ? false : a === b
+      ),
       shareReplay(replayBy),
-      withLog(logMessage)
+      withLog(logMessage),
+      takeUntil(destroyedNotifier)
     );
 }
 
@@ -122,6 +119,10 @@ export function coerceArray<T>(value: T | T[]): T[] {
   return Array.isArray(value) ? value : [value];
 }
 
+export function isEmptyArray<T>(arr: T[]): boolean {
+  return !arr || !isArray(arr) || arr.length === 0;
+}
+
 export function mapToArray<T>(map: HashMap<T>): T[] {
   const result = [];
   for (const key in map) {
@@ -131,6 +132,19 @@ export function mapToArray<T>(map: HashMap<T>): T[] {
   }
 
   return result;
+}
+
+export function mapToEntries<T>(map: HashMap<T>): Entries<T> {
+  const result = [];
+  for (const key in map) {
+    result.push([key, map[key]]);
+  }
+
+  return result;
+}
+
+export function unique<T>(arr: T[]): T[] {
+  return [...new Set<T>(arr)];
 }
 
 export function arrayToMap<T>(arr: Array<{ id: ID } & T>): HashMap<T> {

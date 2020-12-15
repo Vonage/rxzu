@@ -1,5 +1,5 @@
-import { PortModel } from '../../models/port.model';
 import { LinkModel } from '../../models/link.model';
+import { PortModel } from '../../models/port.model';
 import { HashMap } from '../../utils/types';
 import { DefaultLinkModel } from './default-link.model';
 
@@ -25,7 +25,7 @@ export class DefaultPortModel extends PortModel {
     id = null,
     label = null,
     linkType = 'default',
-    maximumLinks = null,
+    maximumLinks = null
   }: DefaultPortModelConfig = {}) {
     super(name, type, id, null, linkType);
     this.in = isInput;

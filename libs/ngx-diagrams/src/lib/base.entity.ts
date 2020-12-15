@@ -1,13 +1,14 @@
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { MonoTypeOperatorFunction, Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseEvent, LockEvent } from './interfaces/event.interface';
+import { createValueState } from './state/state';
 import {
   entityProperty as _entityProperty,
   ID,
   log as _log,
   LOG_LEVEL,
   UID,
-  withLog as _withLog,
+  withLog as _withLog
 } from './utils/tool-kit.util';
 import { HashMap } from './utils/types';
 
@@ -15,16 +16,9 @@ export type BaseEntityType = 'node' | 'link' | 'port' | 'point';
 
 export class BaseEntity {
   protected _id: ID;
-  /**
-   * a prefix to make logs more easier
-   */
-  protected _destroyed = new Subject<void>();
-  protected _destroyed$ = this._destroyed.asObservable();
-  protected _locked = new BehaviorSubject(false);
-  protected _locked$ = this._locked.pipe(
-    this.entityPipe('locked'),
-    map((locked) => new LockEvent(this, locked))
-  );
+
+  protected destroyed$ = new Subject<void>();
+  protected locked$ = createValueState(false, this.entityPipe('locked'));
 
   protected readonly _logPrefix: string;
 
@@ -33,11 +27,11 @@ export class BaseEntity {
     this._logPrefix = `${logPrefix}`;
   }
 
-  public get id(): ID {
+  get id(): ID {
     return this._id;
   }
 
-  public set id(id: ID) {
+  set id(id: ID) {
     this._id = id;
   }
 
@@ -49,20 +43,16 @@ export class BaseEntity {
     return _withLog(`${this._logPrefix} ${message}: `, LOG_LEVEL.LOG, ...args);
   }
 
-  entityPipe(logMessage = '') {
-    return _entityProperty(
-      this.onEntityDestroy(),
-      0,
-      `${this._logPrefix}: ${logMessage}`
-    );
+  entityPipe<T>(logMessage = ''): MonoTypeOperatorFunction<T> {
+    return _entityProperty<T>(this.onEntityDestroy(), 0, `${this._logPrefix}: ${logMessage}`);
   }
 
   getLocked(): boolean {
-    return this._locked.getValue();
+    return this.locked$.value;
   }
 
   setLocked(locked = true) {
-    this._locked.next(locked);
+    this.locked$.set(locked).emit();
   }
 
   // eslint-disable-next-line
@@ -70,7 +60,7 @@ export class BaseEntity {
     /*noop*/
   }
 
-  public clone(lookupTable: HashMap<any> = {}) {
+  clone(lookupTable: HashMap<any> = {}) {
     // try and use an existing clone first
     if (lookupTable[this.id]) {
       return lookupTable[this.id];
@@ -84,24 +74,24 @@ export class BaseEntity {
     return clone;
   }
 
-  public serialize() {
+  serialize() {
     return {
       id: this.id,
-      locked: this.getLocked(),
+      locked: this.getLocked()
     };
   }
 
-  public lockChanges(): Observable<LockEvent> {
-    return this._locked$;
+  lockChanges(): Observable<LockEvent> {
+    return this.locked$.select((locked) => new LockEvent(this, locked));
   }
 
-  public destroy() {
+  destroy() {
     this.log('entity destroyed');
-    this._destroyed.next();
-    this._destroyed.complete();
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
-  public onEntityDestroy(): Observable<BaseEvent<BaseEntity>> {
-    return this._destroyed$.pipe(map((opts) => new BaseEvent(this, opts)));
+  onEntityDestroy(): Observable<BaseEvent<BaseEntity>> {
+    return this.destroyed$.pipe(map((opts) => new BaseEvent(this, opts)));
   }
 }

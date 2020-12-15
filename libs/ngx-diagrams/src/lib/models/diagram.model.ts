@@ -1,75 +1,66 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { BaseEntity, BaseEntityType } from '../base.entity';
 import { Coords } from '../interfaces/coords.interface';
 import { SelectOptions } from '../interfaces/select-options.interface';
 import { SerializedDiagramModel } from '../interfaces/serialization.interface';
 import { DiagramEngine } from '../services/engine.service';
-import { arrayToMap, ID, isArray } from '../utils/tool-kit.util';
-import { HashMap } from '../utils/types';
+import { createEntityState, createValueState } from '../state/state';
+import { coerceArray, ID, isEmptyArray, unique } from '../utils';
+import { EntityMap } from '../utils/types';
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { NodeModel } from './node.model';
-import { PointModel } from './point.model';
 import { PortModel } from './port.model';
 
 export class DiagramModel extends BaseEntity {
-  protected _links$ = new BehaviorSubject<HashMap<LinkModel>>({});
-  protected _nodes$ = new BehaviorSubject<HashMap<NodeModel>>({});
-  protected _zoom$ = new BehaviorSubject(100);
-  protected _offsetX$ = new BehaviorSubject(0);
-  protected _offsetY$ = new BehaviorSubject(0);
-  protected _gridSize$ = new BehaviorSubject(0);
-  protected _maxZoomOut$ = new BehaviorSubject(null);
-  protected _maxZoomIn$ = new BehaviorSubject(null);
+  protected nodes$ = createEntityState<NodeModel>([], this.entityPipe('nodes'));
+  protected links$ = createEntityState<LinkModel>([], this.entityPipe('links'));
+  protected offsetX$ = createValueState(0, this.entityPipe('offsetX'));
+  protected offsetY$ = createValueState(0, this.entityPipe('offsetY'));
+  protected zoom$ = createValueState(100, this.entityPipe('zoom'));
+  protected maxZoomOut$ = createValueState(null);
+  protected maxZoomIn$ = createValueState(null);
+  protected gridSize$ = createValueState(0);
 
-  protected nodes$ = this._nodes$.pipe(this.entityPipe('nodes'));
-  protected links$ = this._links$.pipe(this.entityPipe('links'));
-
-  protected offsetX$ = this._offsetX$.pipe(this.entityPipe('offsetX'));
-  protected offsetY$ = this._offsetY$.pipe(this.entityPipe('offsetY'));
-  protected zoom$ = this._zoom$.pipe(this.entityPipe('zoom'));
-
-  constructor(
-    protected diagramEngine: DiagramEngine,
-    id?: string,
-    logPrefix = '[Diagram]'
-  ) {
+  constructor(protected diagramEngine: DiagramEngine, id?: string, logPrefix = '[Diagram]') {
     super(id, logPrefix);
   }
 
   // TODO: support the following events for links and nodes
   // removed, updated<positionChanged/dataChanged>, added
-  getNodes(): HashMap<NodeModel> {
-    return this._nodes$.getValue();
+  getNodes(): EntityMap<NodeModel> {
+    return this.nodes$.value;
   }
 
-  getNode(id: ID): NodeModel | null {
-    return this._nodes$.getValue()[id];
+  getNodesArray(): NodeModel[] {
+    return this.nodes$.array();
   }
 
-  getLink(id: ID): LinkModel | null {
-    return this._links$.getValue()[id];
+  getNode(id: ID): NodeModel | undefined {
+    return this.nodes$.get(id);
   }
 
-  getLinks(): HashMap<LinkModel> {
-    return this._links$.getValue();
+  getLink(id: ID): LinkModel | undefined {
+    return this.links$.get(id);
   }
 
-  getAllPorts(options?: SelectOptions<PortModel>): Map<string, PortModel> {
-    const portsMap = new Map();
-    // TODO: optimize!
-    Object.values(this.getNodes()).forEach((node) => {
-      for (const [key, port] of Object.entries(node.getPorts())) {
-        if (options.filter) {
-          if (options.filter(port as PortModel)) {
-            portsMap.set(key, port);
-          }
-        } else {
-          portsMap.set(key, port);
-        }
-      }
+  getLinks(): EntityMap<LinkModel> {
+    return this.links$.value;
+  }
+
+  getLinksArray(): LinkModel[] {
+    return this.links$.array();
+  }
+
+  getAllPorts(options: SelectOptions<PortModel> = {}): Map<string, PortModel> {
+    const result = new Map<ID, PortModel>();
+
+    this.getNodes().forEach((node) => {
+      const ports = options.filter ? node.getPortsArray().filter(options.filter) : node.getPortsArray();
+      ports.forEach((port) => result.set(port.id, port));
     });
-    return portsMap;
+
+    return result;
   }
 
   /**
@@ -77,7 +68,7 @@ export class DiagramModel extends BaseEntity {
    * @returns Inserted Node
    */
   addNode(node: NodeModel): NodeModel {
-    this._nodes$.next({ ...this._nodes$.value, [node.id]: node });
+    this.nodes$.add(node).emit();
     return node;
   }
 
@@ -85,28 +76,23 @@ export class DiagramModel extends BaseEntity {
    * Delete a node from the diagram
    */
   deleteNode(nodeOrId: NodeModel | string): void {
-    const nodeID: ID = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
-    const node = this.getNode(nodeID);
+    const nodeId: ID = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
+    const node = this.getNode(nodeId);
 
-    // delete all related links
-    Object.values(node.getPorts()).forEach((port: PortModel) => {
-      Object.values(port.getLinks()).forEach((link) => {
+    for (const port of node.getPorts().values()) {
+      for (const link of port.getLinks().values()) {
         this.deleteLink(link);
-      });
-    });
+      }
+    }
 
-    const updNodes = { ...this.getNodes() };
-    delete updNodes[nodeID];
-    this._nodes$.next(updNodes);
-
-    node.destroy();
+    this.nodes$.remove(nodeId).emit();
   }
 
   /**
    * Get nodes as observable, use `.getValue()` for snapshot
    */
-  selectNodes(): Observable<HashMap<NodeModel>> {
-    return this.nodes$;
+  selectNodes(): Observable<EntityMap<NodeModel>> {
+    return this.nodes$.value$;
   }
 
   /**
@@ -114,7 +100,7 @@ export class DiagramModel extends BaseEntity {
    * @returns Newly created link
    */
   addLink(link: LinkModel): LinkModel {
-    this._links$.next({ ...this.getLinks(), [link.id]: link });
+    this.links$.add(link).emit();
     return link;
   }
 
@@ -122,37 +108,20 @@ export class DiagramModel extends BaseEntity {
    * Delete link
    */
   deleteLink(linkOrId: LinkModel | string) {
-    const linkID: ID = typeof linkOrId === 'string' ? linkOrId : linkOrId.id;
-    const link = this.getLink(linkID);
-
-    const updLinks = { ...this.getLinks() };
-    delete updLinks[linkID];
-
-    this._links$.next(updLinks);
-    link.destroy();
+    const linkId: ID = typeof linkOrId === 'string' ? linkOrId : linkOrId.id;
+    this.links$.remove(linkId).emit();
   }
 
   reset() {
-    const links = Object.values(this.getLinks());
-    const nodes = Object.values(this.getNodes());
-
-    for (const node of nodes) {
-      node.destroy();
-    }
-
-    for (const link of links) {
-      link.destroy();
-    }
-
-    this._nodes$.next({});
-    this._links$.next({});
+    this.nodes$.clear().emit();
+    this.links$.clear().emit();
   }
 
   /**
    * Get links behaviour subject, use `.getValue()` for snapshot
    */
-  selectLinks(): Observable<HashMap<LinkModel>> {
-    return this.links$;
+  selectLinks(): Observable<EntityMap<LinkModel>> {
+    return this.links$.value$;
   }
 
   // /**
@@ -160,82 +129,75 @@ export class DiagramModel extends BaseEntity {
   //  * @returns diagram model as a string
   //  */
   serialize(): SerializedDiagramModel {
-    const serializedNodes = Object.values(this.getNodes()).map((node) =>
-      node.serialize()
-    );
-    const serializedLinks = Object.values(this.getLinks()).map((link) =>
-      link.serialize()
-    );
-    return {
-      ...super.serialize(),
-      nodes: serializedNodes,
-      links: serializedLinks,
-    };
+    const serializedNodes = this.nodes$.map((node) => node.serialize());
+    const serializedLinks = this.links$.map((link) => link.serialize());
+
+    return { ...super.serialize(), nodes: serializedNodes, links: serializedLinks };
   }
 
   setMaxZoomOut(maxZoomOut: number) {
-    this._maxZoomOut$.next(maxZoomOut);
+    this.maxZoomOut$.set(maxZoomOut).emit();
   }
 
   setMaxZoomIn(maxZoomIn: number) {
-    this._maxZoomIn$.next(maxZoomIn);
+    this.maxZoomIn$.set(maxZoomIn).emit();
   }
 
   getMaxZoomOut() {
-    return this._maxZoomOut$.getValue();
+    return this.maxZoomOut$.value;
   }
 
   getMaxZoomIn() {
-    return this._maxZoomIn$.getValue();
+    return this.maxZoomIn$.value;
   }
 
   setOffset(x: number, y: number) {
-    this._offsetX$.next(x);
-    this._offsetY$.next(y);
+    this.offsetX$.set(x).emit();
+    this.offsetY$.set(y).emit();
   }
 
   setOffsetX(x: number) {
-    this._offsetX$.next(x);
+    this.offsetX$.set(x).emit();
   }
 
   getOffsetX(): number {
-    return this._offsetX$.getValue();
+    return this.offsetX$.value;
   }
 
   selectOffsetX(): Observable<number> {
-    return this.offsetX$;
+    return this.offsetX$.value$;
   }
 
   setOffsetY(y: number) {
-    this._offsetY$.next(y);
+    this.offsetY$.set(y).emit();
   }
 
   getOffsetY(): number {
-    return this._offsetY$.getValue();
+    return this.offsetY$.value;
   }
 
   selectOffsetY(): Observable<number> {
-    return this.offsetY$;
+    return this.offsetY$.value$;
   }
 
   setZoomLevel(z: number) {
-    const maxZoomIn = this._maxZoomIn$.getValue();
-    const maxZoomOut = this._maxZoomOut$.getValue();
+    const maxZoomIn = this.getMaxZoomIn();
+    const maxZoomOut = this.getMaxZoomOut();
 
     // check if zoom levels exceeded defined boundaries
     if ((maxZoomIn && z > maxZoomIn) || (maxZoomOut && z < maxZoomOut)) {
       return;
     }
 
-    this._zoom$.next(z);
+    this.zoom$.set(z).emit();
   }
 
   getZoomLevel(): number {
-    return this._zoom$.getValue();
+    return this.zoom$.value;
   }
 
   selectZoomLevel(): Observable<number> {
-    return this.zoom$;
+    return this.zoom$.value$;
   }
 
   getDiagramEngine(): DiagramEngine {
@@ -244,7 +206,7 @@ export class DiagramModel extends BaseEntity {
 
   clearSelection(ignore: BaseModel | null = null) {
     this.getSelectedItems().forEach((element) => {
-      if (ignore && ignore.id === element.id) {
+      if (ignore?.id === element.id) {
         return;
       }
       element.setSelected(false);
@@ -252,64 +214,47 @@ export class DiagramModel extends BaseEntity {
   }
 
   getGridPosition({ x, y }: Coords): Coords {
-    const gridSize = this._gridSize$.getValue();
+    const gridSize = this.gridSize$.value;
     if (gridSize === 0) {
       return { x, y };
     }
+
     return {
       x: gridSize * Math.floor((x + gridSize / 2) / gridSize),
-      y: gridSize * Math.floor((y + gridSize / 2) / gridSize),
+      y: gridSize * Math.floor((y + gridSize / 2) / gridSize)
     };
   }
 
   getSelectedItems(...filters: BaseEntityType[]): BaseModel[] {
-    if (!Array.isArray(filters)) {
-      filters = [filters];
-    }
-    let items: BaseModel[] = [];
+    filters = coerceArray(filters);
 
-    // run through nodes
-    items = items.concat(
-      Object.values(this.getNodes()).flatMap((node) =>
-        node.getSelectedEntities()
-      )
-    );
+    const items: BaseModel[] = [];
+    const nodes = this.nodes$.array();
+    const links = this.links$.array();
 
-    // find all the links
-    items = items.concat(
-      Object.values(this.getLinks()).flatMap((link) =>
-        link.getSelectedEntities()
-      )
-    );
+    const selectedNodes = () => nodes.flatMap((node) => node.getSelectedEntities());
+    const selectedPorts = () =>
+      nodes.flatMap((node) => node.getPortsArray().flatMap((port: PortModel) => port.getSelectedEntities()));
+    const selectedLinks = () => links.flatMap((link) => link.getSelectedEntities());
+    const selectedPoints = () =>
+      links.flatMap((link) => link.getPoints().flatMap((point) => point.getSelectedEntities()));
 
-    // find all points
-    items = items.concat(
-      Object.values(this.getLinks()).flatMap((link) => {
-        return link.getPoints().flatMap((point) => point.getSelectedEntities());
-      })
-    );
+    if (isEmptyArray(filters)) {
+      items.push(...selectedNodes(), ...selectedPorts(), ...selectedLinks(), ...selectedPoints());
+    } else {
+      const byType: Record<BaseEntityType, () => BaseModel[]> = {
+        node: selectedNodes,
+        port: selectedPorts,
+        link: selectedLinks,
+        point: selectedPoints
+      };
 
-    items = [...new Set(items)];
-
-    if (filters.length > 0) {
-      items = items.filter((item: BaseModel) => {
-        if (filters.includes('node') && item instanceof NodeModel) {
-          return true;
-        }
-        if (filters.includes('link') && item instanceof LinkModel) {
-          return true;
-        }
-        if (filters.includes('port') && item instanceof PortModel) {
-          return true;
-        }
-        if (filters.includes('point') && item instanceof PointModel) {
-          return true;
-        }
-        return false;
-      });
+      for (const type of filters) {
+        items.push(...byType[type]());
+      }
     }
 
-    return items;
+    return unique(items);
   }
 
   addAll(...models: BaseModel[]) {
@@ -330,13 +275,17 @@ export class DiagramModel extends BaseEntity {
     return models;
   }
 
-  addLinks(links: LinkModel[] | HashMap<LinkModel>) {
-    const added = isArray(links) ? arrayToMap(links) : links;
-    this._links$.next({ ...this.getLinks(), ...added });
+  addLinks(links: LinkModel[]) {
+    this.links$.addMany(links).emit();
   }
 
-  addNodes(nodes: NodeModel[] | HashMap<NodeModel>) {
-    const added = isArray(nodes) ? arrayToMap(nodes) : nodes;
-    this._nodes$.next({ ...this.getNodes(), ...added });
+  addNodes(nodes: NodeModel[]) {
+    this.nodes$.addMany(nodes).emit();
+  }
+
+  destroy() {
+    super.destroy();
+    this.nodes$.destroy();
+    this.links$.destroy();
   }
 }

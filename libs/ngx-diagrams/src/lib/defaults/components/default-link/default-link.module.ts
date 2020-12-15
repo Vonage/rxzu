@@ -5,7 +5,6 @@ import { DefaultLinkComponent } from './default-link.component';
 @NgModule({
   declarations: [DefaultLinkComponent],
   imports: [CommonModule],
-  providers: [],
   exports: [DefaultLinkComponent],
   entryComponents: [DefaultLinkComponent],
 })

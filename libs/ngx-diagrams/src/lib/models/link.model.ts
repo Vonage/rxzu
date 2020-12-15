@@ -1,7 +1,8 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Coords } from '../interfaces/coords.interface';
 import { SerializedLinkModel } from '../interfaces/serialization.interface';
 import { DiagramEngine } from '../services/engine.service';
+import { createValueState } from '../state/state';
 import { ID } from '../utils/tool-kit.util';
 import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
@@ -19,20 +20,11 @@ export class LinkModel extends BaseModel<DiagramModel> {
   protected points: PointModel[];
   protected extras: any;
 
-  protected readonly _label$ = new BehaviorSubject<LabelModel>(null);
+  protected label$ = createValueState<LabelModel>(null, this.entityPipe('label'));
 
-  label$ = this._label$.pipe(this.entityPipe('label'));
-
-  constructor(
-    linkType = 'default',
-    id?: string,
-    logPrefix = '[Link]'
-  ) {
+  constructor(linkType = 'default', id?: string, logPrefix = '[Link]') {
     super(linkType, id, logPrefix);
-    this.points = [
-      new PointModel(this, { x: 0, y: 0 }),
-      new PointModel(this, { x: 0, y: 0 }),
-    ];
+    this.points = [new PointModel(this, { x: 0, y: 0 }), new PointModel(this, { x: 0, y: 0 })];
     this.extras = {};
     this.sourcePort = null;
     this.targetPort = null;
@@ -48,7 +40,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
       targetPort: this.getTargetPort().id,
       extras: this.getExtras(),
       points: serializedPoints,
-      label,
+      label
     };
   }
 
@@ -126,9 +118,11 @@ export class LinkModel extends BaseModel<DiagramModel> {
     if (this.sourcePort !== null && this.sourcePort.id === port.id) {
       return this.getFirstPoint();
     }
+
     if (this.targetPort !== null && this.targetPort.id === port.id) {
       return this.getLastPoint();
     }
+
     return null;
   }
 
@@ -185,26 +179,26 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
   setLabel(label: LabelModel) {
     label.setParent(this);
-    this._label$.next(label);
+    this.label$.set(label).emit();
   }
 
   selectLabel(): Observable<LabelModel | null> {
-    return this.label$;
+    return this.label$.value$;
   }
 
   getLabel(): LabelModel {
-    return this._label$.getValue();
+    return this.label$.value;
   }
 
   resetLabel() {
-    const currentLabel = this._label$.getValue();
+    const currentLabel = this.getLabel();
 
     if (currentLabel) {
       currentLabel.setParent(null);
       currentLabel.setPainted(false);
     }
 
-    this._label$.next(null);
+    this.setLabel(null);
   }
 
   removePoint(pointModel: PointModel) {

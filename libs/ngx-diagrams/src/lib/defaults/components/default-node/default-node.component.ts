@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { filter, switchMap } from 'rxjs/operators';
 import { DefaultPortModel } from '../../models';
 import { DefaultNodeModel } from '../../models/default-node.model';
@@ -7,6 +7,7 @@ import { DefaultNodeModel } from '../../models/default-node.model';
   selector: 'ngdx-default-node',
   templateUrl: './default-node.component.html',
   styleUrls: ['./default-node.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DefaultNodeComponent extends DefaultNodeModel implements OnInit {
   @ViewChild('portsLayer', { read: ViewContainerRef, static: true })

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { DiagramModel, PointModel } from '../models';
 import * as dagre from 'dagre';
-import { GraphLabel, NodeConfig, EdgeConfig } from 'dagre';
+import { EdgeConfig, GraphLabel, NodeConfig } from 'dagre';
+import { DiagramModel, PointModel } from '../models';
 
 export interface DagreEngineOptions {
   graph?: GraphLabel;
@@ -15,17 +15,18 @@ export interface DagreEngineOptions {
 @Injectable()
 export class DagreEngine {
   g: dagre.graphlib.Graph;
-  constructor() {
+
+  instantiate() {
     try {
       this.g = new dagre.graphlib.Graph({ multigraph: true });
     } catch (error) {
-      console.warn(
-        "`dagre` packages isn't installed, please install it before using the DagreEngine plugin"
-      );
+      console.warn("`dagre` packages isn't installed, please install it before using the DagreEngine plugin");
     }
   }
 
   redistribute(model: DiagramModel, options: DagreEngineOptions = {}): void {
+    this.instantiate();
+
     this.g.setGraph(options.graph || {});
 
     this.g.setDefaultEdgeLabel(() => {
@@ -35,21 +36,21 @@ export class DagreEngine {
     const processedlinks: { [id: string]: boolean } = {};
 
     // set nodes
-    Object.values(model.getNodes()).forEach((node) => {
+    model.getNodes().forEach((node) => {
       this.g.setNode(node.id, {
         width: node.getWidth(),
-        height: node.getHeight(),
+        height: node.getHeight()
       });
     });
 
-    Object.values(model.getLinks()).forEach((link) => {
+    model.getLinks().forEach((link) => {
       // set edges
       if (link.getSourcePort() && link.getTargetPort()) {
         processedlinks[link.id] = true;
         this.g.setEdge({
           v: link.getSourcePort().getNode().id,
           w: link.getTargetPort().getNode().id,
-          name: link.id,
+          name: link.id
         });
       }
     });
@@ -70,9 +71,7 @@ export class DagreEngine {
 
         const points = [link.getFirstPoint()];
         for (let i = 1; i < edge.points.length - 2; i++) {
-          points.push(
-            new PointModel(link, { x: edge.points[i].x, y: edge.points[i].y })
-          );
+          points.push(new PointModel(link, { x: edge.points[i].x, y: edge.points[i].y }));
         }
         link.setPoints(points.concat(link.getLastPoint()));
       });

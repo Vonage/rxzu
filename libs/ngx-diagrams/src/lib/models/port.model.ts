@@ -1,6 +1,6 @@
-import { BehaviorSubject, Observable } from 'rxjs';
-import { distinctUntilChanged, shareReplay, takeUntil } from 'rxjs/operators';
-import { HashMap } from '../utils/types';
+import { Observable } from 'rxjs';
+import { createEntityState, createValueState } from '../state/state';
+import { EntityMap, ID, isString } from '../utils';
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { NodeModel } from './node.model';
@@ -11,22 +11,13 @@ export class PortModel extends BaseModel<NodeModel> {
   protected maximumLinks: number;
   protected linkType: string;
 
-  protected _links$ = new BehaviorSubject<HashMap<LinkModel>>({});
-  protected _x$ = new BehaviorSubject(0);
-  protected _y$ = new BehaviorSubject(0);
-  protected _magnetic$ = new BehaviorSubject(true);
-  protected _width$ = new BehaviorSubject(0);
-  protected _height$ = new BehaviorSubject(0);
-  protected _canCreateLinks$ = new BehaviorSubject(true);
-
-  protected links$ = this._links$.pipe(
-    takeUntil(this.onEntityDestroy()),
-    distinctUntilChanged(),
-    shareReplay(1)
-  );
-  protected x$ = this._x$.pipe(this.entityPipe('x'));
-  protected y$ = this._y$.pipe(this.entityPipe('y'));
-  protected magnetic$ = this._magnetic$.pipe(this.entityPipe('magnetic'));
+  protected links$ = createEntityState<LinkModel>([], this.entityPipe('links'));
+  protected x$ = createValueState(0, this.entityPipe('x'));
+  protected y$ = createValueState(0, this.entityPipe('y'));
+  protected width$ = createValueState(0, this.entityPipe('y'));
+  protected height$ = createValueState(0, this.entityPipe('y'));
+  protected magnetic$ = createValueState(true, this.entityPipe('magnetic'));
+  protected canCreateLinks$ = createValueState(true, this.entityPipe('magnetic'));
 
   constructor(
     name: string,
@@ -55,7 +46,7 @@ export class PortModel extends BaseModel<NodeModel> {
       height: this.getHeight(),
       width: this.getWidth(),
       canCreateLinks: this.getCanCreateLinks(),
-      ...this.getCoords(),
+      ...this.getCoords()
     };
   }
 
@@ -68,61 +59,61 @@ export class PortModel extends BaseModel<NodeModel> {
   }
 
   getCanCreateLinks(): boolean {
-    const numberOfLinks: number = Object.keys(this._links$.getValue()).length;
+    const numberOfLinks = this.getLinks().size;
 
     if (this.maximumLinks && numberOfLinks >= this.maximumLinks) {
       return false;
     }
 
-    return this._canCreateLinks$.getValue();
+    return this.canCreateLinks$.value;
   }
 
   getCoords() {
     return { x: this.getX(), y: this.getY() };
   }
 
-  selectCanCreateLinks() {
-    return this._canCreateLinks$;
+  selectCanCreateLinks(): Observable<boolean> {
+    return this.canCreateLinks$.value$;
   }
 
   setCanCreateLinks(value: boolean) {
-    this._canCreateLinks$.next(value);
+    this.canCreateLinks$.set(value).emit();
   }
 
-  getMagnetic() {
-    return this._magnetic$.getValue();
+  getMagnetic(): boolean {
+    return this.magnetic$.value;
   }
 
-  selectMagnetic() {
-    return this.magnetic$;
+  selectMagnetic(): Observable<boolean> {
+    return this.magnetic$.value$;
   }
 
   setMagnetic(magnetic: boolean) {
-    this._magnetic$.next(magnetic);
+    this.magnetic$.set(magnetic).emit();
   }
 
   selectX(): Observable<number> {
-    return this.x$;
+    return this.x$.value$;
   }
 
   selectY(): Observable<number> {
-    return this.y$;
+    return this.y$.value$;
   }
 
   getY() {
-    return this._y$.getValue();
+    return this.y$.value;
   }
 
   getX() {
-    return this._x$.getValue();
+    return this.x$.value;
   }
 
   getHeight() {
-    return this._height$.getValue();
+    return this.height$.value;
   }
 
   getWidth() {
-    return this._width$.getValue();
+    return this.width$.value;
   }
 
   getMaximumLinks(): number {
@@ -141,42 +132,35 @@ export class PortModel extends BaseModel<NodeModel> {
     this.linkType = type;
   }
 
-  removeLink(link: LinkModel) {
-    const links = this._links$.getValue();
-    delete links[link.id];
-    this._links$.next({ ...links });
+  removeLink(linkOrId: ID | LinkModel) {
+    const linkId = isString(linkOrId) ? linkOrId : linkOrId.id;
+    this.links$.remove(linkId, false).emit();
   }
 
   addLink(link: LinkModel) {
-    this._links$.next({ ...this._links$.value, [link.id]: link });
+    this.links$.add(link).emit();
   }
 
-  getLinks(): HashMap<LinkModel> {
-    return this._links$.getValue();
+  getLinks(): EntityMap<LinkModel> {
+    return this.links$.value;
   }
 
-  selectLinks(): Observable<HashMap<LinkModel>> {
-    return this.links$;
+  getLinksArray(): LinkModel[] {
+    return this.links$.array();
   }
 
-  updateCoords({
-    x,
-    y,
-    width,
-    height,
-  }: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  }) {
-    this._x$.next(x);
-    this._y$.next(y);
-    this._width$.next(width);
-    this._height$.next(height);
+  selectLinks(): Observable<EntityMap<LinkModel>> {
+    return this.links$.value$;
   }
 
-  canLinkToPort(port?: PortModel): boolean {
+  updateCoords({ x, y, width, height }: { x: number; y: number; width: number; height: number }) {
+    this.x$.set(x).emit();
+    this.y$.set(y).emit();
+    this.width$.set(width).emit();
+    this.height$.set(height).emit();
+  }
+
+  canLinkToPort(port: PortModel): boolean {
     return true;
   }
 
@@ -192,9 +176,6 @@ export class PortModel extends BaseModel<NodeModel> {
 
   destroy() {
     super.destroy();
-
-    Object.values(this.getLinks()).forEach((link) => {
-      link.destroy();
-    });
+    this.links$.clear().emit();
   }
 }

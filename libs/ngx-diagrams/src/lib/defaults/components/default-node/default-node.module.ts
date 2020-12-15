@@ -5,7 +5,6 @@ import { DefaultNodeComponent } from './default-node.component';
 @NgModule({
   declarations: [DefaultNodeComponent],
   imports: [CommonModule],
-  providers: [],
   exports: [DefaultNodeComponent],
   entryComponents: [DefaultNodeComponent],
 })

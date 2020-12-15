@@ -1,6 +1,6 @@
+import { Observable } from 'rxjs';
 import { NodeModel } from '../../models/node.model';
 import { DefaultPortModel } from './default-port.model';
-import { Observable } from 'rxjs';
 
 export class DefaultNodeModel extends NodeModel {
   name: string;
@@ -12,7 +12,7 @@ export class DefaultNodeModel extends NodeModel {
     name = 'Untitled',
     type = 'default',
     color = 'rgb(0, 192, 255)',
-    id,
+    id
   }: {
     name?: string;
     type?: string;
@@ -30,7 +30,7 @@ export class DefaultNodeModel extends NodeModel {
     name,
     type = 'default',
     id,
-    linkType = 'default',
+    linkType = 'default'
   }: {
     name: string;
     type?: string;
@@ -43,7 +43,7 @@ export class DefaultNodeModel extends NodeModel {
       type,
       id,
       label: null,
-      linkType,
+      linkType
     });
     this.addPort(port);
     return port;
@@ -54,7 +54,7 @@ export class DefaultNodeModel extends NodeModel {
     type = 'default',
     id,
     linkType = 'default',
-    maximumLinks = null,
+    maximumLinks = null
   }: {
     name: string;
     type?: string;
@@ -69,7 +69,7 @@ export class DefaultNodeModel extends NodeModel {
       id,
       label: null,
       linkType,
-      maximumLinks,
+      maximumLinks
     });
     this.addPort(port);
     return port;

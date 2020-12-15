@@ -1,30 +1,24 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { LabelModel } from '../../models/label.model';
+import { createValueState } from '../../state/state';
 
 export class DefaultLabelModel extends LabelModel {
-  protected _label = new BehaviorSubject('');
+  protected label$ = createValueState<string>('', this.entityPipe('label'));
 
-  label$ = this._label.pipe(this.entityPipe('label'));
-
-  constructor(
-    label = 'NO LABEL',
-    type = 'default',
-    id?: string,
-    logPrefix = '[DefaultLabel]'
-  ) {
+  constructor(label = 'NO LABEL', type = 'default', id?: string, logPrefix = '[DefaultLabel]') {
     super(type, id, logPrefix);
     this.setLabel(label);
   }
 
   setLabel(label: string) {
-    this._label.next(label);
+    this.label$.set(label).emit();
   }
 
   getLabel(): string {
-    return this._label.getValue();
+    return this.label$.value;
   }
 
   selectLabel(): Observable<string> {
-    return this.label$;
+    return this.label$.value$;
   }
 }
