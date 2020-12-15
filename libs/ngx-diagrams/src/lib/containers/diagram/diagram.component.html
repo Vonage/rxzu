@@ -1,0 +1,22 @@
+<div class="ngdx-diagram" #canvas (mousedown)="onMouseDown($event)" (wheel)="onMouseWheel($event)">
+	<!-- Nodes Layer -->
+	<div class="ngdx-nodes-layer">
+		<ng-template #nodesLayer></ng-template>
+	</div>
+
+	<!-- Links Layer -->
+	<div class="ngdx-links-layer">
+		<ng-template #linksLayer></ng-template>
+	</div>
+
+	<!-- Selection Box -->
+	<div
+		*ngIf="shouldDrawSelectionBox() && selectAction() | async as action"
+		class="selector"
+		[ngStyle]="{
+			top: action.dimensions.top + 'px',
+			left: action.dimensions.left + 'px',
+			width: action.dimensions.width + 'px',
+			height: action.dimensions.height + 'px'
+		}"></div>
+</div>

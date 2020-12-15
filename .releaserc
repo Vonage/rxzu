@@ -29,7 +29,7 @@
     [
       "@semantic-release/npm",
       {
-        "pkgRoot": "dist/ngx-diagrams",
+        "pkgRoot": "dist/libs/ngx-diagrams",
         "tarballDir": "dist"
       }
     ],
@@ -49,7 +49,7 @@
     [
       "@semantic-release/npm",
       {
-        "pkgRoot": "dist/ngx-diagrams",
+        "pkgRoot": "dist/libs/ngx-diagrams",
         "tarballDir": "dist"
       }
     ],
