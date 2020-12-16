@@ -8,7 +8,7 @@
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 > Light Weight, Modular, Typed Diagram Engine for Angular
@@ -34,6 +34,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="https://github.com/danzrou"><img src="https://avatars3.githubusercontent.com/u/6433766?v=4" width="100px;" alt=""/><br /><sub><b>Dan Roujinsky</b></sub></a><br /><a href="https://github.com/Vonage/ngx-diagrams/commits?author=danzrou" title="Documentation">📖</a> <a href="https://github.com/Vonage/ngx-diagrams/commits?author=danzrou" title="Code">💻</a> <a href="#ideas-danzrou" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/omerheller"><img src="https://avatars0.githubusercontent.com/u/18534185?v=4" width="100px;" alt=""/><br /><sub><b>omerheller</b></sub></a><br /><a href="https://github.com/Vonage/ngx-diagrams/commits?author=omerheller" title="Code">💻</a> <a href="#ideas-omerheller" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/Vonage/ngx-diagrams/commits?author=omerheller" title="Documentation">📖</a></td>
   </tr>
 </table>
 
