@@ -35,6 +35,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/danzrou"><img src="https://avatars3.githubusercontent.com/u/6433766?v=4" width="100px;" alt=""/><br /><sub><b>Dan Roujinsky</b></sub></a><br /><a href="https://github.com/Vonage/ngx-diagrams/commits?author=danzrou" title="Documentation">📖</a> <a href="https://github.com/Vonage/ngx-diagrams/commits?author=danzrou" title="Code">💻</a> <a href="#ideas-danzrou" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/ronnetzer"><img src="https://avatars2.githubusercontent.com/u/1116785?v=4" width="100px;" alt=""/><br /><sub><b>Ron Netzer</b></sub></a><br /><a href="https://github.com/Vonage/ngx-diagrams/commits?author=ronnetzer" title="Code">💻</a> <a href="#ideas-ronnetzer" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/Vonage/ngx-diagrams/commits?author=ronnetzer" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/omerheller"><img src="https://avatars0.githubusercontent.com/u/18534185?v=4" width="100px;" alt=""/><br /><sub><b>omerheller</b></sub></a><br /><a href="https://github.com/Vonage/ngx-diagrams/commits?author=omerheller" title="Code">💻</a> <a href="#ideas-omerheller" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/Vonage/ngx-diagrams/commits?author=omerheller" title="Documentation">📖</a></td>
   </tr>
 </table>
 
