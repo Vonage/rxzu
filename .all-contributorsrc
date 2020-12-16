@@ -15,6 +15,17 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "ronnetzer",
+      "name": "Ron Netzer",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1116785?v=4",
+      "profile": "https://github.com/ronnetzer",
+      "contributions": [
+        "code",
+        "ideas",
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
