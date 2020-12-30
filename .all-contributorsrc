@@ -1,0 +1,48 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "danzrou",
+      "name": "Dan Roujinsky",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/6433766?v=4",
+      "profile": "https://github.com/danzrou",
+      "contributions": [
+        "doc",
+        "code",
+        "ideas"
+      ]
+    },
+    {
+      "login": "ronnetzer",
+      "name": "Ron Netzer",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1116785?v=4",
+      "profile": "https://github.com/ronnetzer",
+      "contributions": [
+        "doc",
+        "code",
+        "ideas"
+      ]
+    },
+    {
+      "login": "omerheller",
+      "name": "omerheller",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/18534185?v=4",
+      "profile": "https://github.com/omerheller",
+      "contributions": [
+        "code",
+        "ideas",
+        "doc"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "ngx-diagrams",
+  "projectOwner": "Vonage",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
