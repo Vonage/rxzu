@@ -1,13 +1,14 @@
-## RxZu
+## RxZu 図 
+
+>
+
 ![Quality Check](https://github.com/Vonage/rxzu/workflows/Quality%20Check/badge.svg)
 [![Known Vulnerabilities](https://snyk.io/test/github/Vonage/rxzu/badge.svg)](https://snyk.io/test/github/DanielNetzer/rxzu) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg)](#contributors-)<!-- ALL-CONTRIBUTORS-BADGE:END --> [![PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Vonage/rxzu)
 [![commitizen](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![coc-badge](https://img.shields.io/badge/codeof-conduct-ff69b4.svg)](https://github.com/Vonage/rxzu/blob/main/CODE_OF_CONDUCT.md)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-> Light Weight, Modular, Typed Diagram Engine
-
-Near zero dependency and a complete customizable diagram engine makes RxZu the perfect fit to any project.
+> Zu 図 : drawing; picture; diagram; figure; illustration; chart; graph
 
 ---
 
