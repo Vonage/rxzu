@@ -1,6 +1,6 @@
-## RxZu <img src="https://i.postimg.cc/mrZH51BT/icon.png" width="100">
+## RxZu
 ![Quality Check](https://github.com/Vonage/rxzu/workflows/Quality%20Check/badge.svg)
-[![Known Vulnerabilities](https://snyk.io/test/github/Vonage/rxzu/badge.svg)](https://snyk.io/test/github/DanielNetzer/rxzu)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)<!-- ALL-CONTRIBUTORS-BADGE:END -->[![PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/Vonage/rxzu)
+[![Known Vulnerabilities](https://snyk.io/test/github/Vonage/rxzu/badge.svg)](https://snyk.io/test/github/DanielNetzer/rxzu)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)<!-- ALL-CONTRIBUTORS-BADGE:END --> [![PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/Vonage/rxzu)
 [![commitizen](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg?style=flat-square)](http://commitizen.github.io/cz-cli/)
 [![coc-badge](https://img.shields.io/badge/codeof-conduct-ff69b4.svg?style=flat-square)](https://github.com/Vonage/rxzu/blob/master/CODE_OF_CONDUCT.md)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
@@ -17,7 +17,7 @@ RxZu is a diagrams engine system, built on top of RxJS, which takes the idea of 
 NGX-Digrams encourages creativity. It allows you to create any node, link, label, or even a custom entity and provide powerful tools with a moderate learning curve, suitable for both experienced and inexperienced developers alike.
 
 - 🤓 Learn about it on our [Storybook](https://vonage.github.io/rxzu)
-- 🍄 Join RxZu [Gitter](https://gitter.im/rxzu/community) room
+- 🍄 Join RxZu [Gitter](https://gitter.im/vonage-rxzu/community) room
 
 ## Contributors ✨
 
