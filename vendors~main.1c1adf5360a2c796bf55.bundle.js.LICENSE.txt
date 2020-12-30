@@ -5,6 +5,21 @@ object-assign
 */
 
 /*!
+  Copyright (c) 2017 Jed Watson.
+  Licensed under the MIT License (MIT), see
+  http://jedwatson.github.io/classnames
+*/
+
+/*!
+ * Fuse.js v3.6.1 - Lightweight fuzzy-search (http://fusejs.io)
+ * 
+ * Copyright (c) 2012-2017 Kirollos Risk (http://kiro.me)
+ * All Rights Reserved. Apache Software License 2.0
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+/*!
  * OverlayScrollbars
  * https://github.com/KingSora/OverlayScrollbars
  *
@@ -15,13 +30,6 @@ object-assign
  *
  * Released under the MIT license.
  * Date: 02.08.2020
- */
-
-/*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * @license  MIT
  */
 
 /*!
@@ -47,41 +55,18 @@ object-assign
  * Released under the MIT License.
  */
 
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */
-
 /**
-     * @license
-     * Copyright Google Inc. All Rights Reserved.
-     *
-     * Use of this source code is governed by an MIT-style license that can be
-     * found in the LICENSE file at https://angular.io/license
-     */
-
-/**
- * @license
- * Copyright Google LLC All Rights Reserved.
+ * Checks if an event is supported in the current execution environment.
  *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-
-/**
- * @license Angular v11.0.4
- * (c) 2010-2020 Google LLC. https://angular.io/
- * License: MIT
+ * NOTE: This will not work correctly for non-generic events such as `change`,
+ * `reset`, `load`, `error`, and `select`.
+ *
+ * Borrows from Modernizr.
+ *
+ * @param {string} eventNameSuffix Event name, e.g. "click".
+ * @return {boolean} True if the event is supported.
+ * @internal
+ * @license Modernizr 3.0.0pre (Custom Build) | MIT
  */
 
 /**
@@ -93,14 +78,17 @@ PERFORMANCE OF THIS SOFTWARE.
  * @public
  */
 
-/**
-* @license Angular v9.1.0-next.4+61.sha-e552591.with-local-changes
-* (c) 2010-2020 Google LLC. https://angular.io/
-* License: MIT
-*/
+/** @license React v0.19.1
+ * scheduler-tracing.development.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 
 /** @license React v0.19.1
- * scheduler.production.min.js
+ * scheduler.development.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -109,7 +97,7 @@ PERFORMANCE OF THIS SOFTWARE.
  */
 
 /** @license React v16.13.1
- * react-dom.production.min.js
+ * react-is.development.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -117,8 +105,8 @@ PERFORMANCE OF THIS SOFTWARE.
  * LICENSE file in the root directory of this source tree.
  */
 
-/** @license React v16.13.1
- * react-is.production.min.js
+/** @license React v16.14.0
+ * react-dom.development.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -126,8 +114,17 @@ PERFORMANCE OF THIS SOFTWARE.
  * LICENSE file in the root directory of this source tree.
  */
 
-/** @license React v16.13.1
- * react.production.min.js
+/** @license React v16.14.0
+ * react.development.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/** @license React v17.0.1
+ * react-is.development.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
