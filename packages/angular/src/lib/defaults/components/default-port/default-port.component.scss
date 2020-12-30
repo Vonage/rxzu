@@ -1,0 +1,21 @@
+:host {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border-radius: 60px;
+  border: 1px solid gray;
+  background-color: lightgray;
+  margin: 10px 0;
+
+  &:hover {
+    background-color: green;
+  }
+
+  &.out {
+    right: -195px;
+  }
+
+  &.in {
+    left: -5px;
+  }
+}

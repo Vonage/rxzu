@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@rxzu/core": ["packages/core/src/index.ts"]
+      "@rxzu/core": ["packages/core/src/index.ts"],
+      "@rxzu/angular": ["packages/angular/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

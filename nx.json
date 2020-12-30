@@ -25,6 +25,10 @@
   "projects": {
     "core": {
       "tags": []
+    },
+    "angular": {
+      "tags": [],
+      "implicitDependencies": ["core"]
     }
   },
   "workspaceLayout": {

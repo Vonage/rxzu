@@ -1,6 +1,6 @@
-# core
+# RxZu/Core
 
-This library was generated with [Nx](https://nx.dev).
+
 
 ## Running unit tests
 

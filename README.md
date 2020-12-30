@@ -14,7 +14,7 @@ Near zero dependency and a complete customizable diagram engine makes RxZu the p
 
 RxZu is a diagrams engine system, built on top of RxJS, which takes the idea of graphic visualization to the next level in terms of performance, rendering optimization, and customizability.
 
-NGX-Digrams encourages creativity. It allows you to create any node, link, label, or even a custom entity and provide powerful tools with a moderate learning curve, suitable for both experienced and inexperienced developers alike.
+RxZu encourages creativity. It allows you to create any node, link, label, or even a custom entity and provide powerful tools with a moderate learning curve, suitable for both experienced and inexperienced developers alike.
 
 - 🤓 Learn about it on our [Storybook](https://vonage.github.io/rxzu)
 - 🍄 Join RxZu [Gitter](https://gitter.im/vonage-rxzu/community) room

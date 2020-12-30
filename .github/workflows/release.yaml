@@ -1,0 +1,96 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  dependencies:
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
+    name: Cache dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - uses: actions/cache@v1
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: node_modules # !WARN does not work if running multiple node versions, instead use https://github.com/actions/cache/blob/master/examples.md#node---yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Yarn Install
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+
+  build:
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
+    needs: [dependencies]
+    name: Build storybook & library
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Restore dependencies from cache
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Run builders
+        run: yarn run-many
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          path: ./dist
+          retention-days: 5
+
+  publish_docs:
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
+    needs: [build]
+    name: Publish storybook
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
+          path: dist
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist/storybook/ngx-diagrams
+
+  publish_lib:
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
+    needs: [build]
+    name: Publish ngx-diagrams
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Restore dependencies from cache
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
+          path: dist
+      - name: Run semantic-release
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

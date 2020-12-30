@@ -40,9 +40,63 @@
           }
         }
       }
+    },
+    "angular": {
+      "projectType": "library",
+      "root": "packages/angular",
+      "sourceRoot": "packages/angular/src",
+      "prefix": "rxzu",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/angular:package",
+          "options": {
+            "tsConfig": "packages/angular/tsconfig.lib.json",
+            "project": "packages/angular/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "packages/angular/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "lint": {
+          "executor": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "packages/angular/tsconfig.lib.json",
+              "packages/angular/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!packages/angular/**/*"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/packages/angular"
+          ],
+          "options": {
+            "jestConfig": "packages/angular/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {
-    "defaultCollection": "@nrwl/workspace"
+    "defaultCollection": "@nrwl/angular"
+  },
+  "generators": {
+    "@nrwl/angular:application": {
+      "unitTestRunner": "jest"
+    },
+    "@nrwl/angular:library": {
+      "unitTestRunner": "jest"
+    },
+    "@nrwl/angular:component": {
+      "style": "scss"
+    }
   }
 }
