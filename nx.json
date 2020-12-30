@@ -1,7 +1,7 @@
 {
   "npmScope": "rxzu",
   "affected": {
-    "defaultBase": "master"
+    "defaultBase": "main"
   },
   "implicitDependencies": {
     "workspace.json": "*",
@@ -29,10 +29,16 @@
     "angular": {
       "tags": [],
       "implicitDependencies": ["core"]
+    },
+    "shared-storybook": {
+      "tags": []
+    },
+    "rxzu-angular-e2e": {
+      "tags": [],
+      "implicitDependencies": ["core", "angular"]
     }
   },
   "workspaceLayout": {
-    "appsDir": "packages",
     "libsDir": "packages"
   }
 }

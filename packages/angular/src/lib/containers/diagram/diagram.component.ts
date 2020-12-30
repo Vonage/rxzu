@@ -225,10 +225,10 @@ export class RxZuDiagramComponent
             targetPort
               .getLinksArray()
               .some(
-                (link) =>
-                  link !== link &&
-                  (link.getSourcePort() === sourcePort ||
-                    link.getTargetPort() === sourcePort)
+                (someLink) =>
+                  link !== someLink &&
+                  (someLink.getSourcePort() === sourcePort ||
+                    someLink.getTargetPort() === sourcePort)
               )
           ) {
             // link is a duplicate

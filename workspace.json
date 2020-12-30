@@ -9,16 +9,12 @@
         "lint": {
           "executor": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "packages/core/**/*.ts"
-            ]
+            "lintFilePatterns": ["packages/core/**/*.ts"]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/packages/core"
-          ],
+          "outputs": ["coverage/packages/core"],
           "options": {
             "jestConfig": "packages/core/jest.config.js",
             "passWithNoTests": true
@@ -26,17 +22,13 @@
         },
         "build": {
           "executor": "@nrwl/node:package",
-          "outputs": [
-            "{options.outputPath}"
-          ],
+          "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/packages/core",
             "tsConfig": "packages/core/tsconfig.lib.json",
             "packageJson": "packages/core/package.json",
             "main": "packages/core/src/index.ts",
-            "assets": [
-              "packages/core/*.md"
-            ]
+            "assets": ["packages/core/*.md"]
           }
         }
       }
@@ -46,7 +38,7 @@
       "root": "packages/angular",
       "sourceRoot": "packages/angular/src",
       "prefix": "rxzu",
-      "targets": {
+      "architect": {
         "build": {
           "executor": "@nrwl/angular:package",
           "options": {
@@ -60,26 +52,91 @@
           }
         },
         "lint": {
-          "executor": "@angular-devkit/build-angular:tslint",
+          "executor": "@nrwl/linter:lint",
           "options": {
             "tsConfig": [
               "packages/angular/tsconfig.lib.json",
               "packages/angular/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!packages/angular/**/*"
-            ]
+            "exclude": ["**/node_modules/**", "!packages/angular/**/*"]
           }
         },
         "test": {
           "executor": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/packages/angular"
-          ],
+          "outputs": ["coverage/packages/angular"],
           "options": {
             "jestConfig": "packages/angular/jest.config.js",
             "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "shared-storybook": {
+      "projectType": "library",
+      "root": "packages/storybook",
+      "sourceRoot": "packages/storybook",
+      "prefix": "sharedstorybook",
+      "architect": {
+        "storybook": {
+          "builder": "@nrwl/storybook:storybook",
+          "options": {
+            "uiFramework": "@storybook/angular",
+            "port": 4400,
+            "config": {
+              "configFolder": "packages/storybook/.storybook"
+            }
+          },
+          "configurations": {
+            "ci": {
+              "quiet": true
+            }
+          }
+        },
+        "build": {
+          "builder": "@nrwl/storybook:build",
+          "options": {
+            "uiFramework": "@storybook/angular",
+            "outputPath": "dist/storybook/shared-storybook",
+            "config": {
+              "configFolder": "packages/storybook/.storybook"
+            }
+          },
+          "configurations": {
+            "ci": {
+              "quiet": true
+            }
+          }
+        }
+      },
+      "schematics": {
+        "@nrwl/angular:component": {
+          "style": "scss"
+        }
+      }
+    },
+    "rxzu-angular-e2e": {
+      "root": "apps/rxzu-angular-e2e",
+      "sourceRoot": "apps/rxzu-angular-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/rxzu-angular-e2e/cypress.json",
+            "tsConfig": "apps/rxzu-angular-e2e/tsconfig.e2e.json",
+            "devServerTarget": "shared-storybook:storybook"
+          },
+          "configurations": {
+            "ci": {
+              "devServerTarget": "shared-storybook:storybook:ci"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "tsConfig": ["apps/rxzu-angular-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**", "!apps/rxzu-angular-e2e/**"]
           }
         }
       }
@@ -98,5 +155,6 @@
     "@nrwl/angular:component": {
       "style": "scss"
     }
-  }
+  },
+  "defaultProject": "angular"
 }
