@@ -11,13 +11,17 @@ import {
   LabelModel,
 } from './models';
 import { createValueState } from './state';
-import { BaseAction, EntityMap, SelectingAction } from '..';
+import { BaseAction, SelectingAction } from './actions';
+import { EntityMap } from './utils';
+import { EngineSetup } from './interfaces/setup.interface';
+import { MouseManager } from './managers/mouse.manager';
 
 export class DiagramEngineCore {
   protected canvas$ = createValueState<Element>(null);
   protected factoriesManager: FactoriesManager<
     AbstractFactory<BaseModel, unknown, unknown>
   >;
+  protected mouseManager: MouseManager;
   diagramModel: DiagramModel;
 
   protected nodes$: Observable<EntityMap<NodeModel>>;
@@ -25,6 +29,20 @@ export class DiagramEngineCore {
   protected action$ = new BehaviorSubject<BaseAction>(null);
 
   constructor() {
+    this.createFactoriesManager();
+    this.createMouseManager();
+  }
+
+  createMouseManager() {
+    if (this.mouseManager) {
+      console.warn('[RxZu: Mouse Manager already initialized, bailing out.');
+      return;
+    }
+
+    this.mouseManager = new MouseManager(this);
+  }
+
+  createFactoriesManager() {
     if (this.factoriesManager) {
       this.factoriesManager.dispose();
     }
@@ -44,6 +62,10 @@ export class DiagramEngineCore {
 
   getFactoriesManager() {
     return this.factoriesManager;
+  }
+
+  getMouseManager() {
+    return this.mouseManager;
   }
 
   getNodeElement(node: NodeModel): HTMLElement {
@@ -145,18 +167,6 @@ export class DiagramEngineCore {
     this.canvas$.set(canvas).emit();
   }
 
-  getRelativeMousePoint(event: MouseEvent): { x: number; y: number } {
-    const point = this.getRelativePoint(event.clientX, event.clientY);
-    return {
-      x:
-        (point.x - this.diagramModel.getOffsetX()) /
-        (this.diagramModel.getZoomLevel() / 100.0),
-      y:
-        (point.y - this.diagramModel.getOffsetY()) /
-        (this.diagramModel.getZoomLevel() / 100.0),
-    };
-  }
-
   getRelativePoint(x: number, y: number) {
     const canvasRect = this.canvas$.value.getBoundingClientRect();
     return { x: x - canvasRect.left, y: y - canvasRect.top };
@@ -202,7 +212,20 @@ export class DiagramEngineCore {
       });
   }
 
-  setup({ maxZoomIn, maxZoomOut }: { maxZoomIn: number; maxZoomOut: number }) {
+  setup({
+    maxZoomIn,
+    maxZoomOut,
+    portMagneticRadius,
+    allowLooseLinks,
+    allowCanvasZoom,
+    allowCanvasTranslation,
+    inverseZoom,
+  }: EngineSetup) {
+    this.diagramModel.setAllowCanvasZoom(allowCanvasZoom);
+    this.diagramModel.setAllowCanvasTranslation(allowCanvasTranslation);
+    this.diagramModel.setInverseZoom(inverseZoom);
+    this.diagramModel.setAllowLooseLinks(allowLooseLinks);
+    this.diagramModel.setPortMagneticRadius(portMagneticRadius);
     this.diagramModel.setMaxZoomIn(maxZoomIn);
     this.diagramModel.setMaxZoomOut(maxZoomOut);
   }
@@ -302,7 +325,7 @@ export class DiagramEngineCore {
    * fire the action registered and notify subscribers
    */
   fireAction() {
-    if (this.action$.value) {
+    if (this.action$.getValue) {
       return this.action$.getValue();
     }
   }
@@ -335,58 +358,9 @@ export class DiagramEngineCore {
   shouldDrawSelectionBox() {
     const action = this.action$.getValue();
     if (action instanceof SelectingAction) {
-      action.getBoxDimensions();
-      return true;
+      console.log(action.getBoxDimensions());
+      return action.getBoxDimensions();
     }
     return false;
-  }
-
-  getMouseElement(event: MouseEvent): { model: BaseModel; element: Element } {
-    const target = event.target as Element;
-
-    // is it a port?
-    let element = target.closest('[data-portid]');
-    if (element) {
-      // get the relevant node and return the port.
-      const nodeEl = target.closest('[data-nodeid]');
-      return {
-        model: this.diagramModel
-          .getNode(nodeEl.getAttribute('data-nodeid'))
-          .getPort(element.getAttribute('data-portid')),
-        element,
-      };
-    }
-
-    // look for a point
-    element = target.closest('[data-pointid]');
-    if (element) {
-      return {
-        model: this.diagramModel
-          .getLink(element.getAttribute('data-linkid'))
-          .getPointModel(element.getAttribute('data-pointid')),
-        element,
-      };
-    }
-
-    // look for a link
-    element = target.closest('[data-linkid]');
-    if (element) {
-      return {
-        model: this.diagramModel.getLink(element.getAttribute('data-linkid')),
-        element,
-      };
-    }
-
-    // a node maybe
-    element = target.closest('[data-nodeid]');
-    if (element) {
-      return {
-        model: this.diagramModel.getNode(element.getAttribute('data-nodeid')),
-        element,
-      };
-    }
-
-    // just the canvas
-    return null;
   }
 }

@@ -17,7 +17,8 @@
     "paths": {
       "@rxzu/core": ["packages/core/src/index.ts"],
       "@rxzu/angular": ["packages/angular/src/index.ts"]
-    }
+    },
+    "noUnusedLocals": true
   },
   "exclude": ["node_modules", "tmp"]
 }

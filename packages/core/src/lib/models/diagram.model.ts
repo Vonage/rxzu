@@ -15,19 +15,50 @@ import { PortModel } from './port.model';
 export class DiagramModel extends BaseEntity {
   protected nodes$ = createEntityState<NodeModel>([], this.entityPipe('nodes'));
   protected links$ = createEntityState<LinkModel>([], this.entityPipe('links'));
-  protected offsetX$ = createValueState(0, this.entityPipe('offsetX'));
-  protected offsetY$ = createValueState(0, this.entityPipe('offsetY'));
-  protected zoom$ = createValueState(100, this.entityPipe('zoom'));
-  protected maxZoomOut$ = createValueState(null);
-  protected maxZoomIn$ = createValueState(null);
-  protected gridSize$ = createValueState(0);
+  protected offsetX$ = createValueState<number>(0, this.entityPipe('offsetX'));
+  protected offsetY$ = createValueState<number>(0, this.entityPipe('offsetY'));
+  protected zoom$ = createValueState<number>(100, this.entityPipe('zoom'));
+  protected maxZoomOut$ = createValueState<number>(
+    null,
+    this.entityPipe('maxZoomOut')
+  );
+  protected maxZoomIn$ = createValueState<number>(
+    null,
+    this.entityPipe('maxZoomIn')
+  );
+  protected gridSize$ = createValueState<number>(
+    0,
+    this.entityPipe('gridSize')
+  );
+  protected allowCanvasZoom$ = createValueState<boolean>(
+    true,
+    this.entityPipe('allowCanvasZoom')
+  );
+  protected allowCanvasTranslation$ = createValueState<boolean>(
+    true,
+    this.entityPipe('allowCanvasTranslation')
+  );
+  protected inverseZoom$ = createValueState<boolean>(
+    true,
+    this.entityPipe('inverseZoom')
+  );
+  protected allowLooseLinks$ = createValueState<boolean>(
+    true,
+    this.entityPipe('allowLooseLinks')
+  );
+  protected portMagneticRadius$ = createValueState<number>(
+    30,
+    this.entityPipe('portMagneticRadius')
+  );
 
-  constructor(protected diagramEngine: DiagramEngineCore, id?: string, logPrefix = '[Diagram]') {
+  constructor(
+    protected diagramEngine: DiagramEngineCore,
+    id?: string,
+    logPrefix = '[Diagram]'
+  ) {
     super(id, logPrefix);
   }
 
-  // TODO: support the following events for links and nodes
-  // removed, updated<positionChanged/dataChanged>, added
   getNodes(): EntityMap<NodeModel> {
     return this.nodes$.value;
   }
@@ -56,7 +87,9 @@ export class DiagramModel extends BaseEntity {
     const result = new Map<ID, PortModel>();
 
     this.getNodes().forEach((node) => {
-      const ports = options.filter ? node.getPortsArray().filter(options.filter) : node.getPortsArray();
+      const ports = options.filter
+        ? node.getPortsArray().filter(options.filter)
+        : node.getPortsArray();
       ports.forEach((port) => result.set(port.id, port));
     });
 
@@ -132,19 +165,87 @@ export class DiagramModel extends BaseEntity {
     const serializedNodes = this.nodes$.map((node) => node.serialize());
     const serializedLinks = this.links$.map((link) => link.serialize());
 
-    return { ...super.serialize(), nodes: serializedNodes, links: serializedLinks };
+    return {
+      ...super.serialize(),
+      nodes: serializedNodes,
+      links: serializedLinks,
+    };
+  }
+
+  setPortMagneticRadius(portMagneticRadius: number) {
+    this.portMagneticRadius$.set(portMagneticRadius).emit();
+  }
+
+  getPortMagneticRadius() {
+    return this.portMagneticRadius$.value;
+  }
+
+  selectPortMagneticRadius() {
+    return this.portMagneticRadius$.select();
+  }
+
+  setAllowLooseLinks(allowLooseLinks: boolean) {
+    this.inverseZoom$.set(allowLooseLinks).emit();
+  }
+
+  getAllowLooseLinks() {
+    return this.allowLooseLinks$.value;
+  }
+
+  selectAllowLooseLinks() {
+    return this.allowLooseLinks$.select();
+  }
+
+  setInverseZoom(inverseZoom: boolean) {
+    this.inverseZoom$.set(inverseZoom).emit();
+  }
+
+  getInverseZoom() {
+    return this.inverseZoom$.value;
+  }
+
+  selectInverseZoom() {
+    return this.inverseZoom$.select();
+  }
+
+  setAllowCanvasZoom(allowCanvasZoom: boolean) {
+    this.allowCanvasZoom$.set(allowCanvasZoom).emit();
+  }
+
+  getAllowCanvasZoom() {
+    return this.allowCanvasZoom$.value;
+  }
+
+  selectAllowCanvasZoom() {
+    return this.allowCanvasTranslation$.select();
+  }
+
+  setAllowCanvasTranslation(allowCanvasTranslation: boolean) {
+    this.allowCanvasTranslation$.set(allowCanvasTranslation).emit();
+  }
+
+  getAllowCanvasTranslation() {
+    return this.allowCanvasTranslation$.value;
+  }
+
+  selectAllowCanvasTranslation() {
+    return this.allowCanvasTranslation$.select();
   }
 
   setMaxZoomOut(maxZoomOut: number) {
     this.maxZoomOut$.set(maxZoomOut).emit();
   }
 
-  setMaxZoomIn(maxZoomIn: number) {
-    this.maxZoomIn$.set(maxZoomIn).emit();
-  }
-
   getMaxZoomOut() {
     return this.maxZoomOut$.value;
+  }
+
+  selectMaxZoomOut() {
+    return this.maxZoomOut$.select();
+  }
+
+  setMaxZoomIn(maxZoomIn: number) {
+    this.maxZoomIn$.set(maxZoomIn).emit();
   }
 
   getMaxZoomIn() {
@@ -221,7 +322,7 @@ export class DiagramModel extends BaseEntity {
 
     return {
       x: gridSize * Math.floor((x + gridSize / 2) / gridSize),
-      y: gridSize * Math.floor((y + gridSize / 2) / gridSize)
+      y: gridSize * Math.floor((y + gridSize / 2) / gridSize),
     };
   }
 
@@ -232,21 +333,34 @@ export class DiagramModel extends BaseEntity {
     const nodes = this.nodes$.array();
     const links = this.links$.array();
 
-    const selectedNodes = () => nodes.flatMap((node) => node.getSelectedEntities());
+    const selectedNodes = () =>
+      nodes.flatMap((node) => node.getSelectedEntities());
     const selectedPorts = () =>
-      nodes.flatMap((node) => node.getPortsArray().flatMap((port: PortModel) => port.getSelectedEntities()));
-    const selectedLinks = () => links.flatMap((link) => link.getSelectedEntities());
+      nodes.flatMap((node) =>
+        node
+          .getPortsArray()
+          .flatMap((port: PortModel) => port.getSelectedEntities())
+      );
+    const selectedLinks = () =>
+      links.flatMap((link) => link.getSelectedEntities());
     const selectedPoints = () =>
-      links.flatMap((link) => link.getPoints().flatMap((point) => point.getSelectedEntities()));
+      links.flatMap((link) =>
+        link.getPoints().flatMap((point) => point.getSelectedEntities())
+      );
 
     if (isEmptyArray(filters)) {
-      items.push(...selectedNodes(), ...selectedPorts(), ...selectedLinks(), ...selectedPoints());
+      items.push(
+        ...selectedNodes(),
+        ...selectedPorts(),
+        ...selectedLinks(),
+        ...selectedPoints()
+      );
     } else {
       const byType: Record<BaseEntityType, () => BaseModel[]> = {
         node: selectedNodes,
         port: selectedPorts,
         link: selectedLinks,
-        point: selectedPoints
+        point: selectedPoints,
       };
 
       for (const type of filters) {
