@@ -8,5 +8,14 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "keywords": [
+    "web",
+    "diagram",
+    "diagrams",
+    "typescript",
+    "flowchart",
+    "graph"
+  ],
+  "description": "RxZu Core Engine"
 }

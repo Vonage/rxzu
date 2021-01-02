@@ -15,5 +15,15 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "keywords": [
+    "web",
+    "diagram",
+    "diagrams",
+    "typescript",
+    "flowchart",
+    "graph",
+    "angular"
+  ],
+  "description": "RxZu Angular Wrapper"
 }
