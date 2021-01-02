@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/Vonage/rxzu/compare/v1.1.0...v1.1.1) (2021-01-02)
+
+
+### Bug Fixes
+
+* **publish:** packges public access ([5fa989b](https://github.com/Vonage/rxzu/commit/5fa989bde55fb04c5246838820fae4f854820f76))
+
 # [1.1.0](https://github.com/Vonage/rxzu/compare/v1.0.0...v1.1.0) (2021-01-02)
 
 
