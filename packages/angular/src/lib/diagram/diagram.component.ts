@@ -4,25 +4,23 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  EventEmitter,
   Input,
   NgZone,
   OnDestroy,
-  Output,
   Renderer2,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
 import { combineLatest, Observable, ReplaySubject } from 'rxjs';
-import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import {
-  BaseAction,
   DiagramEngineCore,
   DiagramModel,
   SelectingAction,
   MouseManager,
+  isNil,
 } from '@rxzu/core';
-import { ZonedClass, OutsideZone } from '../../utils/decorators';
+import { ZonedClass, OutsideZone } from '../utils';
 
 @Component({
   selector: 'ngdx-diagram',
@@ -41,10 +39,6 @@ export class RxZuDiagramComponent
   @Input() maxZoomIn: number = null;
   @Input() portMagneticRadius = 30;
 
-  @Output() actionStartedFiring = new EventEmitter<BaseAction>();
-  @Output() actionStillFiring = new EventEmitter<BaseAction>();
-  @Output() actionStoppedFiring = new EventEmitter<BaseAction>();
-
   @ViewChild('nodesLayer', { read: ViewContainerRef })
   nodesLayer: ViewContainerRef;
 
@@ -57,6 +51,7 @@ export class RxZuDiagramComponent
   diagramEngine: DiagramEngineCore;
   mouseManager: MouseManager;
   protected destroyed$ = new ReplaySubject<boolean>(1);
+  protected selectionBox$: Observable<SelectingAction>;
 
   get host(): HTMLElement {
     return this.elRef.nativeElement;
@@ -88,6 +83,7 @@ export class RxZuDiagramComponent
         )
         .subscribe(() => {
           this.initSubs();
+          this.initSelectionBox();
           this.cdRef.detectChanges();
         });
     }
@@ -98,27 +94,23 @@ export class RxZuDiagramComponent
     this.destroyed$.complete();
   }
 
+  initSelectionBox() {
+    this.selectionBox$ = this.diagramEngine.selectAction().pipe(
+      map((action) => {
+        if (action instanceof SelectingAction && !isNil(action.dimensions)) {
+          return action;
+        }
+        return null;
+      }),
+      tap(() => this.cdRef.detectChanges())
+    ) as Observable<SelectingAction>;
+  }
+
   @OutsideZone
   onMouseUp(event: MouseEvent) {
     this.mouseManager.onMouseUp(event);
   }
 
-  shouldDrawSelectionBox() {
-    return this.diagramEngine && this.diagramEngine.shouldDrawSelectionBox();
-  }
-
-  selectionAction(): Observable<SelectingAction> {
-    return this.diagramEngine
-      .selectAction()
-      .pipe(
-        filter((action) => action instanceof SelectingAction)
-      ) as Observable<SelectingAction>;
-  }
-
-  /**
-   * @description Mouse Move Event Handler
-   * @param event MouseEvent
-   */
   @OutsideZone
   onMouseMove(event: MouseEvent) {
     this.mouseManager.onMouseMove(event);

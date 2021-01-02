@@ -348,7 +348,7 @@ export class DiagramEngineCore {
   }
 
   selectAction() {
-    return this.action$ as BehaviorSubject<BaseAction>;
+    return this.action$;
   }
 
   setAction(action: BaseAction) {
@@ -358,7 +358,6 @@ export class DiagramEngineCore {
   shouldDrawSelectionBox() {
     const action = this.action$.getValue();
     if (action instanceof SelectingAction) {
-      console.log(action.getBoxDimensions());
       return action.getBoxDimensions();
     }
     return false;
