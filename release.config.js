@@ -32,12 +32,6 @@ module.exports = {
         tarballDir: 'dist',
       },
     ],
-    [
-      '@semantic-release/github',
-      {
-        assets: ['dist/*.tgz', 'dist/*.zip'],
-      },
-    ],
   ],
   prepare: [
     '@semantic-release/changelog',
