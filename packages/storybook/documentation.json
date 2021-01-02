@@ -1056,7 +1056,7 @@
         },
         {
             "name": "DefaultNodeComponent",
-            "id": "component-DefaultNodeComponent-fbb229247c158cf39b93385136a5cf9b",
+            "id": "component-DefaultNodeComponent-a98eccc643d39526f64dae1634950f2f",
             "file": "packages/angular/src/lib/defaults/components/default-node/default-node.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -1081,7 +1081,7 @@
                     "type": "ViewContainerRef",
                     "optional": false,
                     "description": "",
-                    "line": 13,
+                    "line": 12,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1097,7 +1097,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 19
+                    "line": 18
                 }
             ],
             "hostBindings": [],
@@ -1105,7 +1105,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import { ChangeDetectionStrategy, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';\nimport { DefaultNodeModel } from '@rxzu/core';\nimport { filter, switchMap, tap } from 'rxjs/operators';\n\n@Component({\n  selector: 'ngdx-default-node',\n  templateUrl: './default-node.component.html',\n  styleUrls: ['./default-node.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class DefaultNodeComponent extends DefaultNodeModel implements OnInit {\n  @ViewChild('portsLayer', { read: ViewContainerRef, static: true })\n  portsLayer: ViewContainerRef;\n\n  constructor() {\n    super({ type: 'ngdx-default-node' });\n  }\n\n  ngOnInit() {\n    this.selectPorts().subscribe((ports) => {\n      const factoriesManager = this.getParent().getDiagramEngine().getFactoriesManager();\n      for (const port of ports) {\n        if (!port.getPainted().isPainted) {\n          factoriesManager\n            .getFactory({ factoryType: 'portFactories', modelType: port.getType() })\n            .generateWidget({ model: port, host: this.portsLayer });\n        }\n      }\n      this.setPainted(true);\n    });\n  }\n}\n",
+            "sourceCode": "import { ChangeDetectionStrategy, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';\nimport { DefaultNodeModel } from '@rxzu/core';\n\n@Component({\n  selector: 'ngdx-default-node',\n  templateUrl: './default-node.component.html',\n  styleUrls: ['./default-node.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class DefaultNodeComponent extends DefaultNodeModel implements OnInit {\n  @ViewChild('portsLayer', { read: ViewContainerRef, static: true })\n  portsLayer: ViewContainerRef;\n\n  constructor() {\n    super({ type: 'ngdx-default-node' });\n  }\n\n  ngOnInit() {\n    this.selectPorts().subscribe((ports) => {\n      const factoriesManager = this.getParent().getDiagramEngine().getFactoriesManager();\n      for (const port of ports) {\n        if (!port.getPainted().isPainted) {\n          factoriesManager\n            .getFactory({ factoryType: 'portFactories', modelType: port.getType() })\n            .generateWidget({ model: port, host: this.portsLayer });\n        }\n      }\n      this.setPainted(true);\n    });\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -1118,7 +1118,7 @@
                 "name": "constructor",
                 "description": "",
                 "args": [],
-                "line": 13
+                "line": 12
             },
             "extends": "DefaultNodeModel",
             "implements": [
@@ -1186,7 +1186,7 @@
         },
         {
             "name": "RxZuDiagramComponent",
-            "id": "component-RxZuDiagramComponent-94de383b11246b2f0850840d772e3359",
+            "id": "component-RxZuDiagramComponent-46b4a13c20c07c9f7e225d6f379eadc0",
             "file": "packages/angular/src/lib/containers/diagram/diagram.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -1207,63 +1207,63 @@
                 {
                     "name": "allowCanvasTranslation",
                     "defaultValue": "true",
-                    "line": 36
+                    "line": 37
                 },
                 {
                     "name": "allowCanvasZoom",
                     "defaultValue": "true",
-                    "line": 35
+                    "line": 36
                 },
                 {
                     "name": "allowLooseLinks",
                     "defaultValue": "true",
-                    "line": 38
+                    "line": 39
                 },
                 {
                     "name": "inverseZoom",
                     "defaultValue": "true",
-                    "line": 37
+                    "line": 38
                 },
                 {
                     "name": "maxZoomIn",
                     "defaultValue": "null",
-                    "line": 40,
+                    "line": 41,
                     "type": "number"
                 },
                 {
                     "name": "maxZoomOut",
                     "defaultValue": "null",
-                    "line": 39,
+                    "line": 40,
                     "type": "number"
                 },
                 {
                     "name": "model",
-                    "line": 34,
+                    "line": 35,
                     "type": "DiagramModel"
                 },
                 {
                     "name": "portMagneticRadius",
                     "defaultValue": "30",
-                    "line": 41
+                    "line": 42
                 }
             ],
             "outputsClass": [
                 {
                     "name": "actionStartedFiring",
                     "defaultValue": "new EventEmitter<BaseAction>()",
-                    "line": 43,
+                    "line": 44,
                     "type": "EventEmitter"
                 },
                 {
                     "name": "actionStillFiring",
                     "defaultValue": "new EventEmitter<BaseAction>()",
-                    "line": 44,
+                    "line": 45,
                     "type": "EventEmitter"
                 },
                 {
                     "name": "actionStoppedFiring",
                     "defaultValue": "new EventEmitter<BaseAction>()",
-                    "line": 45,
+                    "line": 46,
                     "type": "EventEmitter"
                 }
             ],
@@ -1273,7 +1273,7 @@
                     "type": "ElementRef",
                     "optional": false,
                     "description": "",
-                    "line": 54,
+                    "line": 55,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1287,7 +1287,7 @@
                     "type": "",
                     "optional": false,
                     "description": "",
-                    "line": 57,
+                    "line": 59,
                     "modifierKind": [
                         113
                     ]
@@ -1297,14 +1297,14 @@
                     "type": "DiagramEngineCore",
                     "optional": false,
                     "description": "",
-                    "line": 56
+                    "line": 57
                 },
                 {
                     "name": "linksLayer",
                     "type": "ViewContainerRef",
                     "optional": false,
                     "description": "",
-                    "line": 51,
+                    "line": 52,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1313,11 +1313,18 @@
                     ]
                 },
                 {
+                    "name": "mouseManager",
+                    "type": "MouseManager",
+                    "optional": false,
+                    "description": "",
+                    "line": 58
+                },
+                {
                     "name": "ngZone",
                     "type": "NgZone",
                     "optional": false,
                     "description": "",
-                    "line": 64,
+                    "line": 66,
                     "modifierKind": [
                         114
                     ]
@@ -1327,7 +1334,7 @@
                     "type": "ViewContainerRef",
                     "optional": false,
                     "description": "",
-                    "line": 48,
+                    "line": 49,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1343,7 +1350,7 @@
                     "optional": false,
                     "returnType": "HTMLDivElement",
                     "typeParameters": [],
-                    "line": 215,
+                    "line": 166,
                     "modifierKind": [
                         113
                     ]
@@ -1354,7 +1361,7 @@
                     "optional": false,
                     "returnType": "HTMLDivElement",
                     "typeParameters": [],
-                    "line": 211,
+                    "line": 162,
                     "modifierKind": [
                         113
                     ]
@@ -1365,7 +1372,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 198,
+                    "line": 149,
                     "modifierKind": [
                         113
                     ]
@@ -1376,7 +1383,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 70
+                    "line": 72
                 },
                 {
                     "name": "ngOnDestroy",
@@ -1384,7 +1391,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 93
+                    "line": 96
                 },
                 {
                     "name": "onMouseDown",
@@ -1397,7 +1404,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 125,
+                    "line": 128,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1424,7 +1431,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 120,
+                    "line": 123,
                     "description": "",
                     "decorators": [
                         {
@@ -1434,15 +1441,15 @@
                     "jsdoctags": [
                         {
                             "name": {
-                                "pos": 3035,
-                                "end": 3040,
+                                "pos": 3144,
+                                "end": 3149,
                                 "flags": 0,
                                 "escapedText": "event"
                             },
                             "type": "MouseEvent",
                             "tagName": {
-                                "pos": 3029,
-                                "end": 3034,
+                                "pos": 3138,
+                                "end": 3143,
                                 "flags": 0,
                                 "escapedText": "param"
                             },
@@ -1461,7 +1468,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 99,
+                    "line": 102,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1488,7 +1495,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 130,
+                    "line": 133,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1510,7 +1517,7 @@
                     "optional": false,
                     "returnType": "Observable<SelectingAction>",
                     "typeParameters": [],
-                    "line": 107
+                    "line": 110
                 },
                 {
                     "name": "setLayerStyles",
@@ -1531,7 +1538,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 187,
+                    "line": 138,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1570,7 +1577,7 @@
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 103
+                    "line": 106
                 }
             ],
             "hostBindings": [],
@@ -1578,7 +1585,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  EventEmitter,\n  Input,\n  NgZone,\n  OnDestroy,\n  Output,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { combineLatest, Observable, ReplaySubject } from 'rxjs';\nimport { filter, switchMap, takeUntil, tap } from 'rxjs/operators';\nimport {\n  BaseAction,\n  DiagramEngineCore,\n  DiagramModel,\n  SelectingAction,\n} from '@rxzu/core';\nimport { ZonedClass, OutsideZone } from '../../utils/decorators';\n\n@Component({\n  selector: 'ngdx-diagram',\n  templateUrl: 'diagram.component.html',\n  styleUrls: ['diagram.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class RxZuDiagramComponent\n  implements AfterViewInit, OnDestroy, ZonedClass {\n  @Input('model') diagramModel: DiagramModel;\n  @Input() allowCanvasZoom = true;\n  @Input() allowCanvasTranslation = true;\n  @Input() inverseZoom = true;\n  @Input() allowLooseLinks = true;\n  @Input() maxZoomOut: number = null;\n  @Input() maxZoomIn: number = null;\n  @Input() portMagneticRadius = 30;\n\n  @Output() actionStartedFiring = new EventEmitter<BaseAction>();\n  @Output() actionStillFiring = new EventEmitter<BaseAction>();\n  @Output() actionStoppedFiring = new EventEmitter<BaseAction>();\n\n  @ViewChild('nodesLayer', { read: ViewContainerRef })\n  nodesLayer: ViewContainerRef;\n\n  @ViewChild('linksLayer', { read: ViewContainerRef })\n  linksLayer: ViewContainerRef;\n\n  @ViewChild('canvas', { read: ElementRef })\n  canvas: ElementRef;\n\n  diagramEngine: DiagramEngineCore;\n  protected destroyed$ = new ReplaySubject<boolean>(1);\n\n  get host(): HTMLElement {\n    return this.elRef.nativeElement;\n  }\n\n  constructor(\n    public ngZone: NgZone,\n    protected renderer: Renderer2,\n    protected cdRef: ChangeDetectorRef,\n    protected elRef: ElementRef<HTMLElement>\n  ) {}\n\n  ngAfterViewInit() {\n    if (this.diagramModel) {\n      this.diagramEngine = this.diagramModel.getDiagramEngine();\n      this.diagramEngine.setCanvas(this.canvas.nativeElement);\n\n      this.diagramEngine.setup({\n        ...this,\n      });\n\n      (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)\n        .pipe(\n          switchMap(\n            () =>\n              this.diagramEngine.paintLinks(this.linksLayer) as Observable<void>\n          )\n        )\n        .subscribe(() => {\n          this.initSubs();\n          this.cdRef.detectChanges();\n        });\n    }\n  }\n\n  ngOnDestroy() {\n    this.destroyed$.next(true);\n    this.destroyed$.complete();\n  }\n\n  @OutsideZone\n  onMouseUp(event: MouseEvent) {\n    this.diagramEngine.onMouseUp(event);\n  }\n\n  shouldDrawSelectionBox() {\n    return this.diagramEngine && this.diagramEngine.shouldDrawSelectionBox();\n  }\n\n  selectionAction(): Observable<SelectingAction> {\n    return this.diagramEngine\n      .selectAction()\n      .pipe(\n        filter((action) => action instanceof SelectingAction)\n      ) as Observable<SelectingAction>;\n  }\n\n  /**\n   * @description Mouse Move Event Handler\n   * @param event MouseEvent\n   */\n  @OutsideZone\n  onMouseMove(event: MouseEvent) {\n    this.diagramEngine.onMouseMove(event);\n  }\n\n  @OutsideZone\n  onMouseDown(event: MouseEvent) {\n    this.diagramEngine.onMouseDown(event);\n  }\n\n  @OutsideZone\n  onMouseWheel(event: WheelEvent) {\n    if (!this.allowCanvasZoom) {\n      return;\n    }\n\n    event.preventDefault();\n    event.stopPropagation();\n    const currentZoomLevel = this.diagramModel.getZoomLevel();\n\n    const oldZoomFactor = currentZoomLevel / 100;\n    let scrollDelta = this.inverseZoom ? -event.deltaY : event.deltaY;\n\n    // check if it is pinch gesture\n    if (event.ctrlKey && scrollDelta % 1 !== 0) {\n      /* Chrome and Firefox sends wheel event with deltaY that\n\t\t\t\t\t\t have fractional part, also `ctrlKey` prop of the event is true\n\t\t\t\t\t\t though ctrl isn't pressed\n\t\t\t\t\t*/\n      scrollDelta /= 3;\n    } else {\n      scrollDelta /= 60;\n    }\n\n    if (currentZoomLevel + scrollDelta > 10) {\n      const newZoomLvl = currentZoomLevel + scrollDelta;\n      this.diagramModel.setZoomLevel(newZoomLvl);\n    }\n\n    const updatedZoomLvl = this.diagramModel.getZoomLevel();\n    const zoomFactor = updatedZoomLvl / 100;\n\n    const boundingRect = (event.currentTarget as Element).getBoundingClientRect();\n    const clientWidth = boundingRect.width;\n    const clientHeight = boundingRect.height;\n\n    // compute difference between rect before and after scroll\n    const widthDiff = clientWidth * zoomFactor - clientWidth * oldZoomFactor;\n    const heightDiff = clientHeight * zoomFactor - clientHeight * oldZoomFactor;\n\n    // compute mouse coords relative to canvas\n    const clientX = event.clientX - boundingRect.left;\n    const clientY = event.clientY - boundingRect.top;\n\n    // compute width and height increment factor\n    const xFactor =\n      (clientX - this.diagramModel.getOffsetX()) / oldZoomFactor / clientWidth;\n    const yFactor =\n      (clientY - this.diagramModel.getOffsetY()) / oldZoomFactor / clientHeight;\n\n    const updatedXOffset = this.diagramModel.getOffsetX() - widthDiff * xFactor;\n    const updatedYOffset =\n      this.diagramModel.getOffsetY() - heightDiff * yFactor;\n\n    this.diagramModel.setOffset(updatedXOffset, updatedYOffset);\n  }\n\n  @OutsideZone\n  protected setLayerStyles(x: number, y: number, zoom: number): void {\n    const nodesLayer = this.getNodesLayer();\n    const linksLayer = this.getLinksLayer();\n\n    const style = 'transform';\n    const value = `translate(${x}px, ${y}px) scale(${zoom / 100.0})`;\n\n    this.renderer.setStyle(nodesLayer, style, value);\n    this.renderer.setStyle(linksLayer, style, value);\n  }\n\n  protected initSubs() {\n    combineLatest([\n      this.diagramModel.selectOffsetX(),\n      this.diagramModel.selectOffsetY(),\n      this.diagramModel.selectZoomLevel(),\n    ])\n      .pipe(\n        tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),\n        takeUntil(this.destroyed$)\n      )\n      .subscribe();\n  }\n\n  protected getNodesLayer(): HTMLDivElement {\n    return this.host.querySelector('.ngdx-nodes-layer');\n  }\n\n  protected getLinksLayer(): HTMLDivElement {\n    return this.host.querySelector('.ngdx-links-layer');\n  }\n}\n",
+            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  EventEmitter,\n  Input,\n  NgZone,\n  OnDestroy,\n  Output,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { combineLatest, Observable, ReplaySubject } from 'rxjs';\nimport { filter, switchMap, takeUntil, tap } from 'rxjs/operators';\nimport {\n  BaseAction,\n  DiagramEngineCore,\n  DiagramModel,\n  SelectingAction,\n  MouseManager,\n} from '@rxzu/core';\nimport { ZonedClass, OutsideZone } from '../../utils/decorators';\n\n@Component({\n  selector: 'ngdx-diagram',\n  templateUrl: 'diagram.component.html',\n  styleUrls: ['diagram.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class RxZuDiagramComponent\n  implements AfterViewInit, OnDestroy, ZonedClass {\n  @Input('model') diagramModel: DiagramModel;\n  @Input() allowCanvasZoom = true;\n  @Input() allowCanvasTranslation = true;\n  @Input() inverseZoom = true;\n  @Input() allowLooseLinks = true;\n  @Input() maxZoomOut: number = null;\n  @Input() maxZoomIn: number = null;\n  @Input() portMagneticRadius = 30;\n\n  @Output() actionStartedFiring = new EventEmitter<BaseAction>();\n  @Output() actionStillFiring = new EventEmitter<BaseAction>();\n  @Output() actionStoppedFiring = new EventEmitter<BaseAction>();\n\n  @ViewChild('nodesLayer', { read: ViewContainerRef })\n  nodesLayer: ViewContainerRef;\n\n  @ViewChild('linksLayer', { read: ViewContainerRef })\n  linksLayer: ViewContainerRef;\n\n  @ViewChild('canvas', { read: ElementRef })\n  canvas: ElementRef;\n\n  diagramEngine: DiagramEngineCore;\n  mouseManager: MouseManager;\n  protected destroyed$ = new ReplaySubject<boolean>(1);\n\n  get host(): HTMLElement {\n    return this.elRef.nativeElement;\n  }\n\n  constructor(\n    public ngZone: NgZone,\n    protected renderer: Renderer2,\n    protected cdRef: ChangeDetectorRef,\n    protected elRef: ElementRef<HTMLElement>\n  ) {}\n\n  ngAfterViewInit() {\n    if (this.diagramModel) {\n      this.diagramEngine = this.diagramModel.getDiagramEngine();\n      this.mouseManager = this.diagramEngine.getMouseManager();\n      this.diagramEngine.setCanvas(this.canvas.nativeElement);\n\n      this.diagramEngine.setup({\n        ...this,\n      });\n\n      (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)\n        .pipe(\n          switchMap(\n            () =>\n              this.diagramEngine.paintLinks(this.linksLayer) as Observable<void>\n          )\n        )\n        .subscribe(() => {\n          this.initSubs();\n          this.cdRef.detectChanges();\n        });\n    }\n  }\n\n  ngOnDestroy() {\n    this.destroyed$.next(true);\n    this.destroyed$.complete();\n  }\n\n  @OutsideZone\n  onMouseUp(event: MouseEvent) {\n    this.mouseManager.onMouseUp(event);\n  }\n\n  shouldDrawSelectionBox() {\n    return this.diagramEngine && this.diagramEngine.shouldDrawSelectionBox();\n  }\n\n  selectionAction(): Observable<SelectingAction> {\n    return this.diagramEngine\n      .selectAction()\n      .pipe(\n        filter((action) => action instanceof SelectingAction)\n      ) as Observable<SelectingAction>;\n  }\n\n  /**\n   * @description Mouse Move Event Handler\n   * @param event MouseEvent\n   */\n  @OutsideZone\n  onMouseMove(event: MouseEvent) {\n    this.mouseManager.onMouseMove(event);\n  }\n\n  @OutsideZone\n  onMouseDown(event: MouseEvent) {\n    this.mouseManager.onMouseDown(event);\n  }\n\n  @OutsideZone\n  onMouseWheel(event: WheelEvent) {\n    this.mouseManager.onMouseWheel(event);\n  }\n\n  @OutsideZone\n  protected setLayerStyles(x: number, y: number, zoom: number): void {\n    const nodesLayer = this.getNodesLayer();\n    const linksLayer = this.getLinksLayer();\n\n    const style = 'transform';\n    const value = `translate(${x}px, ${y}px) scale(${zoom / 100.0})`;\n\n    this.renderer.setStyle(nodesLayer, style, value);\n    this.renderer.setStyle(linksLayer, style, value);\n  }\n\n  protected initSubs() {\n    combineLatest([\n      this.diagramModel.selectOffsetX(),\n      this.diagramModel.selectOffsetY(),\n      this.diagramModel.selectZoomLevel(),\n    ])\n      .pipe(\n        tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),\n        takeUntil(this.destroyed$)\n      )\n      .subscribe();\n  }\n\n  protected getNodesLayer(): HTMLDivElement {\n    return this.host.querySelector('.ngdx-nodes-layer');\n  }\n\n  protected getLinksLayer(): HTMLDivElement {\n    return this.host.querySelector('.ngdx-links-layer');\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -1608,7 +1615,7 @@
                         "type": "ElementRef<HTMLElement>"
                     }
                 ],
-                "line": 61,
+                "line": 63,
                 "jsdoctags": [
                     {
                         "name": "ngZone",
@@ -1652,7 +1659,7 @@
                         "name": "host",
                         "type": "",
                         "returnType": "HTMLElement",
-                        "line": 59
+                        "line": 61
                     }
                 }
             },
@@ -1954,7 +1961,7 @@
                 "linktype": "component",
                 "name": "RxZuDiagramComponent",
                 "coveragePercent": 0,
-                "coverageCount": "0/31",
+                "coverageCount": "0/32",
                 "status": "low"
             },
             {

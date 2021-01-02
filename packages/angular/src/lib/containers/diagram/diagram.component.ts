@@ -20,9 +20,9 @@ import {
   DiagramEngineCore,
   DiagramModel,
   SelectingAction,
+  MouseManager,
 } from '@rxzu/core';
 import { ZonedClass, OutsideZone } from '../../utils/decorators';
-import { MouseManager } from 'packages/core/src/lib/managers/mouse.manager';
 
 @Component({
   selector: 'ngdx-diagram',

@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { DefaultNodeModel } from '@rxzu/core';
-import { filter, switchMap, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'ngdx-default-node',
