@@ -5,6 +5,13 @@
 
 * **rxzu:** complete restructure and rename for library ([d3dbd47](https://github.com/Vonage/rxzu/commit/d3dbd4742d08573e747aa7bcd75691aafe60e241))
 
+# 1.0.0 (2021-01-02)
+
+
+### Features
+
+* **rxzu:** complete restructure and rename for library ([d3dbd47](https://github.com/Vonage/rxzu/commit/d3dbd4742d08573e747aa7bcd75691aafe60e241))
+
 ## [3.3.4](https://github.com/Vonage/rxzu/compare/v3.3.3...v3.3.4) (2020-12-16)
 
 
