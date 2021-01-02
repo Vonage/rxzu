@@ -29,7 +29,7 @@ jobs:
   build:
     if: "!contains(github.event.head_commit.message, 'skip ci')"
     needs: [dependencies]
-    name: Build Storybook & Library
+    name: Build Storybook & Libraries
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -66,31 +66,31 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist/storybook/shared-storybook
 
-  # publish_lib:
-  #   if: "!contains(github.event.head_commit.message, 'skip ci')"
-  #   needs: [build]
-  #   name: Publish RxZu
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #       with:
-  #         persist-credentials: false
-  #     - uses: actions/setup-node@v1
-  #       with:
-  #         node-version: 12
-  #     - name: Restore dependencies from cache
-  #       uses: actions/cache@v1
-  #       with:
-  #         path: node_modules
-  #         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-yarn-
-  #     - uses: actions/download-artifact@v2
-  #       with:
-  #         name: artifact
-  #         path: dist
-  #     - name: Run semantic-release
-  #       run: npx semantic-release
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-  #         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  publish_lib:
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
+    needs: [build]
+    name: Publish RxZu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Restore dependencies from cache
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
+          path: dist
+      - name: Run semantic-release
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
