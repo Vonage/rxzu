@@ -25,5 +25,6 @@
     "graph",
     "angular"
   ],
-  "description": "RxZu Angular Wrapper"
+  "description": "RxZu Angular Wrapper",
+  "homepage": "https://vonage.github.io/rxzu"
 }

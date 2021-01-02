@@ -17,5 +17,6 @@
     "flowchart",
     "graph"
   ],
-  "description": "RxZu Core Engine"
+  "description": "RxZu Core Engine",
+  "homepage": "https://vonage.github.io/rxzu"
 }
