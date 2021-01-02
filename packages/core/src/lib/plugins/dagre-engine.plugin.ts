@@ -13,14 +13,16 @@ export interface DagreEngineOptions {
 }
 
 @Injectable()
-export class DagreEngine {
+export class DagrePlugin {
   g: dagre.graphlib.Graph;
 
   instantiate() {
     try {
       this.g = new dagre.graphlib.Graph({ multigraph: true });
     } catch (error) {
-      console.warn("`dagre` packages isn't installed, please install it before using the DagreEngine plugin");
+      console.warn(
+        "`dagre` packages isn't installed, please install it before using the DagreEngine plugin"
+      );
     }
   }
 
@@ -39,7 +41,7 @@ export class DagreEngine {
     model.getNodes().forEach((node) => {
       this.g.setNode(node.id, {
         width: node.getWidth(),
-        height: node.getHeight()
+        height: node.getHeight(),
       });
     });
 
@@ -50,7 +52,7 @@ export class DagreEngine {
         this.g.setEdge({
           v: link.getSourcePort().getNode().id,
           w: link.getTargetPort().getNode().id,
-          name: link.id
+          name: link.id,
         });
       }
     });
@@ -71,7 +73,9 @@ export class DagreEngine {
 
         const points = [link.getFirstPoint()];
         for (let i = 1; i < edge.points.length - 2; i++) {
-          points.push(new PointModel(link, { x: edge.points[i].x, y: edge.points[i].y }));
+          points.push(
+            new PointModel(link, { x: edge.points[i].x, y: edge.points[i].y })
+          );
         }
         link.setPoints(points.concat(link.getLastPoint()));
       });

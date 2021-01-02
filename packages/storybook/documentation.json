@@ -2,39 +2,6 @@
     "pipes": [],
     "interfaces": [
         {
-            "name": "DagreEngineOptions",
-            "id": "interface-DagreEngineOptions-c1ef38c732251e102e37569efe536d21",
-            "file": "packages/angular/src/lib/plugins/dagre-engine.plugin.ts",
-            "type": "interface",
-            "sourceCode": "import { Injectable } from '@angular/core';\nimport { DiagramModel, PointModel } from '@rxzu/core';\nimport * as dagre from 'dagre';\nimport { EdgeConfig, GraphLabel, NodeConfig } from 'dagre';\n\nexport interface DagreEngineOptions {\n  graph?: GraphLabel;\n  layout?: GraphLabel & NodeConfig & EdgeConfig;\n  /**\n   * Will also layout links\n   */\n  includeLinks?: boolean;\n}\n\n@Injectable()\nexport class DagreEngine {\n  g: dagre.graphlib.Graph;\n\n  instantiate() {\n    try {\n      this.g = new dagre.graphlib.Graph({ multigraph: true });\n    } catch (error) {\n      console.warn(\"`dagre` packages isn't installed, please install it before using the DagreEngine plugin\");\n    }\n  }\n\n  redistribute(model: DiagramModel, options: DagreEngineOptions = {}): void {\n    this.instantiate();\n\n    this.g.setGraph(options.graph || {});\n\n    this.g.setDefaultEdgeLabel(() => {\n      return {};\n    });\n\n    const processedlinks: { [id: string]: boolean } = {};\n\n    // set nodes\n    model.getNodes().forEach((node) => {\n      this.g.setNode(node.id, {\n        width: node.getWidth(),\n        height: node.getHeight()\n      });\n    });\n\n    model.getLinks().forEach((link) => {\n      // set edges\n      if (link.getSourcePort() && link.getTargetPort()) {\n        processedlinks[link.id] = true;\n        this.g.setEdge({\n          v: link.getSourcePort().getNode().id,\n          w: link.getTargetPort().getNode().id,\n          name: link.id\n        });\n      }\n    });\n\n    // layout the graph\n    dagre.layout(this.g, options.layout);\n\n    this.g.nodes().forEach((v) => {\n      const { x, y } = this.g.node(v);\n      model.getNode(v).setCoords({ x, y });\n    });\n\n    // also include links?\n    if (options.includeLinks) {\n      this.g.edges().forEach((e) => {\n        const edge = this.g.edge(e);\n        const link = model.getLink(e.name);\n\n        const points = [link.getFirstPoint()];\n        for (let i = 1; i < edge.points.length - 2; i++) {\n          points.push(new PointModel(link, { x: edge.points[i].x, y: edge.points[i].y }));\n        }\n        link.setPoints(points.concat(link.getLastPoint()));\n      });\n    }\n  }\n}\n",
-            "properties": [
-                {
-                    "name": "graph",
-                    "type": "GraphLabel",
-                    "optional": true,
-                    "description": "",
-                    "line": 7
-                },
-                {
-                    "name": "includeLinks",
-                    "type": "boolean",
-                    "optional": true,
-                    "description": "<p>Will also layout links</p>\n",
-                    "line": 12
-                },
-                {
-                    "name": "layout",
-                    "type": "",
-                    "optional": true,
-                    "description": "",
-                    "line": 8
-                }
-            ],
-            "indexSignatures": [],
-            "kind": 150,
-            "methods": []
-        },
-        {
             "name": "ZonedClass",
             "id": "interface-ZonedClass-95a8ba087560debc8f9321814c92650b",
             "file": "packages/angular/src/lib/utils/decorators.ts",
@@ -55,68 +22,6 @@
         }
     ],
     "injectables": [
-        {
-            "name": "DagreEngine",
-            "id": "injectable-DagreEngine-c1ef38c732251e102e37569efe536d21",
-            "file": "packages/angular/src/lib/plugins/dagre-engine.plugin.ts",
-            "properties": [
-                {
-                    "name": "g",
-                    "type": "dagre.graphlib.Graph",
-                    "optional": false,
-                    "description": "",
-                    "line": 17
-                }
-            ],
-            "methods": [
-                {
-                    "name": "instantiate",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "void",
-                    "typeParameters": [],
-                    "line": 19
-                },
-                {
-                    "name": "redistribute",
-                    "args": [
-                        {
-                            "name": "model",
-                            "type": "DiagramModel"
-                        },
-                        {
-                            "name": "options",
-                            "type": "DagreEngineOptions",
-                            "defaultValue": "{}"
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "void",
-                    "typeParameters": [],
-                    "line": 27,
-                    "jsdoctags": [
-                        {
-                            "name": "model",
-                            "type": "DiagramModel",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        },
-                        {
-                            "name": "options",
-                            "type": "DagreEngineOptions",
-                            "defaultValue": "{}",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ]
-                }
-            ],
-            "description": "",
-            "sourceCode": "import { Injectable } from '@angular/core';\nimport { DiagramModel, PointModel } from '@rxzu/core';\nimport * as dagre from 'dagre';\nimport { EdgeConfig, GraphLabel, NodeConfig } from 'dagre';\n\nexport interface DagreEngineOptions {\n  graph?: GraphLabel;\n  layout?: GraphLabel & NodeConfig & EdgeConfig;\n  /**\n   * Will also layout links\n   */\n  includeLinks?: boolean;\n}\n\n@Injectable()\nexport class DagreEngine {\n  g: dagre.graphlib.Graph;\n\n  instantiate() {\n    try {\n      this.g = new dagre.graphlib.Graph({ multigraph: true });\n    } catch (error) {\n      console.warn(\"`dagre` packages isn't installed, please install it before using the DagreEngine plugin\");\n    }\n  }\n\n  redistribute(model: DiagramModel, options: DagreEngineOptions = {}): void {\n    this.instantiate();\n\n    this.g.setGraph(options.graph || {});\n\n    this.g.setDefaultEdgeLabel(() => {\n      return {};\n    });\n\n    const processedlinks: { [id: string]: boolean } = {};\n\n    // set nodes\n    model.getNodes().forEach((node) => {\n      this.g.setNode(node.id, {\n        width: node.getWidth(),\n        height: node.getHeight()\n      });\n    });\n\n    model.getLinks().forEach((link) => {\n      // set edges\n      if (link.getSourcePort() && link.getTargetPort()) {\n        processedlinks[link.id] = true;\n        this.g.setEdge({\n          v: link.getSourcePort().getNode().id,\n          w: link.getTargetPort().getNode().id,\n          name: link.id\n        });\n      }\n    });\n\n    // layout the graph\n    dagre.layout(this.g, options.layout);\n\n    this.g.nodes().forEach((v) => {\n      const { x, y } = this.g.node(v);\n      model.getNode(v).setCoords({ x, y });\n    });\n\n    // also include links?\n    if (options.includeLinks) {\n      this.g.edges().forEach((e) => {\n        const edge = this.g.edge(e);\n        const link = model.getLink(e.name);\n\n        const points = [link.getFirstPoint()];\n        for (let i = 1; i < edge.points.length - 2; i++) {\n          points.push(new PointModel(link, { x: edge.points[i].x, y: edge.points[i].y }));\n        }\n        link.setPoints(points.concat(link.getLastPoint()));\n      });\n    }\n  }\n}\n",
-            "type": "injectable"
-        },
         {
             "name": "DiagramEngine",
             "id": "injectable-DiagramEngine-bc22c04c81a991546c8c643c9805e228",
@@ -1186,8 +1091,8 @@
         },
         {
             "name": "RxZuDiagramComponent",
-            "id": "component-RxZuDiagramComponent-46b4a13c20c07c9f7e225d6f379eadc0",
-            "file": "packages/angular/src/lib/containers/diagram/diagram.component.ts",
+            "id": "component-RxZuDiagramComponent-f3f6c015155c0336868bcfd6561842c4",
+            "file": "packages/angular/src/lib/diagram/diagram.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
             "entryComponents": [],
@@ -1207,73 +1112,54 @@
                 {
                     "name": "allowCanvasTranslation",
                     "defaultValue": "true",
-                    "line": 37
+                    "line": 35
                 },
                 {
                     "name": "allowCanvasZoom",
                     "defaultValue": "true",
-                    "line": 36
+                    "line": 34
                 },
                 {
                     "name": "allowLooseLinks",
                     "defaultValue": "true",
-                    "line": 39
+                    "line": 37
                 },
                 {
                     "name": "inverseZoom",
                     "defaultValue": "true",
-                    "line": 38
+                    "line": 36
                 },
                 {
                     "name": "maxZoomIn",
                     "defaultValue": "null",
-                    "line": 41,
+                    "line": 39,
                     "type": "number"
                 },
                 {
                     "name": "maxZoomOut",
                     "defaultValue": "null",
-                    "line": 40,
+                    "line": 38,
                     "type": "number"
                 },
                 {
                     "name": "model",
-                    "line": 35,
+                    "line": 33,
                     "type": "DiagramModel"
                 },
                 {
                     "name": "portMagneticRadius",
                     "defaultValue": "30",
-                    "line": 42
+                    "line": 40
                 }
             ],
-            "outputsClass": [
-                {
-                    "name": "actionStartedFiring",
-                    "defaultValue": "new EventEmitter<BaseAction>()",
-                    "line": 44,
-                    "type": "EventEmitter"
-                },
-                {
-                    "name": "actionStillFiring",
-                    "defaultValue": "new EventEmitter<BaseAction>()",
-                    "line": 45,
-                    "type": "EventEmitter"
-                },
-                {
-                    "name": "actionStoppedFiring",
-                    "defaultValue": "new EventEmitter<BaseAction>()",
-                    "line": 46,
-                    "type": "EventEmitter"
-                }
-            ],
+            "outputsClass": [],
             "propertiesClass": [
                 {
                     "name": "canvas",
                     "type": "ElementRef",
                     "optional": false,
                     "description": "",
-                    "line": 55,
+                    "line": 49,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1287,7 +1173,7 @@
                     "type": "",
                     "optional": false,
                     "description": "",
-                    "line": 59,
+                    "line": 53,
                     "modifierKind": [
                         113
                     ]
@@ -1297,14 +1183,14 @@
                     "type": "DiagramEngineCore",
                     "optional": false,
                     "description": "",
-                    "line": 57
+                    "line": 51
                 },
                 {
                     "name": "linksLayer",
                     "type": "ViewContainerRef",
                     "optional": false,
                     "description": "",
-                    "line": 52,
+                    "line": 46,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1317,14 +1203,14 @@
                     "type": "MouseManager",
                     "optional": false,
                     "description": "",
-                    "line": 58
+                    "line": 52
                 },
                 {
                     "name": "ngZone",
                     "type": "NgZone",
                     "optional": false,
                     "description": "",
-                    "line": 66,
+                    "line": 61,
                     "modifierKind": [
                         114
                     ]
@@ -1334,12 +1220,22 @@
                     "type": "ViewContainerRef",
                     "optional": false,
                     "description": "",
-                    "line": 49,
+                    "line": 43,
                     "decorators": [
                         {
                             "name": "ViewChild",
                             "stringifiedArguments": "'nodesLayer', {read: ViewContainerRef}"
                         }
+                    ]
+                },
+                {
+                    "name": "selectionBox$",
+                    "type": "Observable<SelectingAction>",
+                    "optional": false,
+                    "description": "",
+                    "line": 54,
+                    "modifierKind": [
+                        113
                     ]
                 }
             ],
@@ -1350,7 +1246,7 @@
                     "optional": false,
                     "returnType": "HTMLDivElement",
                     "typeParameters": [],
-                    "line": 166,
+                    "line": 158,
                     "modifierKind": [
                         113
                     ]
@@ -1361,10 +1257,18 @@
                     "optional": false,
                     "returnType": "HTMLDivElement",
                     "typeParameters": [],
-                    "line": 162,
+                    "line": 154,
                     "modifierKind": [
                         113
                     ]
+                },
+                {
+                    "name": "initSelectionBox",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 97
                 },
                 {
                     "name": "initSubs",
@@ -1372,7 +1276,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 149,
+                    "line": 141,
                     "modifierKind": [
                         113
                     ]
@@ -1383,7 +1287,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 72
+                    "line": 67
                 },
                 {
                     "name": "ngOnDestroy",
@@ -1391,7 +1295,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 96
+                    "line": 92
                 },
                 {
                     "name": "onMouseDown",
@@ -1404,7 +1308,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 128,
+                    "line": 120,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1431,8 +1335,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 123,
-                    "description": "",
+                    "line": 115,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1440,20 +1343,11 @@
                     ],
                     "jsdoctags": [
                         {
-                            "name": {
-                                "pos": 3144,
-                                "end": 3149,
-                                "flags": 0,
-                                "escapedText": "event"
-                            },
+                            "name": "event",
                             "type": "MouseEvent",
                             "tagName": {
-                                "pos": 3138,
-                                "end": 3143,
-                                "flags": 0,
-                                "escapedText": "param"
-                            },
-                            "comment": "<p>MouseEvent</p>\n"
+                                "text": "param"
+                            }
                         }
                     ]
                 },
@@ -1468,7 +1362,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 102,
+                    "line": 110,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1495,7 +1389,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 133,
+                    "line": 125,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1510,14 +1404,6 @@
                             }
                         }
                     ]
-                },
-                {
-                    "name": "selectionAction",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "Observable<SelectingAction>",
-                    "typeParameters": [],
-                    "line": 110
                 },
                 {
                     "name": "setLayerStyles",
@@ -1538,7 +1424,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 138,
+                    "line": 130,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1570,14 +1456,6 @@
                             }
                         }
                     ]
-                },
-                {
-                    "name": "shouldDrawSelectionBox",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "any",
-                    "typeParameters": [],
-                    "line": 106
                 }
             ],
             "hostBindings": [],
@@ -1585,7 +1463,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  EventEmitter,\n  Input,\n  NgZone,\n  OnDestroy,\n  Output,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { combineLatest, Observable, ReplaySubject } from 'rxjs';\nimport { filter, switchMap, takeUntil, tap } from 'rxjs/operators';\nimport {\n  BaseAction,\n  DiagramEngineCore,\n  DiagramModel,\n  SelectingAction,\n  MouseManager,\n} from '@rxzu/core';\nimport { ZonedClass, OutsideZone } from '../../utils/decorators';\n\n@Component({\n  selector: 'ngdx-diagram',\n  templateUrl: 'diagram.component.html',\n  styleUrls: ['diagram.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class RxZuDiagramComponent\n  implements AfterViewInit, OnDestroy, ZonedClass {\n  @Input('model') diagramModel: DiagramModel;\n  @Input() allowCanvasZoom = true;\n  @Input() allowCanvasTranslation = true;\n  @Input() inverseZoom = true;\n  @Input() allowLooseLinks = true;\n  @Input() maxZoomOut: number = null;\n  @Input() maxZoomIn: number = null;\n  @Input() portMagneticRadius = 30;\n\n  @Output() actionStartedFiring = new EventEmitter<BaseAction>();\n  @Output() actionStillFiring = new EventEmitter<BaseAction>();\n  @Output() actionStoppedFiring = new EventEmitter<BaseAction>();\n\n  @ViewChild('nodesLayer', { read: ViewContainerRef })\n  nodesLayer: ViewContainerRef;\n\n  @ViewChild('linksLayer', { read: ViewContainerRef })\n  linksLayer: ViewContainerRef;\n\n  @ViewChild('canvas', { read: ElementRef })\n  canvas: ElementRef;\n\n  diagramEngine: DiagramEngineCore;\n  mouseManager: MouseManager;\n  protected destroyed$ = new ReplaySubject<boolean>(1);\n\n  get host(): HTMLElement {\n    return this.elRef.nativeElement;\n  }\n\n  constructor(\n    public ngZone: NgZone,\n    protected renderer: Renderer2,\n    protected cdRef: ChangeDetectorRef,\n    protected elRef: ElementRef<HTMLElement>\n  ) {}\n\n  ngAfterViewInit() {\n    if (this.diagramModel) {\n      this.diagramEngine = this.diagramModel.getDiagramEngine();\n      this.mouseManager = this.diagramEngine.getMouseManager();\n      this.diagramEngine.setCanvas(this.canvas.nativeElement);\n\n      this.diagramEngine.setup({\n        ...this,\n      });\n\n      (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)\n        .pipe(\n          switchMap(\n            () =>\n              this.diagramEngine.paintLinks(this.linksLayer) as Observable<void>\n          )\n        )\n        .subscribe(() => {\n          this.initSubs();\n          this.cdRef.detectChanges();\n        });\n    }\n  }\n\n  ngOnDestroy() {\n    this.destroyed$.next(true);\n    this.destroyed$.complete();\n  }\n\n  @OutsideZone\n  onMouseUp(event: MouseEvent) {\n    this.mouseManager.onMouseUp(event);\n  }\n\n  shouldDrawSelectionBox() {\n    return this.diagramEngine && this.diagramEngine.shouldDrawSelectionBox();\n  }\n\n  selectionAction(): Observable<SelectingAction> {\n    return this.diagramEngine\n      .selectAction()\n      .pipe(\n        filter((action) => action instanceof SelectingAction)\n      ) as Observable<SelectingAction>;\n  }\n\n  /**\n   * @description Mouse Move Event Handler\n   * @param event MouseEvent\n   */\n  @OutsideZone\n  onMouseMove(event: MouseEvent) {\n    this.mouseManager.onMouseMove(event);\n  }\n\n  @OutsideZone\n  onMouseDown(event: MouseEvent) {\n    this.mouseManager.onMouseDown(event);\n  }\n\n  @OutsideZone\n  onMouseWheel(event: WheelEvent) {\n    this.mouseManager.onMouseWheel(event);\n  }\n\n  @OutsideZone\n  protected setLayerStyles(x: number, y: number, zoom: number): void {\n    const nodesLayer = this.getNodesLayer();\n    const linksLayer = this.getLinksLayer();\n\n    const style = 'transform';\n    const value = `translate(${x}px, ${y}px) scale(${zoom / 100.0})`;\n\n    this.renderer.setStyle(nodesLayer, style, value);\n    this.renderer.setStyle(linksLayer, style, value);\n  }\n\n  protected initSubs() {\n    combineLatest([\n      this.diagramModel.selectOffsetX(),\n      this.diagramModel.selectOffsetY(),\n      this.diagramModel.selectZoomLevel(),\n    ])\n      .pipe(\n        tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),\n        takeUntil(this.destroyed$)\n      )\n      .subscribe();\n  }\n\n  protected getNodesLayer(): HTMLDivElement {\n    return this.host.querySelector('.ngdx-nodes-layer');\n  }\n\n  protected getLinksLayer(): HTMLDivElement {\n    return this.host.querySelector('.ngdx-links-layer');\n  }\n}\n",
+            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  Input,\n  NgZone,\n  OnDestroy,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { combineLatest, Observable, ReplaySubject } from 'rxjs';\nimport { map, switchMap, takeUntil, tap } from 'rxjs/operators';\nimport {\n  DiagramEngineCore,\n  DiagramModel,\n  SelectingAction,\n  MouseManager,\n  isNil,\n} from '@rxzu/core';\nimport { ZonedClass, OutsideZone } from '../utils';\n\n@Component({\n  selector: 'ngdx-diagram',\n  templateUrl: 'diagram.component.html',\n  styleUrls: ['diagram.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class RxZuDiagramComponent\n  implements AfterViewInit, OnDestroy, ZonedClass {\n  @Input('model') diagramModel: DiagramModel;\n  @Input() allowCanvasZoom = true;\n  @Input() allowCanvasTranslation = true;\n  @Input() inverseZoom = true;\n  @Input() allowLooseLinks = true;\n  @Input() maxZoomOut: number = null;\n  @Input() maxZoomIn: number = null;\n  @Input() portMagneticRadius = 30;\n\n  @ViewChild('nodesLayer', { read: ViewContainerRef })\n  nodesLayer: ViewContainerRef;\n\n  @ViewChild('linksLayer', { read: ViewContainerRef })\n  linksLayer: ViewContainerRef;\n\n  @ViewChild('canvas', { read: ElementRef })\n  canvas: ElementRef;\n\n  diagramEngine: DiagramEngineCore;\n  mouseManager: MouseManager;\n  protected destroyed$ = new ReplaySubject<boolean>(1);\n  protected selectionBox$: Observable<SelectingAction>;\n\n  get host(): HTMLElement {\n    return this.elRef.nativeElement;\n  }\n\n  constructor(\n    public ngZone: NgZone,\n    protected renderer: Renderer2,\n    protected cdRef: ChangeDetectorRef,\n    protected elRef: ElementRef<HTMLElement>\n  ) {}\n\n  ngAfterViewInit() {\n    if (this.diagramModel) {\n      this.diagramEngine = this.diagramModel.getDiagramEngine();\n      this.mouseManager = this.diagramEngine.getMouseManager();\n      this.diagramEngine.setCanvas(this.canvas.nativeElement);\n\n      this.diagramEngine.setup({\n        ...this,\n      });\n\n      (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)\n        .pipe(\n          switchMap(\n            () =>\n              this.diagramEngine.paintLinks(this.linksLayer) as Observable<void>\n          )\n        )\n        .subscribe(() => {\n          this.initSubs();\n          this.initSelectionBox();\n          this.cdRef.detectChanges();\n        });\n    }\n  }\n\n  ngOnDestroy() {\n    this.destroyed$.next(true);\n    this.destroyed$.complete();\n  }\n\n  initSelectionBox() {\n    this.selectionBox$ = this.diagramEngine.selectAction().pipe(\n      map((action) => {\n        if (action instanceof SelectingAction && !isNil(action.dimensions)) {\n          return action;\n        }\n        return null;\n      }),\n      tap(() => this.cdRef.detectChanges())\n    ) as Observable<SelectingAction>;\n  }\n\n  @OutsideZone\n  onMouseUp(event: MouseEvent) {\n    this.mouseManager.onMouseUp(event);\n  }\n\n  @OutsideZone\n  onMouseMove(event: MouseEvent) {\n    this.mouseManager.onMouseMove(event);\n  }\n\n  @OutsideZone\n  onMouseDown(event: MouseEvent) {\n    this.mouseManager.onMouseDown(event);\n  }\n\n  @OutsideZone\n  onMouseWheel(event: WheelEvent) {\n    this.mouseManager.onMouseWheel(event);\n  }\n\n  @OutsideZone\n  protected setLayerStyles(x: number, y: number, zoom: number): void {\n    const nodesLayer = this.getNodesLayer();\n    const linksLayer = this.getLinksLayer();\n\n    const style = 'transform';\n    const value = `translate(${x}px, ${y}px) scale(${zoom / 100.0})`;\n\n    this.renderer.setStyle(nodesLayer, style, value);\n    this.renderer.setStyle(linksLayer, style, value);\n  }\n\n  protected initSubs() {\n    combineLatest([\n      this.diagramModel.selectOffsetX(),\n      this.diagramModel.selectOffsetY(),\n      this.diagramModel.selectZoomLevel(),\n    ])\n      .pipe(\n        tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),\n        takeUntil(this.destroyed$)\n      )\n      .subscribe();\n  }\n\n  protected getNodesLayer(): HTMLDivElement {\n    return this.host.querySelector('.ngdx-nodes-layer');\n  }\n\n  protected getLinksLayer(): HTMLDivElement {\n    return this.host.querySelector('.ngdx-links-layer');\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -1615,7 +1493,7 @@
                         "type": "ElementRef<HTMLElement>"
                     }
                 ],
-                "line": 63,
+                "line": 58,
                 "jsdoctags": [
                     {
                         "name": "ngZone",
@@ -1659,11 +1537,11 @@
                         "name": "host",
                         "type": "",
                         "returnType": "HTMLElement",
-                        "line": 61
+                        "line": 56
                     }
                 }
             },
-            "templateData": "<div\n  class=\"ngdx-diagram\"\n  #canvas\n  (mousedown)=\"onMouseDown($event)\"\n  (wheel)=\"onMouseWheel($event)\"\n>\n  <!-- Nodes Layer -->\n  <div class=\"ngdx-nodes-layer\">\n    <ng-template #nodesLayer></ng-template>\n  </div>\n\n  <!-- Links Layer -->\n  <div class=\"ngdx-links-layer\">\n    <ng-template #linksLayer></ng-template>\n  </div>\n\n  <!-- Selection Box -->\n  <ng-container *ngIf=\"shouldDrawSelectionBox()\">\n    <div\n      *ngIf=\"selectionAction() | async as action\"\n      class=\"selector\"\n      [ngStyle]=\"{\n        top: action.dimensions.top + 'px',\n        left: action.dimensions.left + 'px',\n        width: action.dimensions.width + 'px',\n        height: action.dimensions.height + 'px'\n      }\"\n    ></div>\n  </ng-container>\n</div>\n"
+            "templateData": "<div\n  class=\"ngdx-diagram\"\n  #canvas\n  (mousedown)=\"onMouseDown($event)\"\n  (wheel)=\"onMouseWheel($event)\"\n>\n  <!-- Nodes Layer -->\n  <div class=\"ngdx-nodes-layer\">\n    <ng-template #nodesLayer></ng-template>\n  </div>\n\n  <!-- Links Layer -->\n  <div class=\"ngdx-links-layer\">\n    <ng-template #linksLayer></ng-template>\n  </div>\n\n  <!-- Selection Box -->\n  <div\n    *ngIf=\"selectionBox$ | async as selectionBox\"\n    class=\"selector\"\n    [ngStyle]=\"{\n      top: selectionBox.dimensions.top + 'px',\n      left: selectionBox.dimensions.left + 'px',\n      width: selectionBox.dimensions.width + 'px',\n      height: selectionBox.dimensions.height + 'px'\n    }\"\n  ></div>\n</div>\n"
         }
     ],
     "modules": [
@@ -1952,18 +1830,9 @@
     },
     "routes": [],
     "coverage": {
-        "count": 1,
+        "count": 0,
         "status": "low",
         "files": [
-            {
-                "filePath": "packages/angular/src/lib/containers/diagram/diagram.component.ts",
-                "type": "component",
-                "linktype": "component",
-                "name": "RxZuDiagramComponent",
-                "coveragePercent": 0,
-                "coverageCount": "0/32",
-                "status": "low"
-            },
             {
                 "filePath": "packages/angular/src/lib/defaults/components/default-label/default-label.component.ts",
                 "type": "component",
@@ -2046,30 +1915,21 @@
                 "status": "low"
             },
             {
+                "filePath": "packages/angular/src/lib/diagram/diagram.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "RxZuDiagramComponent",
+                "coveragePercent": 0,
+                "coverageCount": "0/29",
+                "status": "low"
+            },
+            {
                 "filePath": "packages/angular/src/lib/engine.service.ts",
                 "type": "injectable",
                 "linktype": "injectable",
                 "name": "DiagramEngine",
                 "coveragePercent": 0,
                 "coverageCount": "0/4",
-                "status": "low"
-            },
-            {
-                "filePath": "packages/angular/src/lib/plugins/dagre-engine.plugin.ts",
-                "type": "injectable",
-                "linktype": "injectable",
-                "name": "DagreEngine",
-                "coveragePercent": 0,
-                "coverageCount": "0/4",
-                "status": "low"
-            },
-            {
-                "filePath": "packages/angular/src/lib/plugins/dagre-engine.plugin.ts",
-                "type": "interface",
-                "linktype": "interface",
-                "name": "DagreEngineOptions",
-                "coveragePercent": 25,
-                "coverageCount": "1/4",
                 "status": "low"
             },
             {

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import {
   AutoArrangeDiagramTemplate,
   BasicDiagramTemplate,
+  EventsDiagramTemplate,
   PerformanceDiagramTemplate,
   SerializationDiagramTemplate,
 } from './examples.template';
@@ -15,9 +16,9 @@ import {
   DefaultNodeComponent,
   DefaultLabelComponent,
   DefaultPortComponent,
-  DagreEngine,
   RxZuDiagramsModule,
 } from '@rxzu/angular';
+import { DagrePlugin } from '@rxzu/core';
 
 export default {
   title: 'Examples',
@@ -35,7 +36,7 @@ export default {
         DefaultLabelComponent,
         DefaultPortComponent,
       ],
-      providers: [DagreEngine],
+      providers: [DagrePlugin],
       imports: [CommonModule, RxZuDiagramsModule],
       entryComponents: [
         DefaultNodeComponent,
@@ -48,6 +49,8 @@ export default {
 } as Meta;
 
 export const Basic = BasicDiagramTemplate.bind({});
+
+export const Events = EventsDiagramTemplate.bind({});
 
 export const Serialization = SerializationDiagramTemplate.bind({});
 
