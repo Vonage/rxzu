@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "tslib": "^2.0.0",
-    "@rxzu/core": "^1.1.1"
+    "@rxzu/core": "latest"
   },
   "repository": {
     "type": "git",
