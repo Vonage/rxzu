@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/Vonage/rxzu/compare/v1.2.0...v1.2.1) (2021-01-03)
+
+
+### Bug Fixes
+
+* **events:** added event state to actions observer ([8af62bd](https://github.com/Vonage/rxzu/commit/8af62bd517ba61d42c6356fc394132565dac2b0a))
+
 # [1.2.0](https://github.com/Vonage/rxzu/compare/v1.1.1...v1.2.0) (2021-01-03)
 
 
