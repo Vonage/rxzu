@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/Vonage/rxzu/compare/v1.2.1...v1.2.2) (2021-01-03)
+
+
+### Bug Fixes
+
+* **link model:** path and points moved to model to fix imports issue ([1006135](https://github.com/Vonage/rxzu/commit/10061354ab39a878d2219912c0281dcc424f6901))
+
 ## [1.2.1](https://github.com/Vonage/rxzu/compare/v1.2.0...v1.2.1) (2021-01-03)
 
 
