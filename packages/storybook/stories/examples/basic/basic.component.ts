@@ -4,8 +4,12 @@ import { DiagramModel, DefaultNodeModel } from '@rxzu/core';
 
 @Component({
   selector: 'app-root',
-  template: `<ngdx-diagram class="demo-diagram" [model]="diagramModel"></ngdx-diagram>`,
-  styleUrls: ['../demo-diagram.component.scss']
+  template: `<ngdx-diagram
+    class="demo-diagram"
+    [inverseZoom]="true"
+    [model]="diagramModel"
+  ></ngdx-diagram>`,
+  styleUrls: ['../demo-diagram.component.scss'],
 })
 export class BasicExampleStoryComponent implements OnInit {
   diagramModel: DiagramModel;

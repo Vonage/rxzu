@@ -457,6 +457,7 @@ export class MouseManager {
     const currentZoomLevel = this.engine.getDiagramModel().getZoomLevel();
 
     const oldZoomFactor = currentZoomLevel / 100;
+
     let scrollDelta = this.engine.getDiagramModel().getInverseZoom()
       ? -event.deltaY
       : event.deltaY;

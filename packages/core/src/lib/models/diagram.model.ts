@@ -185,7 +185,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   setAllowLooseLinks(allowLooseLinks: boolean) {
-    this.inverseZoom$.set(allowLooseLinks).emit();
+    this.allowLooseLinks$.set(allowLooseLinks).emit();
   }
 
   getAllowLooseLinks() {
