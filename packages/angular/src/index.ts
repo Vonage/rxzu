@@ -6,3 +6,6 @@ export * from './lib/engine.service';
 export * from './lib/diagram/diagram.component';
 export * from './lib/main.module';
 export * from './lib/utils';
+
+// export all core
+export * from '@rxzu/core';
