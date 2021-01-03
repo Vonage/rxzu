@@ -17,11 +17,19 @@ export class LinkModel extends BaseModel<DiagramModel> {
   protected points: PointModel[];
   protected extras: any;
 
-  protected label$ = createValueState<LabelModel>(null, this.entityPipe('label'));
+  protected label$ = createValueState<LabelModel>(
+    null,
+    this.entityPipe('label')
+  );
+  path$ = createValueState<string>(null, this.entityPipe('path'));
+  points$ = createValueState<PointModel[]>([], this.entityPipe('points'));
 
   constructor(linkType = 'default', id?: string, logPrefix = '[Link]') {
     super(linkType, id, logPrefix);
-    this.points = [new PointModel(this, { x: 0, y: 0 }), new PointModel(this, { x: 0, y: 0 })];
+    this.points = [
+      new PointModel(this, { x: 0, y: 0 }),
+      new PointModel(this, { x: 0, y: 0 }),
+    ];
     this.extras = {};
     this.sourcePort = null;
     this.targetPort = null;
@@ -37,7 +45,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
       targetPort: this.getTargetPort().id,
       extras: this.getExtras(),
       points: serializedPoints,
-      label
+      label,
     };
   }
 

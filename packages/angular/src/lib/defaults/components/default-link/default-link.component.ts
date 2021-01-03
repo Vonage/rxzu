@@ -8,7 +8,6 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import {
-  createValueState,
   PointModel,
   generateCurvePath,
   Coords,
@@ -28,9 +27,6 @@ export class DefaultLinkComponent
   implements AfterViewInit, OnInit {
   @ViewChild('labelLayer', { read: ViewContainerRef, static: true })
   labelLayer: ViewContainerRef;
-
-  path$ = createValueState<string>(null, this.entityPipe('path'));
-  points$ = createValueState<PointModel[]>([], this.entityPipe('points'));
 
   constructor(private cdRef: ChangeDetectorRef) {
     super({ type: 'ngdx-default-link' });
