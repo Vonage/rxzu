@@ -1,3 +1,4 @@
+export type BaseActionState = 'started' | 'firing' | 'stopped';
 export class BaseAction {
   mouseX: number;
   mouseY: number;

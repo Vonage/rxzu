@@ -96,10 +96,15 @@ export class RxZuDiagramComponent
 
   initSelectionBox() {
     this.selectionBox$ = this.diagramEngine.selectAction().pipe(
-      map((action) => {
-        if (action instanceof SelectingAction && !isNil(action.dimensions)) {
-          return action;
+      map((a) => {
+        if (
+          !isNil(a) &&
+          a.action instanceof SelectingAction &&
+          a.state === 'firing'
+        ) {
+          return a.action;
         }
+
         return null;
       }),
       tap(() => this.cdRef.detectChanges())

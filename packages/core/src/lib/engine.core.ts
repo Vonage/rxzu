@@ -11,7 +11,7 @@ import {
   LabelModel,
 } from './models';
 import { createValueState } from './state';
-import { BaseAction, SelectingAction } from './actions';
+import { BaseAction, BaseActionState, SelectingAction } from './actions';
 import { EntityMap } from './utils';
 import { EngineSetup } from './interfaces/setup.interface';
 import { MouseManager } from './managers/mouse.manager';
@@ -26,7 +26,10 @@ export class DiagramEngineCore {
 
   protected nodes$: Observable<EntityMap<NodeModel>>;
   protected links$: Observable<EntityMap<LinkModel>>;
-  protected action$ = new BehaviorSubject<BaseAction>(null);
+  protected action$ = new BehaviorSubject<{
+    action: BaseAction;
+    state: BaseActionState;
+  }>(null);
 
   constructor() {
     this.createFactoriesManager();
@@ -35,7 +38,7 @@ export class DiagramEngineCore {
 
   createMouseManager() {
     if (this.mouseManager) {
-      console.warn('[RxZu: Mouse Manager already initialized, bailing out.');
+      console.warn('[RxZu] Mouse Manager already initialized, bailing out.');
       return;
     }
 
@@ -56,7 +59,13 @@ export class DiagramEngineCore {
         'diagram model already exists, please reset model prior to creating new diagram'
       );
     }
+
     this.diagramModel = new DiagramModel(this);
+
+    this.diagramModel.onEntityDestroy().subscribe(() => {
+      this.diagramModel = undefined;
+    });
+
     return this.diagramModel;
   }
 
@@ -325,8 +334,10 @@ export class DiagramEngineCore {
    * fire the action registered and notify subscribers
    */
   fireAction() {
-    if (this.action$.getValue) {
-      return this.action$.getValue();
+    const action = this.action$.getValue()?.action;
+    if (action) {
+      this.action$.next({ action, state: 'firing' });
+      return action;
     }
   }
 
@@ -334,16 +345,19 @@ export class DiagramEngineCore {
    * Unregister the action, post firing and notify subscribers
    */
   stopFiringAction() {
-    const stoppedAction = this.action$.getValue();
-    this.action$.next(null);
-    return stoppedAction;
+    const stoppedAction = this.action$.getValue()?.action;
+    if (stoppedAction) {
+      this.action$.next({ action: stoppedAction, state: 'stopped' });
+      this.action$.next(null);
+      return stoppedAction;
+    }
   }
 
   /**
    * Register the new action, pre firing and notify subscribers
    */
   startFiringAction(action: BaseAction) {
-    this.action$.next(action);
+    this.action$.next({ action, state: 'started' });
     return action;
   }
 
@@ -352,7 +366,7 @@ export class DiagramEngineCore {
   }
 
   setAction(action: BaseAction) {
-    this.action$.next(action);
+    this.action$.next({ action, state: 'firing' });
   }
 
   shouldDrawSelectionBox() {

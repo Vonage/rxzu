@@ -94,7 +94,7 @@ export class MouseManager {
   }
 
   onMouseMove(event: MouseEvent) {
-    const action = this.engine.selectAction().getValue();
+    const action = this.engine.selectAction().getValue()?.action;
 
     if (action === null || action === undefined) {
       return;
@@ -150,7 +150,6 @@ export class MouseManager {
       action.mouseX2 = relative.x;
       action.mouseY2 = relative.y;
 
-      this.engine.setAction(action);
       this.engine.fireAction();
     } else if (action instanceof MoveItemsAction) {
       const coords: Coords = {
@@ -327,10 +326,11 @@ export class MouseManager {
   }
 
   onMouseUp(event: MouseEvent) {
-    const action = this.engine.selectAction().getValue();
+    const action = this.engine.selectAction().getValue()?.action;
 
     // are we going to connect a link to something?
     if (action instanceof MoveItemsAction) {
+      this.engine.stopFiringAction();
       const element = this.getElement(event);
       action.selectionModels.forEach((model) => {
         // only care about points connecting to things
@@ -445,8 +445,6 @@ export class MouseManager {
     } else {
       this.engine.stopFiringAction();
     }
-
-    this.engine.setAction(null);
   }
 
   onMouseWheel(event: WheelEvent) {
