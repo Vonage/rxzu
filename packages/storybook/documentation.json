@@ -743,7 +743,7 @@
         },
         {
             "name": "DefaultLinkComponent",
-            "id": "component-DefaultLinkComponent-c588f3c53f653b5d526a87dae8e1ea60",
+            "id": "component-DefaultLinkComponent-b67f91f44a13d7b6be1d100794133f58",
             "file": "packages/angular/src/lib/defaults/components/default-link/default-link.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -768,7 +768,7 @@
                     "type": "ViewContainerRef",
                     "optional": false,
                     "description": "",
-                    "line": 22,
+                    "line": 30,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -782,7 +782,7 @@
                     "type": "",
                     "optional": false,
                     "description": "",
-                    "line": 24
+                    "line": 32
                 },
                 {
                     "name": "points$",
@@ -790,7 +790,7 @@
                     "type": "",
                     "optional": false,
                     "description": "",
-                    "line": 25
+                    "line": 33
                 }
             ],
             "methodsClass": [
@@ -809,7 +809,7 @@
                     "optional": false,
                     "returnType": "Coords",
                     "typeParameters": [],
-                    "line": 97,
+                    "line": 109,
                     "jsdoctags": [
                         {
                             "name": "firstPoint",
@@ -842,7 +842,7 @@
                     "optional": false,
                     "returnType": "number",
                     "typeParameters": [],
-                    "line": 80,
+                    "line": 92,
                     "jsdoctags": [
                         {
                             "name": "firstPoint",
@@ -866,7 +866,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 39
+                    "line": 47
                 },
                 {
                     "name": "ngOnInit",
@@ -874,7 +874,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 35
+                    "line": 43
                 },
                 {
                     "name": "selectPath",
@@ -882,7 +882,7 @@
                     "optional": false,
                     "returnType": "Observable<string>",
                     "typeParameters": [],
-                    "line": 101
+                    "line": 116
                 },
                 {
                     "name": "trackByPoints",
@@ -899,7 +899,7 @@
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 31,
+                    "line": 39,
                     "jsdoctags": [
                         {
                             "name": "i",
@@ -923,7 +923,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  OnInit,\n  ViewChild,\n  ViewContainerRef\n} from '@angular/core';\nimport { createValueState, PointModel, generateCurvePath, Coords, DefaultLinkModel } from '@rxzu/core';\nimport { combineLatest, Observable } from 'rxjs';\nimport { takeUntil } from 'rxjs/operators';\n\n@Component({\n  selector: 'ngdx-default-link',\n  templateUrl: './default-link.component.html',\n  styleUrls: ['./default-link.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class DefaultLinkComponent extends DefaultLinkModel implements AfterViewInit, OnInit {\n  @ViewChild('labelLayer', { read: ViewContainerRef, static: true })\n  labelLayer: ViewContainerRef;\n\n  path$ = createValueState<string>(null, this.entityPipe('path'));\n  points$ = createValueState<PointModel[]>([], this.entityPipe('points'));\n\n  constructor(private cdRef: ChangeDetectorRef) {\n    super({ type: 'ngdx-default-link' });\n  }\n\n  trackByPoints(i: number, point: PointModel) {\n    return point.id;\n  }\n\n  ngOnInit() {\n    this.setPainted(true);\n  }\n\n  ngAfterViewInit() {\n    const firstPCoords$ = this.getFirstPoint().selectCoords();\n    const lastPCoords$ = this.getLastPoint().selectCoords();\n\n    // Observe link coords and update drawing accordingly\n    combineLatest([firstPCoords$, lastPCoords$])\n      .pipe(takeUntil(this.onEntityDestroy()))\n      .subscribe(([firstPCoords, lastPCoords]) => {\n        const points = [firstPCoords, lastPCoords];\n\n        // handle regular links\n        // draw the smoothing\n        // if the points are too close, just draw a straight line\n        const isHorizontal = Math.abs(firstPCoords.x - lastPCoords.x) > Math.abs(firstPCoords.y - lastPCoords.y);\n        const xOrY = isHorizontal ? 'x' : 'y';\n        let isStraight = false;\n        if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 50) {\n          isStraight = true;\n        }\n\n        const path = generateCurvePath(firstPCoords, lastPCoords, isStraight ? 0 : this.curvyness);\n        this.path$.set(path).emit();\n\n        const label = this.getLabel();\n        // update label position\n        if (label) {\n          label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));\n\n          // TODO: check whether we want the label to rotate along with the line\n          // label.setRotation(this.calcLabelIncline(firstPCoords, lastPCoords));\n        }\n\n        // TODO: handle the multiple lines in between the points\n        // https://github.com/projectstorm/react-diagrams/blob/master/src/defaults/widgets/DefaultLinkWidget.tsx#L344-L371\n\n        this.cdRef.detectChanges();\n      });\n\n    this.setPainted(true);\n  }\n\n  calcLabelIncline(firstPoint: Coords, secondPoint: Coords): number {\n    const dy = secondPoint.y - firstPoint.y;\n    const dx = secondPoint.x - firstPoint.x;\n\n    if (dx === 0) {\n      return 0;\n    }\n\n    let inclineAngel = (Math.atan(dy / dx) * 180) / Math.PI;\n\n    if (inclineAngel < 0) {\n      inclineAngel += 180;\n    }\n\n    return inclineAngel;\n  }\n\n  calcCenterOfPath(firstPoint: Coords, secondPoint: Coords): Coords {\n    return { x: (firstPoint.x + secondPoint.x) / 2 + 20, y: (firstPoint.y + secondPoint.y) / 2 + 20 };\n  }\n\n  selectPath(): Observable<string> {\n    return this.path$.value$;\n  }\n}\n",
+            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  OnInit,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport {\n  createValueState,\n  PointModel,\n  generateCurvePath,\n  Coords,\n  DefaultLinkModel,\n} from '@rxzu/core';\nimport { combineLatest, Observable } from 'rxjs';\nimport { takeUntil } from 'rxjs/operators';\n\n@Component({\n  selector: 'ngdx-default-link',\n  templateUrl: './default-link.component.html',\n  styleUrls: ['./default-link.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultLinkComponent\n  extends DefaultLinkModel\n  implements AfterViewInit, OnInit {\n  @ViewChild('labelLayer', { read: ViewContainerRef, static: true })\n  labelLayer: ViewContainerRef;\n\n  path$ = createValueState<string>(null, this.entityPipe('path'));\n  points$ = createValueState<PointModel[]>([], this.entityPipe('points'));\n\n  constructor(private cdRef: ChangeDetectorRef) {\n    super({ type: 'ngdx-default-link' });\n  }\n\n  trackByPoints(i: number, point: PointModel) {\n    return point.id;\n  }\n\n  ngOnInit() {\n    this.setPainted(true);\n  }\n\n  ngAfterViewInit() {\n    const firstPCoords$ = this.getFirstPoint().selectCoords();\n    const lastPCoords$ = this.getLastPoint().selectCoords();\n\n    // Observe link coords and update drawing accordingly\n    combineLatest([firstPCoords$, lastPCoords$])\n      .pipe(takeUntil(this.onEntityDestroy()))\n      .subscribe(([firstPCoords, lastPCoords]) => {\n        const points = [firstPCoords, lastPCoords];\n\n        // handle regular links\n        // draw the smoothing\n        // if the points are too close, just draw a straight line\n        const isHorizontal =\n          Math.abs(firstPCoords.x - lastPCoords.x) >\n          Math.abs(firstPCoords.y - lastPCoords.y);\n        const xOrY = isHorizontal ? 'x' : 'y';\n        let isStraight = false;\n        if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 50) {\n          isStraight = true;\n        }\n\n        const path = generateCurvePath(\n          firstPCoords,\n          lastPCoords,\n          isStraight ? 0 : this.curvyness\n        );\n        this.path$.set(path).emit();\n\n        const label = this.getLabel();\n        // update label position\n        if (label) {\n          label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));\n\n          // TODO: check whether we want the label to rotate along with the line\n          // label.setRotation(this.calcLabelIncline(firstPCoords, lastPCoords));\n        }\n        // TODO: handle the multiple lines in between the points\n\n        this.cdRef.detectChanges();\n      });\n\n    this.setPainted(true);\n  }\n\n  calcLabelIncline(firstPoint: Coords, secondPoint: Coords): number {\n    const dy = secondPoint.y - firstPoint.y;\n    const dx = secondPoint.x - firstPoint.x;\n\n    if (dx === 0) {\n      return 0;\n    }\n\n    let inclineAngel = (Math.atan(dy / dx) * 180) / Math.PI;\n\n    if (inclineAngel < 0) {\n      inclineAngel += 180;\n    }\n\n    return inclineAngel;\n  }\n\n  calcCenterOfPath(firstPoint: Coords, secondPoint: Coords): Coords {\n    return {\n      x: (firstPoint.x + secondPoint.x) / 2 + 20,\n      y: (firstPoint.y + secondPoint.y) / 2 + 20,\n    };\n  }\n\n  selectPath(): Observable<string> {\n    return this.path$.value$;\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -941,7 +941,7 @@
                         "type": "ChangeDetectorRef"
                     }
                 ],
-                "line": 25,
+                "line": 33,
                 "jsdoctags": [
                     {
                         "name": "cdRef",

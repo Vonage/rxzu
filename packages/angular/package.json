@@ -1,12 +1,14 @@
 {
   "name": "@rxzu/angular",
   "version": "0.0.1",
+  "license": "MIT",
   "peerDependencies": {
     "@angular/common": "^11.0.5",
     "@angular/core": "^11.0.5"
   },
   "dependencies": {
-    "tslib": "^2.0.0"
+    "tslib": "^2.0.0",
+    "@rxzu/core": "^1.1.1"
   },
   "repository": {
     "type": "git",
