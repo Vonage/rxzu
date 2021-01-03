@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/Vonage/rxzu/compare/v1.1.1...v1.2.0) (2021-01-03)
+
+
+### Features
+
+* **metadata:** updated packages and versions ([0af7376](https://github.com/Vonage/rxzu/commit/0af73768cbd28e692da4f3606e47e6b4118f7575))
+
 ## [1.1.1](https://github.com/Vonage/rxzu/compare/v1.1.0...v1.1.1) (2021-01-02)
 
 
