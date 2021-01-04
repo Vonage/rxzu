@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/Vonage/rxzu/compare/v1.2.2...v1.2.3) (2021-01-04)
+
+
+### Bug Fixes
+
+* **inverse zoom:** fixed assignment ([e181ee3](https://github.com/Vonage/rxzu/commit/e181ee3b2a8c3a7dbd1fbed174aaf37b49391002))
+
 ## [1.2.2](https://github.com/Vonage/rxzu/compare/v1.2.1...v1.2.2) (2021-01-03)
 
 
