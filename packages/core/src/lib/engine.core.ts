@@ -307,10 +307,12 @@ export class DiagramEngineCore {
               .generateWidget({ model: link, host: linksHost });
 
             // Handle link label, if any
-            const label = link.getLabel();
-            if (label) {
-              this.paintLabel(link.getLabel(), linksHost);
-            }
+            link
+              .selectLabel()
+              .pipe(filter(Boolean))
+              .subscribe((label: LabelModel) =>
+                this.paintLabel(label, linksHost)
+              );
           }
         }
       })
