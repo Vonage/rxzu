@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/Vonage/rxzu/compare/v1.2.3...v1.2.4) (2021-01-04)
+
+
+### Bug Fixes
+
+* **labels:** will be selected and not painted once ([990d79f](https://github.com/Vonage/rxzu/commit/990d79f7138540e96c2368b585575dba1327bfd6))
+
 ## [1.2.3](https://github.com/Vonage/rxzu/compare/v1.2.2...v1.2.3) (2021-01-04)
 
 
