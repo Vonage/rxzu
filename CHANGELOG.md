@@ -1,3 +1,10 @@
+## [1.2.5](https://github.com/Vonage/rxzu/compare/v1.2.4...v1.2.5) (2021-01-05)
+
+
+### Performance Improvements
+
+* **rxjs:** updated version ([65a8102](https://github.com/Vonage/rxzu/commit/65a81025a7b3cbb61c65d5430a977932924ebe36))
+
 ## [1.2.4](https://github.com/Vonage/rxzu/compare/v1.2.3...v1.2.4) (2021-01-04)
 
 
