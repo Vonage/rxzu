@@ -148,6 +148,12 @@ export class LinkModel extends BaseModel<DiagramModel> {
       this.sourcePort.removeLink(this);
     }
     this.sourcePort = port;
+
+    port.selectCoords().subscribe((coords) => {
+      const x = coords.x - coords.width / 2;
+      const y = coords.y - coords.height / 2;
+      this.getPointForPort(port).setCoords({ x, y });
+    });
   }
 
   getSourcePort(): PortModel {

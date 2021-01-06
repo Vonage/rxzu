@@ -2,6 +2,7 @@ import { action } from '@storybook/addon-actions';
 import { Story } from '@storybook/angular';
 import { AutoArrangeExampleStoryComponent } from './auto-arrange/auto-arrange.component';
 import { BasicExampleStoryComponent } from './basic/basic.component';
+import { DynamicPortsExampleStoryComponent } from './dynamic-ports/dynamic-ports.component';
 import { EventsExampleStoryComponent } from './events/events.component';
 import { PerformanceExampleStoryComponent } from './performance/performance.component';
 import { SerializationExampleStoryComponent } from './serialization/serialization.component';
@@ -38,5 +39,12 @@ export const PerformanceDiagramTemplate: Story<PerformanceExampleStoryComponent>
   args: any
 ) => ({
   component: PerformanceExampleStoryComponent,
+  props: args,
+});
+
+export const DynamicPortsDiagramTemplate: Story<DynamicPortsExampleStoryComponent> = (
+  args: any
+) => ({
+  component: DynamicPortsExampleStoryComponent,
   props: args,
 });

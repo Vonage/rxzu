@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs';
+import { filter, take, takeUntil } from 'rxjs/operators';
 import { Coords } from '../interfaces/coords.interface';
 import { Dimensions } from '../interfaces/dimensions.interface';
 import { SerializedNodeModel } from '../interfaces/serialization.interface';
@@ -9,11 +10,19 @@ import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
 import { PortModel } from './port.model';
 
-export class NodeModel<P extends PortModel = PortModel> extends BaseModel<DiagramModel> {
+export class NodeModel<P extends PortModel = PortModel> extends BaseModel<
+  DiagramModel
+> {
   protected extras$ = createValueState<any>({}, this.entityPipe('extras'));
   protected ports$ = createEntityState<P>([], this.entityPipe('ports'));
-  protected coords$ = createValueState<Coords>({ x: 0, y: 0 }, this.entityPipe('coords'));
-  protected dimensions$ = createValueState<Dimensions>({ width: 0, height: 0 }, this.entityPipe('dimensions'));
+  protected coords$ = createValueState<Coords>(
+    { x: 0, y: 0 },
+    this.entityPipe('coords')
+  );
+  protected dimensions$ = createValueState<Dimensions>(
+    { width: 0, height: 0 },
+    this.entityPipe('dimensions')
+  );
 
   constructor(
     nodeType = 'default',
@@ -29,6 +38,34 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
     this.setExtras(extras);
     this.setDimensions({ width, height });
     this.setCoords({ x, y });
+
+    // once node finish painting itself, subscribe to ports change and update their coords
+    this.paintChanges()
+      .pipe(
+        filter((paintE) => !!paintE.isPainted),
+        take(1)
+      )
+      .subscribe(() => {
+        this.selectPorts()
+          .pipe(takeUntil(this.destroyed$))
+          .subscribe((ports) => {
+            ports.forEach((port) => {
+              const height = this.getParent()
+                .getDiagramEngine()
+                .getNodePortElement(port).clientHeight;
+
+              const width = this.getParent()
+                .getDiagramEngine()
+                .getNodePortElement(port).clientWidth;
+
+              const portCenter = this.getParent()
+                .getDiagramEngine()
+                .getPortCenter(port);
+
+              port.updateCoords({ ...portCenter, height, width });
+            });
+          });
+      });
   }
 
   getCoords(): Coords {
@@ -50,7 +87,9 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
   }
 
   serialize(): SerializedNodeModel {
-    const serializedPorts = this.getPortsArray().map((port: P) => port.serialize());
+    const serializedPorts = this.getPortsArray().map((port: P) =>
+      port.serialize()
+    );
 
     return {
       ...super.serialize(),
@@ -59,7 +98,7 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
       width: this.getWidth(),
       height: this.getHeight(),
       ...this.getCoords(),
-      ports: serializedPorts
+      ports: serializedPorts,
     };
   }
 
@@ -70,7 +109,9 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
     // add the points of each link that are selected here
     if (this.getSelected()) {
       this.getPorts().forEach((port) => {
-        const points = port.getLinksArray().map((link) => link.getPointForPort(port));
+        const points = port
+          .getLinksArray()
+          .map((link) => link.getPointForPort(port));
         entities = entities.concat(points);
       });
     }
@@ -160,11 +201,15 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
   }
 
   selectWidth(): Observable<number> {
-    return this.dimensions$.select((d) => d.width).pipe(this.withLog('selectWidth'));
+    return this.dimensions$
+      .select((d) => d.width)
+      .pipe(this.withLog('selectWidth'));
   }
 
   selectHeight(): Observable<number> {
-    return this.dimensions$.select((d) => d.height).pipe(this.withLog('selectHeight'));
+    return this.dimensions$
+      .select((d) => d.height)
+      .pipe(this.withLog('selectHeight'));
   }
 
   setExtras(extras: any) {
@@ -175,7 +220,9 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<Diagra
     return this.extras$.value;
   }
 
-  selectExtras<E = any>(selector?: (extra: E) => E[keyof E] | string | string[]): Observable<E> {
+  selectExtras<E = any>(
+    selector?: (extra: E) => E[keyof E] | string | string[]
+  ): Observable<E> {
     return this.extras$.select(selector);
   }
 

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import {
   AutoArrangeDiagramTemplate,
   BasicDiagramTemplate,
+  DynamicPortsDiagramTemplate,
   EventsDiagramTemplate,
   PerformanceDiagramTemplate,
   SerializationDiagramTemplate,
@@ -57,3 +58,5 @@ export const Serialization = SerializationDiagramTemplate.bind({});
 export const AutoArrange = AutoArrangeDiagramTemplate.bind({});
 
 export const Performance = PerformanceDiagramTemplate.bind({});
+
+export const DynamicPorts = DynamicPortsDiagramTemplate.bind({});

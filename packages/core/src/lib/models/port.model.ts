@@ -1,4 +1,5 @@
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { createEntityState, createValueState } from '../state';
 import { EntityMap, ID, isString } from '../utils';
 import { BaseModel } from './base.model';
@@ -14,10 +15,13 @@ export class PortModel extends BaseModel<NodeModel> {
   protected links$ = createEntityState<LinkModel>([], this.entityPipe('links'));
   protected x$ = createValueState(0, this.entityPipe('x'));
   protected y$ = createValueState(0, this.entityPipe('y'));
-  protected width$ = createValueState(0, this.entityPipe('y'));
-  protected height$ = createValueState(0, this.entityPipe('y'));
+  protected width$ = createValueState<number>(0, this.entityPipe('y'));
+  protected height$ = createValueState<number>(0, this.entityPipe('y'));
   protected magnetic$ = createValueState(true, this.entityPipe('magnetic'));
-  protected canCreateLinks$ = createValueState(true, this.entityPipe('magnetic'));
+  protected canCreateLinks$ = createValueState(
+    true,
+    this.entityPipe('magnetic')
+  );
 
   constructor(
     name: string,
@@ -46,7 +50,7 @@ export class PortModel extends BaseModel<NodeModel> {
       height: this.getHeight(),
       width: this.getWidth(),
       canCreateLinks: this.getCanCreateLinks(),
-      ...this.getCoords()
+      ...this.getCoords(),
     };
   }
 
@@ -70,6 +74,15 @@ export class PortModel extends BaseModel<NodeModel> {
 
   getCoords() {
     return { x: this.getX(), y: this.getY() };
+  }
+
+  selectCoords() {
+    return combineLatest([
+      this.selectX(),
+      this.selectY(),
+      this.selectWidth(),
+      this.selectHeight(),
+    ]).pipe(map(([x, y, height, width]) => ({ x, y, height, width })));
   }
 
   selectCanCreateLinks(): Observable<boolean> {
@@ -112,8 +125,16 @@ export class PortModel extends BaseModel<NodeModel> {
     return this.height$.value;
   }
 
+  selectHeight() {
+    return this.height$.select();
+  }
+
   getWidth() {
     return this.width$.value;
+  }
+
+  selectWidth() {
+    return this.width$.select();
   }
 
   getMaximumLinks(): number {
@@ -153,7 +174,17 @@ export class PortModel extends BaseModel<NodeModel> {
     return this.links$.value$;
   }
 
-  updateCoords({ x, y, width, height }: { x: number; y: number; width: number; height: number }) {
+  updateCoords({
+    x,
+    y,
+    width,
+    height,
+  }: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }) {
     this.x$.set(x).emit();
     this.y$.set(y).emit();
     this.width$.set(width).emit();

@@ -945,7 +945,7 @@
         },
         {
             "name": "DefaultNodeComponent",
-            "id": "component-DefaultNodeComponent-a98eccc643d39526f64dae1634950f2f",
+            "id": "component-DefaultNodeComponent-81303a847c868d0a80ea97b2a0103a2f",
             "file": "packages/angular/src/lib/defaults/components/default-node/default-node.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -970,7 +970,7 @@
                     "type": "ViewContainerRef",
                     "optional": false,
                     "description": "",
-                    "line": 12,
+                    "line": 18,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -986,7 +986,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 18
+                    "line": 24
                 }
             ],
             "hostBindings": [],
@@ -994,7 +994,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import { ChangeDetectionStrategy, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';\nimport { DefaultNodeModel } from '@rxzu/core';\n\n@Component({\n  selector: 'ngdx-default-node',\n  templateUrl: './default-node.component.html',\n  styleUrls: ['./default-node.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class DefaultNodeComponent extends DefaultNodeModel implements OnInit {\n  @ViewChild('portsLayer', { read: ViewContainerRef, static: true })\n  portsLayer: ViewContainerRef;\n\n  constructor() {\n    super({ type: 'ngdx-default-node' });\n  }\n\n  ngOnInit() {\n    this.selectPorts().subscribe((ports) => {\n      const factoriesManager = this.getParent().getDiagramEngine().getFactoriesManager();\n      for (const port of ports) {\n        if (!port.getPainted().isPainted) {\n          factoriesManager\n            .getFactory({ factoryType: 'portFactories', modelType: port.getType() })\n            .generateWidget({ model: port, host: this.portsLayer });\n        }\n      }\n      this.setPainted(true);\n    });\n  }\n}\n",
+            "sourceCode": "import {\n  ChangeDetectionStrategy,\n  Component,\n  OnInit,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { DefaultNodeModel } from '@rxzu/core';\n\n@Component({\n  selector: 'ngdx-default-node',\n  templateUrl: './default-node.component.html',\n  styleUrls: ['./default-node.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultNodeComponent extends DefaultNodeModel implements OnInit {\n  @ViewChild('portsLayer', { read: ViewContainerRef, static: true })\n  portsLayer: ViewContainerRef;\n\n  constructor() {\n    super({ type: 'ngdx-default-node' });\n  }\n\n  ngOnInit() {\n    this.selectPorts().subscribe((ports) => {\n      const factoriesManager = this.getParent()\n        .getDiagramEngine()\n        .getFactoriesManager();\n\n      for (const port of ports) {\n        if (!port.getPainted().isPainted) {\n          factoriesManager\n            .getFactory({\n              factoryType: 'portFactories',\n              modelType: port.getType(),\n            })\n            .generateWidget({ model: port, host: this.portsLayer });\n        }\n      }\n      this.setPainted(true);\n    });\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -1007,7 +1007,7 @@
                 "name": "constructor",
                 "description": "",
                 "args": [],
-                "line": 12
+                "line": 18
             },
             "extends": "DefaultNodeModel",
             "implements": [
