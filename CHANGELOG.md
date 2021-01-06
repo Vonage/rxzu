@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/Vonage/rxzu/compare/v1.2.5...v1.3.0) (2021-01-06)
+
+
+### Features
+
+* **links and ports:** dynamically updating coords on changes ([1b032f2](https://github.com/Vonage/rxzu/commit/1b032f264551547a79854f86eb4b14cc16e0686c))
+
 ## [1.2.5](https://github.com/Vonage/rxzu/compare/v1.2.4...v1.2.5) (2021-01-05)
 
 
