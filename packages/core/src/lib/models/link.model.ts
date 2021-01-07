@@ -144,9 +144,11 @@ export class LinkModel extends BaseModel<DiagramModel> {
     if (port !== null) {
       port.addLink(this);
     }
+
     if (this.sourcePort !== null) {
       this.sourcePort.removeLink(this);
     }
+
     this.sourcePort = port;
 
     port.selectCoords().subscribe((coords) => {
@@ -168,9 +170,11 @@ export class LinkModel extends BaseModel<DiagramModel> {
     if (port !== null) {
       port.addLink(this);
     }
+
     if (this.targetPort !== null) {
       this.targetPort.removeLink(this);
     }
+
     this.targetPort = port;
   }
 

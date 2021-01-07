@@ -62,7 +62,10 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<
                 .getDiagramEngine()
                 .getPortCenter(port);
 
-              port.updateCoords({ ...portCenter, height, width });
+              const x = portCenter.x + width / 2;
+              const y = portCenter.y + height / 2;
+
+              port.updateCoords({ x, y, height, width });
             });
           });
       });
