@@ -152,6 +152,28 @@ export class DiagramEngineCore {
   }
 
   /**
+   * Calculate rectangular coordinates of the node passed in.
+   */
+  getNodeCoords(node: NodeModel) {
+    const sourceElement = this.getNodeElement(node);
+    const sourceRect = sourceElement.getBoundingClientRect() as DOMRect;
+    const canvasRect = this.canvas$.value.getBoundingClientRect() as ClientRect;
+
+    return {
+      x:
+        (sourceRect.x - this.diagramModel.getOffsetX()) /
+          (this.diagramModel.getZoomLevel() / 100.0) -
+        canvasRect.left,
+      y:
+        (sourceRect.y - this.diagramModel.getOffsetY()) /
+          (this.diagramModel.getZoomLevel() / 100.0) -
+        canvasRect.top,
+      width: sourceRect.width,
+      height: sourceRect.height,
+    };
+  }
+
+  /**
    * Determine the width and height of the node passed in.
    * It currently assumes nodes have a rectangular shape, can be overriden for customised shapes.
    */
@@ -174,6 +196,14 @@ export class DiagramEngineCore {
 
   setCanvas(canvas: Element) {
     this.canvas$.set(canvas).emit();
+  }
+
+  getCanvas() {
+    return this.canvas$.value;
+  }
+
+  selectCanvas() {
+    return this.canvas$.select();
   }
 
   getRelativePoint(x: number, y: number) {
