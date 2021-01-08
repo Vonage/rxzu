@@ -81,8 +81,6 @@ export class DefaultLinkComponent
 
         this.cdRef.detectChanges();
       });
-
-    this.setPainted(true);
   }
 
   calcLabelIncline(firstPoint: Coords, secondPoint: Coords): number {
