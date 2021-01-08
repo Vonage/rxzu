@@ -213,6 +213,10 @@ export class LinkModel extends BaseModel<DiagramModel> {
     return this.points$.value;
   }
 
+  selectPoints(): Observable<PointModel[]> {
+    return this.points$.select();
+  }
+
   setPoints(points: PointModel[]) {
     points.forEach((point) => {
       point.setParent(this);
