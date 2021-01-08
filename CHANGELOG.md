@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/Vonage/rxzu/compare/v1.4.0...v1.5.0) (2021-01-08)
+
+
+### Features
+
+* **engine:** node and canvas selectors ([a41f760](https://github.com/Vonage/rxzu/commit/a41f76072e869dfef87ec7eea4c9da2738cf82c0))
+
 # [1.4.0](https://github.com/Vonage/rxzu/compare/v1.3.0...v1.4.0) (2021-01-08)
 
 
