@@ -45,7 +45,7 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Run linting
         continue-on-error: true # temporary measurements until linting errors are fixed
-        run: yarn nx run-many --target=lint --all --linter=eslint
+        run: yarn affected:lint:fix
 
   test:
     if: "!contains(github.event.head_commit.message, 'skip ci')"
