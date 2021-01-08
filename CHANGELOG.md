@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/Vonage/rxzu/compare/v1.3.0...v1.4.0) (2021-01-08)
+
+
+### Features
+
+* **link:** points selector added ([ec48ab1](https://github.com/Vonage/rxzu/commit/ec48ab11003753b24fdc563d8895ee10137e0990))
+
 # [1.3.0](https://github.com/Vonage/rxzu/compare/v1.2.5...v1.3.0) (2021-01-06)
 
 
