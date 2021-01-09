@@ -1,3 +1,12 @@
+## [1.5.1](https://github.com/Vonage/rxzu/compare/v1.5.0...v1.5.1) (2021-01-09)
+
+
+### Bug Fixes
+
+* **angular links:** hover change detection manually triggered ([f9aac7c](https://github.com/Vonage/rxzu/commit/f9aac7c8eb3d25a88e54d65a13c002a6fd456837))
+* **dynamic:** ports updates will now consider offsets and zoom level ([9a35868](https://github.com/Vonage/rxzu/commit/9a35868f9fe831c11ab5c851ddb51377eb244281))
+* **imports:** removed unused imports, build only whats neccessery ([3fb1e89](https://github.com/Vonage/rxzu/commit/3fb1e89ed31ce88c4163959919558994e26c4668))
+
 # [1.5.0](https://github.com/Vonage/rxzu/compare/v1.4.0...v1.5.0) (2021-01-08)
 
 
