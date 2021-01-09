@@ -156,7 +156,8 @@ export class MouseManager {
         x: event.clientX - action.mouseX,
         y: event.clientY - action.mouseY,
       };
-      const amountZoom = this.engine.getDiagramModel().getZoomLevel() / 100;
+
+      const zoomLevel = this.engine.getDiagramModel().getZoomLevel() / 100;
       action.selectionModels.forEach((selectionModel) => {
         // reset all previous magnets if any
         selectionModel.magnet = undefined;
@@ -168,8 +169,8 @@ export class MouseManager {
             !selectionModel.model.isConnectedToPort())
         ) {
           const newCoords = {
-            x: selectionModel.initialX + coords.x / amountZoom,
-            y: selectionModel.initialY + coords.y / amountZoom,
+            x: selectionModel.initialX + coords.x / zoomLevel,
+            y: selectionModel.initialY + coords.y / zoomLevel,
           };
           const gridRelativeCoords = this.engine
             .getDiagramModel()
@@ -217,9 +218,10 @@ export class MouseManager {
           // we want points that are connected to ports, to not necessarily snap to grid
           // this stuff needs to be pixel perfect, dont touch it
           const newCoords = this.engine.getDiagramModel().getGridPosition({
-            x: coords.x / amountZoom,
-            y: coords.y / amountZoom,
+            x: coords.x / zoomLevel,
+            y: coords.y / zoomLevel,
           });
+
           selectionModel.model.setCoords({
             x: selectionModel.initialX + newCoords.x,
             y: selectionModel.initialY + newCoords.y,

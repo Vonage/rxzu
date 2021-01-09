@@ -88,10 +88,10 @@
     "classes": [
         {
             "name": "AbstractAngularFactory",
-            "id": "class-AbstractAngularFactory-596b32474941a6f20fdcaa4e4f0ce7f1",
+            "id": "class-AbstractAngularFactory-3c5c67a27fbd50dfd800dd2deda6405b",
             "file": "packages/angular/src/lib/defaults/factories/angular.factory.ts",
             "type": "class",
-            "sourceCode": "import { ComponentRef, ViewContainerRef } from '@angular/core';\nimport { BaseModel, AbstractFactory, DiagramModel } from '@rxzu/core';\n\nexport abstract class AbstractAngularFactory<\n  T extends BaseModel = BaseModel,\n  R = ViewContainerRef,\n  Y = ComponentRef<T>\n> extends AbstractFactory<T, R, Y> {\n  abstract generateWidget({\n    model,\n    host,\n    diagramModel,\n  }: {\n    model: T;\n    host: R;\n    diagramModel?: DiagramModel;\n  }): Y;\n}\n",
+            "sourceCode": "import { ComponentRef, ViewContainerRef } from '@angular/core';\nimport { BaseModel, AbstractFactory, DiagramModel } from '@rxzu/core';\n\nexport abstract class AbstractAngularFactory<\n  T extends BaseModel = BaseModel,\n  R = ViewContainerRef,\n  Y = ComponentRef<T>\n> extends AbstractFactory<T, R, Y> {\n  abstract generateWidget({\n    model,\n    host,\n    diagramModel,\n  }: {\n    model: T;\n    host: R;\n    diagramModel?: DiagramModel;\n  }): Y | any;\n}\n",
             "properties": [],
             "methods": [
                 {
@@ -102,7 +102,7 @@
                         }
                     ],
                     "optional": false,
-                    "returnType": "Y",
+                    "returnType": "Y | any",
                     "typeParameters": [],
                     "line": 9,
                     "modifierKind": [
@@ -200,7 +200,7 @@
                         }
                     ],
                     "optional": false,
-                    "returnType": "Y",
+                    "returnType": "Y | any",
                     "typeParameters": [],
                     "line": 9,
                     "modifierKind": [
@@ -301,7 +301,7 @@
                         }
                     ],
                     "optional": false,
-                    "returnType": "Y",
+                    "returnType": "Y | any",
                     "typeParameters": [],
                     "line": 9,
                     "modifierKind": [
@@ -329,10 +329,10 @@
         },
         {
             "name": "DefaultNodeFactory",
-            "id": "class-DefaultNodeFactory-031ec5053ccc1221b00e567aeed6abd7",
+            "id": "class-DefaultNodeFactory-c4b0a9c748212aacc1b63a495e3c33f7",
             "file": "packages/angular/src/lib/defaults/factories/default-node.factory.ts",
             "type": "class",
-            "sourceCode": "import { DefaultNodeComponent } from '../components/default-node/default-node.component';\nimport {\n  ComponentFactoryResolver,\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactory,\n  Renderer2,\n} from '@angular/core';\nimport { DefaultNodeModel, DiagramModel } from '@rxzu/core';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultNodeFactory extends AbstractAngularFactory<\n  DefaultNodeComponent\n> {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n    diagramModel,\n  }: {\n    model: DefaultNodeModel;\n    host: ViewContainerRef;\n    diagramModel?: DiagramModel;\n  }): ComponentRef<DefaultNodeComponent> {\n    const componentRef = host.createComponent(this.getRecipe(), host.length);\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for node\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n    this.renderer.setStyle(rootNode, 'display', 'block');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-nodeid', model.id);\n\n    // subscribe to node coordinates\n    model.selectCoords().subscribe(({ x, y }) => {\n      this.renderer.setStyle(rootNode, 'left', `${x}px`);\n      this.renderer.setStyle(rootNode, 'top', `${y}px`);\n    });\n\n    model.selectionChanges().subscribe((e) => {\n      e.isSelected\n        ? this.renderer.addClass(rootNode, 'selected')\n        : this.renderer.removeClass(rootNode, 'selected');\n    });\n\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    // assign all passed properties to node initialization.\n    Object.entries(model).forEach(([key, value]) => {\n      componentRef.instance[key] = value;\n    });\n\n    componentRef.instance.setParent(diagramModel);\n    componentRef.instance.ngOnInit();\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultNodeComponent> {\n    return this.resolver.resolveComponentFactory(DefaultNodeComponent);\n  }\n}\n",
+            "sourceCode": "import { DefaultNodeComponent } from '../components/default-node/default-node.component';\nimport {\n  ComponentFactoryResolver,\n  ViewContainerRef,\n  ComponentFactory,\n  Renderer2,\n} from '@angular/core';\nimport { DefaultNodeModel, DiagramModel } from '@rxzu/core';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultNodeFactory extends AbstractAngularFactory<\n  DefaultNodeComponent\n> {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n    diagramModel,\n  }: {\n    model: DefaultNodeModel;\n    host: ViewContainerRef;\n    diagramModel?: DiagramModel;\n  }): ViewContainerRef {\n    const componentRef = host.createComponent(this.getRecipe(), host.length);\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for node\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n    this.renderer.setStyle(rootNode, 'display', 'block');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-nodeid', model.id);\n\n    // subscribe to node coordinates\n    model.selectCoords().subscribe(({ x, y }) => {\n      this.renderer.setStyle(rootNode, 'left', `${x}px`);\n      this.renderer.setStyle(rootNode, 'top', `${y}px`);\n    });\n\n    model.selectionChanges().subscribe((e) => {\n      e.isSelected\n        ? this.renderer.addClass(rootNode, 'selected')\n        : this.renderer.removeClass(rootNode, 'selected');\n    });\n\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    // assign all passed properties to node initialization.\n    Object.entries(model).forEach(([key, value]) => {\n      componentRef.instance[key] = value;\n    });\n\n    componentRef.instance.setParent(diagramModel);\n    componentRef.instance.ngOnInit();\n    const portsHost = componentRef.instance.getPortsHost();\n    return portsHost;\n  }\n\n  getRecipe(): ComponentFactory<DefaultNodeComponent> {\n    return this.resolver.resolveComponentFactory(DefaultNodeComponent);\n  }\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -346,7 +346,7 @@
                         "type": "Renderer2"
                     }
                 ],
-                "line": 14,
+                "line": 13,
                 "jsdoctags": [
                     {
                         "name": "resolver",
@@ -374,9 +374,9 @@
                         }
                     ],
                     "optional": false,
-                    "returnType": "ComponentRef<DefaultNodeComponent>",
+                    "returnType": "ViewContainerRef",
                     "typeParameters": [],
-                    "line": 22,
+                    "line": 21,
                     "jsdoctags": [
                         {
                             "type": "literal type",
@@ -402,7 +402,7 @@
                         }
                     ],
                     "optional": false,
-                    "returnType": "Y",
+                    "returnType": "Y | any",
                     "typeParameters": [],
                     "line": 9,
                     "modifierKind": [
@@ -503,7 +503,7 @@
                         }
                     ],
                     "optional": false,
-                    "returnType": "Y",
+                    "returnType": "Y | any",
                     "typeParameters": [],
                     "line": 9,
                     "modifierKind": [
@@ -743,7 +743,7 @@
         },
         {
             "name": "DefaultLinkComponent",
-            "id": "component-DefaultLinkComponent-3407bf6d4e791ddff664efef5a031669",
+            "id": "component-DefaultLinkComponent-b1daba1c79f611b2d43088c80f3df5c3",
             "file": "packages/angular/src/lib/defaults/components/default-link/default-link.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -793,7 +793,7 @@
                     "optional": false,
                     "returnType": "Coords",
                     "typeParameters": [],
-                    "line": 103,
+                    "line": 99,
                     "jsdoctags": [
                         {
                             "name": "firstPoint",
@@ -826,7 +826,7 @@
                     "optional": false,
                     "returnType": "number",
                     "typeParameters": [],
-                    "line": 86,
+                    "line": 82,
                     "jsdoctags": [
                         {
                             "name": "firstPoint",
@@ -866,7 +866,7 @@
                     "optional": false,
                     "returnType": "Observable<string>",
                     "typeParameters": [],
-                    "line": 110
+                    "line": 106
                 },
                 {
                     "name": "trackByPoints",
@@ -907,7 +907,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  OnInit,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport {\n  PointModel,\n  generateCurvePath,\n  Coords,\n  DefaultLinkModel,\n} from '@rxzu/core';\nimport { combineLatest, Observable } from 'rxjs';\nimport { takeUntil } from 'rxjs/operators';\n\n@Component({\n  selector: 'ngdx-default-link',\n  templateUrl: './default-link.component.html',\n  styleUrls: ['./default-link.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultLinkComponent\n  extends DefaultLinkModel\n  implements AfterViewInit, OnInit {\n  @ViewChild('labelLayer', { read: ViewContainerRef, static: true })\n  labelLayer: ViewContainerRef;\n\n  constructor(private cdRef: ChangeDetectorRef) {\n    super({ type: 'ngdx-default-link' });\n  }\n\n  trackByPoints(i: number, point: PointModel) {\n    return point.id;\n  }\n\n  ngOnInit() {\n    this.setPainted(true);\n  }\n\n  ngAfterViewInit() {\n    const firstPCoords$ = this.getFirstPoint().selectCoords();\n    const lastPCoords$ = this.getLastPoint().selectCoords();\n\n    // Observe link coords and update drawing accordingly\n    combineLatest([firstPCoords$, lastPCoords$])\n      .pipe(takeUntil(this.onEntityDestroy()))\n      .subscribe(([firstPCoords, lastPCoords]) => {\n        const points = [firstPCoords, lastPCoords];\n\n        // handle regular links\n        // draw the smoothing\n        // if the points are too close, just draw a straight line\n        const isHorizontal =\n          Math.abs(firstPCoords.x - lastPCoords.x) >\n          Math.abs(firstPCoords.y - lastPCoords.y);\n        const xOrY = isHorizontal ? 'x' : 'y';\n        let isStraight = false;\n        if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 50) {\n          isStraight = true;\n        }\n\n        const path = generateCurvePath(\n          firstPCoords,\n          lastPCoords,\n          isStraight ? 0 : this.curvyness\n        );\n        this.path$.set(path).emit();\n\n        const label = this.getLabel();\n        // update label position\n        if (label) {\n          label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));\n\n          // TODO: check whether we want the label to rotate along with the line\n          // label.setRotation(this.calcLabelIncline(firstPCoords, lastPCoords));\n        }\n        // TODO: handle the multiple lines in between the points\n\n        this.cdRef.detectChanges();\n      });\n  }\n\n  calcLabelIncline(firstPoint: Coords, secondPoint: Coords): number {\n    const dy = secondPoint.y - firstPoint.y;\n    const dx = secondPoint.x - firstPoint.x;\n\n    if (dx === 0) {\n      return 0;\n    }\n\n    let inclineAngel = (Math.atan(dy / dx) * 180) / Math.PI;\n\n    if (inclineAngel < 0) {\n      inclineAngel += 180;\n    }\n\n    return inclineAngel;\n  }\n\n  calcCenterOfPath(firstPoint: Coords, secondPoint: Coords): Coords {\n    return {\n      x: (firstPoint.x + secondPoint.x) / 2 + 20,\n      y: (firstPoint.y + secondPoint.y) / 2 + 20,\n    };\n  }\n\n  selectPath(): Observable<string> {\n    return this.path$.value$;\n  }\n}\n",
+            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  OnInit,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport {\n  PointModel,\n  generateCurvePath,\n  Coords,\n  DefaultLinkModel,\n} from '@rxzu/core';\nimport { combineLatest, Observable } from 'rxjs';\nimport { takeUntil } from 'rxjs/operators';\n\n@Component({\n  selector: 'ngdx-default-link',\n  templateUrl: './default-link.component.html',\n  styleUrls: ['./default-link.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultLinkComponent\n  extends DefaultLinkModel\n  implements AfterViewInit, OnInit {\n  @ViewChild('labelLayer', { read: ViewContainerRef, static: true })\n  labelLayer: ViewContainerRef;\n\n  constructor(private cdRef: ChangeDetectorRef) {\n    super({ type: 'ngdx-default-link' });\n  }\n\n  trackByPoints(i: number, point: PointModel) {\n    return point.id;\n  }\n\n  ngOnInit() {\n    this.setPainted(true);\n  }\n\n  ngAfterViewInit() {\n    const firstPCoords$ = this.getFirstPoint().selectCoords();\n    const lastPCoords$ = this.getLastPoint().selectCoords();\n\n    // Observe link coords and update drawing accordingly\n    combineLatest([firstPCoords$, lastPCoords$])\n      .pipe(takeUntil(this.onEntityDestroy()))\n      .subscribe(([firstPCoords, lastPCoords]) => {\n        const points = [firstPCoords, lastPCoords];\n\n        // handle regular links\n        // draw the smoothing\n        // if the points are too close, just draw a straight line\n        const isHorizontal =\n          Math.abs(firstPCoords.x - lastPCoords.x) >\n          Math.abs(firstPCoords.y - lastPCoords.y);\n        const xOrY = isHorizontal ? 'x' : 'y';\n        let isStraight = false;\n        if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 50) {\n          isStraight = true;\n        }\n\n        const path = generateCurvePath(\n          firstPCoords,\n          lastPCoords,\n          isStraight ? 0 : this.curvyness\n        );\n        this.path$.set(path).emit();\n\n        const label = this.getLabel();\n        // update label position\n        if (label) {\n          label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));\n        }\n\n        this.cdRef.detectChanges();\n      });\n  }\n\n  calcLabelIncline(firstPoint: Coords, secondPoint: Coords): number {\n    const dy = secondPoint.y - firstPoint.y;\n    const dx = secondPoint.x - firstPoint.x;\n\n    if (dx === 0) {\n      return 0;\n    }\n\n    let inclineAngel = (Math.atan(dy / dx) * 180) / Math.PI;\n\n    if (inclineAngel < 0) {\n      inclineAngel += 180;\n    }\n\n    return inclineAngel;\n  }\n\n  calcCenterOfPath(firstPoint: Coords, secondPoint: Coords): Coords {\n    return {\n      x: (firstPoint.x + secondPoint.x) / 2 + 20,\n      y: (firstPoint.y + secondPoint.y) / 2 + 20,\n    };\n  }\n\n  selectPath(): Observable<string> {\n    return this.path$.value$;\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -945,7 +945,7 @@
         },
         {
             "name": "DefaultNodeComponent",
-            "id": "component-DefaultNodeComponent-81303a847c868d0a80ea97b2a0103a2f",
+            "id": "component-DefaultNodeComponent-e2d50889adb9e05102ef658500235f0e",
             "file": "packages/angular/src/lib/defaults/components/default-node/default-node.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -981,6 +981,14 @@
             ],
             "methodsClass": [
                 {
+                    "name": "getPortsHost",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "any",
+                    "typeParameters": [],
+                    "line": 28
+                },
+                {
                     "name": "ngOnInit",
                     "args": [],
                     "optional": false,
@@ -994,7 +1002,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  ChangeDetectionStrategy,\n  Component,\n  OnInit,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { DefaultNodeModel } from '@rxzu/core';\n\n@Component({\n  selector: 'ngdx-default-node',\n  templateUrl: './default-node.component.html',\n  styleUrls: ['./default-node.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultNodeComponent extends DefaultNodeModel implements OnInit {\n  @ViewChild('portsLayer', { read: ViewContainerRef, static: true })\n  portsLayer: ViewContainerRef;\n\n  constructor() {\n    super({ type: 'ngdx-default-node' });\n  }\n\n  ngOnInit() {\n    this.selectPorts().subscribe((ports) => {\n      const factoriesManager = this.getParent()\n        .getDiagramEngine()\n        .getFactoriesManager();\n\n      for (const port of ports) {\n        if (!port.getPainted().isPainted) {\n          factoriesManager\n            .getFactory({\n              factoryType: 'portFactories',\n              modelType: port.getType(),\n            })\n            .generateWidget({ model: port, host: this.portsLayer });\n        }\n      }\n      this.setPainted(true);\n    });\n  }\n}\n",
+            "sourceCode": "import {\n  ChangeDetectionStrategy,\n  Component,\n  OnInit,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { DefaultNodeModel } from '@rxzu/core';\n\n@Component({\n  selector: 'ngdx-default-node',\n  templateUrl: './default-node.component.html',\n  styleUrls: ['./default-node.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultNodeComponent extends DefaultNodeModel implements OnInit {\n  @ViewChild('portsLayer', { read: ViewContainerRef, static: true })\n  portsLayer: ViewContainerRef;\n\n  constructor() {\n    super({ type: 'ngdx-default-node' });\n  }\n\n  ngOnInit() {\n    this.setPainted(true);\n  }\n\n  getPortsHost() {\n    return this.portsLayer;\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -1841,7 +1849,7 @@
                 "linktype": "component",
                 "name": "DefaultNodeComponent",
                 "coveragePercent": 0,
-                "coverageCount": "0/4",
+                "coverageCount": "0/5",
                 "status": "low"
             },
             {

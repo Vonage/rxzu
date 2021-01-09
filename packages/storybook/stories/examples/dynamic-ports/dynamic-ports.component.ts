@@ -8,6 +8,7 @@ import { DiagramModel, DefaultNodeModel } from '@rxzu/core';
     <div class="action-bar">
       <button (click)="addPort()">Add Last Port</button>
       <button (click)="removePort()">Remove First Port</button>
+      <button (click)="enlargeNode()">Enlarge Node</button>
     </div>
     <ngdx-diagram class="demo-diagram" [model]="diagramModel"></ngdx-diagram>
   `,
@@ -63,5 +64,13 @@ export class DynamicPortsExampleStoryComponent implements OnInit {
     const node = this.diagramModel.getNode('1') as DefaultNodeModel;
     const firstPort = node.getPortsArray()[0];
     node.removePort(firstPort);
+  }
+
+  enlargeNode() {
+    const node = this.diagramModel.getNode('1') as DefaultNodeModel;
+    const nodeCurrentDimensions = node.getDimensions();
+    node.setDimensions({
+      height: nodeCurrentDimensions.height + 50,
+    });
   }
 }

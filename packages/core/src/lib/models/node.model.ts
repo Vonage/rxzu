@@ -41,31 +41,18 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<
 
     // once node finish painting itself, subscribe to ports change and update their coords
     this.paintChanges()
-      .pipe(
-        filter((paintE) => !!paintE.isPainted),
-        take(1)
-      )
+      .pipe(filter((paintE) => !!paintE.isPainted))
       .subscribe(() => {
         this.selectPorts()
           .pipe(takeUntil(this.destroyed$))
           .subscribe((ports) => {
             ports.forEach((port) => {
-              const height = this.getParent()
-                .getDiagramEngine()
-                .getNodePortElement(port).clientHeight;
-
-              const width = this.getParent()
-                .getDiagramEngine()
-                .getNodePortElement(port).clientWidth;
-
-              const portCenter = this.getParent()
-                .getDiagramEngine()
-                .getPortCenter(port);
-
-              const x = portCenter.x + width / 2;
-              const y = portCenter.y + height / 2;
-
-              port.updateCoords({ x, y, height, width });
+              if (port.getPainted().isPainted) {
+                const diagramEngine = this.getParent().getDiagramEngine();
+                const portSize = diagramEngine.getPortCoords(port);
+                const portCenter = diagramEngine.getPortCenter(port);
+                port.updateCoords({ ...portSize, ...portCenter });
+              }
             });
           });
       });
@@ -105,7 +92,6 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<
     };
   }
 
-  // TODO: override selectionChanges and replace this with it (convert to rx)
   getSelectedEntities() {
     let entities = super.getSelectedEntities();
 
@@ -123,7 +109,6 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<
     return entities;
   }
 
-  // TODO: map to BaseEvent
   coordsChanges(): Observable<Coords> {
     return this.coords$.value$;
   }

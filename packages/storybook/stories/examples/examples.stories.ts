@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import {
   AutoArrangeDiagramTemplate,
   BasicDiagramTemplate,
+  DragAndDropDiagramTemplate,
   DynamicPortsDiagramTemplate,
   EventsDiagramTemplate,
   PerformanceDiagramTemplate,
@@ -20,6 +21,7 @@ import {
   RxZuDiagramsModule,
 } from '@rxzu/angular';
 import { DagrePlugin } from '@rxzu/core';
+import { DragAndDropExampleStoryComponent } from './drag-and-drop/drag-and-drop.component';
 
 export default {
   title: 'Examples',
@@ -33,6 +35,7 @@ export default {
         SerializationExampleStoryComponent,
         AutoArrangeExampleStoryComponent,
         PerformanceExampleStoryComponent,
+        DragAndDropExampleStoryComponent,
         DefaultLinkComponent,
         DefaultLabelComponent,
         DefaultPortComponent,
@@ -60,3 +63,5 @@ export const AutoArrange = AutoArrangeDiagramTemplate.bind({});
 export const Performance = PerformanceDiagramTemplate.bind({});
 
 export const DynamicPorts = DynamicPortsDiagramTemplate.bind({});
+
+export const DragAndDrop = DragAndDropDiagramTemplate.bind({});

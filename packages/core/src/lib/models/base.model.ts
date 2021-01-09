@@ -1,15 +1,31 @@
 import { Observable } from 'rxjs';
 import { BaseEntity } from '../base.entity';
-import { PaintedEvent, ParentChangeEvent, SelectionEvent } from '../interfaces/event.interface';
+import {
+  PaintedEvent,
+  ParentChangeEvent,
+  SelectionEvent,
+} from '../interfaces/event.interface';
 import { createValueState } from '../state';
 
 export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   protected readonly _type: string;
 
-  protected parent$ = createValueState<E>(null, this.entityPipe('ParentsChange'));
-  protected selected$ = createValueState<boolean>(false, this.entityPipe('SelectedChange'));
-  protected hovered$ = createValueState<boolean>(false, this.entityPipe('HoveredChange'));
-  protected painted$ = createValueState<PaintedEvent>(new PaintedEvent(this, false), this.entityPipe('PaintedChange'));
+  protected parent$ = createValueState<E>(
+    null,
+    this.entityPipe('ParentsChange')
+  );
+  protected selected$ = createValueState<boolean>(
+    false,
+    this.entityPipe('SelectedChange')
+  );
+  protected hovered$ = createValueState<boolean>(
+    false,
+    this.entityPipe('HoveredChange')
+  );
+  protected painted$ = createValueState<PaintedEvent>(
+    new PaintedEvent(this, false),
+    this.entityPipe('PaintedChange')
+  );
 
   constructor(type?: string, id?: string, logPrefix = '[Base]') {
     super(id, logPrefix);
@@ -19,7 +35,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   serialize() {
     return {
       ...super.serialize(),
-      type: this.getType()
+      type: this.getType(),
     };
   }
 
@@ -56,7 +72,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   }
 
   selectHovered(): Observable<boolean> {
-    return this.hovered$.value$;
+    return this.hovered$.select();
   }
 
   getType(): string {
@@ -76,7 +92,9 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   }
 
   selectionChanges(): Observable<SelectionEvent> {
-    return this.selected$.select((selected) => new SelectionEvent(this, selected));
+    return this.selected$.select(
+      (selected) => new SelectionEvent(this, selected)
+    );
   }
 
   getSelectedEntities(): BaseModel[] {
