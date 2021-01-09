@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DiagramModel, PointModel } from '@rxzu/core';
-import * as dagre from 'dagre';
-import { EdgeConfig, GraphLabel, NodeConfig } from 'dagre';
+import { EdgeConfig, GraphLabel, NodeConfig, graphlib, layout } from 'dagre';
 
 export interface DagreEngineOptions {
   graph?: GraphLabel;
@@ -14,11 +13,11 @@ export interface DagreEngineOptions {
 
 @Injectable()
 export class DagrePlugin {
-  g: dagre.graphlib.Graph;
+  g: graphlib.Graph;
 
   instantiate() {
     try {
-      this.g = new dagre.graphlib.Graph({ multigraph: true });
+      this.g = new graphlib.Graph({ multigraph: true });
     } catch (error) {
       console.warn(
         "`dagre` packages isn't installed, please install it before using the DagreEngine plugin"
@@ -58,7 +57,7 @@ export class DagrePlugin {
     });
 
     // layout the graph
-    dagre.layout(this.g, options.layout);
+    layout(this.g, options.layout);
 
     this.g.nodes().forEach((v) => {
       const { x, y } = this.g.node(v);
