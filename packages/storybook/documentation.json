@@ -743,7 +743,7 @@
         },
         {
             "name": "DefaultLinkComponent",
-            "id": "component-DefaultLinkComponent-b1daba1c79f611b2d43088c80f3df5c3",
+            "id": "component-DefaultLinkComponent-3a38f382e1c947d3df14ad259bc95c2f",
             "file": "packages/angular/src/lib/defaults/components/default-link/default-link.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -793,7 +793,7 @@
                     "optional": false,
                     "returnType": "Coords",
                     "typeParameters": [],
-                    "line": 99,
+                    "line": 103,
                     "jsdoctags": [
                         {
                             "name": "firstPoint",
@@ -826,7 +826,7 @@
                     "optional": false,
                     "returnType": "number",
                     "typeParameters": [],
-                    "line": 82,
+                    "line": 86,
                     "jsdoctags": [
                         {
                             "name": "firstPoint",
@@ -850,10 +850,18 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 43
+                    "line": 47
                 },
                 {
                     "name": "ngOnInit",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 43
+                },
+                {
+                    "name": "onHover",
                     "args": [],
                     "optional": false,
                     "returnType": "void",
@@ -866,7 +874,7 @@
                     "optional": false,
                     "returnType": "Observable<string>",
                     "typeParameters": [],
-                    "line": 106
+                    "line": 110
                 },
                 {
                     "name": "trackByPoints",
@@ -907,7 +915,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  OnInit,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport {\n  PointModel,\n  generateCurvePath,\n  Coords,\n  DefaultLinkModel,\n} from '@rxzu/core';\nimport { combineLatest, Observable } from 'rxjs';\nimport { takeUntil } from 'rxjs/operators';\n\n@Component({\n  selector: 'ngdx-default-link',\n  templateUrl: './default-link.component.html',\n  styleUrls: ['./default-link.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultLinkComponent\n  extends DefaultLinkModel\n  implements AfterViewInit, OnInit {\n  @ViewChild('labelLayer', { read: ViewContainerRef, static: true })\n  labelLayer: ViewContainerRef;\n\n  constructor(private cdRef: ChangeDetectorRef) {\n    super({ type: 'ngdx-default-link' });\n  }\n\n  trackByPoints(i: number, point: PointModel) {\n    return point.id;\n  }\n\n  ngOnInit() {\n    this.setPainted(true);\n  }\n\n  ngAfterViewInit() {\n    const firstPCoords$ = this.getFirstPoint().selectCoords();\n    const lastPCoords$ = this.getLastPoint().selectCoords();\n\n    // Observe link coords and update drawing accordingly\n    combineLatest([firstPCoords$, lastPCoords$])\n      .pipe(takeUntil(this.onEntityDestroy()))\n      .subscribe(([firstPCoords, lastPCoords]) => {\n        const points = [firstPCoords, lastPCoords];\n\n        // handle regular links\n        // draw the smoothing\n        // if the points are too close, just draw a straight line\n        const isHorizontal =\n          Math.abs(firstPCoords.x - lastPCoords.x) >\n          Math.abs(firstPCoords.y - lastPCoords.y);\n        const xOrY = isHorizontal ? 'x' : 'y';\n        let isStraight = false;\n        if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 50) {\n          isStraight = true;\n        }\n\n        const path = generateCurvePath(\n          firstPCoords,\n          lastPCoords,\n          isStraight ? 0 : this.curvyness\n        );\n        this.path$.set(path).emit();\n\n        const label = this.getLabel();\n        // update label position\n        if (label) {\n          label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));\n        }\n\n        this.cdRef.detectChanges();\n      });\n  }\n\n  calcLabelIncline(firstPoint: Coords, secondPoint: Coords): number {\n    const dy = secondPoint.y - firstPoint.y;\n    const dx = secondPoint.x - firstPoint.x;\n\n    if (dx === 0) {\n      return 0;\n    }\n\n    let inclineAngel = (Math.atan(dy / dx) * 180) / Math.PI;\n\n    if (inclineAngel < 0) {\n      inclineAngel += 180;\n    }\n\n    return inclineAngel;\n  }\n\n  calcCenterOfPath(firstPoint: Coords, secondPoint: Coords): Coords {\n    return {\n      x: (firstPoint.x + secondPoint.x) / 2 + 20,\n      y: (firstPoint.y + secondPoint.y) / 2 + 20,\n    };\n  }\n\n  selectPath(): Observable<string> {\n    return this.path$.value$;\n  }\n}\n",
+            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  OnInit,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport {\n  PointModel,\n  generateCurvePath,\n  Coords,\n  DefaultLinkModel,\n} from '@rxzu/core';\nimport { combineLatest, Observable } from 'rxjs';\nimport { takeUntil } from 'rxjs/operators';\n\n@Component({\n  selector: 'ngdx-default-link',\n  templateUrl: './default-link.component.html',\n  styleUrls: ['./default-link.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultLinkComponent\n  extends DefaultLinkModel\n  implements AfterViewInit, OnInit {\n  @ViewChild('labelLayer', { read: ViewContainerRef, static: true })\n  labelLayer: ViewContainerRef;\n\n  constructor(private cdRef: ChangeDetectorRef) {\n    super({ type: 'ngdx-default-link' });\n  }\n\n  trackByPoints(i: number, point: PointModel) {\n    return point.id;\n  }\n\n  onHover() {\n    this.cdRef.detectChanges();\n  }\n\n  ngOnInit() {\n    this.setPainted(true);\n  }\n\n  ngAfterViewInit() {\n    const firstPCoords$ = this.getFirstPoint().selectCoords();\n    const lastPCoords$ = this.getLastPoint().selectCoords();\n\n    // Observe link coords and update drawing accordingly\n    combineLatest([firstPCoords$, lastPCoords$])\n      .pipe(takeUntil(this.onEntityDestroy()))\n      .subscribe(([firstPCoords, lastPCoords]) => {\n        const points = [firstPCoords, lastPCoords];\n\n        // handle regular links\n        // draw the smoothing\n        // if the points are too close, just draw a straight line\n        const isHorizontal =\n          Math.abs(firstPCoords.x - lastPCoords.x) >\n          Math.abs(firstPCoords.y - lastPCoords.y);\n        const xOrY = isHorizontal ? 'x' : 'y';\n        let isStraight = false;\n        if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 50) {\n          isStraight = true;\n        }\n\n        const path = generateCurvePath(\n          firstPCoords,\n          lastPCoords,\n          isStraight ? 0 : this.curvyness\n        );\n        this.path$.set(path).emit();\n\n        const label = this.getLabel();\n        // update label position\n        if (label) {\n          label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));\n        }\n\n        this.cdRef.detectChanges();\n      });\n  }\n\n  calcLabelIncline(firstPoint: Coords, secondPoint: Coords): number {\n    const dy = secondPoint.y - firstPoint.y;\n    const dx = secondPoint.x - firstPoint.x;\n\n    if (dx === 0) {\n      return 0;\n    }\n\n    let inclineAngel = (Math.atan(dy / dx) * 180) / Math.PI;\n\n    if (inclineAngel < 0) {\n      inclineAngel += 180;\n    }\n\n    return inclineAngel;\n  }\n\n  calcCenterOfPath(firstPoint: Coords, secondPoint: Coords): Coords {\n    return {\n      x: (firstPoint.x + secondPoint.x) / 2 + 20,\n      y: (firstPoint.y + secondPoint.y) / 2 + 20,\n    };\n  }\n\n  selectPath(): Observable<string> {\n    return this.path$.value$;\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -941,7 +949,7 @@
                 "AfterViewInit",
                 "OnInit"
             ],
-            "templateData": "<!-- Label Host -->\n<ng-template #labelLayer></ng-template>\n\n<svg class=\"link-container\">\n  <!-- Link -->\n  <g [id]=\"id\">\n    <path\n      [attr.stroke-width]=\"width\"\n      [attr.stroke]=\"selectColor() | async\"\n      [attr.d]=\"selectPath() | async\"\n      class=\"default-link\"\n      (mouseleave)=\"setHovered(false)\"\n      (mouseenter)=\"setHovered()\"\n      [ngClass]=\"{ hovered: selectHovered() | async }\"\n    ></path>\n    <path\n      class=\"default-link\"\n      (mouseleave)=\"setHovered(false)\"\n      (mouseenter)=\"setHovered()\"\n      [attr.stroke-width]=\"20\"\n      [attr.stroke]=\"selectColor() | async\"\n      [attr.stroke-linecap]=\"'round'\"\n      [attr.data-linkid]=\"id\"\n      [attr.stroke-opacity]=\"(selectHovered() | async) ? '0.1' : '0'\"\n      [attr.d]=\"selectPath() | async\"\n    ></path>\n  </g>\n\n  <!-- Points -->\n  <g *ngFor=\"let point of getPoints(); trackBy: trackByPoints\" [id]=\"point.id\">\n    <circle\n      fill=\"currentColor\"\n      [attr.cx]=\"point.selectX() | async\"\n      [attr.cy]=\"point.selectY() | async\"\n      r=\"5\"\n      class=\"default-point\"\n      [ngClass]=\"{ hovered: point.selectHovered() | async }\"\n    />\n    <circle\n      [attr.data-pointid]=\"point.id\"\n      [attr.data-linkid]=\"id\"\n      (mouseleave)=\"point.setHovered(false); setHovered(false)\"\n      (mouseenter)=\"point.setHovered(); setHovered()\"\n      [attr.cx]=\"point.selectX() | async\"\n      [attr.cy]=\"point.selectY() | async\"\n      r=\"15\"\n      [attr.opacity]=\"0\"\n      [ngClass]=\"{ selected: point.selectSelected() | async }\"\n    />\n  </g>\n</svg>\n"
+            "templateData": "<!-- Label Host -->\n<ng-template #labelLayer></ng-template>\n\n<svg class=\"link-container\">\n  <!-- Link -->\n  <g [id]=\"id\">\n    <path\n      [attr.stroke-width]=\"width\"\n      [attr.stroke]=\"selectColor() | async\"\n      [attr.d]=\"selectPath() | async\"\n      class=\"default-link\"\n      (mouseleave)=\"setHovered(false); onHover()\"\n      (mouseenter)=\"setHovered(); onHover()\"\n      [ngClass]=\"{ hovered: selectHovered() | async }\"\n    ></path>\n    <path\n      class=\"default-link\"\n      (mouseleave)=\"setHovered(false); onHover()\"\n      (mouseenter)=\"setHovered(); onHover()\"\n      [attr.stroke-width]=\"20\"\n      [attr.stroke]=\"selectColor() | async\"\n      stroke-linecap=\"round\"\n      [attr.data-linkid]=\"id\"\n      [attr.stroke-opacity]=\"(selectHovered() | async) ? '0.1' : '0'\"\n      [attr.d]=\"selectPath() | async\"\n    ></path>\n  </g>\n\n  <!-- Points -->\n  <g *ngFor=\"let point of getPoints(); trackBy: trackByPoints\" [id]=\"point.id\">\n    <circle\n      fill=\"currentColor\"\n      [attr.cx]=\"point.selectX() | async\"\n      [attr.cy]=\"point.selectY() | async\"\n      r=\"5\"\n      class=\"default-point\"\n      [ngClass]=\"{ hovered: point.selectHovered() | async }\"\n    />\n    <circle\n      [attr.data-pointid]=\"point.id\"\n      [attr.data-linkid]=\"id\"\n      (mouseleave)=\"point.setHovered(false); setHovered(false)\"\n      (mouseenter)=\"point.setHovered(); setHovered()\"\n      [attr.cx]=\"point.selectX() | async\"\n      [attr.cy]=\"point.selectY() | async\"\n      r=\"15\"\n      [attr.opacity]=\"0\"\n      [ngClass]=\"{ selected: point.selectSelected() | async }\"\n    />\n  </g>\n</svg>\n"
         },
         {
             "name": "DefaultNodeComponent",
@@ -1840,7 +1848,7 @@
                 "linktype": "component",
                 "name": "DefaultLinkComponent",
                 "coveragePercent": 0,
-                "coverageCount": "0/9",
+                "coverageCount": "0/10",
                 "status": "low"
             },
             {

@@ -38,9 +38,8 @@
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect",
     "storybook": "yarn docs:json && nx run shared-storybook:storybook",
-    "storybook:build": "yarn docs:json && npx nx run shared-storybook:build",
     "docs:json": "compodoc -p ./packages/angular/tsconfig.lib.prod.json -e json -d ./packages/storybook",
-    "run-many": "npx nx run-many --target=build --configuration=production --all && yarn storybook:build"
+    "run-many": "yarn docs:json && npx nx run-many --target=build --configuration=production --all"
   },
   "private": false,
   "dependencies": {

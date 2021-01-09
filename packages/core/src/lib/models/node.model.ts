@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { filter, take, takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { Coords } from '../interfaces/coords.interface';
 import { Dimensions } from '../interfaces/dimensions.interface';
 import { SerializedNodeModel } from '../interfaces/serialization.interface';
