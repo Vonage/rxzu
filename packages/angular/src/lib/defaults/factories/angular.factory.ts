@@ -14,5 +14,5 @@ export abstract class AbstractAngularFactory<
     model: T;
     host: R;
     diagramModel?: DiagramModel;
-  }): Y;
+  }): Y | any;
 }

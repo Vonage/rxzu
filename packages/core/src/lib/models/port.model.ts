@@ -189,6 +189,13 @@ export class PortModel extends BaseModel<NodeModel> {
     this.y$.set(y).emit();
     this.width$.set(width).emit();
     this.height$.set(height).emit();
+
+    this.getLinksArray().forEach((link) => {
+      const engine = this.getParent().getParent().getDiagramEngine();
+      const relCoords = engine.getPortCenter(this);
+      const point = link.getPointForPort(this);
+      point.setCoords(relCoords);
+    });
   }
 
   canLinkToPort(port: PortModel): boolean {

@@ -2,7 +2,6 @@ import { DefaultNodeComponent } from '../components/default-node/default-node.co
 import {
   ComponentFactoryResolver,
   ViewContainerRef,
-  ComponentRef,
   ComponentFactory,
   Renderer2,
 } from '@angular/core';
@@ -27,7 +26,7 @@ export class DefaultNodeFactory extends AbstractAngularFactory<
     model: DefaultNodeModel;
     host: ViewContainerRef;
     diagramModel?: DiagramModel;
-  }): ComponentRef<DefaultNodeComponent> {
+  }): ViewContainerRef {
     const componentRef = host.createComponent(this.getRecipe(), host.length);
 
     // attach coordinates and default positional behaviour to the generated component host
@@ -63,7 +62,8 @@ export class DefaultNodeFactory extends AbstractAngularFactory<
 
     componentRef.instance.setParent(diagramModel);
     componentRef.instance.ngOnInit();
-    return componentRef;
+    const portsHost = componentRef.instance.getPortsHost();
+    return portsHost;
   }
 
   getRecipe(): ComponentFactory<DefaultNodeComponent> {

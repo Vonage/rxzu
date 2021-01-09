@@ -173,6 +173,23 @@ export class DiagramEngineCore {
     };
   }
 
+  getNodeCenter(node: NodeModel) {
+    const sourceElement = this.getNodeElement(node);
+    const sourceRect = sourceElement.getBoundingClientRect();
+    const rel = this.getRelativePoint(sourceRect.left, sourceRect.top);
+
+    return {
+      x:
+        sourceElement.offsetWidth / 2 +
+        (rel.x - this.diagramModel.getOffsetX()) /
+          (this.diagramModel.getZoomLevel() / 100.0),
+      y:
+        sourceElement.offsetHeight / 2 +
+        (rel.y - this.diagramModel.getOffsetY()) /
+          (this.diagramModel.getZoomLevel() / 100.0),
+    };
+  }
+
   /**
    * Determine the width and height of the node passed in.
    * It currently assumes nodes have a rectangular shape, can be overriden for customised shapes.
@@ -279,7 +296,7 @@ export class DiagramEngineCore {
         const nodesPainted$ = [];
         for (const node of nodes.values()) {
           if (!node.getPainted().isPainted) {
-            this.getFactoriesManager()
+            const portsHost = this.getFactoriesManager()
               .getFactory({
                 factoryType: 'nodeFactories',
                 modelType: node.getType(),
@@ -288,6 +305,22 @@ export class DiagramEngineCore {
                 model: node,
                 host: nodesHost,
                 diagramModel: this.diagramModel,
+              });
+
+            node
+              .selectPorts()
+              .pipe(filter(Boolean))
+              .subscribe((ports: PortModel[]) => {
+                ports.forEach((port) => {
+                  if (!port.getPainted().isPainted) {
+                    this.factoriesManager
+                      .getFactory({
+                        factoryType: 'portFactories',
+                        modelType: port.getType(),
+                      })
+                      .generateWidget({ model: port, host: portsHost });
+                  }
+                });
               });
 
             nodesPainted$.push(

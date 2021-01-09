@@ -73,11 +73,7 @@ export class DefaultLinkComponent
         // update label position
         if (label) {
           label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));
-
-          // TODO: check whether we want the label to rotate along with the line
-          // label.setRotation(this.calcLabelIncline(firstPCoords, lastPCoords));
         }
-        // TODO: handle the multiple lines in between the points
 
         this.cdRef.detectChanges();
       });
