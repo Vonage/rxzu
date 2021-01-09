@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/Vonage/rxzu/compare/v1.5.1...v1.5.2) (2021-01-09)
+
+
+### Bug Fixes
+
+* **state:** isArray native ([c0c7f7e](https://github.com/Vonage/rxzu/commit/c0c7f7e2a09a1e0d467889acd60c7b42f8657964))
+
 ## [1.5.1](https://github.com/Vonage/rxzu/compare/v1.5.0...v1.5.1) (2021-01-09)
 
 
