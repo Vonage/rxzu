@@ -36,6 +36,10 @@ export class DefaultLinkComponent
     return point.id;
   }
 
+  onHover() {
+    this.cdRef.detectChanges();
+  }
+
   ngOnInit() {
     this.setPainted(true);
   }
