@@ -1014,7 +1014,7 @@
             "assetsDirs": [],
             "styleUrlsData": [
                 {
-                    "data": ":host {\n  &.selected {\n    .default-node {\n      background-color: white !important;\n      border-color: blue;\n    }\n  }\n\n  .default-node {\n    pointer-events: all;\n    width: 100%;\n    border-radius: 10px;\n    transition: all 0.3s ease-in-out;\n    user-select: none;\n    cursor: auto;\n\n    .title {\n      padding: 10px;\n      text-align: center;\n      border-bottom: 1px solid blue;\n    }\n  }\n\n  .ports {\n    flex-grow: 1;\n    display: flex;\n    flex-direction: column;\n  }\n}\n",
+                    "data": ":host {\n  &.selected {\n    .default-node {\n      background-color: white !important;\n      border-color: blue;\n    }\n  }\n\n  .default-node {\n    pointer-events: all;\n    width: 100%;\n    border-radius: 10px;\n    user-select: none;\n    cursor: auto;\n\n    .title {\n      padding: 10px;\n      text-align: center;\n      border-bottom: 1px solid blue;\n    }\n  }\n\n  .ports {\n    flex-grow: 1;\n    display: flex;\n    flex-direction: column;\n  }\n}\n",
                     "styleUrl": "./default-node.component.scss"
                 }
             ],

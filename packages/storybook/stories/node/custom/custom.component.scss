@@ -13,7 +13,6 @@
     pointer-events: all;
     background-color: white !important;
     border-radius: 16px;
-    transition: all 0.3s ease-in-out;
     padding: 20px;
     cursor: auto;
     border: 1px solid #e1e2e6;
@@ -24,7 +23,6 @@
     }
 
     &:after {
-      transition: all 0.3s ease-in-out;
       content: '';
       position: absolute;
       top: 12px;
