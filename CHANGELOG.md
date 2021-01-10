@@ -1,3 +1,10 @@
+## [1.5.3](https://github.com/Vonage/rxzu/compare/v1.5.2...v1.5.3) (2021-01-10)
+
+
+### Bug Fixes
+
+* **default node:** removed default animations on node appearance ([0aa6502](https://github.com/Vonage/rxzu/commit/0aa6502e0b236e68601f3bf871601e1bec1c0d05))
+
 ## [1.5.2](https://github.com/Vonage/rxzu/compare/v1.5.1...v1.5.2) (2021-01-09)
 
 
