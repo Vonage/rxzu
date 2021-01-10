@@ -19,6 +19,7 @@ RxZu encourages creativity. It allows you to create any node, link, label, or ev
 - 🤓 Learn about it on our [Storybook](https://vonage.github.io/rxzu)
 - 🍄 Join RxZu [Gitter](https://gitter.im/vonage-rxzu/community) room
 
+![Alt Text](https://github.com/Vonage/rxzu/raw/main/assets/dragndropexample.gif)
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
