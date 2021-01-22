@@ -5,7 +5,7 @@ import {
   Renderer2,
 } from '@angular/core';
 import { AbstractAngularFactory } from '@rxzu/angular';
-import { DefaultNodeModel } from '@rxzu/core';
+import { DefaultNodeModel, DiagramModel } from '@rxzu/core';
 import { CustomNodeComponent } from './custom.component';
 
 export class CustomNodeFactory extends AbstractAngularFactory<
@@ -21,9 +21,11 @@ export class CustomNodeFactory extends AbstractAngularFactory<
   generateWidget({
     model,
     host,
+    diagramModel,
   }: {
     model: DefaultNodeModel;
     host: ViewContainerRef;
+    diagramModel?: DiagramModel;
   }): ViewContainerRef {
     const componentRef = host.createComponent(this.getRecipe());
 
@@ -58,6 +60,7 @@ export class CustomNodeFactory extends AbstractAngularFactory<
       componentRef.instance[key] = value;
     });
 
+    componentRef.instance.setParent(diagramModel);
     componentRef.instance.ngOnInit();
     const portsHost = componentRef.instance.getPortsHost();
     return portsHost;
