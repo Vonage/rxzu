@@ -1,8 +1,12 @@
 import { Coords } from './';
 
-export interface SerializedBaseModel {
+export type Serializable = string | number | boolean | Array<any> | Record<string, any> | undefined
+export type SerializedModel = Record<string, Serializable>;
+
+export interface SerializedBaseModel extends SerializedModel {
   locked: boolean;
   id: string;
+  type?: string;
 }
 
 export interface SerializedDiagramModel extends SerializedBaseModel {
@@ -13,35 +17,30 @@ export interface SerializedDiagramModel extends SerializedBaseModel {
 export interface SerializedNodeModel extends SerializedBaseModel {
   x: number;
   y: number;
-  nodeType: string;
+  nodeType?: string;
   extras: {
     [s: string]: any;
   };
   width: number;
   height: number;
-  type: string;
-  id: string;
-  locked: boolean;
   ports: SerializedPortModel[];
 }
 
 export interface SerializedLinkModel extends SerializedBaseModel {
   name?: string;
-  sourcePort: string;
-  targetPort: string;
+  sourcePort?: string;
+  targetPort?: string;
   extras: any;
   points: SerializedPointModel[];
   label?: SerializedLabelModel;
-  type: string;
 }
 
 export interface SerializedPortModel extends SerializedBaseModel {
   x: number;
   y: number;
   name: string;
-  linkType: string;
-  maximumLinks: number;
-  type: string;
+  linkType?: string;
+  maximumLinks?: number;
   magnetic: boolean;
   height: number;
   width: number;
@@ -50,11 +49,9 @@ export interface SerializedPortModel extends SerializedBaseModel {
 
 export interface SerializedPointModel extends SerializedBaseModel {
   coords: Coords;
-  type: string;
 }
 
 export interface SerializedLabelModel extends SerializedBaseModel {
-  type: string;
   rotation: number;
   coords: Coords;
 }

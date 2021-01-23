@@ -13,7 +13,7 @@ export class FactoriesManager<T extends AbstractFactory<BaseModel, unknown, unkn
     this[type].set(factory.type, factory);
   }
 
-  getFactory({ factoryType, modelType }: { factoryType: FactoryType; modelType: string }): T {
+  getFactory({ factoryType, modelType }: { factoryType: FactoryType; modelType: string }): T | undefined {
     if (!this[factoryType]) {
       throw new Error(`cannot find factory ${factoryType}`);
     }

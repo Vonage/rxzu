@@ -5,12 +5,13 @@ import { EntityMap, ID, isString } from '../utils';
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { NodeModel } from './node.model';
+import { SerializedPortModel } from '../interfaces';
 
 export class PortModel extends BaseModel<NodeModel> {
   // TODO: convert all primitives to subjects
   protected name: string;
-  protected maximumLinks: number;
-  protected linkType: string;
+  protected maximumLinks?: number;
+  protected linkType?: string;
 
   protected links$ = createEntityState<LinkModel>([], this.entityPipe('links'));
   protected x$ = createValueState(0, this.entityPipe('x'));
@@ -39,7 +40,7 @@ export class PortModel extends BaseModel<NodeModel> {
     this.setMagnetic(magnetic);
   }
 
-  serialize() {
+  serialize(): SerializedPortModel {
     return {
       ...super.serialize(),
       name: this.getName(),
@@ -137,11 +138,11 @@ export class PortModel extends BaseModel<NodeModel> {
     return this.width$.select();
   }
 
-  getMaximumLinks(): number {
+  getMaximumLinks(): number | undefined {
     return this.maximumLinks;
   }
 
-  setMaximumLinks(maximumLinks: number) {
+  setMaximumLinks(maximumLinks?: number) {
     this.maximumLinks = maximumLinks;
   }
 
@@ -153,9 +154,11 @@ export class PortModel extends BaseModel<NodeModel> {
     this.linkType = type;
   }
 
-  removeLink(linkOrId: ID | LinkModel) {
-    const linkId = isString(linkOrId) ? linkOrId : linkOrId.id;
-    this.links$.remove(linkId, false).emit();
+  removeLink(linkOrId?: ID | LinkModel | null) {
+    if (linkOrId) {
+      const linkId = isString(linkOrId) ? linkOrId : linkOrId?.id;
+      this.links$.remove(linkId, false).emit();
+    }
   }
 
   addLink(link: LinkModel) {
@@ -189,16 +192,22 @@ export class PortModel extends BaseModel<NodeModel> {
     this.y$.set(y).emit();
     this.width$.set(width).emit();
     this.height$.set(height).emit();
+    // TODO: add a cleaner way to get the engine without traveling through parents
+    const engine = this.getParent()?.getParent()?.getDiagramEngine();
+
+    if (!engine) {
+      this.log(`Couldn't find DiagramEngine when updating cords. skipping`);
+      return;
+    }
 
     this.getLinksArray().forEach((link) => {
-      const engine = this.getParent().getParent().getDiagramEngine();
       const relCoords = engine.getPortCenter(this);
       const point = link.getPointForPort(this);
-      point.setCoords(relCoords);
+      point && point.setCoords(relCoords);
     });
   }
 
-  canLinkToPort(port: PortModel): boolean {
+  canLinkToPort(port?: PortModel | null): boolean {
     return true;
   }
 
@@ -206,10 +215,11 @@ export class PortModel extends BaseModel<NodeModel> {
     return super.getLocked();
   }
 
-  createLinkModel() {
+  createLinkModel(): LinkModel | undefined {
     if (this.getCanCreateLinks()) {
       return new LinkModel();
     }
+    return undefined;
   }
 
   destroy() {

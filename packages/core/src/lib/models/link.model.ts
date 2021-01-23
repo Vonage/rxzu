@@ -10,8 +10,8 @@ import { PointModel } from './point.model';
 import { PortModel } from './port.model';
 
 export class LinkModel extends BaseModel<DiagramModel> {
-  protected name$ = createValueState<string>(
-    null,
+  protected name$ = createValueState<string | undefined>(
+    undefined,
     this.entityPipe('targetPort')
   );
   protected sourcePort$ = createValueState<PortModel | null>(
@@ -23,11 +23,11 @@ export class LinkModel extends BaseModel<DiagramModel> {
     this.entityPipe('targetPort')
   );
   protected extras$ = createValueState<any>({}, this.entityPipe('extras'));
-  protected label$ = createValueState<LabelModel>(
+  protected label$ = createValueState<LabelModel | null>(
     null,
     this.entityPipe('label')
   );
-  path$ = createValueState<string>(null, this.entityPipe('path'));
+  path$ = createValueState<string | null>(null, this.entityPipe('path'));
   points$ = createValueState<PointModel[]>(
     [
       new PointModel(this, { x: 0, y: 0 }),
@@ -48,8 +48,8 @@ export class LinkModel extends BaseModel<DiagramModel> {
     return {
       ...super.serialize(),
       name: this.getName(),
-      sourcePort: this.getSourcePort().id,
-      targetPort: this.getTargetPort().id,
+      sourcePort: this.getSourcePort()?.id,
+      targetPort: this.getTargetPort()?.id,
       extras: this.getExtras(),
       points: serializedPoints,
       label,
@@ -60,7 +60,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
     this.name$.set(name).emit();
   }
 
-  getName(): string {
+  getName(): string | undefined {
     return this.name$.value;
   }
 
@@ -80,18 +80,13 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
   destroy() {
     this.resetLabel();
-    if (this.sourcePort$.value) {
-      this.sourcePort$.value.removeLink(this);
-    }
-
-    if (this.targetPort$.value) {
-      this.targetPort$.value.removeLink(this);
-    }
+    this.sourcePort$.value?.removeLink(this);
+    this.targetPort$.value?.removeLink(this);
 
     super.destroy();
   }
 
-  doClone(lookupTable = {}, clone) {
+  doClone(lookupTable = {}, clone: this) {
     clone.setPoints(
       this.getPoints().map((point: PointModel) => {
         return point.clone(lookupTable);
@@ -114,16 +109,16 @@ export class LinkModel extends BaseModel<DiagramModel> {
     return this.points$.value.indexOf(point);
   }
 
-  getPointModel(id: ID): PointModel | null {
+  getPointModel(id?: ID | null): PointModel | undefined {
     for (const point of this.points$.value) {
       if (point.id === id) {
         return point;
       }
     }
-    return null;
+    return undefined;
   }
 
-  getPortForPoint(point: PointModel): PortModel {
+  getPortForPoint(point: PointModel): PortModel | null {
     if (
       this.sourcePort$.value !== null &&
       this.getFirstPoint().id === point.id
@@ -141,7 +136,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
     return null;
   }
 
-  getPointForPort(port: PortModel): PointModel {
+  getPointForPort(port: PortModel): PointModel | null {
     if (
       this.sourcePort$.value !== null &&
       this.sourcePort$.value.id === port.id
@@ -172,29 +167,25 @@ export class LinkModel extends BaseModel<DiagramModel> {
       port.addLink(this);
     }
 
-    if (this.getSourcePort() !== null) {
-      this.getSourcePort().removeLink(this);
-    }
+    this.getSourcePort()?.removeLink(this);
 
     this.sourcePort$.set(port).emit();
   }
 
-  getSourcePort(): PortModel {
+  getSourcePort(): PortModel | null {
     return this.sourcePort$.value;
   }
 
-  getTargetPort(): PortModel {
+  getTargetPort(): PortModel | null {
     return this.targetPort$.value;
   }
 
-  setTargetPort(port: PortModel) {
+  setTargetPort(port: PortModel | null) {
     if (port !== null) {
       port.addLink(this);
     }
 
-    if (this.getTargetPort() !== null) {
-      this.getTargetPort().removeLink(this);
-    }
+    this.getTargetPort()?.removeLink(this);
 
     this.targetPort$.set(port).emit();
   }
@@ -227,7 +218,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
     return this.label$.value$;
   }
 
-  getLabel(): LabelModel {
+  getLabel(): LabelModel | null {
     return this.label$.value;
   }
 

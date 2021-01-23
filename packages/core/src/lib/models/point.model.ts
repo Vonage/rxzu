@@ -21,19 +21,16 @@ export class PointModel extends BaseModel<LinkModel> {
     };
   }
 
-  isConnectedToPort() {
-    return this.getParent().getPortForPoint(this) !== null;
+  isConnectedToPort(): boolean {
+    return this.getParent()?.getPortForPoint(this) !== null;
   }
 
-  getLink(): LinkModel {
+  getLink(): LinkModel | null {
     return this.getParent();
   }
 
   destroy() {
-    if (this.getParent) {
-      this.getParent().removePoint(this);
-    }
-
+    this.getParent()?.removePoint(this);
     super.destroy();
   }
 

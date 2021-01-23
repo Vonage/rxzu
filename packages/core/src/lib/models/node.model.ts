@@ -9,12 +9,13 @@ import { EntityMap, HashMap } from '../utils/types';
 import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
 import { PortModel } from './port.model';
+import { PointModel } from './point.model';
 
-export class NodeModel<P extends PortModel = PortModel> extends BaseModel<
+export class NodeModel extends BaseModel<
   DiagramModel
 > {
   protected extras$ = createValueState<any>({}, this.entityPipe('extras'));
-  protected ports$ = createEntityState<P>([], this.entityPipe('ports'));
+  protected ports$ = createEntityState<PortModel>([], this.entityPipe('ports'));
   protected coords$ = createValueState<Coords>(
     { x: 0, y: 0 },
     this.entityPipe('coords')
@@ -47,11 +48,13 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<
           .pipe(takeUntil(this.destroyed$))
           .subscribe((ports) => {
             ports.forEach((port) => {
-              if (port.getPainted().isPainted) {
-                const diagramEngine = this.getParent().getDiagramEngine();
-                const portSize = diagramEngine.getPortCoords(port);
-                const portCenter = diagramEngine.getPortCenter(port);
-                port.updateCoords({ ...portSize, ...portCenter });
+              if (port.getPainted().isPainted && this.getParent()) {
+                const diagramEngine = this.getParent()?.getDiagramEngine();
+                if (diagramEngine) {
+                  const portSize = diagramEngine.getPortCoords(port);
+                  const portCenter = diagramEngine.getPortCenter(port);
+                  port.updateCoords({ ...portSize, ...portCenter });
+                }
               }
             });
           });
@@ -68,6 +71,7 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<
     this.getPorts().forEach((port) => {
       port.getLinks().forEach((link) => {
         const point = link.getPointForPort(port);
+        if (!point) return;
         const { x: pointX, y: pointY } = point.getCoords();
         point.setCoords({ x: pointX + x - oldX, y: pointY + y - oldY });
       });
@@ -77,13 +81,14 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<
   }
 
   serialize(): SerializedNodeModel {
-    const serializedPorts = this.getPortsArray().map((port: P) =>
+    const serializedPorts = this.getPortsArray().map(port =>
       port.serialize()
     );
 
     return {
       ...super.serialize(),
       nodeType: this.getType(),
+      type: this.getType(),
       extras: this.getExtras(),
       width: this.getWidth(),
       height: this.getHeight(),
@@ -92,15 +97,16 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<
     };
   }
 
-  getSelectedEntities() {
-    let entities = super.getSelectedEntities();
+  getSelectedEntities(): (NodeModel | PointModel)[] {
+    let entities: (NodeModel | PointModel)[] = super.getSelectedEntities() as NodeModel[];
 
+    const isPoint = (point: PointModel | null): point is PointModel => !!point;
     // add the points of each link that are selected here
     if (this.getSelected()) {
       this.getPorts().forEach((port) => {
         const points = port
           .getLinksArray()
-          .map((link) => link.getPointForPort(port));
+          .map((link) => link.getPointForPort(port)).filter(isPoint);
         entities = entities.concat(points);
       });
     }
@@ -129,33 +135,33 @@ export class NodeModel<P extends PortModel = PortModel> extends BaseModel<
    * Assign a port to the node and set the node as its getParent
    * @returns the inserted port
    */
-  addPort(port: P): P {
+  addPort(port: PortModel): PortModel {
     port.setParent(this);
     this.ports$.add(port).emit();
     return port;
   }
 
-  removePort(portOrId: ID | P): string {
+  removePort(portOrId: ID | PortModel): string {
     const portId = typeof portOrId === 'string' ? portOrId : portOrId.id;
     this.ports$.remove(portId).emit();
     return portId;
   }
 
-  getPort(id: ID): P {
-    return this.ports$.get(id);
+  getPort(id?: ID | null): PortModel | undefined {
+    return id && this.ports$.get(id) || undefined;
   }
 
-  selectPorts(selector?: () => boolean | ID | ID[]): Observable<P[]> {
+  selectPorts(selector?: () => boolean | ID | ID[]): Observable<PortModel[]> {
     // TODO: implement selector
     // TODO: create coerce func
     return this.ports$.array$().pipe(this.withLog('selectPorts'));
   }
 
-  getPorts(): EntityMap<P> {
+  getPorts(): EntityMap<PortModel> {
     return this.ports$.value;
   }
 
-  getPortsArray(): P[] {
+  getPortsArray(): PortModel[] {
     return this.ports$.array();
   }
 

@@ -14,8 +14,7 @@ import {
   NodeModel,
   PointModel,
   PortModel,
-  BaseModel,
-  LinkModel,
+  BaseModel
 } from '../models';
 import { isNil } from '../utils';
 
@@ -26,19 +25,19 @@ export class MouseManager {
     this.engine = _diagramEngine;
   }
 
-  getElement(event: MouseEvent): { model: BaseModel; element: Element } {
+  getElement(event: MouseEvent): { model: BaseModel | undefined; element: Element } | null {
     const target = event.target as Element;
 
     // is it a port?
     let element = target.closest('[data-portid]');
-    if (element) {
+    const nodeEl = target.closest('[data-nodeid]');
+    if (element && nodeEl) {
       // get the relevant node and return the port.
-      const nodeEl = target.closest('[data-nodeid]');
       return {
         model: this.engine
           .getDiagramModel()
-          .getNode(nodeEl.getAttribute('data-nodeid'))
-          .getPort(element.getAttribute('data-portid')),
+          ?.getNode(nodeEl.getAttribute('data-nodeid'))
+          ?.getPort(element.getAttribute('data-portid')) as BaseModel | undefined,
         element,
       };
     }
@@ -49,8 +48,8 @@ export class MouseManager {
       return {
         model: this.engine
           .getDiagramModel()
-          .getLink(element.getAttribute('data-linkid'))
-          .getPointModel(element.getAttribute('data-pointid')),
+          ?.getLink(element.getAttribute('data-linkid'))
+          ?.getPointModel(element.getAttribute('data-pointid')) as BaseModel | undefined,
         element,
       };
     }
@@ -61,7 +60,7 @@ export class MouseManager {
       return {
         model: this.engine
           .getDiagramModel()
-          .getLink(element.getAttribute('data-linkid')),
+          ?.getLink(element.getAttribute('data-linkid')) as BaseModel | undefined,
         element,
       };
     }
@@ -72,7 +71,7 @@ export class MouseManager {
       return {
         model: this.engine
           .getDiagramModel()
-          .getNode(element.getAttribute('data-nodeid')),
+          ?.getNode(element.getAttribute('data-nodeid')) as BaseModel | undefined,
         element,
       };
     }
@@ -313,11 +312,11 @@ export class MouseManager {
       this.engine.getDiagramModel().clearSelection();
     } else {
       // its some other element, probably want to move it
-      if (!event.shiftKey && !selectedModel.model.getSelected()) {
+      if (!event.shiftKey && !selectedModel.model?.getSelected()) {
         this.engine.getDiagramModel().clearSelection();
       }
 
-      selectedModel.model.setSelected();
+      selectedModel.model?.setSelected();
 
       this.engine.startFiringAction(
         new MoveItemsAction(event.clientX, event.clientY, this.engine)
@@ -340,28 +339,29 @@ export class MouseManager {
           return;
         }
 
-        let el: BaseModel;
+        let el: BaseModel | null = null;
         if (model.magnet) {
-          el = model.magnet;
+          el = model.magnet as BaseModel;
         } else if (element && element.model) {
           el = element.model;
         }
 
         if (el instanceof PortModel && !this.engine.isModelLocked(el)) {
           const link = model.model.getLink();
-          if (link.getTargetPort() !== null) {
+          if (!isNil(link?.getTargetPort())) {
             // if this was a valid link already and we are adding a node in the middle, create 2 links from the original
-            if (link.getTargetPort() !== el && link.getSourcePort() !== el) {
-              const targetPort = link.getTargetPort();
-              const newLink = link.clone({});
-              newLink.setSourcePort(el);
-              newLink.setTargetPort(targetPort);
-              link.setTargetPort(el);
-              targetPort.removeLink(link);
-              newLink.removePointsBefore(
-                newLink.getPoints()[link.getPointIndex(model.model)]
+            if (link?.getTargetPort() !== el && link?.getSourcePort() !== el) {
+              const targetPort = link?.getTargetPort();
+              const newLink = link?.clone({});
+              newLink?.setSourcePort(el);
+              newLink?.setTargetPort(targetPort);
+              link?.setTargetPort(el);
+              targetPort?.removeLink(link);
+              const idx = link?.getPointIndex(model.model);
+              !isNil(idx) && newLink?.removePointsBefore(
+                newLink?.getPoints()[idx]
               );
-              link.removePointsAfter(model.model);
+              link?.removePointsAfter(model.model);
               this.engine.getDiagramModel().addLink(newLink);
               // if we are connecting to the same target or source, destroy tweener points
             } else if (link.getTargetPort() === el) {
@@ -370,13 +370,13 @@ export class MouseManager {
               link.removePointsBefore(model.model);
             }
           } else {
-            link.setTargetPort(el);
-            const targetPort = link.getTargetPort();
-            const srcPort = link.getSourcePort();
+            link?.setTargetPort(el);
+            const targetPort = link?.getTargetPort();
+            const srcPort = link?.getSourcePort();
 
             if (
-              targetPort.id !== srcPort.id &&
-              srcPort.canLinkToPort(targetPort)
+              targetPort?.id !== srcPort?.id &&
+              srcPort?.canLinkToPort(targetPort)
             ) {
               // link is valid, fire the event
               this.engine.startFiringAction(
@@ -399,8 +399,8 @@ export class MouseManager {
           }
 
           const selectedPoint: PointModel = model.model;
-          const link: LinkModel = selectedPoint.getLink();
-          if (link.getSourcePort() === null || link.getTargetPort() === null) {
+          const link = selectedPoint.getLink();
+          if (link?.getSourcePort() === null || link?.getTargetPort() === null) {
             link.destroy();
             this.engine.startFiringAction(
               new LooseLinkDestroyed(event.clientX, event.clientY, link)
@@ -416,14 +416,14 @@ export class MouseManager {
           return;
         }
 
-        const link: LinkModel = model.model.getLink();
-        const sourcePort: PortModel = link.getSourcePort();
-        const targetPort: PortModel = link.getTargetPort();
+        const link = model.model.getLink();
+        const sourcePort = link?.getSourcePort();
+        const targetPort = link?.getTargetPort();
 
-        if (sourcePort !== null && targetPort !== null) {
+        if (link && sourcePort && targetPort) {
           if (!sourcePort.canLinkToPort(targetPort)) {
             // link not allowed
-            link.destroy();
+            link?.destroy();
             this.engine.startFiringAction(
               new InvalidLinkDestroyed(event.clientX, event.clientY, link)
             );

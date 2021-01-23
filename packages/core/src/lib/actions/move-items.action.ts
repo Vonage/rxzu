@@ -4,6 +4,7 @@ import { NodeModel } from '../models/node.model';
 import { LinkModel } from '../models/link.model';
 import { DiagramEngineCore } from '../engine.core';
 import { SelectionModel } from '../interfaces/move-selection.interface';
+import { BaseModel, PortModel } from '../models';
 
 export class MoveItemsAction extends BaseAction {
   selectionModels: SelectionModel[];
@@ -12,17 +13,16 @@ export class MoveItemsAction extends BaseAction {
   constructor(mouseX: number, mouseY: number, diagramEngine: DiagramEngineCore) {
     super(mouseX, mouseY);
     this.moved = false;
-    let selectedItems = diagramEngine.getDiagramModel().getSelectedItems();
+    const isNotLockedAndLink = (item: any): item is NodeModel | PointModel | PortModel => !diagramEngine.isModelLocked(item) && !(item instanceof LinkModel);
+
+    const selectedItems = diagramEngine.getDiagramModel().getSelectedItems().filter(isNotLockedAndLink);
 
     // dont allow items which are locked to move and links which generate their position based on points.
-    selectedItems = selectedItems.filter((item) => {
-      return !diagramEngine.isModelLocked(item) && !(item instanceof LinkModel);
-    });
 
-    this.selectionModels = selectedItems.map((item: PointModel | NodeModel) => {
+    this.selectionModels = selectedItems.map(item => {
       const { x: initialX, y: initialY } = item.getCoords();
       return {
-        model: item,
+        model: item as BaseModel,
         initialX,
         initialY
       };

@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, MonoTypeOperatorFunction } from 'rxjs';
+import { Observable, MonoTypeOperatorFunction } from 'rxjs';
 import { BaseEntity } from '../base.entity';
 import { EntityMap, ID } from '../utils';
 import { ValueState } from './value.state';
@@ -6,12 +6,9 @@ import { ValueState } from './value.state';
 export class EntityState<T extends BaseEntity> extends ValueState<
   EntityMap<T>
 > {
-  protected stream$: BehaviorSubject<EntityMap<T>>;
-
-  value$: Observable<EntityMap<T>>;
 
   constructor(
-    value?: EntityMap<T>,
+    value: EntityMap<T>,
     entityPipe?: MonoTypeOperatorFunction<EntityMap<T>>
   ) {
     super(value, entityPipe);
@@ -19,8 +16,6 @@ export class EntityState<T extends BaseEntity> extends ValueState<
 
   destroy() {
     this.clear();
-    this.stream$ = null;
-    this.value$ = null;
   }
 
   clear(destroy = true) {
@@ -32,7 +27,7 @@ export class EntityState<T extends BaseEntity> extends ValueState<
     return this;
   }
 
-  get(id: ID): T {
+  get(id: ID): T | undefined {
     return this.value.get(id);
   }
 
