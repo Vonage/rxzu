@@ -4,7 +4,7 @@ import { NodeModel } from '../models/node.model';
 import { LinkModel } from '../models';
 
 export class LooseLinkDestroyed extends BaseAction {
-  sourcePort: PortModel;
+  sourcePort: PortModel | null;
   link: LinkModel;
 
   constructor(mouseX: number, mouseY: number, link: LinkModel) {
@@ -13,7 +13,7 @@ export class LooseLinkDestroyed extends BaseAction {
     this.link = link;
   }
 
-  getOutPortNode(): NodeModel {
-    return this.sourcePort.getParent();
+  getOutPortNode(): NodeModel | null {
+    return this.sourcePort?.getParent() ?? null;
   }
 }

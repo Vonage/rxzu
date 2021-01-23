@@ -94,7 +94,7 @@ export function isFunction(val: any): val is (...args: any) => any {
 }
 
 // @internal
-export function isNil(v: any) {
+export function isNil(v: any): v is null | undefined {
   return v === null || v === undefined;
 }
 
@@ -121,7 +121,7 @@ export function mapToArray<T>(map: HashMap<T>): T[] {
 }
 
 export function mapToEntries<T>(map: HashMap<T>): Entries<T> {
-  const result = [];
+  const result: Entries<T> = [];
   for (const key in map) {
     result.push([key, map[key]]);
   }
@@ -131,17 +131,6 @@ export function mapToEntries<T>(map: HashMap<T>): Entries<T> {
 
 export function unique<T>(arr: T[]): T[] {
   return [...new Set<T>(arr)];
-}
-
-export function arrayToMap<T>(arr: Array<{ id: ID } & T>): HashMap<T> {
-  const result = {};
-  for (const val of arr) {
-    if (!isNil(val)) {
-      result[val.id] = val;
-    }
-  }
-
-  return result;
 }
 
 export function generateLinePath(firstPoint: any, lastPoint: any): string {

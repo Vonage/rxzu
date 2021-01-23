@@ -13,7 +13,7 @@ export interface DagreEngineOptions {
 
 @Injectable()
 export class DagrePlugin {
-  g: graphlib.Graph;
+  g!: graphlib.Graph;
 
   instantiate() {
     try {
@@ -48,9 +48,11 @@ export class DagrePlugin {
       // set edges
       if (link.getSourcePort() && link.getTargetPort()) {
         processedlinks[link.id] = true;
-        this.g.setEdge({
-          v: link.getSourcePort().getNode().id,
-          w: link.getTargetPort().getNode().id,
+        const v = link.getSourcePort()?.getNode()?.id;
+        const w = link.getTargetPort()?.getNode()?.id;
+        v && w && this.g.setEdge({
+          v,
+          w,
           name: link.id,
         });
       }
@@ -61,7 +63,7 @@ export class DagrePlugin {
 
     this.g.nodes().forEach((v) => {
       const { x, y } = this.g.node(v);
-      model.getNode(v).setCoords({ x, y });
+      model.getNode(v)?.setCoords({ x, y });
     });
 
     // also include links?
@@ -70,13 +72,15 @@ export class DagrePlugin {
         const edge = this.g.edge(e);
         const link = model.getLink(e.name);
 
-        const points = [link.getFirstPoint()];
-        for (let i = 1; i < edge.points.length - 2; i++) {
-          points.push(
-            new PointModel(link, { x: edge.points[i].x, y: edge.points[i].y })
-          );
+        if (link) {
+          const points = [link?.getFirstPoint()];
+          for (let i = 1; i < edge.points.length - 2; i++) {
+            points.push(
+              new PointModel(link, { x: edge.points[i].x, y: edge.points[i].y })
+            );
+          }
+          link?.setPoints(points.concat(link?.getLastPoint()));
         }
-        link.setPoints(points.concat(link.getLastPoint()));
       });
     }
   }

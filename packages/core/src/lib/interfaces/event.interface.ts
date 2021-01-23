@@ -25,9 +25,9 @@ export class LockEvent<T extends BaseEntity = BaseEntity> extends BaseEvent<T> {
 export class ParentChangeEvent<P extends BaseEntity = BaseEntity, T extends BaseEntity = BaseEntity> extends BaseEvent<
   T
 > {
-  parent: P;
+  parent: P | null;
 
-  constructor(entity: T, parent: P) {
+  constructor(entity: T, parent: P | null) {
     super(entity);
     this.parent = parent;
   }

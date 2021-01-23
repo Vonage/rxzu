@@ -21,12 +21,12 @@ export class DefaultPortModel extends PortModel {
     isInput = true,
     name = 'port',
     type = 'default',
-    id = null,
-    label = null,
+    id = undefined,
+    label = undefined,
     linkType = 'default',
-    maximumLinks = null
+    maximumLinks = undefined
   }: DefaultPortModelConfig = {}) {
-    super(name, type, id, null, linkType);
+    super(name, type, id, undefined, linkType);
     this.in = isInput;
     this.label = label || name;
 
@@ -38,7 +38,7 @@ export class DefaultPortModel extends PortModel {
     }
   }
 
-  link(port: PortModel): LinkModel {
+  link(port: PortModel): LinkModel | null {
     if (super.getCanCreateLinks()) {
       const link = new DefaultLinkModel({ type: this.getLinkType() });
       link.setSourcePort(this);
@@ -53,6 +53,7 @@ export class DefaultPortModel extends PortModel {
     if (super.getCanCreateLinks()) {
       return new DefaultLinkModel({ type: this.getLinkType() });
     }
+    return undefined;
   }
 
   canLinkToPort(port: PortModel): boolean {

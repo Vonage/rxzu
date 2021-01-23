@@ -11,6 +11,7 @@ import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { NodeModel } from './node.model';
 import { PortModel } from './port.model';
+import { PointModel } from './point.model';
 
 export class DiagramModel extends BaseEntity {
   protected nodes$ = createEntityState<NodeModel>([], this.entityPipe('nodes'));
@@ -18,11 +19,11 @@ export class DiagramModel extends BaseEntity {
   protected offsetX$ = createValueState<number>(0, this.entityPipe('offsetX'));
   protected offsetY$ = createValueState<number>(0, this.entityPipe('offsetY'));
   protected zoom$ = createValueState<number>(100, this.entityPipe('zoom'));
-  protected maxZoomOut$ = createValueState<number>(
+  protected maxZoomOut$ = createValueState<number | null>(
     null,
     this.entityPipe('maxZoomOut')
   );
-  protected maxZoomIn$ = createValueState<number>(
+  protected maxZoomIn$ = createValueState<number | null>(
     null,
     this.entityPipe('maxZoomIn')
   );
@@ -67,12 +68,12 @@ export class DiagramModel extends BaseEntity {
     return this.nodes$.array();
   }
 
-  getNode(id: ID): NodeModel | undefined {
-    return this.nodes$.get(id);
+  getNode(id?: ID | null): NodeModel | undefined {
+    return id && this.nodes$.get(id) || undefined;
   }
 
-  getLink(id: ID): LinkModel | undefined {
-    return this.links$.get(id);
+  getLink(id?: ID | null): LinkModel | undefined {
+    return id && this.links$.get(id) || undefined;
   }
 
   getLinks(): EntityMap<LinkModel> {
@@ -111,6 +112,7 @@ export class DiagramModel extends BaseEntity {
   deleteNode(nodeOrId: NodeModel | string): void {
     const nodeId: ID = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
     const node = this.getNode(nodeId);
+    if (!node) return;
 
     for (const port of node.getPorts().values()) {
       for (const link of port.getLinks().values()) {
@@ -326,26 +328,26 @@ export class DiagramModel extends BaseEntity {
     };
   }
 
-  getSelectedItems(...filters: BaseEntityType[]): BaseModel[] {
+  getSelectedItems(...filters: BaseEntityType[]): (NodeModel | PointModel | PortModel | LinkModel)[] {
     filters = coerceArray(filters);
 
-    const items: BaseModel[] = [];
+    const items: (NodeModel | PointModel | PortModel | LinkModel)[] = [];
     const nodes = this.nodes$.array();
     const links = this.links$.array();
 
-    const selectedNodes = () =>
+    const selectedNodes = (): (NodeModel | PointModel)[] =>
       nodes.flatMap((node) => node.getSelectedEntities());
-    const selectedPorts = () =>
+    const selectedPorts = (): PortModel[] =>
       nodes.flatMap((node) =>
         node
           .getPortsArray()
-          .flatMap((port: PortModel) => port.getSelectedEntities())
+          .flatMap((port: PortModel) => port.getSelectedEntities() as PortModel[])
       );
-    const selectedLinks = () =>
-      links.flatMap((link) => link.getSelectedEntities());
-    const selectedPoints = () =>
+    const selectedLinks = (): LinkModel[] =>
+      links.flatMap((link) => link.getSelectedEntities() as LinkModel[]);
+    const selectedPoints = (): PointModel[] =>
       links.flatMap((link) =>
-        link.getPoints().flatMap((point) => point.getSelectedEntities())
+        link.getPoints().flatMap((point) => point.getSelectedEntities() as PointModel[])
       );
 
     if (isEmptyArray(filters)) {
@@ -356,7 +358,7 @@ export class DiagramModel extends BaseEntity {
         ...selectedPoints()
       );
     } else {
-      const byType: Record<BaseEntityType, () => BaseModel[]> = {
+      const byType: Record<BaseEntityType, () => (NodeModel | PointModel | PortModel | LinkModel)[]> = {
         node: selectedNodes,
         port: selectedPorts,
         link: selectedLinks,

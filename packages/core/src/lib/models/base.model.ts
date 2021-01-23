@@ -6,11 +6,12 @@ import {
   SelectionEvent,
 } from '../interfaces/event.interface';
 import { createValueState } from '../state';
+import { SerializedBaseModel } from '../interfaces';
 
 export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
-  protected readonly _type: string;
+  protected readonly _type?: string;
 
-  protected parent$ = createValueState<E>(
+  protected parent$ = createValueState<E | null>(
     null,
     this.entityPipe('ParentsChange')
   );
@@ -32,18 +33,18 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
     this._type = type;
   }
 
-  serialize() {
+  serialize(): SerializedBaseModel {
     return {
       ...super.serialize(),
       type: this.getType(),
     };
   }
 
-  getParent(): E {
+  getParent(): E | null {
     return this.parent$.value;
   }
 
-  setParent(parent: E): void {
+  setParent(parent: E | null): void {
     this.parent$.set(parent).emit();
   }
 
@@ -75,7 +76,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
     return this.hovered$.select();
   }
 
-  getType(): string {
+  getType(): string | undefined {
     return this._type;
   }
 
@@ -97,7 +98,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
     );
   }
 
-  getSelectedEntities(): BaseModel[] {
+  getSelectedEntities(): BaseModel<any>[] {
     return this.getSelected() ? [this] : [];
   }
 }

@@ -11,6 +11,7 @@ import {
   withLog as _withLog
 } from './utils/tool-kit.util';
 import { HashMap } from './utils/types';
+import { SerializedBaseModel } from './interfaces';
 
 export type BaseEntityType = 'node' | 'link' | 'port' | 'point';
 
@@ -56,7 +57,7 @@ export class BaseEntity {
   }
 
   // eslint-disable-next-line
-  doClone(lookupTable: HashMap<any> = {}, clone: any) {
+  doClone(lookupTable: HashMap<any> = {}, clone: this) {
     /*noop*/
   }
 
@@ -74,7 +75,7 @@ export class BaseEntity {
     return clone;
   }
 
-  serialize() {
+  serialize(): SerializedBaseModel {
     return {
       id: this.id,
       locked: this.getLocked()
