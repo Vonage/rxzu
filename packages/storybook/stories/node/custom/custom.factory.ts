@@ -1,20 +1,32 @@
-import { ComponentFactoryResolver, ViewContainerRef, ComponentRef, ComponentFactory, Renderer2 } from '@angular/core';
+import {
+  ComponentFactoryResolver,
+  ViewContainerRef,
+  ComponentFactory,
+  Renderer2,
+} from '@angular/core';
 import { AbstractAngularFactory } from '@rxzu/angular';
-import { DefaultNodeModel } from '@rxzu/core';
+import { DefaultNodeModel, DiagramModel } from '@rxzu/core';
 import { CustomNodeComponent } from './custom.component';
 
-export class CustomNodeFactory extends AbstractAngularFactory<DefaultNodeModel> {
-  constructor(private resolver: ComponentFactoryResolver, private renderer: Renderer2) {
+export class CustomNodeFactory extends AbstractAngularFactory<
+  DefaultNodeModel
+> {
+  constructor(
+    private resolver: ComponentFactoryResolver,
+    private renderer: Renderer2
+  ) {
     super('custom-node');
   }
 
   generateWidget({
     model,
-    host
+    host,
+    diagramModel,
   }: {
     model: DefaultNodeModel;
     host: ViewContainerRef;
-  }): ComponentRef<CustomNodeComponent> {
+    diagramModel?: DiagramModel;
+  }): ViewContainerRef {
     const componentRef = host.createComponent(this.getRecipe());
 
     // attach coordinates and default positional behaviour to the generated component host
@@ -34,7 +46,9 @@ export class CustomNodeFactory extends AbstractAngularFactory<DefaultNodeModel> 
     });
 
     model.selectionChanges().subscribe((e) => {
-      e.isSelected ? this.renderer.addClass(rootNode, 'selected') : this.renderer.removeClass(rootNode, 'selected');
+      e.isSelected
+        ? this.renderer.addClass(rootNode, 'selected')
+        : this.renderer.removeClass(rootNode, 'selected');
     });
 
     model.onEntityDestroy().subscribe(() => {
@@ -46,8 +60,10 @@ export class CustomNodeFactory extends AbstractAngularFactory<DefaultNodeModel> 
       componentRef.instance[key] = value;
     });
 
+    componentRef.instance.setParent(diagramModel);
     componentRef.instance.ngOnInit();
-    return componentRef;
+    const portsHost = componentRef.instance.getPortsHost();
+    return portsHost;
   }
 
   getRecipe(): ComponentFactory<CustomNodeComponent> {
