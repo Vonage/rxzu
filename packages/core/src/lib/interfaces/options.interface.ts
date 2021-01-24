@@ -18,15 +18,18 @@ import { Dimensions } from './dimensions.interface';
 
 // export type SerializedModel = Record<string, Serializable>;
 
-export interface BaseModelOptions {
+export interface BaseEntityOptions {
   type: string;
   locked?: boolean;
   id?: string;
-  parent?: any;
   logPrefix?: string;
 }
 
-export interface DiagramModelOptions extends BaseModelOptions {
+export interface BaseModelOptions<E> extends BaseEntityOptions {
+  parent?: E;
+}
+
+export interface DiagramModelOptions extends BaseEntityOptions {
   offsetX?: number;
   offsetY?: number;
   zoom?: number;
@@ -40,16 +43,14 @@ export interface DiagramModelOptions extends BaseModelOptions {
   portMagneticRadius?: number;
 }
 
-export interface NodeModelOptions extends BaseModelOptions {
-  parent?: DiagramModel;
+export interface NodeModelOptions extends BaseModelOptions<DiagramModel> {
   coords?: Coords;
   dimensions?: Dimensions;
   ports?: PortModelOptions[];
   extras?: any;
 }
 
-export interface LinkModelOptions extends BaseModelOptions {
-  parent?: DiagramModel;
+export interface LinkModelOptions extends BaseModelOptions<DiagramModel> {
   points?: PointModelOptions[];
   name?: string;
   sourcePort?: PortModel;
@@ -58,8 +59,7 @@ export interface LinkModelOptions extends BaseModelOptions {
   label?: LabelModel;
 }
 
-export interface PortModelOptions extends BaseModelOptions {
-  parent?: NodeModel;
+export interface PortModelOptions extends BaseModelOptions<NodeModel> {
   coords?: Coords;
   name?: string;
   linkType?: string;
@@ -69,13 +69,11 @@ export interface PortModelOptions extends BaseModelOptions {
   canCreateLinks?: boolean;
 }
 
-export interface PointModelOptions extends BaseModelOptions {
-  parent?: LinkModel;
+export interface PointModelOptions extends BaseModelOptions<LinkModel> {
   coords?: Coords;
 }
 
-export interface LabelModelOptions extends BaseModelOptions {
-  parent?: LinkModel;
+export interface LabelModelOptions extends BaseModelOptions<LinkModel> {
   rotation?: number;
   coords?: Coords;
   text?: string;

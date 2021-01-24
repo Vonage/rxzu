@@ -16,7 +16,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   protected hovered$: ValueState<boolean>;
   protected painted$: ValueState<PaintedEvent>;
 
-  constructor(options: BaseModelOptions) {
+  constructor(options: BaseModelOptions<any>) {
     super({ id: options.id, logPrefix: options.logPrefix });
     this._type = options.type;
 

@@ -1,12 +1,11 @@
 import { filter, map, switchMap, take, takeUntil } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import { BaseEntity } from './base.entity';
-import { AbstractFactory, FactoriesManager } from './factories';
+import { FactoriesManager } from './factories';
 import {
   DiagramModel,
   PortModel,
   NodeModel,
-  BaseModel,
   LabelModel,
 } from './models';
 import { createValueState, ValueState } from './state';
@@ -21,9 +20,7 @@ export class DiagramEngineCore {
     state: BaseActionState | null;
   }>({ action: null, state: null });
 
-  protected factoriesManager: FactoriesManager<
-    AbstractFactory<BaseModel<BaseEntity>, unknown, unknown>
-  >;
+  protected factoriesManager: FactoriesManager;
   protected mouseManager: MouseManager;
   protected diagramModel: DiagramModel | undefined;
 
@@ -343,7 +340,7 @@ export class DiagramEngineCore {
             }
 
             const portsHost = nodeFactory.generateWidget({
-              model: node as any,
+              model: node,
               host: nodesHost,
               diagramModel: this.diagramModel,
             });
@@ -371,7 +368,7 @@ export class DiagramEngineCore {
                     }
 
                     portFactory.generateWidget({
-                      model: port as any,
+                      model: port,
                       host: portsHost,
                     });
                   }
@@ -442,7 +439,7 @@ export class DiagramEngineCore {
               return;
             }
 
-            linkFactory.generateWidget({ model: link as any, host: linksHost });
+            linkFactory.generateWidget({ model: link, host: linksHost });
 
             // (canvas: HTMLElement | null | undefined): canvas is HTMLElement =>
             // Handle link label, if any
@@ -474,7 +471,7 @@ export class DiagramEngineCore {
         return;
       }
 
-      labalFactory.generateWidget({ model: label as any, host });
+      labalFactory.generateWidget({ model: label, host });
     }
   }
 

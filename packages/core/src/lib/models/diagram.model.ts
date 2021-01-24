@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { BaseEntityType } from '../base.entity';
+import { BaseEntity, BaseEntityType } from '../base.entity';
 import { DiagramEngineCore } from '../engine.core';
 import { SelectOptions, Coords } from '../interfaces';
 import {
@@ -16,7 +16,7 @@ import { PortModel } from './port.model';
 import { PointModel } from './point.model';
 import { DiagramModelOptions } from '../interfaces/options.interface';
 
-export class DiagramModel extends BaseModel {
+export class DiagramModel extends BaseEntity {
   protected nodes$: EntityState<NodeModel>;
   protected links$: EntityState<LinkModel>;
   protected offsetX$: ValueState<number>;
@@ -35,7 +35,7 @@ export class DiagramModel extends BaseModel {
     protected diagramEngine: DiagramEngineCore,
     options: DiagramModelOptions
   ) {
-    super({ logPrefix: '[Diagram]', type: 'default' });
+    super({ logPrefix: '[Diagram]' });
 
     this.nodes$ = createEntityState([], this.entityPipe('nodes'));
     this.links$ = createEntityState([], this.entityPipe('links'));

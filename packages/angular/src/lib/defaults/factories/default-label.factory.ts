@@ -9,9 +9,7 @@ import { LabelModel } from '@rxzu/core';
 import { DefaultLabelComponent } from '../components/default-label/default-label.component';
 import { AbstractAngularFactory } from './angular.factory';
 
-export class DefaultLabelFactory extends AbstractAngularFactory<
-  DefaultLabelComponent
-> {
+export class DefaultLabelFactory extends AbstractAngularFactory {
   constructor(
     protected resolver: ComponentFactoryResolver,
     protected renderer: Renderer2

@@ -9,9 +9,7 @@ import { PortModel } from '@rxzu/core';
 import { DefaultPortComponent } from '../components/default-port/default-port.component';
 import { AbstractAngularFactory } from './angular.factory';
 
-export class DefaultPortFactory extends AbstractAngularFactory<
-  DefaultPortComponent
-> {
+export class DefaultPortFactory extends AbstractAngularFactory {
   constructor(
     protected resolver: ComponentFactoryResolver,
     protected renderer: Renderer2

@@ -9,9 +9,7 @@ import {
 import { LinkModel } from '@rxzu/core';
 import { AbstractAngularFactory } from './angular.factory';
 
-export class DefaultLinkFactory extends AbstractAngularFactory<
-  DefaultLinkComponent
-> {
+export class DefaultLinkFactory extends AbstractAngularFactory {
   constructor(
     protected resolver: ComponentFactoryResolver,
     protected renderer: Renderer2
