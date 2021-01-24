@@ -5,7 +5,7 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { DefaultNodeModel } from '@rxzu/core';
+import { NodeModel } from '@rxzu/core';
 
 @Component({
   selector: 'ngdx-default-node',
@@ -13,9 +13,9 @@ import { DefaultNodeModel } from '@rxzu/core';
   styleUrls: ['./default-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DefaultNodeComponent extends DefaultNodeModel implements OnInit {
+export class DefaultNodeComponent extends NodeModel implements OnInit {
   @ViewChild('portsLayer', { read: ViewContainerRef, static: true })
-  portsLayer: ViewContainerRef;
+  portsLayer!: ViewContainerRef;
 
   constructor() {
     super({ type: 'ngdx-default-node' });

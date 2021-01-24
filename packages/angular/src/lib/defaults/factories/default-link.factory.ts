@@ -6,7 +6,7 @@ import {
   ComponentFactory,
   Renderer2,
 } from '@angular/core';
-import { DefaultLinkModel } from '@rxzu/core';
+import { LinkModel } from '@rxzu/core';
 import { AbstractAngularFactory } from './angular.factory';
 
 export class DefaultLinkFactory extends AbstractAngularFactory<
@@ -23,7 +23,7 @@ export class DefaultLinkFactory extends AbstractAngularFactory<
     model,
     host,
   }: {
-    model: DefaultLinkModel;
+    model: LinkModel;
     host: ViewContainerRef;
   }): ComponentRef<DefaultLinkComponent> {
     const componentRef = host.createComponent(this.getRecipe());
@@ -41,11 +41,6 @@ export class DefaultLinkFactory extends AbstractAngularFactory<
     // on destroy make sure to destroy the componentRef
     model.onEntityDestroy().subscribe(() => {
       componentRef.destroy();
-    });
-
-    // assign all passed properties to link initialization.
-    Object.entries(model).forEach(([key, value]) => {
-      componentRef.instance[key] = value;
     });
 
     componentRef.instance.ngOnInit();

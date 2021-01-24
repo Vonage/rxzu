@@ -1,9 +1,8 @@
 <div
   class="default-node"
   [ngStyle]="{
-    'height.px': height$ | async,
-    'width.px': width$ | async,
-    'background-color': color
+    'height.px': this.selectHeight() | async,
+    'width.px': this.selectWidth() | async
   }"
 >
   <div class="ports">

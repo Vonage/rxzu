@@ -11,14 +11,15 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { combineLatest, Observable, ReplaySubject } from 'rxjs';
-import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { combineLatest, noop, Observable, of, ReplaySubject } from 'rxjs';
+import { filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import {
   DiagramEngineCore,
-  DiagramModel,
   SelectingAction,
   MouseManager,
   isNil,
+  DiagramModel,
+  BaseAction,
 } from '@rxzu/core';
 import { ZonedClass, OutsideZone } from '../utils';
 
@@ -30,28 +31,28 @@ import { ZonedClass, OutsideZone } from '../utils';
 })
 export class RxZuDiagramComponent
   implements AfterViewInit, OnDestroy, ZonedClass {
-  @Input('model') diagramModel: DiagramModel;
+  @Input('model') diagramModel: DiagramModel | null = null;
   @Input() allowCanvasZoom = true;
   @Input() allowCanvasTranslation = true;
   @Input() inverseZoom = true;
   @Input() allowLooseLinks = true;
-  @Input() maxZoomOut: number = null;
-  @Input() maxZoomIn: number = null;
+  @Input() maxZoomOut = 0;
+  @Input() maxZoomIn = 0;
   @Input() portMagneticRadius = 30;
 
   @ViewChild('nodesLayer', { read: ViewContainerRef })
-  nodesLayer: ViewContainerRef;
+  nodesLayer?: ViewContainerRef;
 
   @ViewChild('linksLayer', { read: ViewContainerRef })
-  linksLayer: ViewContainerRef;
+  linksLayer?: ViewContainerRef;
 
   @ViewChild('canvas', { read: ElementRef })
-  canvas: ElementRef;
+  canvas?: ElementRef;
 
-  diagramEngine: DiagramEngineCore;
-  mouseManager: MouseManager;
-  protected destroyed$ = new ReplaySubject<boolean>(1);
-  protected selectionBox$: Observable<SelectingAction>;
+  diagramEngine?: DiagramEngineCore;
+  mouseManager?: MouseManager;
+  selectionBox$?: Observable<SelectingAction>;
+  destroyed$ = new ReplaySubject<boolean>(1);
 
   get host(): HTMLElement {
     return this.elRef.nativeElement;
@@ -65,28 +66,37 @@ export class RxZuDiagramComponent
   ) {}
 
   ngAfterViewInit() {
-    if (this.diagramModel) {
-      this.diagramEngine = this.diagramModel.getDiagramEngine();
-      this.mouseManager = this.diagramEngine.getMouseManager();
-      this.diagramEngine.setCanvas(this.canvas.nativeElement);
-
-      this.diagramEngine.setup({
-        ...this,
-      });
-
-      (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)
-        .pipe(
-          switchMap(
-            () =>
-              this.diagramEngine.paintLinks(this.linksLayer) as Observable<void>
-          )
-        )
-        .subscribe(() => {
-          this.initSubs();
-          this.initSelectionBox();
-          this.cdRef.detectChanges();
-        });
+    const model = this.diagramModel;
+    if (!model || !this.canvas) {
+      return;
     }
+
+    this.diagramEngine = model.getDiagramEngine();
+
+    this.mouseManager = this.diagramEngine.getMouseManager();
+    this.diagramEngine.setCanvas(this.canvas.nativeElement);
+
+    this.diagramEngine.setup({
+      ...this,
+    });
+
+    (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)
+      .pipe(
+        switchMap(() => {
+          if (!this.diagramEngine) {
+            return of(null);
+          }
+
+          return this.diagramEngine.paintLinks(this.linksLayer) as Observable<
+            void
+          >;
+        })
+      )
+      .subscribe(() => {
+        this.initSubs();
+        this.initSelectionBox();
+        this.cdRef.detectChanges();
+      });
   }
 
   ngOnDestroy() {
@@ -95,17 +105,22 @@ export class RxZuDiagramComponent
   }
 
   initSelectionBox() {
+    if (!this.diagramEngine) {
+      return;
+    }
+
     this.selectionBox$ = this.diagramEngine.selectAction().pipe(
-      map((a) => {
-        if (
+      filter(
+        (a: {
+          action: BaseAction | null;
+          state: string | null;
+        }): a is { action: SelectingAction; state: 'firing' } =>
           !isNil(a) &&
           a.action instanceof SelectingAction &&
           a.state === 'firing'
-        ) {
-          return a.action;
-        }
-
-        return null;
+      ),
+      map((a) => {
+        return a.action;
       }),
       tap(() => this.cdRef.detectChanges())
     ) as Observable<SelectingAction>;
@@ -113,22 +128,22 @@ export class RxZuDiagramComponent
 
   @OutsideZone
   onMouseUp(event: MouseEvent) {
-    this.mouseManager.onMouseUp(event);
+    this.mouseManager ? this.mouseManager.onMouseUp(event) : noop();
   }
 
   @OutsideZone
   onMouseMove(event: MouseEvent) {
-    this.mouseManager.onMouseMove(event);
+    this.mouseManager ? this.mouseManager.onMouseMove(event) : noop();
   }
 
   @OutsideZone
   onMouseDown(event: MouseEvent) {
-    this.mouseManager.onMouseDown(event);
+    this.mouseManager ? this.mouseManager.onMouseDown(event) : noop();
   }
 
   @OutsideZone
   onMouseWheel(event: WheelEvent) {
-    this.mouseManager.onMouseWheel(event);
+    this.mouseManager ? this.mouseManager.onMouseWheel(event) : noop();
   }
 
   @OutsideZone
@@ -144,10 +159,15 @@ export class RxZuDiagramComponent
   }
 
   protected initSubs() {
+    const diagramModel = this.diagramEngine?.getDiagramModel();
+    if (!diagramModel) {
+      return;
+    }
+
     combineLatest([
-      this.diagramModel.selectOffsetX(),
-      this.diagramModel.selectOffsetY(),
-      this.diagramModel.selectZoomLevel(),
+      diagramModel.selectOffsetX(),
+      diagramModel.selectOffsetY(),
+      diagramModel.selectZoomLevel(),
     ])
       .pipe(
         tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),
@@ -156,11 +176,19 @@ export class RxZuDiagramComponent
       .subscribe();
   }
 
-  protected getNodesLayer(): HTMLDivElement {
+  protected getNodesLayer(): HTMLDivElement | null {
+    if (!this.host) {
+      return null;
+    }
+
     return this.host.querySelector('.ngdx-nodes-layer');
   }
 
-  protected getLinksLayer(): HTMLDivElement {
+  protected getLinksLayer(): HTMLDivElement | null {
+    if (!this.host) {
+      return null;
+    }
+
     return this.host.querySelector('.ngdx-links-layer');
   }
 }

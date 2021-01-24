@@ -5,7 +5,7 @@ import {
   ComponentFactory,
   Renderer2,
 } from '@angular/core';
-import { DefaultLabelModel } from '@rxzu/core';
+import { LabelModel } from '@rxzu/core';
 import { DefaultLabelComponent } from '../components/default-label/default-label.component';
 import { AbstractAngularFactory } from './angular.factory';
 
@@ -23,7 +23,7 @@ export class DefaultLabelFactory extends AbstractAngularFactory<
     model,
     host,
   }: {
-    model: DefaultLabelModel;
+    model: LabelModel;
     host: ViewContainerRef;
   }): ComponentRef<DefaultLabelComponent> {
     const componentRef = host.createComponent(this.getRecipe());
@@ -40,11 +40,6 @@ export class DefaultLabelFactory extends AbstractAngularFactory<
     // on destroy make sure to destroy the componentRef
     model.onEntityDestroy().subscribe(() => {
       componentRef.destroy();
-    });
-
-    // assign all passed properties to node initialization.
-    Object.entries(model).forEach(([key, value]) => {
-      componentRef.instance[key] = value;
     });
 
     componentRef.instance.ngOnInit();

@@ -5,8 +5,8 @@
   <!-- Link -->
   <g [id]="id">
     <path
-      [attr.stroke-width]="width"
-      [attr.stroke]="selectColor() | async"
+      attr.stroke-width="1"
+      attr.stroke="blue"
       [attr.d]="selectPath() | async"
       class="default-link"
       (mouseleave)="setHovered(false); onHover()"
@@ -18,7 +18,7 @@
       (mouseleave)="setHovered(false); onHover()"
       (mouseenter)="setHovered(); onHover()"
       [attr.stroke-width]="20"
-      [attr.stroke]="selectColor() | async"
+      attr.stroke="blue"
       stroke-linecap="round"
       [attr.data-linkid]="id"
       [attr.stroke-opacity]="(selectHovered() | async) ? '0.1' : '0'"

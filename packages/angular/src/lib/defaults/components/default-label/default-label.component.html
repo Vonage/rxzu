@@ -3,14 +3,14 @@
   [ngStyle]="{
     transform:
       'translate(' +
-      (selectCoords() | async).x +
+      (selectCoords() | async)?.x +
       'px, ' +
-      (selectCoords() | async).y +
+      (selectCoords() | async)?.y +
       'px)' +
       'rotate(' +
       (selectRotation() | async) +
       'deg)'
   }"
 >
-  {{ selectLabel() | async }}
+  {{ selectText() | async }}
 </div>

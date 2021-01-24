@@ -5,7 +5,7 @@ import {
   ComponentFactory,
   Renderer2,
 } from '@angular/core';
-import { DefaultNodeModel, DiagramModel } from '@rxzu/core';
+import { DiagramModel, NodeModel } from '@rxzu/core';
 import { AbstractAngularFactory } from './angular.factory';
 
 export class DefaultNodeFactory extends AbstractAngularFactory<
@@ -23,9 +23,9 @@ export class DefaultNodeFactory extends AbstractAngularFactory<
     host,
     diagramModel,
   }: {
-    model: DefaultNodeModel;
+    model: NodeModel;
     host: ViewContainerRef;
-    diagramModel?: DiagramModel;
+    diagramModel: DiagramModel;
   }): ViewContainerRef {
     const componentRef = host.createComponent(this.getRecipe(), host.length);
 
@@ -53,11 +53,6 @@ export class DefaultNodeFactory extends AbstractAngularFactory<
 
     model.onEntityDestroy().subscribe(() => {
       componentRef.destroy();
-    });
-
-    // assign all passed properties to node initialization.
-    Object.entries(model).forEach(([key, value]) => {
-      componentRef.instance[key] = value;
     });
 
     componentRef.instance.setParent(diagramModel);

@@ -7,13 +7,8 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import {
-  PointModel,
-  generateCurvePath,
-  Coords,
-  DefaultLinkModel,
-} from '@rxzu/core';
-import { combineLatest, Observable } from 'rxjs';
+import { PointModel, generateCurvePath, Coords, LinkModel } from '@rxzu/core';
+import { combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -23,10 +18,10 @@ import { takeUntil } from 'rxjs/operators';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DefaultLinkComponent
-  extends DefaultLinkModel
+  extends LinkModel
   implements AfterViewInit, OnInit {
   @ViewChild('labelLayer', { read: ViewContainerRef, static: true })
-  labelLayer: ViewContainerRef;
+  labelLayer!: ViewContainerRef;
 
   constructor(private cdRef: ChangeDetectorRef) {
     super({ type: 'ngdx-default-link' });
@@ -69,7 +64,7 @@ export class DefaultLinkComponent
         const path = generateCurvePath(
           firstPCoords,
           lastPCoords,
-          isStraight ? 0 : this.curvyness
+          isStraight ? 0 : 50
         );
         this.path$.set(path).emit();
 
@@ -107,7 +102,7 @@ export class DefaultLinkComponent
     };
   }
 
-  selectPath(): Observable<string> {
+  selectPath() {
     return this.path$.value$;
   }
 }
