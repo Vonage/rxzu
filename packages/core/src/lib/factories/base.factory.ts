@@ -1,6 +1,6 @@
-import { BaseModel, DiagramModel } from '../models';
+import { DiagramModel } from '../models';
 
-export abstract class AbstractFactory<T extends BaseModel, R, Y> {
+export abstract class AbstractFactory<H, R> {
   protected _type: string;
 
   constructor(type: string) {
@@ -11,13 +11,13 @@ export abstract class AbstractFactory<T extends BaseModel, R, Y> {
     return this._type;
   }
 
-  abstract generateWidget({
+  abstract generateWidget<T extends any>({
     model,
     host,
     diagramModel,
   }: {
     model: T;
-    host?: R;
+    host?: H;
     diagramModel?: DiagramModel;
-  }): Y;
+  }): R;
 }

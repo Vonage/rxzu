@@ -8,9 +8,7 @@ import {
 import { DiagramModel, NodeModel } from '@rxzu/core';
 import { AbstractAngularFactory } from './angular.factory';
 
-export class DefaultNodeFactory extends AbstractAngularFactory<
-  DefaultNodeComponent
-> {
+export class DefaultNodeFactory extends AbstractAngularFactory {
   constructor(
     protected resolver: ComponentFactoryResolver,
     protected renderer: Renderer2

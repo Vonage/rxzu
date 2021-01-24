@@ -1,4 +1,3 @@
-import { BaseModel } from '../models';
 import { AbstractFactory } from './base.factory';
 
 export type FactoryType =
@@ -7,15 +6,13 @@ export type FactoryType =
   | 'linkFactories'
   | 'portFactories';
 
-export class FactoriesManager<
-  T extends AbstractFactory<BaseModel, unknown, unknown>
-> {
-  protected nodeFactories = new Map<string, T>();
-  protected labelFactories = new Map<string, T>();
-  protected linkFactories = new Map<string, T>();
-  protected portFactories = new Map<string, T>();
+export class FactoriesManager {
+  protected nodeFactories = new Map<string, AbstractFactory<unknown, unknown>>();
+  protected labelFactories = new Map<string, AbstractFactory<unknown, unknown>>();
+  protected linkFactories = new Map<string, AbstractFactory<unknown, unknown>>();
+  protected portFactories = new Map<string, AbstractFactory<unknown, unknown>>();
 
-  registerFactory({ type, factory }: { type: FactoryType; factory: T }) {
+  registerFactory<T extends AbstractFactory<any, any>>({ type, factory }: { type: FactoryType; factory: T }) {
     this[type].set(factory.type, factory);
   }
 
@@ -25,7 +22,7 @@ export class FactoriesManager<
   }: {
     factoryType: FactoryType;
     modelType: string;
-  }): T | undefined {
+  }): AbstractFactory<unknown, unknown> | undefined {
     if (!this[factoryType]) {
       throw new Error(`cannot find factory ${factoryType}`);
     }

@@ -38,7 +38,7 @@ export class NodeModel extends BaseModel<DiagramModel> {
 
     // once node finish painting itself, subscribe to ports change and update their coords
     this.paintChanges()
-      .pipe(filter((paintE) => !!paintE.isPainted))
+      .pipe(filter((paintE) => paintE.isPainted))
       .subscribe(() => {
         this.selectPorts()
           .pipe(takeUntil(this.destroyed$))

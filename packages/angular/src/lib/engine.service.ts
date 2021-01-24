@@ -4,7 +4,7 @@ import {
   Renderer2,
   RendererFactory2,
 } from '@angular/core';
-import { DiagramEngineCore } from '@rxzu/core';
+import { AbstractFactory, DiagramEngineCore } from '@rxzu/core';
 import {
   DefaultLabelFactory,
   DefaultLinkFactory,
@@ -29,22 +29,22 @@ export class DiagramEngine extends DiagramEngineCore {
     const factoriesManager = this.getFactoriesManager();
     factoriesManager.registerFactory({
       type: 'nodeFactories',
-      factory: new DefaultNodeFactory(this.resolver, this._renderer),
+      factory: new DefaultNodeFactory(this.resolver, this._renderer) as AbstractFactory<any, any>,
     });
 
     factoriesManager.registerFactory({
       type: 'linkFactories',
-      factory: new DefaultLinkFactory(this.resolver, this._renderer),
+      factory: new DefaultLinkFactory(this.resolver, this._renderer) as AbstractFactory<any, any>,
     });
 
     factoriesManager.registerFactory({
       type: 'portFactories',
-      factory: new DefaultPortFactory(this.resolver, this._renderer),
+      factory: new DefaultPortFactory(this.resolver, this._renderer) as AbstractFactory<any, any>,
     });
 
     factoriesManager.registerFactory({
       type: 'labelFactories',
-      factory: new DefaultLabelFactory(this.resolver, this._renderer),
+      factory: new DefaultLabelFactory(this.resolver, this._renderer) as AbstractFactory<any, any>,
     });
   }
 }
