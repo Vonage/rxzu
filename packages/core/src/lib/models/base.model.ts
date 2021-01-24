@@ -9,7 +9,7 @@ import { BaseModelOptions } from '../interfaces/options.interface';
 import { createValueState, ValueState } from '../state';
 
 export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
-  protected readonly _type?: string;
+  protected readonly _type: string;
 
   protected parent$: ValueState<E>;
   protected selected$: ValueState<boolean>;
@@ -84,7 +84,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
     return this.hovered$.select();
   }
 
-  getType(): string | undefined {
+  getType(): string {
     return this._type;
   }
 

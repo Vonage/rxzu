@@ -210,7 +210,7 @@ export class PortModel extends BaseModel<NodeModel> {
     this.getLinksArray().forEach((link) => {
       const relCoords = engine.getPortCenter(this);
       const point = link.getPointForPort(this);
-      point && point.setCoords(relCoords);
+      point && point.setCoords({ ...relCoords });
     });
   }
 

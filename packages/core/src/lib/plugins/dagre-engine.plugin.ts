@@ -50,11 +50,13 @@ export class DagrePlugin {
         processedlinks[link.id] = true;
         const v = link.getSourcePort()?.getNode()?.id;
         const w = link.getTargetPort()?.getNode()?.id;
-        v && w && this.g.setEdge({
-          v,
-          w,
-          name: link.id,
-        });
+        v &&
+          w &&
+          this.g.setEdge({
+            v,
+            w,
+            name: link.id,
+          });
       }
     });
 
@@ -76,7 +78,11 @@ export class DagrePlugin {
           const points = [link?.getFirstPoint()];
           for (let i = 1; i < edge.points.length - 2; i++) {
             points.push(
-              new PointModel(link, { x: edge.points[i].x, y: edge.points[i].y })
+              new PointModel({
+                parent: link,
+                coords: { x: edge.points[i].x, y: edge.points[i].y },
+                type: 'default',
+              })
             );
           }
           link?.setPoints(points.concat(link?.getLastPoint()));

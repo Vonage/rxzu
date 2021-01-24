@@ -1,48 +1,46 @@
-import { delay, filter, map, switchMap, take, takeUntil } from 'rxjs/operators';
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { filter, map, switchMap, take, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import { BaseEntity } from './base.entity';
 import { AbstractFactory, FactoriesManager } from './factories';
 import {
   DiagramModel,
   PortModel,
   NodeModel,
-  LinkModel,
   BaseModel,
   LabelModel,
+  LinkModel,
 } from './models';
-import { createValueState } from './state';
+import { createValueState, ValueState } from './state';
 import { BaseAction, BaseActionState, SelectingAction } from './actions';
-import { EntityMap } from './utils';
-import { EngineSetup } from './interfaces/setup.interface';
-import { MouseManager } from './managers/mouse.manager';
+import { DiagramModelOptions, EngineSetup } from './interfaces';
+import { MouseManager } from './managers';
 
 export class DiagramEngineCore {
-  protected canvas$ = createValueState<Element>(null);
+  protected canvas$: ValueState<HTMLElement | null>;
+  protected action$ = new BehaviorSubject<{
+    action: BaseAction | null;
+    state: BaseActionState | null;
+  }>({ action: null, state: null });
+
   protected factoriesManager: FactoriesManager<
     AbstractFactory<BaseModel, unknown, unknown>
   >;
   protected mouseManager: MouseManager;
-  diagramModel: DiagramModel;
-
-  protected nodes$: Observable<EntityMap<NodeModel>>;
-  protected links$: Observable<EntityMap<LinkModel>>;
-  protected action$ = new BehaviorSubject<{
-    action: BaseAction;
-    state: BaseActionState;
-  }>(null);
+  protected diagramModel: DiagramModel | undefined;
 
   constructor() {
-    this.createFactoriesManager();
-    this.createMouseManager();
+    this.factoriesManager = this.createFactoriesManager();
+    this.mouseManager = this.createMouseManager();
+    this.canvas$ = createValueState<HTMLElement | null>(null);
   }
 
   createMouseManager() {
     if (this.mouseManager) {
       console.warn('[RxZu] Mouse Manager already initialized, bailing out.');
-      return;
+      return this.mouseManager;
     }
 
-    this.mouseManager = new MouseManager(this);
+    return new MouseManager(this);
   }
 
   createFactoriesManager() {
@@ -50,17 +48,17 @@ export class DiagramEngineCore {
       this.factoriesManager.dispose();
     }
 
-    this.factoriesManager = new FactoriesManager();
+    return new FactoriesManager();
   }
 
-  createModel() {
+  createModel(options?: DiagramModelOptions) {
     if (this.diagramModel) {
       throw new Error(
         'diagram model already exists, please reset model prior to creating new diagram'
       );
     }
 
-    this.diagramModel = new DiagramModel(this);
+    this.diagramModel = new DiagramModel(this, options ?? { type: 'default' });
 
     this.diagramModel.onEntityDestroy().subscribe(() => {
       this.diagramModel = undefined;
@@ -77,10 +75,9 @@ export class DiagramEngineCore {
     return this.mouseManager;
   }
 
-  getNodeElement(node: NodeModel): HTMLElement {
-    const selector = this.canvas$.value.querySelector(
-      `[data-nodeid="${node.id}"]`
-    );
+  getNodeElement(node: NodeModel) {
+    const canvas = this.getCanvas();
+    const selector = canvas.querySelector(`[data-nodeid="${node.id}"]`);
     if (selector === null) {
       throw new Error(
         'Cannot find Node element with node id: [' + node.id + ']'
@@ -89,8 +86,9 @@ export class DiagramEngineCore {
     return selector as HTMLElement;
   }
 
-  getNodePortElement(port: PortModel): HTMLElement {
-    const selector = this.canvas$.value.querySelector(
+  getNodePortElement(port: PortModel) {
+    const canvas = this.getCanvas();
+    const selector = canvas.querySelector(
       `[data-nodeid="${port.getParent().id}"] [data-portid="${port.id}"]`
     );
     if (selector === null) {
@@ -107,44 +105,52 @@ export class DiagramEngineCore {
 
   getPortCenter(port: PortModel) {
     const sourceElement = this.getNodePortElement(port);
+    const diagramModel = this.getDiagramModel();
+    if (!sourceElement || !diagramModel) {
+      return null;
+    }
+
     const sourceRect = sourceElement.getBoundingClientRect();
     const rel = this.getRelativePoint(sourceRect.left, sourceRect.top);
+
+    if (!rel) {
+      return null;
+    }
 
     return {
       x:
         sourceElement.offsetWidth / 2 +
-        (rel.x - this.diagramModel.getOffsetX()) /
-          (this.diagramModel.getZoomLevel() / 100.0),
+        (rel.x - diagramModel.getOffsetX()) /
+          (diagramModel.getZoomLevel() / 100.0),
       y:
         sourceElement.offsetHeight / 2 +
-        (rel.y - this.diagramModel.getOffsetY()) /
-          (this.diagramModel.getZoomLevel() / 100.0),
+        (rel.y - diagramModel.getOffsetY()) /
+          (diagramModel.getZoomLevel() / 100.0),
     };
   }
 
   /**
    * Calculate rectangular coordinates of the port passed in.
    */
-  getPortCoords(
-    port: PortModel
-  ): {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  } {
+  getPortCoords(port: PortModel) {
     const sourceElement = this.getNodePortElement(port);
+    const canvas = this.getCanvas();
+    const diagramModel = this.getDiagramModel();
+    if (!sourceElement || !canvas || !diagramModel) {
+      return null;
+    }
+
     const sourceRect = sourceElement.getBoundingClientRect() as DOMRect;
-    const canvasRect = this.canvas$.value.getBoundingClientRect() as ClientRect;
+    const canvasRect = canvas.getBoundingClientRect() as ClientRect;
 
     return {
       x:
-        (sourceRect.x - this.diagramModel.getOffsetX()) /
-          (this.diagramModel.getZoomLevel() / 100.0) -
+        (sourceRect.x - diagramModel.getOffsetX()) /
+          (diagramModel.getZoomLevel() / 100.0) -
         canvasRect.left,
       y:
-        (sourceRect.y - this.diagramModel.getOffsetY()) /
-          (this.diagramModel.getZoomLevel() / 100.0) -
+        (sourceRect.y - diagramModel.getOffsetY()) /
+          (diagramModel.getZoomLevel() / 100.0) -
         canvasRect.top,
       width: sourceRect.width,
       height: sourceRect.height,
@@ -156,17 +162,23 @@ export class DiagramEngineCore {
    */
   getNodeCoords(node: NodeModel) {
     const sourceElement = this.getNodeElement(node);
+    const canvas = this.getCanvas();
+    const diagramModel = this.getDiagramModel();
+    if (!sourceElement || !canvas || !diagramModel) {
+      return null;
+    }
+
     const sourceRect = sourceElement.getBoundingClientRect() as DOMRect;
-    const canvasRect = this.canvas$.value.getBoundingClientRect() as ClientRect;
+    const canvasRect = canvas.getBoundingClientRect() as ClientRect;
 
     return {
       x:
-        (sourceRect.x - this.diagramModel.getOffsetX()) /
-          (this.diagramModel.getZoomLevel() / 100.0) -
+        (sourceRect.x - diagramModel.getOffsetX()) /
+          (diagramModel.getZoomLevel() / 100.0) -
         canvasRect.left,
       y:
-        (sourceRect.y - this.diagramModel.getOffsetY()) /
-          (this.diagramModel.getZoomLevel() / 100.0) -
+        (sourceRect.y - diagramModel.getOffsetY()) /
+          (diagramModel.getZoomLevel() / 100.0) -
         canvasRect.top,
       width: sourceRect.width,
       height: sourceRect.height,
@@ -175,18 +187,27 @@ export class DiagramEngineCore {
 
   getNodeCenter(node: NodeModel) {
     const sourceElement = this.getNodeElement(node);
+    const diagramModel = this.getDiagramModel();
+    if (!sourceElement || !diagramModel) {
+      return null;
+    }
+
     const sourceRect = sourceElement.getBoundingClientRect();
     const rel = this.getRelativePoint(sourceRect.left, sourceRect.top);
+
+    if (!rel) {
+      return null;
+    }
 
     return {
       x:
         sourceElement.offsetWidth / 2 +
-        (rel.x - this.diagramModel.getOffsetX()) /
-          (this.diagramModel.getZoomLevel() / 100.0),
+        (rel.x - diagramModel.getOffsetX()) /
+          (diagramModel.getZoomLevel() / 100.0),
       y:
         sourceElement.offsetHeight / 2 +
-        (rel.y - this.diagramModel.getOffsetY()) /
-          (this.diagramModel.getZoomLevel() / 100.0),
+        (rel.y - diagramModel.getOffsetY()) /
+          (diagramModel.getZoomLevel() / 100.0),
     };
   }
 
@@ -194,15 +215,11 @@ export class DiagramEngineCore {
    * Determine the width and height of the node passed in.
    * It currently assumes nodes have a rectangular shape, can be overriden for customised shapes.
    */
-  getNodeDimensions(node: NodeModel): { width: number; height: number } {
-    if (!this.canvas$.value) {
-      return {
-        width: 0,
-        height: 0,
-      };
-    }
-
+  getNodeDimensions(node: NodeModel) {
     const nodeElement = this.getNodeElement(node);
+    if (!nodeElement) {
+      return null;
+    }
     const nodeRect = nodeElement.getBoundingClientRect();
 
     return {
@@ -211,11 +228,17 @@ export class DiagramEngineCore {
     };
   }
 
-  setCanvas(canvas: Element) {
+  setCanvas(canvas: HTMLElement) {
     this.canvas$.set(canvas).emit();
   }
 
   getCanvas() {
+    if (!this.canvas$.value) {
+      throw new Error(
+        '[RxZu] No canvas found, please use `setCanvas` to assign one.'
+      );
+    }
+
     return this.canvas$.value;
   }
 
@@ -224,16 +247,23 @@ export class DiagramEngineCore {
   }
 
   getRelativePoint(x: number, y: number) {
-    const canvasRect = this.canvas$.value.getBoundingClientRect();
+    const canvas = this.getCanvas();
+    const canvasRect = canvas.getBoundingClientRect();
     return { x: x - canvasRect.left, y: y - canvasRect.top };
   }
 
   getDiagramModel() {
+    if (!this.diagramModel) {
+      throw new Error(
+        '[RxZu] No model found, please create one and assign it to the engine.'
+      );
+    }
     return this.diagramModel;
   }
 
   isModelLocked(model: BaseEntity) {
-    if (this.diagramModel.getLocked()) {
+    const diagramModel = this.getDiagramModel();
+    if (diagramModel.getLocked()) {
       return true;
     }
 
@@ -246,25 +276,31 @@ export class DiagramEngineCore {
    */
   zoomToFit(additionalZoomFactor = 0.005) {
     this.canvas$.value$
-      .pipe(filter(Boolean), take(1), delay(0))
-      .subscribe((canvas: HTMLElement) => {
+      .pipe(
+        filter(
+          (canvas: HTMLElement | null | undefined): canvas is HTMLElement =>
+            canvas !== null && canvas !== undefined
+        ),
+        take(1)
+      )
+      .subscribe((canvas) => {
+        const diagramModel = this.getDiagramModel();
         const xFactor = canvas.clientWidth / canvas.scrollWidth;
         const yFactor = canvas.clientHeight / canvas.scrollHeight;
         const zoomFactor = xFactor < yFactor ? xFactor : yFactor;
 
         let newZoomLvl =
-          this.diagramModel.getZoomLevel() *
-          (zoomFactor - additionalZoomFactor);
-        const maxZoomOut = this.diagramModel.getMaxZoomOut();
+          diagramModel.getZoomLevel() * (zoomFactor - additionalZoomFactor);
+        const maxZoomOut = diagramModel.getMaxZoomOut();
 
         if (maxZoomOut && newZoomLvl < maxZoomOut) {
           newZoomLvl = maxZoomOut;
         }
 
-        this.diagramModel.setZoomLevel(newZoomLvl);
+        diagramModel.setZoomLevel(newZoomLvl);
 
         // TODO: either block the canvas movement on 0,0 or detect the top left furthest element and set the offest to its edges
-        this.diagramModel.setOffset(0, 0);
+        diagramModel.setOffset(0, 0);
       });
   }
 
@@ -277,48 +313,64 @@ export class DiagramEngineCore {
     allowCanvasTranslation,
     inverseZoom,
   }: EngineSetup) {
-    this.diagramModel.setAllowCanvasZoom(allowCanvasZoom);
-    this.diagramModel.setAllowCanvasTranslation(allowCanvasTranslation);
-    this.diagramModel.setInverseZoom(inverseZoom);
-    this.diagramModel.setAllowLooseLinks(allowLooseLinks);
-    this.diagramModel.setPortMagneticRadius(portMagneticRadius);
-    this.diagramModel.setMaxZoomIn(maxZoomIn);
-    this.diagramModel.setMaxZoomOut(maxZoomOut);
+    const diagramModel = this.getDiagramModel();
+    diagramModel.setAllowCanvasZoom(allowCanvasZoom ?? true);
+    diagramModel.setAllowCanvasTranslation(allowCanvasTranslation ?? true);
+    diagramModel.setInverseZoom(inverseZoom ?? false);
+    diagramModel.setAllowLooseLinks(allowLooseLinks ?? true);
+    diagramModel.setPortMagneticRadius(portMagneticRadius ?? 30);
+    diagramModel.setMaxZoomIn(maxZoomIn ?? 0);
+    diagramModel.setMaxZoomOut(maxZoomOut ?? 0);
   }
 
   paintNodes(
-    nodesHost,
+    nodesHost: any,
     promise = false
-  ): Observable<boolean> | Promise<boolean> {
-    const observable = this.diagramModel.selectNodes().pipe(
-      takeUntil(this.diagramModel.onEntityDestroy()),
+  ): Observable<boolean> | Promise<boolean> | void {
+    const diagramModel = this.getDiagramModel();
+    const observable = diagramModel.selectNodes().pipe(
+      takeUntil(diagramModel.onEntityDestroy()),
       switchMap((nodes) => {
         const nodesPainted$ = [];
         for (const node of nodes.values()) {
           if (!node.getPainted().isPainted) {
-            const portsHost = this.getFactoriesManager()
-              .getFactory({
-                factoryType: 'nodeFactories',
-                modelType: node.getType(),
-              })
-              .generateWidget({
-                model: node,
-                host: nodesHost,
-                diagramModel: this.diagramModel,
-              });
+            const nodeFactory = this.getFactoriesManager().getFactory({
+              factoryType: 'nodeFactories',
+              modelType: node.getType(),
+            });
+
+            if (!nodeFactory) {
+              return of(null);
+            }
+
+            const portsHost = nodeFactory.generateWidget({
+              model: node as NodeModel,
+              host: nodesHost,
+              diagramModel: this.diagramModel,
+            });
 
             node
               .selectPorts()
-              .pipe(filter(Boolean))
-              .subscribe((ports: PortModel[]) => {
+              .pipe(
+                filter(
+                  (
+                    ports: PortModel[] | null | undefined
+                  ): ports is PortModel[] =>
+                    ports !== null && ports !== undefined
+                )
+              )
+              .subscribe((ports) => {
                 ports.forEach((port) => {
                   if (!port.getPainted().isPainted) {
-                    this.factoriesManager
-                      .getFactory({
-                        factoryType: 'portFactories',
-                        modelType: port.getType(),
-                      })
-                      .generateWidget({ model: port, host: portsHost });
+                    const portFactory = this.factoriesManager.getFactory({
+                      factoryType: 'portFactories',
+                      modelType: port.getType(),
+                    });
+
+                    portFactory.generateWidget({
+                      model: port,
+                      host: portsHost,
+                    });
                   }
                 });
               });
@@ -340,42 +392,66 @@ export class DiagramEngineCore {
     return promise ? observable.toPromise() : observable;
   }
 
-  paintLinks(linksHost, promise = false): Observable<void> | Promise<void> {
-    const observable = this.diagramModel.selectLinks().pipe(
-      takeUntil(this.diagramModel.onEntityDestroy()),
+  paintLinks(
+    linksHost: any,
+    promise = false
+  ): Observable<void> | Promise<void> {
+    const diagramModel = this.getDiagramModel();
+    const observable = diagramModel.selectLinks().pipe(
+      takeUntil(diagramModel.onEntityDestroy()),
       map((links) => {
         for (const link of links.values()) {
           if (!link.getPainted().isPainted) {
             const srcPort = link.getSourcePort();
             const targetPort = link.getTargetPort();
 
+            if (!srcPort) {
+              return;
+            }
+
             // Attach link first point to source port
             const portCenter = this.getPortCenter(srcPort);
+
+            if (!portCenter) {
+              return;
+            }
+
             link.getPoints()[0].setCoords(portCenter);
 
             // Attach link last point to target port, will occour only for complete links
             if (targetPort) {
               const portCenter = this.getPortCenter(targetPort);
+              if (!portCenter) {
+                return;
+              }
               link
                 .getPoints()
                 [link.getPoints().length - 1].setCoords(portCenter);
             }
 
             // Render link component
-            this.getFactoriesManager()
-              .getFactory({
-                factoryType: 'linkFactories',
-                modelType: link.getType(),
-              })
-              .generateWidget({ model: link, host: linksHost });
+            const linkFactory = this.getFactoriesManager().getFactory({
+              factoryType: 'linkFactories',
+              modelType: link.getType(),
+            });
 
+            if (!linkFactory) {
+              return;
+            }
+
+            linkFactory.generateWidget({ model: link, host: linksHost });
+
+            // (canvas: HTMLElement | null | undefined): canvas is HTMLElement =>
             // Handle link label, if any
             link
               .selectLabel()
-              .pipe(filter(Boolean))
-              .subscribe((label: LabelModel) =>
-                this.paintLabel(label, linksHost)
-              );
+              .pipe(
+                filter(
+                  (label: LabelModel | null | undefined): label is LabelModel =>
+                    label !== null && label !== undefined
+                )
+              )
+              .subscribe((label) => this.paintLabel(label, linksHost));
           }
         }
       })
@@ -384,14 +460,18 @@ export class DiagramEngineCore {
     return promise ? observable.toPromise() : observable;
   }
 
-  paintLabel(label: LabelModel, host) {
+  paintLabel(label: LabelModel, host: any) {
     if (!label.getPainted().isPainted) {
-      this.getFactoriesManager()
-        .getFactory({
-          factoryType: 'labelFactories',
-          modelType: label.getType(),
-        })
-        .generateWidget({ model: label, host });
+      const labalFactory = this.getFactoriesManager().getFactory({
+        factoryType: 'labelFactories',
+        modelType: label.getType(),
+      });
+
+      if (!labalFactory) {
+        return;
+      }
+
+      labalFactory.generateWidget({ model: label, host });
     }
   }
 
@@ -404,6 +484,8 @@ export class DiagramEngineCore {
       this.action$.next({ action, state: 'firing' });
       return action;
     }
+
+    return;
   }
 
   /**
@@ -413,9 +495,11 @@ export class DiagramEngineCore {
     const stoppedAction = this.action$.getValue()?.action;
     if (stoppedAction) {
       this.action$.next({ action: stoppedAction, state: 'stopped' });
-      this.action$.next(null);
+      this.action$.next({ action: null, state: null });
       return stoppedAction;
     }
+
+    return;
   }
 
   /**

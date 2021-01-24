@@ -18,7 +18,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
   points$: ValueState<PointModel[]>;
 
   constructor(options: LinkModelOptions) {
-    super({ logPrefix: '[Link]', type: 'default', ...options });
+    super({ logPrefix: '[Link]', ...options });
 
     this.name$ = createValueState<string>(
       options.name ?? '',
@@ -45,7 +45,10 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
     this.path$ = createValueState<string | null>(null, this.entityPipe('path'));
     this.points$ = createValueState(
-      [new PointModel({ parent: this }), new PointModel({ parent: this })],
+      [
+        new PointModel({ parent: this, type: 'default' }),
+        new PointModel({ parent: this, type: 'default' }),
+      ],
       this.entityPipe('points')
     );
   }
@@ -269,7 +272,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
   }
 
   generatePoint({ x = 0, y = 0 }: Coords): PointModel {
-    return new PointModel({ parent: this, coords: { x, y } });
+    return new PointModel({ parent: this, coords: { x, y }, type: 'default' });
   }
 
   setLocked(locked = true) {

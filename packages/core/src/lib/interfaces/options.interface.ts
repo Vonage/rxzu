@@ -19,10 +19,10 @@ import { Dimensions } from './dimensions.interface';
 // export type SerializedModel = Record<string, Serializable>;
 
 export interface BaseModelOptions {
+  type: string;
   locked?: boolean;
   id?: string;
   parent?: any;
-  type?: string;
   logPrefix?: string;
 }
 
@@ -46,7 +46,6 @@ export interface NodeModelOptions extends BaseModelOptions {
   dimensions?: Dimensions;
   ports?: PortModelOptions[];
   extras?: any;
-  type?: string;
 }
 
 export interface LinkModelOptions extends BaseModelOptions {

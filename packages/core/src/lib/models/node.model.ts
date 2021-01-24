@@ -21,7 +21,7 @@ export class NodeModel extends BaseModel<DiagramModel> {
   protected dimensions$: ValueState<Dimensions>;
 
   constructor(options: NodeModelOptions) {
-    super({ type: 'default', logPrefix: '[Node]', ...options });
+    super({ logPrefix: '[Node]', ...options });
     this.ports$ = createEntityState([], this.entityPipe('ports'));
     this.extras$ = createValueState(
       options.extras ?? {},
@@ -49,7 +49,14 @@ export class NodeModel extends BaseModel<DiagramModel> {
                 if (diagramEngine) {
                   const portSize = diagramEngine.getPortCoords(port);
                   const portCenter = diagramEngine.getPortCenter(port);
-                  port.updateCoords({ ...portSize, ...portCenter });
+                  port.updateCoords({
+                    x: 0,
+                    y: 0,
+                    width: 0,
+                    height: 0,
+                    ...portSize,
+                    ...portCenter,
+                  });
                 }
               }
             });

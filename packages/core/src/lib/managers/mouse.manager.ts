@@ -10,12 +10,7 @@ import {
 } from '../actions';
 import { DiagramEngineCore } from '../engine.core';
 import { Coords } from '../interfaces';
-import {
-  NodeModel,
-  PointModel,
-  PortModel,
-  BaseModel
-} from '../models';
+import { NodeModel, PointModel, PortModel, BaseModel } from '../models';
 import { isNil } from '../utils';
 
 export class MouseManager {
@@ -25,7 +20,9 @@ export class MouseManager {
     this.engine = _diagramEngine;
   }
 
-  getElement(event: MouseEvent): { model: BaseModel | undefined; element: Element } | null {
+  getElement(
+    event: MouseEvent
+  ): { model: BaseModel | undefined; element: Element } | null {
     const target = event.target as Element;
 
     // is it a port?
@@ -37,7 +34,9 @@ export class MouseManager {
         model: this.engine
           .getDiagramModel()
           ?.getNode(nodeEl.getAttribute('data-nodeid'))
-          ?.getPort(element.getAttribute('data-portid')) as BaseModel | undefined,
+          ?.getPort(element.getAttribute('data-portid')) as
+          | BaseModel
+          | undefined,
         element,
       };
     }
@@ -49,7 +48,9 @@ export class MouseManager {
         model: this.engine
           .getDiagramModel()
           ?.getLink(element.getAttribute('data-linkid'))
-          ?.getPointModel(element.getAttribute('data-pointid')) as BaseModel | undefined,
+          ?.getPointModel(element.getAttribute('data-pointid')) as
+          | BaseModel
+          | undefined,
         element,
       };
     }
@@ -60,7 +61,9 @@ export class MouseManager {
       return {
         model: this.engine
           .getDiagramModel()
-          ?.getLink(element.getAttribute('data-linkid')) as BaseModel | undefined,
+          ?.getLink(element.getAttribute('data-linkid')) as
+          | BaseModel
+          | undefined,
         element,
       };
     }
@@ -71,7 +74,9 @@ export class MouseManager {
       return {
         model: this.engine
           .getDiagramModel()
-          ?.getNode(element.getAttribute('data-nodeid')) as BaseModel | undefined,
+          ?.getNode(element.getAttribute('data-nodeid')) as
+          | BaseModel
+          | undefined,
         element,
       };
     }
@@ -196,6 +201,11 @@ export class MouseManager {
                 this.engine.getDiagramModel().getPortMagneticRadius()
               ) {
                 const portCenter = this.engine.getPortCenter(port);
+
+                if (!portCenter) {
+                  return;
+                }
+
                 selectionModel.model.setCoords(portCenter);
                 selectionModel.magnet = port;
                 return;
@@ -209,6 +219,11 @@ export class MouseManager {
             // update port coordinates as well
             selectionModel.model.getPorts().forEach((port) => {
               const portCoords = this.engine.getPortCoords(port);
+
+              if (!portCoords) {
+                return;
+              }
+
               port.updateCoords(portCoords);
             });
           }
@@ -339,9 +354,9 @@ export class MouseManager {
           return;
         }
 
-        let el: BaseModel | null = null;
+        let el: BaseModel | PortModel | null = null;
         if (model.magnet) {
-          el = model.magnet as BaseModel;
+          el = model.magnet;
         } else if (element && element.model) {
           el = element.model;
         }
@@ -358,9 +373,8 @@ export class MouseManager {
               link?.setTargetPort(el);
               targetPort?.removeLink(link);
               const idx = link?.getPointIndex(model.model);
-              !isNil(idx) && newLink?.removePointsBefore(
-                newLink?.getPoints()[idx]
-              );
+              !isNil(idx) &&
+                newLink?.removePointsBefore(newLink?.getPoints()[idx]);
               link?.removePointsAfter(model.model);
               this.engine.getDiagramModel().addLink(newLink);
               // if we are connecting to the same target or source, destroy tweener points
@@ -400,7 +414,10 @@ export class MouseManager {
 
           const selectedPoint: PointModel = model.model;
           const link = selectedPoint.getLink();
-          if (link?.getSourcePort() === null || link?.getTargetPort() === null) {
+          if (
+            link?.getSourcePort() === null ||
+            link?.getTargetPort() === null
+          ) {
             link.destroy();
             this.engine.startFiringAction(
               new LooseLinkDestroyed(event.clientX, event.clientY, link)
