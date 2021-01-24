@@ -1,58 +1,89 @@
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { createEntityState, createValueState } from '../state';
+import {
+  createEntityState,
+  createValueState,
+  EntityState,
+  ValueState,
+} from '../state';
 import { EntityMap, ID, isString } from '../utils';
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { NodeModel } from './node.model';
-import { SerializedPortModel } from '../interfaces';
+import { Coords, Dimensions, PortModelOptions } from '../interfaces';
 
 export class PortModel extends BaseModel<NodeModel> {
-  // TODO: convert all primitives to subjects
-  protected name: string;
-  protected maximumLinks?: number;
-  protected linkType?: string;
-
-  protected links$ = createEntityState<LinkModel>([], this.entityPipe('links'));
-  protected x$ = createValueState(0, this.entityPipe('x'));
-  protected y$ = createValueState(0, this.entityPipe('y'));
-  protected width$ = createValueState<number>(0, this.entityPipe('y'));
-  protected height$ = createValueState<number>(0, this.entityPipe('y'));
-  protected magnetic$ = createValueState(true, this.entityPipe('magnetic'));
+  protected coords$: ValueState<Coords>;
+  protected name$: ValueState<string | null>;
+  protected maximumLinks$: ValueState<number | null>;
+  protected linkType$: ValueState<string>;
+  protected dimensions$: ValueState<Dimensions>;
+  protected magnetic$: ValueState<boolean>;
   protected canCreateLinks$ = createValueState(
     true,
     this.entityPipe('magnetic')
   );
+  protected links$: EntityState<LinkModel>;
 
-  constructor(
-    name: string,
-    type?: string,
-    id?: string,
-    maximumLinks?: number,
-    linkType?: string,
-    magnetic = true,
-    logPrefix = '[Port]'
-  ) {
-    super(type, id, logPrefix);
-    this.name = name;
-    this.maximumLinks = maximumLinks;
-    this.linkType = linkType;
-    this.setMagnetic(magnetic);
+  constructor(options: PortModelOptions) {
+    super({ linkType: 'default', logPrefix: '[Port]', ...options });
+
+    this.coords$ = createValueState(
+      options.coords ?? { x: 0, y: 0 },
+      this.entityPipe('coords')
+    );
+
+    this.name$ = createValueState(
+      options.name ?? null,
+      this.entityPipe('name')
+    );
+
+    this.maximumLinks$ = createValueState(
+      options.maximumLinks ?? null,
+      this.entityPipe('maximumLinks')
+    );
+
+    this.linkType$ = createValueState(
+      options.linkType ?? 'default',
+      this.entityPipe('linkType')
+    );
+
+    this.magnetic$ = createValueState<boolean>(
+      true,
+      this.entityPipe('magnetic')
+    );
+
+    this.dimensions$ = createValueState(
+      options.dimensions ?? { width: 0, height: 0 },
+      this.entityPipe('dimensions')
+    );
+    this.links$ = createEntityState([], this.entityPipe('links'));
   }
 
-  serialize(): SerializedPortModel {
-    return {
-      ...super.serialize(),
-      name: this.getName(),
-      linkType: this.getLinkType(),
-      maximumLinks: this.getMaximumLinks(),
-      type: this.getType(),
-      magnetic: this.getMagnetic(),
-      height: this.getHeight(),
-      width: this.getWidth(),
-      canCreateLinks: this.getCanCreateLinks(),
-      ...this.getCoords(),
-    };
+  // serialize(): IPortModel {
+  //   return {
+  //     ...super.serialize(),
+  //     name: this.getName(),
+  //     linkType: this.getLinkType(),
+  //     maximumLinks: this.getMaximumLinks(),
+  //     type: this.getType(),
+  //     magnetic: this.getMagnetic(),
+  //     height: this.getHeight(),
+  //     width: this.getWidth(),
+  //     canCreateLinks: this.getCanCreateLinks(),
+  //     ...this.getCoords(),
+  //   };
+  // }
+
+  link(port: PortModel): LinkModel | null {
+    if (this.getCanCreateLinks()) {
+      const link = new LinkModel({ type: this.getLinkType() });
+      link.setSourcePort(this);
+      link.setTargetPort(port);
+      return link;
+    }
+
+    return null;
   }
 
   getNode() {
@@ -60,30 +91,23 @@ export class PortModel extends BaseModel<NodeModel> {
   }
 
   getName() {
-    return this.name;
+    return this.name$.value;
   }
 
   getCanCreateLinks(): boolean {
     const numberOfLinks = this.getLinks().size;
 
-    if (this.maximumLinks && numberOfLinks >= this.maximumLinks) {
+    if (this.maximumLinks$.value && numberOfLinks >= this.maximumLinks$.value) {
       return false;
     }
 
     return this.canCreateLinks$.value;
   }
 
-  getCoords() {
-    return { x: this.getX(), y: this.getY() };
-  }
-
-  selectCoords() {
-    return combineLatest([
-      this.selectX(),
-      this.selectY(),
-      this.selectWidth(),
-      this.selectHeight(),
-    ]).pipe(map(([x, y, height, width]) => ({ x, y, height, width })));
+  selectCoordsAndDimensions() {
+    return combineLatest([this.selectCoords(), this.selectDimensions()]).pipe(
+      map(([coords, dim]) => ({ ...coords, ...dim }))
+    );
   }
 
   selectCanCreateLinks(): Observable<boolean> {
@@ -106,52 +130,36 @@ export class PortModel extends BaseModel<NodeModel> {
     this.magnetic$.set(magnetic).emit();
   }
 
-  selectX(): Observable<number> {
-    return this.x$.value$;
+  selectCoords(): Observable<Coords> {
+    return this.coords$.value$;
   }
 
-  selectY(): Observable<number> {
-    return this.y$.value$;
+  getCoords() {
+    return this.coords$.value;
   }
 
-  getY() {
-    return this.y$.value;
+  getDimensions() {
+    return this.dimensions$.value;
   }
 
-  getX() {
-    return this.x$.value;
+  selectDimensions() {
+    return this.dimensions$.select();
   }
 
-  getHeight() {
-    return this.height$.value;
-  }
-
-  selectHeight() {
-    return this.height$.select();
-  }
-
-  getWidth() {
-    return this.width$.value;
-  }
-
-  selectWidth() {
-    return this.width$.select();
-  }
-
-  getMaximumLinks(): number | undefined {
-    return this.maximumLinks;
+  getMaximumLinks(): number | null {
+    return this.maximumLinks$.value;
   }
 
   setMaximumLinks(maximumLinks?: number) {
-    this.maximumLinks = maximumLinks;
+    this.maximumLinks$.set(maximumLinks ?? null).emit();
   }
 
   getLinkType() {
-    return this.linkType;
+    return this.linkType$.value;
   }
 
   setLinkType(type: string) {
-    this.linkType = type;
+    this.linkType$.set(type).emit();
   }
 
   removeLink(linkOrId?: ID | LinkModel | null) {
@@ -188,15 +196,14 @@ export class PortModel extends BaseModel<NodeModel> {
     width: number;
     height: number;
   }) {
-    this.x$.set(x).emit();
-    this.y$.set(y).emit();
-    this.width$.set(width).emit();
-    this.height$.set(height).emit();
+    this.coords$.set({ x, y }).emit();
+    this.dimensions$.set({ width, height }).emit();
+
     // TODO: add a cleaner way to get the engine without traveling through parents
     const engine = this.getParent()?.getParent()?.getDiagramEngine();
 
     if (!engine) {
-      this.log(`Couldn't find DiagramEngine when updating cords. skipping`);
+      this.log(`Couldn't find DiagramEngine when updating coords. skipping`);
       return;
     }
 
@@ -217,7 +224,10 @@ export class PortModel extends BaseModel<NodeModel> {
 
   createLinkModel(): LinkModel | undefined {
     if (this.getCanCreateLinks()) {
-      return new LinkModel();
+      return new LinkModel({
+        parent: this.getParent().getParent(),
+        type: this.getLinkType(),
+      });
     }
     return undefined;
   }

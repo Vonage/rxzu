@@ -1,31 +1,30 @@
 import { MonoTypeOperatorFunction, Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseEvent, LockEvent } from './interfaces/event.interface';
-import { createValueState } from './state';
+import { createValueState, ValueState } from './state';
 import {
   entityProperty as _entityProperty,
   ID,
   log as _log,
   LOG_LEVEL,
   UID,
-  withLog as _withLog
+  withLog as _withLog,
 } from './utils/tool-kit.util';
 import { HashMap } from './utils/types';
-import { SerializedBaseModel } from './interfaces';
 
 export type BaseEntityType = 'node' | 'link' | 'port' | 'point';
 
 export class BaseEntity {
   protected _id: ID;
-
-  protected destroyed$ = new Subject<void>();
-  protected locked$ = createValueState(false, this.entityPipe('locked'));
-
+  protected destroyed$: Subject<void>;
+  protected locked$: ValueState<boolean>;
   protected readonly _logPrefix: string;
 
-  constructor(id?: ID, logPrefix = '') {
-    this._id = id || UID();
-    this._logPrefix = `${logPrefix}`;
+  constructor(options: { id?: ID; logPrefix?: string }) {
+    this._id = options.id || UID();
+    this._logPrefix = `${options.logPrefix ?? ''}`;
+    this.destroyed$ = new Subject<void>();
+    this.locked$ = createValueState<boolean>(false, this.entityPipe('locked'));
   }
 
   get id(): ID {
@@ -45,7 +44,11 @@ export class BaseEntity {
   }
 
   entityPipe<T>(logMessage = ''): MonoTypeOperatorFunction<T> {
-    return _entityProperty<T>(this.onEntityDestroy(), 0, `${this._logPrefix}: ${logMessage}`);
+    return _entityProperty<T>(
+      this.onEntityDestroy(),
+      0,
+      `${this._logPrefix}: ${logMessage}`
+    );
   }
 
   getLocked(): boolean {
@@ -75,12 +78,12 @@ export class BaseEntity {
     return clone;
   }
 
-  serialize(): SerializedBaseModel {
-    return {
-      id: this.id,
-      locked: this.getLocked()
-    };
-  }
+  // serialize(): BaseModelOptions {
+  //   return {
+  //     id: this.id,
+  //     locked: this.getLocked(),
+  //   };
+  // }
 
   lockChanges(): Observable<LockEvent> {
     return this.locked$.select((locked) => new LockEvent(this, locked));

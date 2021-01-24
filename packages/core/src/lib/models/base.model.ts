@@ -5,46 +5,54 @@ import {
   ParentChangeEvent,
   SelectionEvent,
 } from '../interfaces/event.interface';
-import { createValueState } from '../state';
-import { SerializedBaseModel } from '../interfaces';
+import { BaseModelOptions } from '../interfaces/options.interface';
+import { createValueState, ValueState } from '../state';
 
 export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   protected readonly _type?: string;
 
-  protected parent$ = createValueState<E | null>(
-    null,
-    this.entityPipe('ParentsChange')
-  );
-  protected selected$ = createValueState<boolean>(
-    false,
-    this.entityPipe('SelectedChange')
-  );
-  protected hovered$ = createValueState<boolean>(
-    false,
-    this.entityPipe('HoveredChange')
-  );
-  protected painted$ = createValueState<PaintedEvent>(
-    new PaintedEvent(this, false),
-    this.entityPipe('PaintedChange')
-  );
+  protected parent$: ValueState<E>;
+  protected selected$: ValueState<boolean>;
+  protected hovered$: ValueState<boolean>;
+  protected painted$: ValueState<PaintedEvent>;
 
-  constructor(type?: string, id?: string, logPrefix = '[Base]') {
-    super(id, logPrefix);
-    this._type = type;
+  constructor(options: BaseModelOptions) {
+    super({ id: options.id, logPrefix: options.logPrefix });
+    this._type = options.type;
+
+    this.parent$ = createValueState(
+      options.parent,
+      this.entityPipe('ParentsChange')
+    );
+
+    this.selected$ = createValueState<boolean>(
+      false,
+      this.entityPipe('SelectedChange')
+    );
+
+    this.hovered$ = createValueState<boolean>(
+      false,
+      this.entityPipe('HoveredChange')
+    );
+
+    this.painted$ = createValueState<PaintedEvent>(
+      new PaintedEvent(this, false),
+      this.entityPipe('PaintedChange')
+    );
   }
 
-  serialize(): SerializedBaseModel {
-    return {
-      ...super.serialize(),
-      type: this.getType(),
-    };
-  }
+  // serialize(): IBaseModel {
+  //   return {
+  //     ...super.serialize(),
+  //     type: this.getType(),
+  //   };
+  // }
 
-  getParent(): E | null {
+  getParent(): E {
     return this.parent$.value;
   }
 
-  setParent(parent: E | null): void {
+  setParent(parent: E): void {
     this.parent$.set(parent).emit();
   }
 
@@ -98,7 +106,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
     );
   }
 
-  getSelectedEntities(): BaseModel<any>[] {
+  getSelectedEntities(): BaseModel<E>[] {
     return this.getSelected() ? [this] : [];
   }
 }

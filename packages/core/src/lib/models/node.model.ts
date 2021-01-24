@@ -1,44 +1,40 @@
 import { Observable } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
-import { Coords } from '../interfaces/coords.interface';
-import { Dimensions } from '../interfaces/dimensions.interface';
-import { SerializedNodeModel } from '../interfaces/serialization.interface';
-import { createValueState, createEntityState } from '../state';
+import { Coords, NodeModelOptions, Dimensions } from '../interfaces';
+import {
+  createValueState,
+  createEntityState,
+  ValueState,
+  EntityState,
+} from '../state';
 import { ID } from '../utils/tool-kit.util';
-import { EntityMap, HashMap } from '../utils/types';
+import { EntityMap } from '../utils/types';
 import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
 import { PortModel } from './port.model';
 import { PointModel } from './point.model';
 
-export class NodeModel extends BaseModel<
-  DiagramModel
-> {
-  protected extras$ = createValueState<any>({}, this.entityPipe('extras'));
-  protected ports$ = createEntityState<PortModel>([], this.entityPipe('ports'));
-  protected coords$ = createValueState<Coords>(
-    { x: 0, y: 0 },
-    this.entityPipe('coords')
-  );
-  protected dimensions$ = createValueState<Dimensions>(
-    { width: 0, height: 0 },
-    this.entityPipe('dimensions')
-  );
+export class NodeModel extends BaseModel<DiagramModel> {
+  protected extras$: ValueState<any>;
+  protected ports$: EntityState<PortModel>;
+  protected coords$: ValueState<Coords>;
+  protected dimensions$: ValueState<Dimensions>;
 
-  constructor(
-    nodeType = 'default',
-    id?: string,
-    extras: HashMap<any> = {},
-    x = 0,
-    y = 0,
-    width = 0,
-    height = 0,
-    logPrefix = '[Node]'
-  ) {
-    super(nodeType, id, logPrefix);
-    this.setExtras(extras);
-    this.setDimensions({ width, height });
-    this.setCoords({ x, y });
+  constructor(options: NodeModelOptions) {
+    super({ type: 'default', logPrefix: '[Node]', ...options });
+    this.ports$ = createEntityState([], this.entityPipe('ports'));
+    this.extras$ = createValueState(
+      options.extras ?? {},
+      this.entityPipe('extras')
+    );
+    this.coords$ = createValueState(
+      options.coords ?? { x: 0, y: 0 },
+      this.entityPipe('coords')
+    );
+    this.dimensions$ = createValueState(
+      options.dimensions ?? { width: 0, height: 0 },
+      this.entityPipe('dimensions')
+    );
 
     // once node finish painting itself, subscribe to ports change and update their coords
     this.paintChanges()
@@ -80,33 +76,38 @@ export class NodeModel extends BaseModel<
     this.coords$.set({ x, y }).emit();
   }
 
-  serialize(): SerializedNodeModel {
-    const serializedPorts = this.getPortsArray().map(port =>
-      port.serialize()
-    );
+  // serialize(): INodeModel {
+  //   const serializedPorts = this.getPortsArray().map((port) =>
+  //     port.serialize()
+  //   );
 
-    return {
-      ...super.serialize(),
-      nodeType: this.getType(),
-      type: this.getType(),
-      extras: this.getExtras(),
-      width: this.getWidth(),
-      height: this.getHeight(),
-      ...this.getCoords(),
-      ports: serializedPorts,
-    };
-  }
+  //   return {
+  //     ...super.serialize(),
+  //     nodeType: this.getType(),
+  //     type: this.getType(),
+  //     extras: this.getExtras(),
+  //     width: this.getWidth(),
+  //     height: this.getHeight(),
+  //     ...this.getCoords(),
+  //     ports: serializedPorts,
+  //   };
+  // }
 
-  getSelectedEntities(): (NodeModel | PointModel)[] {
-    let entities: (NodeModel | PointModel)[] = super.getSelectedEntities() as NodeModel[];
+  getSelectedEntities(): any {
+    let entities: (
+      | NodeModel
+      | PointModel
+    )[] = super.getSelectedEntities() as NodeModel[];
 
     const isPoint = (point: PointModel | null): point is PointModel => !!point;
+
     // add the points of each link that are selected here
     if (this.getSelected()) {
       this.getPorts().forEach((port) => {
         const points = port
           .getLinksArray()
-          .map((link) => link.getPointForPort(port)).filter(isPoint);
+          .map((link) => link.getPointForPort(port))
+          .filter(isPoint);
         entities = entities.concat(points);
       });
     }
@@ -148,7 +149,7 @@ export class NodeModel extends BaseModel<
   }
 
   getPort(id?: ID | null): PortModel | undefined {
-    return id && this.ports$.get(id) || undefined;
+    return (id && this.ports$.get(id)) || undefined;
   }
 
   selectPorts(selector?: () => boolean | ID | ID[]): Observable<PortModel[]> {
@@ -206,7 +207,7 @@ export class NodeModel extends BaseModel<
       .pipe(this.withLog('selectHeight'));
   }
 
-  setExtras(extras: any) {
+  setExtras<E>(extras: Partial<E>) {
     this.extras$.set(extras).emit();
   }
 
@@ -214,7 +215,7 @@ export class NodeModel extends BaseModel<
     return this.extras$.value;
   }
 
-  selectExtras<E = any>(
+  selectExtras<E>(
     selector?: (extra: E) => E[keyof E] | string | string[]
   ): Observable<E> {
     return this.extras$.select(selector);
