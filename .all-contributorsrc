@@ -37,6 +37,15 @@
         "ideas",
         "doc"
       ]
+    },
+    {
+      "login": "florianeichin",
+      "name": "Florian Eichin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/30117747?v=4",
+      "profile": "http://www.florianeichin.de",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
