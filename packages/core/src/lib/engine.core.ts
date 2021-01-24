@@ -8,7 +8,6 @@ import {
   NodeModel,
   BaseModel,
   LabelModel,
-  LinkModel,
 } from './models';
 import { createValueState, ValueState } from './state';
 import { BaseAction, BaseActionState, SelectingAction } from './actions';
@@ -23,7 +22,7 @@ export class DiagramEngineCore {
   }>({ action: null, state: null });
 
   protected factoriesManager: FactoriesManager<
-    AbstractFactory<BaseModel, unknown, unknown>
+    AbstractFactory<BaseModel<BaseEntity>, unknown, unknown>
   >;
   protected mouseManager: MouseManager;
   protected diagramModel: DiagramModel | undefined;
@@ -344,7 +343,7 @@ export class DiagramEngineCore {
             }
 
             const portsHost = nodeFactory.generateWidget({
-              model: node as NodeModel,
+              model: node as any,
               host: nodesHost,
               diagramModel: this.diagramModel,
             });
@@ -367,8 +366,12 @@ export class DiagramEngineCore {
                       modelType: port.getType(),
                     });
 
+                    if (!portFactory) {
+                      return;
+                    }
+
                     portFactory.generateWidget({
-                      model: port,
+                      model: port as any,
                       host: portsHost,
                     });
                   }
@@ -439,7 +442,7 @@ export class DiagramEngineCore {
               return;
             }
 
-            linkFactory.generateWidget({ model: link, host: linksHost });
+            linkFactory.generateWidget({ model: link as any, host: linksHost });
 
             // (canvas: HTMLElement | null | undefined): canvas is HTMLElement =>
             // Handle link label, if any
@@ -471,7 +474,7 @@ export class DiagramEngineCore {
         return;
       }
 
-      labalFactory.generateWidget({ model: label, host });
+      labalFactory.generateWidget({ model: label as any, host });
     }
   }
 
