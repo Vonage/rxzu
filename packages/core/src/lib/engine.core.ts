@@ -2,12 +2,7 @@ import { filter, map, switchMap, take, takeUntil } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import { BaseEntity } from './base.entity';
 import { FactoriesManager } from './factories';
-import {
-  DiagramModel,
-  PortModel,
-  NodeModel,
-  LabelModel,
-} from './models';
+import { DiagramModel, PortModel, NodeModel, LabelModel } from './models';
 import { createValueState, ValueState } from './state';
 import { BaseAction, BaseActionState, SelectingAction } from './actions';
 import { DiagramModelOptions, EngineSetup } from './interfaces';
@@ -386,6 +381,7 @@ export class DiagramEngineCore {
 
         return combineLatest(nodesPainted$);
       }),
+      filter((val) => val !== null),
       map(() => true)
     );
 

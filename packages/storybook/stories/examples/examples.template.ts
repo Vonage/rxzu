@@ -6,7 +6,6 @@ import { DragAndDropExampleStoryComponent } from './drag-and-drop/drag-and-drop.
 import { DynamicPortsExampleStoryComponent } from './dynamic-ports/dynamic-ports.component';
 import { EventsExampleStoryComponent } from './events/events.component';
 import { PerformanceExampleStoryComponent } from './performance/performance.component';
-import { SerializationExampleStoryComponent } from './serialization/serialization.component';
 
 export const BasicDiagramTemplate: Story<BasicExampleStoryComponent> = (
   args: any
@@ -20,13 +19,6 @@ export const EventsDiagramTemplate: Story<EventsExampleStoryComponent> = (
 ) => ({
   component: EventsExampleStoryComponent,
   props: { ...args, events: action('events') },
-});
-
-export const SerializationDiagramTemplate: Story<SerializationExampleStoryComponent> = (
-  args: any
-) => ({
-  component: SerializationExampleStoryComponent,
-  props: { ...args, serialized: action('serialized') },
 });
 
 export const AutoArrangeDiagramTemplate: Story<AutoArrangeExampleStoryComponent> = (

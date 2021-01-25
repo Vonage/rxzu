@@ -7,10 +7,8 @@ import {
   DynamicPortsDiagramTemplate,
   EventsDiagramTemplate,
   PerformanceDiagramTemplate,
-  SerializationDiagramTemplate,
 } from './examples.template';
 import { BasicExampleStoryComponent } from './basic/basic.component';
-import { SerializationExampleStoryComponent } from './serialization/serialization.component';
 import { AutoArrangeExampleStoryComponent } from './auto-arrange/auto-arrange.component';
 import { PerformanceExampleStoryComponent } from './performance/performance.component';
 import {
@@ -32,7 +30,6 @@ export default {
       declarations: [
         DefaultNodeComponent,
         BasicExampleStoryComponent,
-        SerializationExampleStoryComponent,
         AutoArrangeExampleStoryComponent,
         PerformanceExampleStoryComponent,
         DragAndDropExampleStoryComponent,
@@ -55,8 +52,6 @@ export default {
 export const Basic = BasicDiagramTemplate.bind({});
 
 export const Events = EventsDiagramTemplate.bind({});
-
-export const Serialization = SerializationDiagramTemplate.bind({});
 
 export const AutoArrange = AutoArrangeDiagramTemplate.bind({});
 

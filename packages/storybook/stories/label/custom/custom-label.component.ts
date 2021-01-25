@@ -1,16 +1,21 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { DefaultLabelModel } from '@rxzu/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+} from '@angular/core';
+import { LabelModel } from '@rxzu/core';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'custom-label',
   templateUrl: './custom-label.component.html',
   styleUrls: ['./custom-label.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CustomLabelComponent extends DefaultLabelModel implements OnInit {
+export class CustomLabelComponent extends LabelModel implements OnInit {
   constructor(private cdRef: ChangeDetectorRef) {
-    super('custom');
+    super({ type: 'custom' });
   }
 
   ngOnInit() {

@@ -7,12 +7,30 @@ export type FactoryType =
   | 'portFactories';
 
 export class FactoriesManager {
-  protected nodeFactories = new Map<string, AbstractFactory<unknown, unknown>>();
-  protected labelFactories = new Map<string, AbstractFactory<unknown, unknown>>();
-  protected linkFactories = new Map<string, AbstractFactory<unknown, unknown>>();
-  protected portFactories = new Map<string, AbstractFactory<unknown, unknown>>();
+  protected nodeFactories = new Map<
+    string,
+    AbstractFactory<unknown, unknown>
+  >();
+  protected labelFactories = new Map<
+    string,
+    AbstractFactory<unknown, unknown>
+  >();
+  protected linkFactories = new Map<
+    string,
+    AbstractFactory<unknown, unknown>
+  >();
+  protected portFactories = new Map<
+    string,
+    AbstractFactory<unknown, unknown>
+  >();
 
-  registerFactory<T extends AbstractFactory<any, any>>({ type, factory }: { type: FactoryType; factory: T }) {
+  registerFactory<T extends AbstractFactory<any, any>>({
+    type,
+    factory,
+  }: {
+    type: FactoryType;
+    factory: T;
+  }) {
     this[type].set(factory.type, factory);
   }
 

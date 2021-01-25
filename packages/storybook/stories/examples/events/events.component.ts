@@ -1,52 +1,79 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { DiagramEngine } from '@rxzu/angular';
-import { DiagramModel, DefaultNodeModel, BaseAction } from '@rxzu/core';
+import {
+  DiagramModel,
+  NodeModel,
+  BaseAction,
+  PortModel,
+  BaseModel,
+} from '@rxzu/core';
 import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
-  template: `<ngdx-diagram
+  template: `<rxzu-diagram
     class="demo-diagram"
     [model]="diagramModel"
-  ></ngdx-diagram>`,
+  ></rxzu-diagram>`,
   styleUrls: ['../demo-diagram.component.scss'],
 })
 export class EventsExampleStoryComponent implements OnInit {
   diagramModel: DiagramModel;
 
-  @Output() events: EventEmitter<BaseAction> = new EventEmitter();
+  @Output() events: EventEmitter<{
+    action: BaseAction | null;
+    state: string | null;
+  }> = new EventEmitter();
 
-  constructor(private diagramEngine: DiagramEngine) {}
+  constructor(private diagramEngine: DiagramEngine) {
+    this.diagramEngine.registerDefaultFactories();
+    this.diagramModel = this.diagramEngine.createModel();
+  }
 
   ngOnInit() {
     const nodesDefaultDimensions = { height: 200, width: 200 };
-    this.diagramEngine.registerDefaultFactories();
 
-    this.diagramModel = this.diagramEngine.createModel();
+    const node1 = new NodeModel({
+      coords: { x: 500, y: 300 },
+      type: 'default',
+      dimensions: nodesDefaultDimensions,
+    });
+    const outPort = new PortModel({ type: 'default', name: 'outport1' });
+    node1.addPort(outPort);
 
-    const node1 = new DefaultNodeModel();
-    node1.setCoords({ x: 500, y: 300 });
-    node1.setDimensions(nodesDefaultDimensions);
-    const outport1 = node1.addOutPort({ name: 'outport1' });
+    const node2 = new NodeModel({
+      coords: { x: 1000, y: 0 },
+      type: 'default',
+      dimensions: nodesDefaultDimensions,
+    });
 
-    const node2 = new DefaultNodeModel();
-    node2.setCoords({ x: 1000, y: 0 });
     node2.setDimensions(nodesDefaultDimensions);
-    const inport = node2.addInPort({ name: 'inport2' });
+    const inPort = new PortModel({ type: 'default', name: 'inport2' });
+    node2.addPort(inPort);
 
     for (let index = 0; index < 2; index++) {
-      const nodeLoop = new DefaultNodeModel();
-      nodeLoop.setCoords({ x: 1000, y: 300 + index * 300 });
-      nodeLoop.setDimensions(nodesDefaultDimensions);
-      nodeLoop.addInPort({ name: `inport${index + 3}` });
+      const nodeLoop = new NodeModel({
+        coords: { x: 1000, y: 300 + index * 300 },
+        type: 'default',
+        dimensions: nodesDefaultDimensions,
+      });
+      const portLoop = new PortModel({
+        type: 'default',
+        name: `inport${index + 3}`,
+      });
+      nodeLoop.addPort(portLoop);
 
       this.diagramModel.addNode(nodeLoop);
     }
 
-    const link = outport1.link(inport);
-    link.setLocked();
+    const link = outPort.link(inPort);
+    const models: BaseModel[] = [node1, node2];
+    if (link) {
+      link.setLocked();
+      models.push(link);
+    }
 
-    this.diagramModel.addAll(node1, node2, link);
+    this.diagramModel.addAll(...models);
 
     this.diagramModel.getDiagramEngine().zoomToFit();
 
@@ -56,7 +83,7 @@ export class EventsExampleStoryComponent implements OnInit {
   subscribeToDiagramEvents() {
     this.diagramEngine
       .selectAction()
-      .pipe(filter(Boolean))
-      .subscribe((e: BaseAction) => this.events.emit(e));
+      .pipe(filter((e) => e !== null))
+      .subscribe((e) => this.events.emit(e));
   }
 }

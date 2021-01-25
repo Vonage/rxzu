@@ -8,7 +8,7 @@ import {
 import { NodeModel } from '@rxzu/core';
 
 @Component({
-  selector: 'ngdx-default-node',
+  selector: 'rxzu-default-node',
   templateUrl: './default-node.component.html',
   styleUrls: ['./default-node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,7 +18,7 @@ export class DefaultNodeComponent extends NodeModel implements OnInit {
   portsLayer!: ViewContainerRef;
 
   constructor() {
-    super({ type: 'ngdx-default-node' });
+    super({ type: 'rxzu-default-node' });
   }
 
   ngOnInit() {

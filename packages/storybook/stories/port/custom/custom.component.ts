@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
-import { DefaultPortModel } from '@rxzu/core';
+import { PortModel } from '@rxzu/core';
 
 @Component({
   selector: 'custom-port',
   templateUrl: './custom.component.html',
-  styleUrls: ['./custom.component.scss']
+  styleUrls: ['./custom.component.scss'],
 })
-export class CustomPortComponent extends DefaultPortModel {
+export class CustomPortComponent extends PortModel {
   constructor() {
-    super();
+    super({ type: 'custom' });
   }
 }

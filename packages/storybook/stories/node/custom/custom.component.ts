@@ -5,7 +5,7 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { DefaultNodeModel } from '@rxzu/core';
+import { NodeModel } from '@rxzu/core';
 
 @Component({
   selector: 'custom-node',
@@ -13,10 +13,10 @@ import { DefaultNodeModel } from '@rxzu/core';
   styleUrls: ['./custom.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default,
 })
-export class CustomNodeComponent extends DefaultNodeModel implements OnInit {
+export class CustomNodeComponent extends NodeModel implements OnInit {
   @ViewChild('portsLayer', { read: ViewContainerRef, static: true })
-  portsLayer: ViewContainerRef;
-  nodeContent: string;
+  portsLayer!: ViewContainerRef;
+  nodeContent = 'Pick me!';
 
   constructor() {
     super({ type: 'custom-node' });

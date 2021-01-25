@@ -12,7 +12,7 @@ import { combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-  selector: 'ngdx-default-link',
+  selector: 'rxzu-default-link',
   templateUrl: './default-link.component.html',
   styleUrls: ['./default-link.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,7 +24,7 @@ export class DefaultLinkComponent
   labelLayer!: ViewContainerRef;
 
   constructor(private cdRef: ChangeDetectorRef) {
-    super({ type: 'ngdx-default-link' });
+    super({ type: 'rxzu-default-link' });
   }
 
   trackByPoints(i: number, point: PointModel) {

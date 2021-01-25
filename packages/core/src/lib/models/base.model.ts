@@ -11,7 +11,7 @@ import { createValueState, ValueState } from '../state';
 export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   protected readonly _type: string;
 
-  protected parent$: ValueState<E>;
+  protected parent$: ValueState<any>;
   protected selected$: ValueState<boolean>;
   protected hovered$: ValueState<boolean>;
   protected painted$: ValueState<PaintedEvent>;

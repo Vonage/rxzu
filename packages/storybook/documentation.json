@@ -3,10 +3,10 @@
     "interfaces": [
         {
             "name": "ZonedClass",
-            "id": "interface-ZonedClass-95a8ba087560debc8f9321814c92650b",
+            "id": "interface-ZonedClass-e25d4af36bea6b7cde4b97b6a6b47e3a",
             "file": "packages/angular/src/lib/utils/decorators.ts",
             "type": "interface",
-            "sourceCode": "import { NgZone } from '@angular/core';\n\nexport interface ZonedClass {\n  ngZone: NgZone;\n}\n\nexport function OutsideZone<T extends ZonedClass>(targetClass: T, functionName: string, descriptor) {\n  const source = descriptor.value;\n  descriptor.value = function (...data) {\n    if (!this.ngZone) {\n      throw new Error(\"Class with 'OutsideZone' decorator should have 'ngZone' class property with 'NgZone' class.\");\n    }\n    return this.ngZone.runOutsideAngular(() => source.call(this, ...data));\n  };\n  return descriptor;\n}\n",
+            "sourceCode": "import { NgZone } from '@angular/core';\n\nexport interface ZonedClass {\n  ngZone: NgZone;\n}\n\nexport function OutsideZone<T extends ZonedClass>(\n  targetClass: T,\n  functionName: string,\n  descriptor: any\n) {\n  const source = descriptor.value;\n  descriptor.value = function (...data: any[]) {\n    if (!this.ngZone) {\n      throw new Error(\n        \"Class with 'OutsideZone' decorator should have 'ngZone' class property with 'NgZone' class.\"\n      );\n    }\n    return this.ngZone.runOutsideAngular(() => source.call(this, ...data));\n  };\n  return descriptor;\n}\n",
             "properties": [
                 {
                     "name": "ngZone",
@@ -24,7 +24,7 @@
     "injectables": [
         {
             "name": "DiagramEngine",
-            "id": "injectable-DiagramEngine-bc22c04c81a991546c8c643c9805e228",
+            "id": "injectable-DiagramEngine-7ff710c334c4ae64ecafaae1ce38e193",
             "file": "packages/angular/src/lib/engine.service.ts",
             "properties": [
                 {
@@ -49,7 +49,7 @@
                 }
             ],
             "description": "",
-            "sourceCode": "import {\n  ComponentFactoryResolver,\n  Injectable,\n  Renderer2,\n  RendererFactory2,\n} from '@angular/core';\nimport { DiagramEngineCore } from '@rxzu/core';\nimport {\n  DefaultLabelFactory,\n  DefaultLinkFactory,\n  DefaultNodeFactory,\n  DefaultPortFactory,\n} from './defaults';\nimport { RxZuDiagramsModule } from './main.module';\n\n@Injectable({ providedIn: RxZuDiagramsModule })\nexport class DiagramEngine extends DiagramEngineCore {\n  protected _renderer: Renderer2;\n\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected rendererFactory: RendererFactory2\n  ) {\n    super();\n    this._renderer = this.rendererFactory.createRenderer(null, null);\n  }\n\n  registerDefaultFactories() {\n    const factoriesManager = this.getFactoriesManager();\n    factoriesManager.registerFactory({\n      type: 'nodeFactories',\n      factory: new DefaultNodeFactory(this.resolver, this._renderer),\n    });\n\n    factoriesManager.registerFactory({\n      type: 'linkFactories',\n      factory: new DefaultLinkFactory(this.resolver, this._renderer),\n    });\n\n    factoriesManager.registerFactory({\n      type: 'portFactories',\n      factory: new DefaultPortFactory(this.resolver, this._renderer),\n    });\n\n    factoriesManager.registerFactory({\n      type: 'labelFactories',\n      factory: new DefaultLabelFactory(this.resolver, this._renderer),\n    });\n  }\n}\n",
+            "sourceCode": "import {\n  ComponentFactoryResolver,\n  Injectable,\n  Renderer2,\n  RendererFactory2,\n} from '@angular/core';\nimport { AbstractFactory, DiagramEngineCore } from '@rxzu/core';\nimport {\n  DefaultLabelFactory,\n  DefaultLinkFactory,\n  DefaultNodeFactory,\n  DefaultPortFactory,\n} from './defaults';\nimport { RxZuDiagramsModule } from './main.module';\n\n@Injectable({ providedIn: RxZuDiagramsModule })\nexport class DiagramEngine extends DiagramEngineCore {\n  protected _renderer: Renderer2;\n\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected rendererFactory: RendererFactory2\n  ) {\n    super();\n    this._renderer = this.rendererFactory.createRenderer(null, null);\n  }\n\n  registerDefaultFactories() {\n    const factoriesManager = this.getFactoriesManager();\n    factoriesManager.registerFactory({\n      type: 'nodeFactories',\n      factory: new DefaultNodeFactory(this.resolver, this._renderer) as AbstractFactory<any, any>,\n    });\n\n    factoriesManager.registerFactory({\n      type: 'linkFactories',\n      factory: new DefaultLinkFactory(this.resolver, this._renderer) as AbstractFactory<any, any>,\n    });\n\n    factoriesManager.registerFactory({\n      type: 'portFactories',\n      factory: new DefaultPortFactory(this.resolver, this._renderer) as AbstractFactory<any, any>,\n    });\n\n    factoriesManager.registerFactory({\n      type: 'labelFactories',\n      factory: new DefaultLabelFactory(this.resolver, this._renderer) as AbstractFactory<any, any>,\n    });\n  }\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -88,10 +88,10 @@
     "classes": [
         {
             "name": "AbstractAngularFactory",
-            "id": "class-AbstractAngularFactory-3c5c67a27fbd50dfd800dd2deda6405b",
+            "id": "class-AbstractAngularFactory-af7945d57785a0304feffa428903e507",
             "file": "packages/angular/src/lib/defaults/factories/angular.factory.ts",
             "type": "class",
-            "sourceCode": "import { ComponentRef, ViewContainerRef } from '@angular/core';\nimport { BaseModel, AbstractFactory, DiagramModel } from '@rxzu/core';\n\nexport abstract class AbstractAngularFactory<\n  T extends BaseModel = BaseModel,\n  R = ViewContainerRef,\n  Y = ComponentRef<T>\n> extends AbstractFactory<T, R, Y> {\n  abstract generateWidget({\n    model,\n    host,\n    diagramModel,\n  }: {\n    model: T;\n    host: R;\n    diagramModel?: DiagramModel;\n  }): Y | any;\n}\n",
+            "sourceCode": "import { ComponentRef, ViewContainerRef } from '@angular/core';\nimport { BaseModel, AbstractFactory, DiagramModel } from '@rxzu/core';\n\nexport abstract class AbstractAngularFactory<\n  R = ViewContainerRef,\n  Y = ComponentRef<BaseModel>\n> extends AbstractFactory<R, Y> {\n  abstract generateWidget({\n    model,\n    host,\n    diagramModel,\n  }: {\n    model: any;\n    host: R;\n    diagramModel?: DiagramModel;\n  }): Y | any;\n}\n",
             "properties": [],
             "methods": [
                 {
@@ -104,7 +104,7 @@
                     "optional": false,
                     "returnType": "Y | any",
                     "typeParameters": [],
-                    "line": 9,
+                    "line": 8,
                     "modifierKind": [
                         117
                     ],
@@ -127,10 +127,10 @@
         },
         {
             "name": "DefaultLabelFactory",
-            "id": "class-DefaultLabelFactory-ea68f44c1cb3df6ec65a766d2e3cb702",
+            "id": "class-DefaultLabelFactory-6a2332027676cc58ed21e8dd8a68ce2c",
             "file": "packages/angular/src/lib/defaults/factories/default-label.factory.ts",
             "type": "class",
-            "sourceCode": "import {\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactoryResolver,\n  ComponentFactory,\n  Renderer2,\n} from '@angular/core';\nimport { DefaultLabelModel } from '@rxzu/core';\nimport { DefaultLabelComponent } from '../components/default-label/default-label.component';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultLabelFactory extends AbstractAngularFactory<\n  DefaultLabelComponent\n> {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n  }: {\n    model: DefaultLabelModel;\n    host: ViewContainerRef;\n  }): ComponentRef<DefaultLabelComponent> {\n    const componentRef = host.createComponent(this.getRecipe());\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for link\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-labelid', model.id);\n\n    // on destroy make sure to destroy the componentRef\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    // assign all passed properties to node initialization.\n    Object.entries(model).forEach(([key, value]) => {\n      componentRef.instance[key] = value;\n    });\n\n    componentRef.instance.ngOnInit();\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultLabelComponent> {\n    return this.resolver.resolveComponentFactory(DefaultLabelComponent);\n  }\n}\n",
+            "sourceCode": "import {\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactoryResolver,\n  ComponentFactory,\n  Renderer2,\n} from '@angular/core';\nimport { LabelModel } from '@rxzu/core';\nimport { DefaultLabelComponent } from '../components/default-label/default-label.component';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultLabelFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n  }: {\n    model: LabelModel;\n    host: ViewContainerRef;\n  }): ComponentRef<DefaultLabelComponent> {\n    const componentRef = host.createComponent(this.getRecipe());\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for link\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-labelid', model.id);\n\n    // on destroy make sure to destroy the componentRef\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    componentRef.instance.ngOnInit();\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultLabelComponent> {\n    return this.resolver.resolveComponentFactory(DefaultLabelComponent);\n  }\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -144,7 +144,7 @@
                         "type": "Renderer2"
                     }
                 ],
-                "line": 14,
+                "line": 12,
                 "jsdoctags": [
                     {
                         "name": "resolver",
@@ -174,7 +174,7 @@
                     "optional": false,
                     "returnType": "ComponentRef<DefaultLabelComponent>",
                     "typeParameters": [],
-                    "line": 22,
+                    "line": 20,
                     "jsdoctags": [
                         {
                             "type": "literal type",
@@ -190,7 +190,7 @@
                     "optional": false,
                     "returnType": "ComponentFactory<DefaultLabelComponent>",
                     "typeParameters": [],
-                    "line": 54
+                    "line": 47
                 },
                 {
                     "name": "generateWidget",
@@ -202,7 +202,7 @@
                     "optional": false,
                     "returnType": "Y | any",
                     "typeParameters": [],
-                    "line": 9,
+                    "line": 8,
                     "modifierKind": [
                         117
                     ],
@@ -228,10 +228,10 @@
         },
         {
             "name": "DefaultLinkFactory",
-            "id": "class-DefaultLinkFactory-0ece4aff0efd8307f8ec318e2a344b08",
+            "id": "class-DefaultLinkFactory-cb62d085fa2b85e3f4af6ea2d86fdbbc",
             "file": "packages/angular/src/lib/defaults/factories/default-link.factory.ts",
             "type": "class",
-            "sourceCode": "import { DefaultLinkComponent } from '../components/default-link/default-link.component';\nimport {\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactoryResolver,\n  ComponentFactory,\n  Renderer2,\n} from '@angular/core';\nimport { DefaultLinkModel } from '@rxzu/core';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultLinkFactory extends AbstractAngularFactory<\n  DefaultLinkComponent\n> {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n  }: {\n    model: DefaultLinkModel;\n    host: ViewContainerRef;\n  }): ComponentRef<DefaultLinkComponent> {\n    const componentRef = host.createComponent(this.getRecipe());\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for link\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n    this.renderer.addClass(rootNode, 'label');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-linkid', model.id);\n\n    // on destroy make sure to destroy the componentRef\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    // assign all passed properties to link initialization.\n    Object.entries(model).forEach(([key, value]) => {\n      componentRef.instance[key] = value;\n    });\n\n    componentRef.instance.ngOnInit();\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultLinkComponent> {\n    return this.resolver.resolveComponentFactory(DefaultLinkComponent);\n  }\n}\n",
+            "sourceCode": "import { DefaultLinkComponent } from '../components/default-link/default-link.component';\nimport {\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactoryResolver,\n  ComponentFactory,\n  Renderer2,\n} from '@angular/core';\nimport { LinkModel } from '@rxzu/core';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultLinkFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n  }: {\n    model: LinkModel;\n    host: ViewContainerRef;\n  }): ComponentRef<DefaultLinkComponent> {\n    const componentRef = host.createComponent(this.getRecipe());\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for link\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n    this.renderer.addClass(rootNode, 'label');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-linkid', model.id);\n\n    // on destroy make sure to destroy the componentRef\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    componentRef.instance.ngOnInit();\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultLinkComponent> {\n    return this.resolver.resolveComponentFactory(DefaultLinkComponent);\n  }\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -245,7 +245,7 @@
                         "type": "Renderer2"
                     }
                 ],
-                "line": 14,
+                "line": 12,
                 "jsdoctags": [
                     {
                         "name": "resolver",
@@ -275,7 +275,7 @@
                     "optional": false,
                     "returnType": "ComponentRef<DefaultLinkComponent>",
                     "typeParameters": [],
-                    "line": 22,
+                    "line": 20,
                     "jsdoctags": [
                         {
                             "type": "literal type",
@@ -291,7 +291,7 @@
                     "optional": false,
                     "returnType": "ComponentFactory<DefaultLinkComponent>",
                     "typeParameters": [],
-                    "line": 55
+                    "line": 48
                 },
                 {
                     "name": "generateWidget",
@@ -303,7 +303,7 @@
                     "optional": false,
                     "returnType": "Y | any",
                     "typeParameters": [],
-                    "line": 9,
+                    "line": 8,
                     "modifierKind": [
                         117
                     ],
@@ -329,10 +329,10 @@
         },
         {
             "name": "DefaultNodeFactory",
-            "id": "class-DefaultNodeFactory-c4b0a9c748212aacc1b63a495e3c33f7",
+            "id": "class-DefaultNodeFactory-e99a9ec5d229f2ae23649074742ef86d",
             "file": "packages/angular/src/lib/defaults/factories/default-node.factory.ts",
             "type": "class",
-            "sourceCode": "import { DefaultNodeComponent } from '../components/default-node/default-node.component';\nimport {\n  ComponentFactoryResolver,\n  ViewContainerRef,\n  ComponentFactory,\n  Renderer2,\n} from '@angular/core';\nimport { DefaultNodeModel, DiagramModel } from '@rxzu/core';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultNodeFactory extends AbstractAngularFactory<\n  DefaultNodeComponent\n> {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n    diagramModel,\n  }: {\n    model: DefaultNodeModel;\n    host: ViewContainerRef;\n    diagramModel?: DiagramModel;\n  }): ViewContainerRef {\n    const componentRef = host.createComponent(this.getRecipe(), host.length);\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for node\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n    this.renderer.setStyle(rootNode, 'display', 'block');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-nodeid', model.id);\n\n    // subscribe to node coordinates\n    model.selectCoords().subscribe(({ x, y }) => {\n      this.renderer.setStyle(rootNode, 'left', `${x}px`);\n      this.renderer.setStyle(rootNode, 'top', `${y}px`);\n    });\n\n    model.selectionChanges().subscribe((e) => {\n      e.isSelected\n        ? this.renderer.addClass(rootNode, 'selected')\n        : this.renderer.removeClass(rootNode, 'selected');\n    });\n\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    // assign all passed properties to node initialization.\n    Object.entries(model).forEach(([key, value]) => {\n      componentRef.instance[key] = value;\n    });\n\n    componentRef.instance.setParent(diagramModel);\n    componentRef.instance.ngOnInit();\n    const portsHost = componentRef.instance.getPortsHost();\n    return portsHost;\n  }\n\n  getRecipe(): ComponentFactory<DefaultNodeComponent> {\n    return this.resolver.resolveComponentFactory(DefaultNodeComponent);\n  }\n}\n",
+            "sourceCode": "import { DefaultNodeComponent } from '../components/default-node/default-node.component';\nimport {\n  ComponentFactoryResolver,\n  ViewContainerRef,\n  ComponentFactory,\n  Renderer2,\n} from '@angular/core';\nimport { DiagramModel, NodeModel } from '@rxzu/core';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultNodeFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n    diagramModel,\n  }: {\n    model: NodeModel;\n    host: ViewContainerRef;\n    diagramModel: DiagramModel;\n  }): ViewContainerRef {\n    const componentRef = host.createComponent(this.getRecipe(), host.length);\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for node\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n    this.renderer.setStyle(rootNode, 'display', 'block');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-nodeid', model.id);\n\n    // subscribe to node coordinates\n    model.selectCoords().subscribe(({ x, y }) => {\n      this.renderer.setStyle(rootNode, 'left', `${x}px`);\n      this.renderer.setStyle(rootNode, 'top', `${y}px`);\n    });\n\n    model.selectionChanges().subscribe((e) => {\n      e.isSelected\n        ? this.renderer.addClass(rootNode, 'selected')\n        : this.renderer.removeClass(rootNode, 'selected');\n    });\n\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    componentRef.instance.setParent(diagramModel);\n    componentRef.instance.ngOnInit();\n    const portsHost = componentRef.instance.getPortsHost();\n    return portsHost;\n  }\n\n  getRecipe(): ComponentFactory<DefaultNodeComponent> {\n    return this.resolver.resolveComponentFactory(DefaultNodeComponent);\n  }\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -346,7 +346,7 @@
                         "type": "Renderer2"
                     }
                 ],
-                "line": 13,
+                "line": 11,
                 "jsdoctags": [
                     {
                         "name": "resolver",
@@ -376,7 +376,7 @@
                     "optional": false,
                     "returnType": "ViewContainerRef",
                     "typeParameters": [],
-                    "line": 21,
+                    "line": 19,
                     "jsdoctags": [
                         {
                             "type": "literal type",
@@ -392,7 +392,7 @@
                     "optional": false,
                     "returnType": "ComponentFactory<DefaultNodeComponent>",
                     "typeParameters": [],
-                    "line": 69
+                    "line": 62
                 },
                 {
                     "name": "generateWidget",
@@ -404,7 +404,7 @@
                     "optional": false,
                     "returnType": "Y | any",
                     "typeParameters": [],
-                    "line": 9,
+                    "line": 8,
                     "modifierKind": [
                         117
                     ],
@@ -430,10 +430,10 @@
         },
         {
             "name": "DefaultPortFactory",
-            "id": "class-DefaultPortFactory-2aff8beb32b49ce32eeb58a594bf8c9a",
+            "id": "class-DefaultPortFactory-19068166896d0a14216efe7b9b06fc57",
             "file": "packages/angular/src/lib/defaults/factories/default-port.factory.ts",
             "type": "class",
-            "sourceCode": "import {\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactory,\n  ComponentFactoryResolver,\n  Renderer2,\n} from '@angular/core';\nimport { DefaultPortModel } from '@rxzu/core';\nimport { DefaultPortComponent } from '../components/default-port/default-port.component';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultPortFactory extends AbstractAngularFactory<\n  DefaultPortComponent\n> {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host: nodeHost,\n  }: {\n    model: DefaultPortModel;\n    host: ViewContainerRef;\n  }): ComponentRef<DefaultPortComponent> {\n    const componentRef = nodeHost.createComponent(this.getRecipe());\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement as HTMLElement;\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-portid', model.id);\n    this.renderer.setAttribute(rootNode, 'data-name', model.getName());\n\n    model.in\n      ? this.renderer.addClass(rootNode, 'in')\n      : this.renderer.addClass(rootNode, 'out');\n\n    // assign all passed properties to node initialization.\n    Object.entries(model).forEach(([key, value]) => {\n      componentRef.instance[key] = value;\n    });\n\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    componentRef.instance.ngOnInit();\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultPortComponent> {\n    return this.resolver.resolveComponentFactory(DefaultPortComponent);\n  }\n}\n",
+            "sourceCode": "import {\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactory,\n  ComponentFactoryResolver,\n  Renderer2,\n} from '@angular/core';\nimport { PortModel } from '@rxzu/core';\nimport { DefaultPortComponent } from '../components/default-port/default-port.component';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultPortFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host: nodeHost,\n  }: {\n    model: PortModel;\n    host: ViewContainerRef;\n  }): ComponentRef<DefaultPortComponent> {\n    const componentRef = nodeHost.createComponent(this.getRecipe());\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement as HTMLElement;\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-portid', model.id);\n    const name = model.getName();\n    if (name) {\n      this.renderer.setAttribute(rootNode, 'data-name', name);\n    }\n\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    componentRef.instance.ngOnInit();\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultPortComponent> {\n    return this.resolver.resolveComponentFactory(DefaultPortComponent);\n  }\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -447,7 +447,7 @@
                         "type": "Renderer2"
                     }
                 ],
-                "line": 14,
+                "line": 12,
                 "jsdoctags": [
                     {
                         "name": "resolver",
@@ -477,7 +477,7 @@
                     "optional": false,
                     "returnType": "ComponentRef<DefaultPortComponent>",
                     "typeParameters": [],
-                    "line": 22,
+                    "line": 20,
                     "jsdoctags": [
                         {
                             "type": "literal type",
@@ -493,7 +493,7 @@
                     "optional": false,
                     "returnType": "ComponentFactory<DefaultPortComponent>",
                     "typeParameters": [],
-                    "line": 55
+                    "line": 47
                 },
                 {
                     "name": "generateWidget",
@@ -505,7 +505,7 @@
                     "optional": false,
                     "returnType": "Y | any",
                     "typeParameters": [],
-                    "line": 9,
+                    "line": 8,
                     "modifierKind": [
                         117
                     ],
@@ -531,24 +531,24 @@
         },
         {
             "name": "TemplateVarContext",
-            "id": "class-TemplateVarContext-adff97d20031c06a8d3472e4695578f7",
+            "id": "class-TemplateVarContext-a31c3786aab76309a86889750d089e0b",
             "file": "packages/angular/src/lib/utils/template-var.directive.ts",
             "type": "class",
-            "sourceCode": "import { Directive, EmbeddedViewRef, Input, TemplateRef, ViewContainerRef } from '@angular/core';\n\nclass TemplateVarContext {\n  $implicit: any;\n  templateVar: any;\n}\n\n@Directive({\n  selector: '[templateVar]'\n})\nexport class TemplateVarDirective {\n  view: EmbeddedViewRef<any>;\n\n  protected context = new TemplateVarContext();\n\n  @Input()\n  set templateVar(context: any) {\n    this.context.$implicit = this.context.templateVar = context;\n    this.updateView();\n  }\n\n  constructor(protected vcRef: ViewContainerRef, protected templateRef: TemplateRef<any>) {}\n\n  updateView() {\n    if (!this.view) {\n      this.vcRef.clear();\n      this.view = this.vcRef.createEmbeddedView(this.templateRef, this.context);\n    } else {\n      this.view.markForCheck();\n    }\n  }\n}\n",
+            "sourceCode": "import {\n  Directive,\n  EmbeddedViewRef,\n  Input,\n  TemplateRef,\n  ViewContainerRef,\n} from '@angular/core';\n\nclass TemplateVarContext {\n  $implicit: any;\n  templateVar: any;\n}\n\n@Directive({\n  selector: '[templateVar]',\n})\nexport class TemplateVarDirective {\n  view: EmbeddedViewRef<any> | null = null;\n\n  protected context = new TemplateVarContext();\n\n  @Input()\n  set templateVar(context: any) {\n    this.context.$implicit = this.context.templateVar = context;\n    this.updateView();\n  }\n\n  constructor(\n    protected vcRef: ViewContainerRef,\n    protected templateRef: TemplateRef<any>\n  ) {}\n\n  updateView() {\n    if (!this.view) {\n      this.vcRef.clear();\n      this.view = this.vcRef.createEmbeddedView(this.templateRef, this.context);\n    } else {\n      this.view.markForCheck();\n    }\n  }\n}\n",
             "properties": [
                 {
                     "name": "$implicit",
                     "type": "any",
                     "optional": false,
                     "description": "",
-                    "line": 4
+                    "line": 10
                 },
                 {
                     "name": "templateVar",
                     "type": "any",
                     "optional": false,
                     "description": "",
-                    "line": 5
+                    "line": 11
                 }
             ],
             "methods": [],
@@ -562,17 +562,17 @@
     "directives": [
         {
             "name": "TemplateVarDirective",
-            "id": "directive-TemplateVarDirective-adff97d20031c06a8d3472e4695578f7",
+            "id": "directive-TemplateVarDirective-a31c3786aab76309a86889750d089e0b",
             "file": "packages/angular/src/lib/utils/template-var.directive.ts",
             "type": "directive",
             "description": "",
-            "sourceCode": "import { Directive, EmbeddedViewRef, Input, TemplateRef, ViewContainerRef } from '@angular/core';\n\nclass TemplateVarContext {\n  $implicit: any;\n  templateVar: any;\n}\n\n@Directive({\n  selector: '[templateVar]'\n})\nexport class TemplateVarDirective {\n  view: EmbeddedViewRef<any>;\n\n  protected context = new TemplateVarContext();\n\n  @Input()\n  set templateVar(context: any) {\n    this.context.$implicit = this.context.templateVar = context;\n    this.updateView();\n  }\n\n  constructor(protected vcRef: ViewContainerRef, protected templateRef: TemplateRef<any>) {}\n\n  updateView() {\n    if (!this.view) {\n      this.vcRef.clear();\n      this.view = this.vcRef.createEmbeddedView(this.templateRef, this.context);\n    } else {\n      this.view.markForCheck();\n    }\n  }\n}\n",
+            "sourceCode": "import {\n  Directive,\n  EmbeddedViewRef,\n  Input,\n  TemplateRef,\n  ViewContainerRef,\n} from '@angular/core';\n\nclass TemplateVarContext {\n  $implicit: any;\n  templateVar: any;\n}\n\n@Directive({\n  selector: '[templateVar]',\n})\nexport class TemplateVarDirective {\n  view: EmbeddedViewRef<any> | null = null;\n\n  protected context = new TemplateVarContext();\n\n  @Input()\n  set templateVar(context: any) {\n    this.context.$implicit = this.context.templateVar = context;\n    this.updateView();\n  }\n\n  constructor(\n    protected vcRef: ViewContainerRef,\n    protected templateRef: TemplateRef<any>\n  ) {}\n\n  updateView() {\n    if (!this.view) {\n      this.vcRef.clear();\n      this.view = this.vcRef.createEmbeddedView(this.templateRef, this.context);\n    } else {\n      this.view.markForCheck();\n    }\n  }\n}\n",
             "selector": "[templateVar]",
             "providers": [],
             "inputsClass": [
                 {
                     "name": "templateVar",
-                    "line": 17,
+                    "line": 23,
                     "type": "any"
                 }
             ],
@@ -586,17 +586,18 @@
                     "type": "",
                     "optional": false,
                     "description": "",
-                    "line": 14,
+                    "line": 20,
                     "modifierKind": [
                         113
                     ]
                 },
                 {
                     "name": "view",
-                    "type": "EmbeddedViewRef<any>",
+                    "defaultValue": "null",
+                    "type": "EmbeddedViewRef<any> | null",
                     "optional": false,
                     "description": "",
-                    "line": 12
+                    "line": 18
                 }
             ],
             "methodsClass": [
@@ -606,7 +607,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 24
+                    "line": 33
                 }
             ],
             "constructorObj": {
@@ -622,7 +623,7 @@
                         "type": "TemplateRef<any>"
                     }
                 ],
-                "line": 20,
+                "line": 26,
                 "jsdoctags": [
                     {
                         "name": "vcRef",
@@ -653,7 +654,7 @@
                             }
                         ],
                         "returnType": "void",
-                        "line": 17,
+                        "line": 23,
                         "jsdoctags": [
                             {
                                 "name": "context",
@@ -671,7 +672,7 @@
     "components": [
         {
             "name": "DefaultLabelComponent",
-            "id": "component-DefaultLabelComponent-312e6ec5958d7d7f2ef3a74c6e2ec264",
+            "id": "component-DefaultLabelComponent-5836087fc70216af2b44ede627e74624",
             "file": "packages/angular/src/lib/defaults/components/default-label/default-label.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -679,7 +680,7 @@
             "inputs": [],
             "outputs": [],
             "providers": [],
-            "selector": "ngdx-default-label",
+            "selector": "rxzu-default-label",
             "styleUrls": [
                 "./default-label.component.scss"
             ],
@@ -698,7 +699,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 16
+                    "line": 21
                 }
             ],
             "hostBindings": [],
@@ -706,7 +707,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';\nimport { DefaultLabelModel } from '@rxzu/core';\nimport { takeUntil } from 'rxjs/operators';\n\n@Component({\n  selector: 'ngdx-default-label',\n  templateUrl: './default-label.component.html',\n  styleUrls: ['./default-label.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class DefaultLabelComponent extends DefaultLabelModel implements OnInit {\n  constructor(private cdRef: ChangeDetectorRef) {\n    super('ngdx-default-label');\n  }\n\n  ngOnInit() {\n    this.selectCoords()\n      .pipe(takeUntil(this.destroyed$))\n      .subscribe(() => {\n        this.cdRef.detectChanges();\n      });\n\n    this.setPainted(true);\n  }\n}\n",
+            "sourceCode": "import {\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  OnInit,\n} from '@angular/core';\nimport { LabelModel } from '@rxzu/core';\nimport { takeUntil } from 'rxjs/operators';\n\n@Component({\n  selector: 'rxzu-default-label',\n  templateUrl: './default-label.component.html',\n  styleUrls: ['./default-label.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultLabelComponent extends LabelModel implements OnInit {\n  constructor(private cdRef: ChangeDetectorRef) {\n    super({ type: 'rxzu-default-label' });\n  }\n\n  ngOnInit() {\n    this.selectCoords()\n      .pipe(takeUntil(this.destroyed$))\n      .subscribe(() => {\n        this.cdRef.detectChanges();\n      });\n\n    this.setPainted(true);\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -724,7 +725,7 @@
                         "type": "ChangeDetectorRef"
                     }
                 ],
-                "line": 11,
+                "line": 16,
                 "jsdoctags": [
                     {
                         "name": "cdRef",
@@ -735,15 +736,15 @@
                     }
                 ]
             },
-            "extends": "DefaultLabelModel",
+            "extends": "LabelModel",
             "implements": [
                 "OnInit"
             ],
-            "templateData": "<div\n  class=\"default-label\"\n  [ngStyle]=\"{\n    transform:\n      'translate(' +\n      (selectCoords() | async).x +\n      'px, ' +\n      (selectCoords() | async).y +\n      'px)' +\n      'rotate(' +\n      (selectRotation() | async) +\n      'deg)'\n  }\"\n>\n  {{ selectLabel() | async }}\n</div>\n"
+            "templateData": "<div\n  class=\"default-label\"\n  [ngStyle]=\"{\n    transform:\n      'translate(' +\n      (selectCoords() | async)?.x +\n      'px, ' +\n      (selectCoords() | async)?.y +\n      'px)' +\n      'rotate(' +\n      (selectRotation() | async) +\n      'deg)'\n  }\"\n>\n  {{ selectText() | async }}\n</div>\n"
         },
         {
             "name": "DefaultLinkComponent",
-            "id": "component-DefaultLinkComponent-3a38f382e1c947d3df14ad259bc95c2f",
+            "id": "component-DefaultLinkComponent-02f73a44b81a5a6c88aa20d9f2aca5d0",
             "file": "packages/angular/src/lib/defaults/components/default-link/default-link.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -751,7 +752,7 @@
             "inputs": [],
             "outputs": [],
             "providers": [],
-            "selector": "ngdx-default-link",
+            "selector": "rxzu-default-link",
             "styleUrls": [
                 "./default-link.component.scss"
             ],
@@ -768,7 +769,7 @@
                     "type": "ViewContainerRef",
                     "optional": false,
                     "description": "",
-                    "line": 29,
+                    "line": 24,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -793,7 +794,7 @@
                     "optional": false,
                     "returnType": "Coords",
                     "typeParameters": [],
-                    "line": 103,
+                    "line": 98,
                     "jsdoctags": [
                         {
                             "name": "firstPoint",
@@ -826,7 +827,7 @@
                     "optional": false,
                     "returnType": "number",
                     "typeParameters": [],
-                    "line": 86,
+                    "line": 81,
                     "jsdoctags": [
                         {
                             "name": "firstPoint",
@@ -850,7 +851,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 47
+                    "line": 42
                 },
                 {
                     "name": "ngOnInit",
@@ -858,7 +859,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 43
+                    "line": 38
                 },
                 {
                     "name": "onHover",
@@ -866,15 +867,15 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 39
+                    "line": 34
                 },
                 {
                     "name": "selectPath",
                     "args": [],
                     "optional": false,
-                    "returnType": "Observable<string>",
+                    "returnType": "any",
                     "typeParameters": [],
-                    "line": 110
+                    "line": 105
                 },
                 {
                     "name": "trackByPoints",
@@ -891,7 +892,7 @@
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 35,
+                    "line": 30,
                     "jsdoctags": [
                         {
                             "name": "i",
@@ -915,7 +916,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  OnInit,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport {\n  PointModel,\n  generateCurvePath,\n  Coords,\n  DefaultLinkModel,\n} from '@rxzu/core';\nimport { combineLatest, Observable } from 'rxjs';\nimport { takeUntil } from 'rxjs/operators';\n\n@Component({\n  selector: 'ngdx-default-link',\n  templateUrl: './default-link.component.html',\n  styleUrls: ['./default-link.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultLinkComponent\n  extends DefaultLinkModel\n  implements AfterViewInit, OnInit {\n  @ViewChild('labelLayer', { read: ViewContainerRef, static: true })\n  labelLayer: ViewContainerRef;\n\n  constructor(private cdRef: ChangeDetectorRef) {\n    super({ type: 'ngdx-default-link' });\n  }\n\n  trackByPoints(i: number, point: PointModel) {\n    return point.id;\n  }\n\n  onHover() {\n    this.cdRef.detectChanges();\n  }\n\n  ngOnInit() {\n    this.setPainted(true);\n  }\n\n  ngAfterViewInit() {\n    const firstPCoords$ = this.getFirstPoint().selectCoords();\n    const lastPCoords$ = this.getLastPoint().selectCoords();\n\n    // Observe link coords and update drawing accordingly\n    combineLatest([firstPCoords$, lastPCoords$])\n      .pipe(takeUntil(this.onEntityDestroy()))\n      .subscribe(([firstPCoords, lastPCoords]) => {\n        const points = [firstPCoords, lastPCoords];\n\n        // handle regular links\n        // draw the smoothing\n        // if the points are too close, just draw a straight line\n        const isHorizontal =\n          Math.abs(firstPCoords.x - lastPCoords.x) >\n          Math.abs(firstPCoords.y - lastPCoords.y);\n        const xOrY = isHorizontal ? 'x' : 'y';\n        let isStraight = false;\n        if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 50) {\n          isStraight = true;\n        }\n\n        const path = generateCurvePath(\n          firstPCoords,\n          lastPCoords,\n          isStraight ? 0 : this.curvyness\n        );\n        this.path$.set(path).emit();\n\n        const label = this.getLabel();\n        // update label position\n        if (label) {\n          label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));\n        }\n\n        this.cdRef.detectChanges();\n      });\n  }\n\n  calcLabelIncline(firstPoint: Coords, secondPoint: Coords): number {\n    const dy = secondPoint.y - firstPoint.y;\n    const dx = secondPoint.x - firstPoint.x;\n\n    if (dx === 0) {\n      return 0;\n    }\n\n    let inclineAngel = (Math.atan(dy / dx) * 180) / Math.PI;\n\n    if (inclineAngel < 0) {\n      inclineAngel += 180;\n    }\n\n    return inclineAngel;\n  }\n\n  calcCenterOfPath(firstPoint: Coords, secondPoint: Coords): Coords {\n    return {\n      x: (firstPoint.x + secondPoint.x) / 2 + 20,\n      y: (firstPoint.y + secondPoint.y) / 2 + 20,\n    };\n  }\n\n  selectPath(): Observable<string> {\n    return this.path$.value$;\n  }\n}\n",
+            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  OnInit,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { PointModel, generateCurvePath, Coords, LinkModel } from '@rxzu/core';\nimport { combineLatest } from 'rxjs';\nimport { takeUntil } from 'rxjs/operators';\n\n@Component({\n  selector: 'rxzu-default-link',\n  templateUrl: './default-link.component.html',\n  styleUrls: ['./default-link.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultLinkComponent\n  extends LinkModel\n  implements AfterViewInit, OnInit {\n  @ViewChild('labelLayer', { read: ViewContainerRef, static: true })\n  labelLayer!: ViewContainerRef;\n\n  constructor(private cdRef: ChangeDetectorRef) {\n    super({ type: 'rxzu-default-link' });\n  }\n\n  trackByPoints(i: number, point: PointModel) {\n    return point.id;\n  }\n\n  onHover() {\n    this.cdRef.detectChanges();\n  }\n\n  ngOnInit() {\n    this.setPainted(true);\n  }\n\n  ngAfterViewInit() {\n    const firstPCoords$ = this.getFirstPoint().selectCoords();\n    const lastPCoords$ = this.getLastPoint().selectCoords();\n\n    // Observe link coords and update drawing accordingly\n    combineLatest([firstPCoords$, lastPCoords$])\n      .pipe(takeUntil(this.onEntityDestroy()))\n      .subscribe(([firstPCoords, lastPCoords]) => {\n        const points = [firstPCoords, lastPCoords];\n\n        // handle regular links\n        // draw the smoothing\n        // if the points are too close, just draw a straight line\n        const isHorizontal =\n          Math.abs(firstPCoords.x - lastPCoords.x) >\n          Math.abs(firstPCoords.y - lastPCoords.y);\n        const xOrY = isHorizontal ? 'x' : 'y';\n        let isStraight = false;\n        if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 50) {\n          isStraight = true;\n        }\n\n        const path = generateCurvePath(\n          firstPCoords,\n          lastPCoords,\n          isStraight ? 0 : 50\n        );\n        this.path$.set(path).emit();\n\n        const label = this.getLabel();\n        // update label position\n        if (label) {\n          label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));\n        }\n\n        this.cdRef.detectChanges();\n      });\n  }\n\n  calcLabelIncline(firstPoint: Coords, secondPoint: Coords): number {\n    const dy = secondPoint.y - firstPoint.y;\n    const dx = secondPoint.x - firstPoint.x;\n\n    if (dx === 0) {\n      return 0;\n    }\n\n    let inclineAngel = (Math.atan(dy / dx) * 180) / Math.PI;\n\n    if (inclineAngel < 0) {\n      inclineAngel += 180;\n    }\n\n    return inclineAngel;\n  }\n\n  calcCenterOfPath(firstPoint: Coords, secondPoint: Coords): Coords {\n    return {\n      x: (firstPoint.x + secondPoint.x) / 2 + 20,\n      y: (firstPoint.y + secondPoint.y) / 2 + 20,\n    };\n  }\n\n  selectPath() {\n    return this.path$.value$;\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -933,7 +934,7 @@
                         "type": "ChangeDetectorRef"
                     }
                 ],
-                "line": 29,
+                "line": 24,
                 "jsdoctags": [
                     {
                         "name": "cdRef",
@@ -944,16 +945,16 @@
                     }
                 ]
             },
-            "extends": "DefaultLinkModel",
+            "extends": "LinkModel",
             "implements": [
                 "AfterViewInit",
                 "OnInit"
             ],
-            "templateData": "<!-- Label Host -->\n<ng-template #labelLayer></ng-template>\n\n<svg class=\"link-container\">\n  <!-- Link -->\n  <g [id]=\"id\">\n    <path\n      [attr.stroke-width]=\"width\"\n      [attr.stroke]=\"selectColor() | async\"\n      [attr.d]=\"selectPath() | async\"\n      class=\"default-link\"\n      (mouseleave)=\"setHovered(false); onHover()\"\n      (mouseenter)=\"setHovered(); onHover()\"\n      [ngClass]=\"{ hovered: selectHovered() | async }\"\n    ></path>\n    <path\n      class=\"default-link\"\n      (mouseleave)=\"setHovered(false); onHover()\"\n      (mouseenter)=\"setHovered(); onHover()\"\n      [attr.stroke-width]=\"20\"\n      [attr.stroke]=\"selectColor() | async\"\n      stroke-linecap=\"round\"\n      [attr.data-linkid]=\"id\"\n      [attr.stroke-opacity]=\"(selectHovered() | async) ? '0.1' : '0'\"\n      [attr.d]=\"selectPath() | async\"\n    ></path>\n  </g>\n\n  <!-- Points -->\n  <g *ngFor=\"let point of getPoints(); trackBy: trackByPoints\" [id]=\"point.id\">\n    <circle\n      fill=\"currentColor\"\n      [attr.cx]=\"point.selectX() | async\"\n      [attr.cy]=\"point.selectY() | async\"\n      r=\"5\"\n      class=\"default-point\"\n      [ngClass]=\"{ hovered: point.selectHovered() | async }\"\n    />\n    <circle\n      [attr.data-pointid]=\"point.id\"\n      [attr.data-linkid]=\"id\"\n      (mouseleave)=\"point.setHovered(false); setHovered(false)\"\n      (mouseenter)=\"point.setHovered(); setHovered()\"\n      [attr.cx]=\"point.selectX() | async\"\n      [attr.cy]=\"point.selectY() | async\"\n      r=\"15\"\n      [attr.opacity]=\"0\"\n      [ngClass]=\"{ selected: point.selectSelected() | async }\"\n    />\n  </g>\n</svg>\n"
+            "templateData": "<!-- Label Host -->\n<ng-template #labelLayer></ng-template>\n\n<svg class=\"link-container\">\n  <!-- Link -->\n  <g [id]=\"id\">\n    <path\n      attr.stroke-width=\"1\"\n      attr.stroke=\"blue\"\n      [attr.d]=\"selectPath() | async\"\n      class=\"default-link\"\n      (mouseleave)=\"setHovered(false); onHover()\"\n      (mouseenter)=\"setHovered(); onHover()\"\n      [ngClass]=\"{ hovered: selectHovered() | async }\"\n    ></path>\n    <path\n      class=\"default-link\"\n      (mouseleave)=\"setHovered(false); onHover()\"\n      (mouseenter)=\"setHovered(); onHover()\"\n      [attr.stroke-width]=\"20\"\n      attr.stroke=\"blue\"\n      stroke-linecap=\"round\"\n      [attr.data-linkid]=\"id\"\n      [attr.stroke-opacity]=\"(selectHovered() | async) ? '0.1' : '0'\"\n      [attr.d]=\"selectPath() | async\"\n    ></path>\n  </g>\n\n  <!-- Points -->\n  <g *ngFor=\"let point of getPoints(); trackBy: trackByPoints\" [id]=\"point.id\">\n    <circle\n      fill=\"currentColor\"\n      [attr.cx]=\"point.selectX() | async\"\n      [attr.cy]=\"point.selectY() | async\"\n      r=\"5\"\n      class=\"default-point\"\n      [ngClass]=\"{ hovered: point.selectHovered() | async }\"\n    />\n    <circle\n      [attr.data-pointid]=\"point.id\"\n      [attr.data-linkid]=\"id\"\n      (mouseleave)=\"point.setHovered(false); setHovered(false)\"\n      (mouseenter)=\"point.setHovered(); setHovered()\"\n      [attr.cx]=\"point.selectX() | async\"\n      [attr.cy]=\"point.selectY() | async\"\n      r=\"15\"\n      [attr.opacity]=\"0\"\n      [ngClass]=\"{ selected: point.selectSelected() | async }\"\n    />\n  </g>\n</svg>\n"
         },
         {
             "name": "DefaultNodeComponent",
-            "id": "component-DefaultNodeComponent-e2d50889adb9e05102ef658500235f0e",
+            "id": "component-DefaultNodeComponent-e471a41b697f881eeb7776be012d1a91",
             "file": "packages/angular/src/lib/defaults/components/default-node/default-node.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -961,7 +962,7 @@
             "inputs": [],
             "outputs": [],
             "providers": [],
-            "selector": "ngdx-default-node",
+            "selector": "rxzu-default-node",
             "styleUrls": [
                 "./default-node.component.scss"
             ],
@@ -1010,7 +1011,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  ChangeDetectionStrategy,\n  Component,\n  OnInit,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { DefaultNodeModel } from '@rxzu/core';\n\n@Component({\n  selector: 'ngdx-default-node',\n  templateUrl: './default-node.component.html',\n  styleUrls: ['./default-node.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultNodeComponent extends DefaultNodeModel implements OnInit {\n  @ViewChild('portsLayer', { read: ViewContainerRef, static: true })\n  portsLayer: ViewContainerRef;\n\n  constructor() {\n    super({ type: 'ngdx-default-node' });\n  }\n\n  ngOnInit() {\n    this.setPainted(true);\n  }\n\n  getPortsHost() {\n    return this.portsLayer;\n  }\n}\n",
+            "sourceCode": "import {\n  ChangeDetectionStrategy,\n  Component,\n  OnInit,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { NodeModel } from '@rxzu/core';\n\n@Component({\n  selector: 'rxzu-default-node',\n  templateUrl: './default-node.component.html',\n  styleUrls: ['./default-node.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultNodeComponent extends NodeModel implements OnInit {\n  @ViewChild('portsLayer', { read: ViewContainerRef, static: true })\n  portsLayer!: ViewContainerRef;\n\n  constructor() {\n    super({ type: 'rxzu-default-node' });\n  }\n\n  ngOnInit() {\n    this.setPainted(true);\n  }\n\n  getPortsHost() {\n    return this.portsLayer;\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -1025,15 +1026,15 @@
                 "args": [],
                 "line": 18
             },
-            "extends": "DefaultNodeModel",
+            "extends": "NodeModel",
             "implements": [
                 "OnInit"
             ],
-            "templateData": "<div\n  class=\"default-node\"\n  [ngStyle]=\"{\n    'height.px': height$ | async,\n    'width.px': width$ | async,\n    'background-color': color\n  }\"\n>\n  <div class=\"ports\">\n    <ng-template #portsLayer></ng-template>\n  </div>\n</div>\n"
+            "templateData": "<div\n  class=\"default-node\"\n  [ngStyle]=\"{\n    'height.px': this.selectHeight() | async,\n    'width.px': this.selectWidth() | async\n  }\"\n>\n  <div class=\"ports\">\n    <ng-template #portsLayer></ng-template>\n  </div>\n</div>\n"
         },
         {
             "name": "DefaultPortComponent",
-            "id": "component-DefaultPortComponent-072a2630ad49cfccac87ee1dd52ade32",
+            "id": "component-DefaultPortComponent-f865256006ea5347db60387586e8544b",
             "file": "packages/angular/src/lib/defaults/components/default-port/default-port.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -1041,7 +1042,7 @@
             "inputs": [],
             "outputs": [],
             "providers": [],
-            "selector": "ngdx-default-port",
+            "selector": "rxzu-default-port",
             "styleUrls": [
                 "./default-port.component.scss"
             ],
@@ -1068,11 +1069,11 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';\nimport { DefaultPortModel } from '@rxzu/core';\n\n@Component({\n  selector: 'ngdx-default-port',\n  templateUrl: './default-port.component.html',\n  styleUrls: ['./default-port.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class DefaultPortComponent extends DefaultPortModel implements OnInit {\n  constructor() {\n    super({ type: 'ngdx-default-port' });\n  }\n\n  ngOnInit() {\n    this.setPainted(true);\n  }\n}\n",
+            "sourceCode": "import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';\nimport { PortModel } from '@rxzu/core';\n\n@Component({\n  selector: 'rxzu-default-port',\n  templateUrl: './default-port.component.html',\n  styleUrls: ['./default-port.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultPortComponent extends PortModel implements OnInit {\n  constructor() {\n    super({ type: 'rxzu-default-port' });\n  }\n\n  ngOnInit() {\n    this.setPainted(true);\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
-                    "data": ":host {\n  position: relative;\n  width: 10px;\n  height: 10px;\n  border-radius: 60px;\n  border: 1px solid gray;\n  background-color: lightgray;\n  margin: 10px 0;\n\n  &:hover {\n    background-color: green;\n  }\n\n  &.out {\n    right: -195px;\n  }\n\n  &.in {\n    left: -5px;\n  }\n}\n",
+                    "data": ":host {\n  position: relative;\n  width: 10px;\n  height: 10px;\n  border-radius: 60px;\n  border: 1px solid gray;\n  background-color: lightgray;\n  margin: 10px 0;\n}\n",
                     "styleUrl": "./default-port.component.scss"
                 }
             ],
@@ -1083,15 +1084,15 @@
                 "args": [],
                 "line": 10
             },
-            "extends": "DefaultPortModel",
+            "extends": "PortModel",
             "implements": [
                 "OnInit"
             ],
-            "templateData": "<div [ngClass]=\"in ? 'in' : 'out'\" draggable=\"false\"></div>\n"
+            "templateData": "<div draggable=\"false\"></div>\n"
         },
         {
             "name": "RxZuDiagramComponent",
-            "id": "component-RxZuDiagramComponent-6e2d996bead0ac3dcbe88d74b64615ef",
+            "id": "component-RxZuDiagramComponent-b5163fb3c14c8567b8c5028c14e35fed",
             "file": "packages/angular/src/lib/diagram/diagram.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -1099,7 +1100,7 @@
             "inputs": [],
             "outputs": [],
             "providers": [],
-            "selector": "ngdx-diagram",
+            "selector": "rxzu-diagram",
             "styleUrls": [
                 "diagram.component.scss"
             ],
@@ -1112,44 +1113,43 @@
                 {
                     "name": "allowCanvasTranslation",
                     "defaultValue": "true",
-                    "line": 35
+                    "line": 36
                 },
                 {
                     "name": "allowCanvasZoom",
                     "defaultValue": "true",
-                    "line": 34
+                    "line": 35
                 },
                 {
                     "name": "allowLooseLinks",
                     "defaultValue": "true",
-                    "line": 37
+                    "line": 38
                 },
                 {
                     "name": "inverseZoom",
                     "defaultValue": "true",
-                    "line": 36
+                    "line": 37
                 },
                 {
                     "name": "maxZoomIn",
-                    "defaultValue": "null",
-                    "line": 39,
-                    "type": "number"
+                    "defaultValue": "0",
+                    "line": 40
                 },
                 {
                     "name": "maxZoomOut",
-                    "defaultValue": "null",
-                    "line": 38,
-                    "type": "number"
+                    "defaultValue": "0",
+                    "line": 39
                 },
                 {
                     "name": "model",
-                    "line": 33,
-                    "type": "DiagramModel"
+                    "defaultValue": "null",
+                    "line": 34,
+                    "type": "DiagramModel | null"
                 },
                 {
                     "name": "portMagneticRadius",
                     "defaultValue": "30",
-                    "line": 40
+                    "line": 41
                 }
             ],
             "outputsClass": [],
@@ -1157,9 +1157,9 @@
                 {
                     "name": "canvas",
                     "type": "ElementRef",
-                    "optional": false,
+                    "optional": true,
                     "description": "",
-                    "line": 49,
+                    "line": 50,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1173,24 +1173,21 @@
                     "type": "",
                     "optional": false,
                     "description": "",
-                    "line": 53,
-                    "modifierKind": [
-                        113
-                    ]
+                    "line": 55
                 },
                 {
                     "name": "diagramEngine",
                     "type": "DiagramEngineCore",
-                    "optional": false,
+                    "optional": true,
                     "description": "",
-                    "line": 51
+                    "line": 52
                 },
                 {
                     "name": "linksLayer",
                     "type": "ViewContainerRef",
-                    "optional": false,
+                    "optional": true,
                     "description": "",
-                    "line": 46,
+                    "line": 47,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1201,16 +1198,16 @@
                 {
                     "name": "mouseManager",
                     "type": "MouseManager",
-                    "optional": false,
+                    "optional": true,
                     "description": "",
-                    "line": 52
+                    "line": 53
                 },
                 {
                     "name": "ngZone",
                     "type": "NgZone",
                     "optional": false,
                     "description": "",
-                    "line": 61,
+                    "line": 62,
                     "modifierKind": [
                         114
                     ]
@@ -1218,9 +1215,9 @@
                 {
                     "name": "nodesLayer",
                     "type": "ViewContainerRef",
-                    "optional": false,
+                    "optional": true,
                     "description": "",
-                    "line": 43,
+                    "line": 44,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1231,12 +1228,9 @@
                 {
                     "name": "selectionBox$",
                     "type": "Observable<SelectingAction>",
-                    "optional": false,
+                    "optional": true,
                     "description": "",
-                    "line": 54,
-                    "modifierKind": [
-                        113
-                    ]
+                    "line": 54
                 }
             ],
             "methodsClass": [
@@ -1244,9 +1238,9 @@
                     "name": "getLinksLayer",
                     "args": [],
                     "optional": false,
-                    "returnType": "HTMLDivElement",
+                    "returnType": "HTMLDivElement | null",
                     "typeParameters": [],
-                    "line": 163,
+                    "line": 187,
                     "modifierKind": [
                         113
                     ]
@@ -1255,9 +1249,9 @@
                     "name": "getNodesLayer",
                     "args": [],
                     "optional": false,
-                    "returnType": "HTMLDivElement",
+                    "returnType": "HTMLDivElement | null",
                     "typeParameters": [],
-                    "line": 159,
+                    "line": 179,
                     "modifierKind": [
                         113
                     ]
@@ -1268,7 +1262,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 97
+                    "line": 107
                 },
                 {
                     "name": "initSubs",
@@ -1276,7 +1270,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 146,
+                    "line": 161,
                     "modifierKind": [
                         113
                     ]
@@ -1287,7 +1281,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 67
+                    "line": 68
                 },
                 {
                     "name": "ngOnDestroy",
@@ -1295,7 +1289,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 92
+                    "line": 102
                 },
                 {
                     "name": "onMouseDown",
@@ -1308,7 +1302,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 125,
+                    "line": 140,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1335,7 +1329,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 120,
+                    "line": 135,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1362,7 +1356,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 115,
+                    "line": 130,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1389,7 +1383,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 130,
+                    "line": 145,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1424,7 +1418,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 135,
+                    "line": 150,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1463,11 +1457,11 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  Input,\n  NgZone,\n  OnDestroy,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { combineLatest, Observable, ReplaySubject } from 'rxjs';\nimport { map, switchMap, takeUntil, tap } from 'rxjs/operators';\nimport {\n  DiagramEngineCore,\n  DiagramModel,\n  SelectingAction,\n  MouseManager,\n  isNil,\n} from '@rxzu/core';\nimport { ZonedClass, OutsideZone } from '../utils';\n\n@Component({\n  selector: 'ngdx-diagram',\n  templateUrl: 'diagram.component.html',\n  styleUrls: ['diagram.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class RxZuDiagramComponent\n  implements AfterViewInit, OnDestroy, ZonedClass {\n  @Input('model') diagramModel: DiagramModel;\n  @Input() allowCanvasZoom = true;\n  @Input() allowCanvasTranslation = true;\n  @Input() inverseZoom = true;\n  @Input() allowLooseLinks = true;\n  @Input() maxZoomOut: number = null;\n  @Input() maxZoomIn: number = null;\n  @Input() portMagneticRadius = 30;\n\n  @ViewChild('nodesLayer', { read: ViewContainerRef })\n  nodesLayer: ViewContainerRef;\n\n  @ViewChild('linksLayer', { read: ViewContainerRef })\n  linksLayer: ViewContainerRef;\n\n  @ViewChild('canvas', { read: ElementRef })\n  canvas: ElementRef;\n\n  diagramEngine: DiagramEngineCore;\n  mouseManager: MouseManager;\n  protected destroyed$ = new ReplaySubject<boolean>(1);\n  protected selectionBox$: Observable<SelectingAction>;\n\n  get host(): HTMLElement {\n    return this.elRef.nativeElement;\n  }\n\n  constructor(\n    public ngZone: NgZone,\n    protected renderer: Renderer2,\n    protected cdRef: ChangeDetectorRef,\n    protected elRef: ElementRef<HTMLElement>\n  ) {}\n\n  ngAfterViewInit() {\n    if (this.diagramModel) {\n      this.diagramEngine = this.diagramModel.getDiagramEngine();\n      this.mouseManager = this.diagramEngine.getMouseManager();\n      this.diagramEngine.setCanvas(this.canvas.nativeElement);\n\n      this.diagramEngine.setup({\n        ...this,\n      });\n\n      (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)\n        .pipe(\n          switchMap(\n            () =>\n              this.diagramEngine.paintLinks(this.linksLayer) as Observable<void>\n          )\n        )\n        .subscribe(() => {\n          this.initSubs();\n          this.initSelectionBox();\n          this.cdRef.detectChanges();\n        });\n    }\n  }\n\n  ngOnDestroy() {\n    this.destroyed$.next(true);\n    this.destroyed$.complete();\n  }\n\n  initSelectionBox() {\n    this.selectionBox$ = this.diagramEngine.selectAction().pipe(\n      map((a) => {\n        if (\n          !isNil(a) &&\n          a.action instanceof SelectingAction &&\n          a.state === 'firing'\n        ) {\n          return a.action;\n        }\n\n        return null;\n      }),\n      tap(() => this.cdRef.detectChanges())\n    ) as Observable<SelectingAction>;\n  }\n\n  @OutsideZone\n  onMouseUp(event: MouseEvent) {\n    this.mouseManager.onMouseUp(event);\n  }\n\n  @OutsideZone\n  onMouseMove(event: MouseEvent) {\n    this.mouseManager.onMouseMove(event);\n  }\n\n  @OutsideZone\n  onMouseDown(event: MouseEvent) {\n    this.mouseManager.onMouseDown(event);\n  }\n\n  @OutsideZone\n  onMouseWheel(event: WheelEvent) {\n    this.mouseManager.onMouseWheel(event);\n  }\n\n  @OutsideZone\n  protected setLayerStyles(x: number, y: number, zoom: number): void {\n    const nodesLayer = this.getNodesLayer();\n    const linksLayer = this.getLinksLayer();\n\n    const style = 'transform';\n    const value = `translate(${x}px, ${y}px) scale(${zoom / 100.0})`;\n\n    this.renderer.setStyle(nodesLayer, style, value);\n    this.renderer.setStyle(linksLayer, style, value);\n  }\n\n  protected initSubs() {\n    combineLatest([\n      this.diagramModel.selectOffsetX(),\n      this.diagramModel.selectOffsetY(),\n      this.diagramModel.selectZoomLevel(),\n    ])\n      .pipe(\n        tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),\n        takeUntil(this.destroyed$)\n      )\n      .subscribe();\n  }\n\n  protected getNodesLayer(): HTMLDivElement {\n    return this.host.querySelector('.ngdx-nodes-layer');\n  }\n\n  protected getLinksLayer(): HTMLDivElement {\n    return this.host.querySelector('.ngdx-links-layer');\n  }\n}\n",
+            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  Input,\n  NgZone,\n  OnDestroy,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { combineLatest, noop, Observable, of, ReplaySubject } from 'rxjs';\nimport { filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';\nimport {\n  DiagramEngineCore,\n  SelectingAction,\n  MouseManager,\n  isNil,\n  DiagramModel,\n  BaseAction,\n} from '@rxzu/core';\nimport { ZonedClass, OutsideZone } from '../utils';\n\n@Component({\n  selector: 'rxzu-diagram',\n  templateUrl: 'diagram.component.html',\n  styleUrls: ['diagram.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class RxZuDiagramComponent\n  implements AfterViewInit, OnDestroy, ZonedClass {\n  @Input('model') diagramModel: DiagramModel | null = null;\n  @Input() allowCanvasZoom = true;\n  @Input() allowCanvasTranslation = true;\n  @Input() inverseZoom = true;\n  @Input() allowLooseLinks = true;\n  @Input() maxZoomOut = 0;\n  @Input() maxZoomIn = 0;\n  @Input() portMagneticRadius = 30;\n\n  @ViewChild('nodesLayer', { read: ViewContainerRef })\n  nodesLayer?: ViewContainerRef;\n\n  @ViewChild('linksLayer', { read: ViewContainerRef })\n  linksLayer?: ViewContainerRef;\n\n  @ViewChild('canvas', { read: ElementRef })\n  canvas?: ElementRef;\n\n  diagramEngine?: DiagramEngineCore;\n  mouseManager?: MouseManager;\n  selectionBox$?: Observable<SelectingAction>;\n  destroyed$ = new ReplaySubject<boolean>(1);\n\n  get host(): HTMLElement {\n    return this.elRef.nativeElement;\n  }\n\n  constructor(\n    public ngZone: NgZone,\n    protected renderer: Renderer2,\n    protected cdRef: ChangeDetectorRef,\n    protected elRef: ElementRef<HTMLElement>\n  ) {}\n\n  ngAfterViewInit() {\n    const model = this.diagramModel;\n    if (!model || !this.canvas) {\n      return;\n    }\n\n    this.diagramEngine = model.getDiagramEngine();\n\n    this.mouseManager = this.diagramEngine.getMouseManager();\n    this.diagramEngine.setCanvas(this.canvas.nativeElement);\n\n    this.diagramEngine.setup({\n      ...this,\n    });\n\n    (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)\n      .pipe(\n        switchMap(() => {\n          if (!this.diagramEngine) {\n            return of(null);\n          }\n\n          return this.diagramEngine.paintLinks(this.linksLayer) as Observable<\n            void\n          >;\n        })\n      )\n      .subscribe(() => {\n        this.initSubs();\n        this.initSelectionBox();\n        this.cdRef.detectChanges();\n      });\n  }\n\n  ngOnDestroy() {\n    this.destroyed$.next(true);\n    this.destroyed$.complete();\n  }\n\n  initSelectionBox() {\n    if (!this.diagramEngine) {\n      return;\n    }\n\n    this.selectionBox$ = this.diagramEngine.selectAction().pipe(\n      filter(\n        (a: {\n          action: BaseAction | null;\n          state: string | null;\n        }): a is { action: SelectingAction; state: 'firing' } =>\n          !isNil(a) &&\n          a.action instanceof SelectingAction &&\n          a.state === 'firing'\n      ),\n      map((a) => {\n        return a.action;\n      }),\n      tap(() => this.cdRef.detectChanges())\n    ) as Observable<SelectingAction>;\n  }\n\n  @OutsideZone\n  onMouseUp(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseUp(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseMove(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseMove(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseDown(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseDown(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseWheel(event: WheelEvent) {\n    this.mouseManager ? this.mouseManager.onMouseWheel(event) : noop();\n  }\n\n  @OutsideZone\n  protected setLayerStyles(x: number, y: number, zoom: number): void {\n    const nodesLayer = this.getNodesLayer();\n    const linksLayer = this.getLinksLayer();\n\n    const style = 'transform';\n    const value = `translate(${x}px, ${y}px) scale(${zoom / 100.0})`;\n\n    this.renderer.setStyle(nodesLayer, style, value);\n    this.renderer.setStyle(linksLayer, style, value);\n  }\n\n  protected initSubs() {\n    const diagramModel = this.diagramEngine?.getDiagramModel();\n    if (!diagramModel) {\n      return;\n    }\n\n    combineLatest([\n      diagramModel.selectOffsetX(),\n      diagramModel.selectOffsetY(),\n      diagramModel.selectZoomLevel(),\n    ])\n      .pipe(\n        tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),\n        takeUntil(this.destroyed$)\n      )\n      .subscribe();\n  }\n\n  protected getNodesLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-nodes-layer');\n  }\n\n  protected getLinksLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-links-layer');\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
-                    "data": ".ngdx-diagram {\n  position: relative;\n  flex-grow: 1;\n  display: flex;\n  cursor: move;\n  overflow: hidden;\n\n  .selector {\n    position: absolute;\n    background-color: rgba(0, 192, 255, 0.2);\n    border: solid 2px rgb(0, 192, 255);\n  }\n\n  .ngdx-nodes-layer {\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    transform-origin: 0 0;\n    overflow: visible !important;\n    pointer-events: none;\n    z-index: 150;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    right: 0;\n  }\n\n  .ngdx-links-layer {\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    transform-origin: 0 0;\n    overflow: visible !important;\n    pointer-events: none;\n    z-index: 100;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    right: 0;\n  }\n}\n",
+                    "data": ".rxzu-diagram {\n  position: relative;\n  flex-grow: 1;\n  display: flex;\n  cursor: move;\n  overflow: hidden;\n\n  .selector {\n    position: absolute;\n    background-color: rgba(0, 192, 255, 0.2);\n    border: solid 2px rgb(0, 192, 255);\n  }\n\n  .rxzu-nodes-layer {\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    transform-origin: 0 0;\n    overflow: visible !important;\n    pointer-events: none;\n    z-index: 150;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    right: 0;\n  }\n\n  .rxzu-links-layer {\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    transform-origin: 0 0;\n    overflow: visible !important;\n    pointer-events: none;\n    z-index: 100;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    right: 0;\n  }\n}\n",
                     "styleUrl": "diagram.component.scss"
                 }
             ],
@@ -1493,7 +1487,7 @@
                         "type": "ElementRef<HTMLElement>"
                     }
                 ],
-                "line": 58,
+                "line": 59,
                 "jsdoctags": [
                     {
                         "name": "ngZone",
@@ -1537,11 +1531,11 @@
                         "name": "host",
                         "type": "",
                         "returnType": "HTMLElement",
-                        "line": 56
+                        "line": 57
                     }
                 }
             },
-            "templateData": "<div\n  class=\"ngdx-diagram\"\n  #canvas\n  (mousedown)=\"onMouseDown($event)\"\n  (wheel)=\"onMouseWheel($event)\"\n>\n  <!-- Nodes Layer -->\n  <div class=\"ngdx-nodes-layer\">\n    <ng-template #nodesLayer></ng-template>\n  </div>\n\n  <!-- Links Layer -->\n  <div class=\"ngdx-links-layer\">\n    <ng-template #linksLayer></ng-template>\n  </div>\n\n  <!-- Selection Box -->\n  <div\n    *ngIf=\"selectionBox$ | async as selectionBox\"\n    class=\"selector\"\n    [ngStyle]=\"{\n      top: selectionBox.dimensions.top + 'px',\n      left: selectionBox.dimensions.left + 'px',\n      width: selectionBox.dimensions.width + 'px',\n      height: selectionBox.dimensions.height + 'px'\n    }\"\n  ></div>\n</div>\n"
+            "templateData": "<div\n  class=\"rxzu-diagram\"\n  #canvas\n  (mousedown)=\"onMouseDown($event)\"\n  (wheel)=\"onMouseWheel($event)\"\n>\n  <!-- Nodes Layer -->\n  <div class=\"rxzu-nodes-layer\">\n    <ng-template #nodesLayer></ng-template>\n  </div>\n\n  <!-- Links Layer -->\n  <div class=\"rxzu-links-layer\">\n    <ng-template #linksLayer></ng-template>\n  </div>\n\n  <!-- Selection Box -->\n  <div\n    *ngIf=\"selectionBox$ | async as selectionBox\"\n    class=\"selector\"\n    [ngStyle]=\"{\n      top: selectionBox.dimensions.top + 'px',\n      left: selectionBox.dimensions.left + 'px',\n      width: selectionBox.dimensions.width + 'px',\n      height: selectionBox.dimensions.height + 'px'\n    }\"\n  ></div>\n</div>\n"
         }
     ],
     "modules": [
@@ -1752,7 +1746,7 @@
                     },
                     {
                         "name": "descriptor",
-                        "type": ""
+                        "type": "any"
                     }
                 ],
                 "jsdoctags": [
@@ -1770,7 +1764,7 @@
                     },
                     {
                         "name": "descriptor",
-                        "type": "",
+                        "type": "any",
                         "tagName": {
                             "text": "param"
                         }
@@ -1798,7 +1792,7 @@
                         },
                         {
                             "name": "descriptor",
-                            "type": ""
+                            "type": "any"
                         }
                     ],
                     "jsdoctags": [
@@ -1816,7 +1810,7 @@
                         },
                         {
                             "name": "descriptor",
-                            "type": "",
+                            "type": "any",
                             "tagName": {
                                 "text": "param"
                             }

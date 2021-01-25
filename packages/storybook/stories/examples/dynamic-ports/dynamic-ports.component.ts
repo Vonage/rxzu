@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DiagramEngine } from '@rxzu/angular';
-import { DiagramModel, DefaultNodeModel } from '@rxzu/core';
+import { BaseModel, DiagramModel, NodeModel, PortModel } from '@rxzu/core';
 
 @Component({
   selector: 'app-root',
@@ -10,64 +10,115 @@ import { DiagramModel, DefaultNodeModel } from '@rxzu/core';
       <button (click)="removePort()">Remove First Port</button>
       <button (click)="enlargeNode()">Enlarge Node</button>
     </div>
-    <ngdx-diagram class="demo-diagram" [model]="diagramModel"></ngdx-diagram>
+    <rxzu-diagram class="demo-diagram" [model]="diagramModel"></rxzu-diagram>
   `,
   styleUrls: ['../demo-diagram.component.scss'],
 })
 export class DynamicPortsExampleStoryComponent implements OnInit {
   diagramModel: DiagramModel;
 
-  constructor(private diagramEngine: DiagramEngine) {}
+  constructor(private diagramEngine: DiagramEngine) {
+    this.diagramEngine.registerDefaultFactories();
+    this.diagramModel = this.diagramEngine.createModel();
+  }
 
   ngOnInit() {
     const nodesDefaultDimensions = { height: 200, width: 200 };
-    this.diagramEngine.registerDefaultFactories();
 
-    this.diagramModel = this.diagramEngine.createModel();
+    const node1 = new NodeModel({
+      type: 'default',
+      coords: { x: 500, y: 300 },
+      dimensions: nodesDefaultDimensions,
+      id: '1',
+    });
 
-    const node1 = new DefaultNodeModel({ id: '1' });
-    node1.setCoords({ x: 500, y: 300 });
-    node1.setDimensions(nodesDefaultDimensions);
-    node1.addOutPort({ name: 'outport1', id: 'outport1' });
-    node1.addOutPort({ name: 'outport2', id: 'outport2' });
-    const outport3 = node1.addOutPort({ name: 'outport3', id: 'outport3' });
+    const outPort1 = new PortModel({
+      name: 'outport1',
+      id: 'outport1',
+      type: 'default',
+    });
+    const outPort2 = new PortModel({
+      name: 'outport2',
+      id: 'outport2',
+      type: 'default',
+    });
+    const outPort3 = new PortModel({
+      name: 'outport3',
+      id: 'outport3',
+      type: 'default',
+    });
 
-    const node2 = new DefaultNodeModel();
-    node2.setCoords({ x: 1000, y: 0 });
-    node2.setDimensions(nodesDefaultDimensions);
-    const inport = node2.addInPort({ name: 'inport2' });
+    node1.addPort(outPort1);
+    node1.addPort(outPort2);
+    node1.addPort(outPort3);
+
+    const node2 = new NodeModel({
+      type: 'default',
+      coords: { x: 1000, y: 0 },
+      dimensions: nodesDefaultDimensions,
+    });
+
+    const inPort = new PortModel({ type: 'default', name: 'inport2' });
+    node2.addPort(inPort);
 
     for (let index = 0; index < 2; index++) {
-      const nodeLoop = new DefaultNodeModel();
-      nodeLoop.setCoords({ x: 1000, y: 300 + index * 300 });
-      nodeLoop.setDimensions(nodesDefaultDimensions);
-      nodeLoop.addInPort({ name: `inport${index + 3}` });
+      const nodeLoop = new NodeModel({
+        type: 'default',
+        coords: { x: 1000, y: 300 + index * 300 },
+        dimensions: nodesDefaultDimensions,
+      });
+
+      const loopPort = new PortModel({
+        type: 'default',
+        name: `inport${index + 3}`,
+      });
+      nodeLoop.addPort(loopPort);
 
       this.diagramModel.addNode(nodeLoop);
     }
 
-    const link = outport3.link(inport);
-    link.setLocked();
+    const link = outPort3.link(inPort);
+    const models: BaseModel[] = [node1, node2];
 
-    this.diagramModel.addAll(node1, node2, link);
+    if (link) {
+      link.setLocked();
+      models.push(link);
+    }
+    this.diagramModel.addAll(...models);
 
     this.diagramModel.getDiagramEngine().zoomToFit();
   }
 
   addPort() {
-    const node = this.diagramModel.getNode('1') as DefaultNodeModel;
+    const node = this.diagramModel.getNode('1');
+    if (!node) {
+      return;
+    }
+
     const numOfPorts = node.getPorts().values.length;
-    node.addOutPort({ name: `inport${numOfPorts}` });
+    const newPort = new PortModel({
+      type: 'default',
+      name: `inport${numOfPorts}`,
+    });
+    node.addPort(newPort);
   }
 
   removePort() {
-    const node = this.diagramModel.getNode('1') as DefaultNodeModel;
+    const node = this.diagramModel.getNode('1');
+    if (!node) {
+      return;
+    }
+
     const firstPort = node.getPortsArray()[0];
     node.removePort(firstPort);
   }
 
   enlargeNode() {
-    const node = this.diagramModel.getNode('1') as DefaultNodeModel;
+    const node = this.diagramModel.getNode('1');
+    if (!node) {
+      return;
+    }
+
     const nodeCurrentDimensions = node.getDimensions();
     node.setDimensions({
       height: nodeCurrentDimensions.height + 50,

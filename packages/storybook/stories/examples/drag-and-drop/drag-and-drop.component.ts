@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DiagramEngine } from '@rxzu/angular';
-import { DiagramModel, DefaultNodeModel } from '@rxzu/core';
+import { DiagramModel, NodeModel } from '@rxzu/core';
 
 @Component({
   selector: 'app-root',
@@ -18,12 +18,12 @@ import { DiagramModel, DefaultNodeModel } from '@rxzu/core';
       </div>
       <div></div>
     </div>
-    <ngdx-diagram
+    <rxzu-diagram
       class="demo-diagram"
       [model]="diagramModel"
       (drop)="onBlockDropped($event)"
       (dragover)="$event.preventDefault()"
-    ></ngdx-diagram>
+    ></rxzu-diagram>
   `,
   styleUrls: [
     '../demo-diagram.component.scss',
@@ -34,56 +34,29 @@ export class DragAndDropExampleStoryComponent implements OnInit {
   diagramModel: DiagramModel;
   nodesDefaultDimensions = { height: 200, width: 200 };
   nodesLibrary = [
-    { color: '#AFF8D8', type: 'greenish' },
-    { color: '#FFB5E8', type: 'pinkish' },
-    { color: '#85E3FF', type: 'blueish' },
+    { color: '#AFF8D8', type: 'default' },
+    { color: '#FFB5E8', type: 'default' },
+    { color: '#85E3FF', type: 'default' },
   ];
 
-  constructor(private diagramEngine: DiagramEngine) {}
-
-  ngOnInit() {
+  constructor(private diagramEngine: DiagramEngine) {
     this.diagramEngine.registerDefaultFactories();
     this.diagramModel = this.diagramEngine.createModel();
-
-    const node1 = new DefaultNodeModel({ id: '1' });
-    node1.setCoords({ x: 500, y: 300 });
-    node1.setDimensions(this.nodesDefaultDimensions);
-    node1.addOutPort({ name: 'outport1', id: 'outport1' });
-    node1.addOutPort({ name: 'outport2', id: 'outport2' });
-    const outport3 = node1.addOutPort({ name: 'outport3', id: 'outport3' });
-
-    const node2 = new DefaultNodeModel();
-    node2.setCoords({ x: 1000, y: 0 });
-    node2.setDimensions(this.nodesDefaultDimensions);
-    const inport = node2.addInPort({ name: 'inport2' });
-
-    for (let index = 0; index < 2; index++) {
-      const nodeLoop = new DefaultNodeModel();
-      nodeLoop.setCoords({ x: 1000, y: 300 + index * 300 });
-      nodeLoop.setDimensions(this.nodesDefaultDimensions);
-      nodeLoop.addInPort({ name: `inport${index + 3}` });
-
-      this.diagramModel.addNode(nodeLoop);
-    }
-
-    const link = outport3.link(inport);
-    link.setLocked();
-
-    this.diagramModel.addAll(node1, node2, link);
-
-    this.diagramModel.getDiagramEngine().zoomToFit();
   }
+
+  ngOnInit() {}
 
   createNode(type: string) {
     const nodeData = this.nodesLibrary.find((nodeLib) => nodeLib.type === type);
-    const node = new DefaultNodeModel({ color: nodeData.color });
+    if (nodeData) {
+      const node = new NodeModel({ type: nodeData.type });
+      node.setExtras(nodeData);
+      node.setDimensions(this.nodesDefaultDimensions);
 
-    node.setExtras(nodeData);
-    node.setDimensions(this.nodesDefaultDimensions);
-    node.addOutPort({ name: 'outport1', id: 'outport1' });
-    node.addOutPort({ name: 'outport2', id: 'outport2' });
+      return node;
+    }
 
-    return node;
+    return null;
   }
 
   /**
@@ -91,25 +64,31 @@ export class DragAndDropExampleStoryComponent implements OnInit {
    */
   onBlockDrag(e: DragEvent) {
     const type = (e.target as HTMLElement).getAttribute('data-type');
-    e.dataTransfer.setData('type', type);
+    if (e.dataTransfer && type) {
+      e.dataTransfer.setData('type', type);
+    }
   }
 
   /**
    * on block dropped, create new intent with the empty data of the selected block type
    */
   onBlockDropped(e: DragEvent): void | undefined {
-    const nodeType = e.dataTransfer.getData('type');
-    const node = this.createNode(nodeType);
-    const droppedPoint = this.diagramEngine
-      .getMouseManager()
-      .getRelativePoint(e);
+    if (e.dataTransfer) {
+      const nodeType = e.dataTransfer.getData('type');
+      const node = this.createNode(nodeType);
+      const droppedPoint = this.diagramEngine
+        .getMouseManager()
+        .getRelativePoint(e);
 
-    const coords = {
-      x: droppedPoint.x - this.nodesDefaultDimensions.width / 2,
-      y: droppedPoint.y - this.nodesDefaultDimensions.height / 2,
-    };
+      const coords = {
+        x: droppedPoint.x - this.nodesDefaultDimensions.width / 2,
+        y: droppedPoint.y - this.nodesDefaultDimensions.height / 2,
+      };
 
-    node.setCoords(coords);
-    this.diagramModel.addNode(node);
+      if (node) {
+        node.setCoords(coords);
+        this.diagramModel.addNode(node);
+      }
+    }
   }
 }

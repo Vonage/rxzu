@@ -8,14 +8,14 @@ import { LabelModel } from '@rxzu/core';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-  selector: 'ngdx-default-label',
+  selector: 'rxzu-default-label',
   templateUrl: './default-label.component.html',
   styleUrls: ['./default-label.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DefaultLabelComponent extends LabelModel implements OnInit {
   constructor(private cdRef: ChangeDetectorRef) {
-    super({ type: 'ngdx-default-label' });
+    super({ type: 'rxzu-default-label' });
   }
 
   ngOnInit() {

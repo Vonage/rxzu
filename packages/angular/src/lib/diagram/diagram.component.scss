@@ -1,4 +1,4 @@
-.ngdx-diagram {
+.rxzu-diagram {
   position: relative;
   flex-grow: 1;
   display: flex;
@@ -11,7 +11,7 @@
     border: solid 2px rgb(0, 192, 255);
   }
 
-  .ngdx-nodes-layer {
+  .rxzu-nodes-layer {
     position: absolute;
     height: 100%;
     width: 100%;
@@ -25,7 +25,7 @@
     right: 0;
   }
 
-  .ngdx-links-layer {
+  .rxzu-links-layer {
     position: absolute;
     height: 100%;
     width: 100%;

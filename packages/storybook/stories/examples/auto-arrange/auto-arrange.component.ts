@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DiagramEngine } from '@rxzu/angular';
-import { DiagramModel, DagrePlugin, DefaultNodeModel } from '@rxzu/core';
+import { DiagramModel, DagrePlugin, NodeModel, PortModel } from '@rxzu/core';
 
 @Component({
   selector: 'app-root',
@@ -8,7 +8,7 @@ import { DiagramModel, DagrePlugin, DefaultNodeModel } from '@rxzu/core';
     <div class="action-bar">
       <button (click)="autoArrange()">Auto Arrange</button>
     </div>
-    <ngdx-diagram class="demo-diagram" [model]="diagramModel"></ngdx-diagram>
+    <rxzu-diagram class="demo-diagram" [model]="diagramModel"></rxzu-diagram>
   `,
   styleUrls: ['../demo-diagram.component.scss'],
 })
@@ -18,42 +18,45 @@ export class AutoArrangeExampleStoryComponent implements OnInit {
   constructor(
     private diagramEngine: DiagramEngine,
     private dagreEngine: DagrePlugin
-  ) {}
+  ) {
+    this.diagramEngine.registerDefaultFactories();
+    this.diagramModel = this.diagramEngine.createModel();
+  }
 
   ngOnInit() {
     const nodesDefaultDimensions = { height: 200, width: 200 };
-    this.diagramEngine.registerDefaultFactories();
-
-    this.diagramModel = this.diagramEngine.createModel();
-
-    const node1 = new DefaultNodeModel();
+    const node1 = new NodeModel({ type: 'default' });
     node1.setCoords({ x: 500, y: 300 });
     node1.setDimensions(nodesDefaultDimensions);
-    const outport1 = node1.addOutPort({ name: 'outport1' });
+    const outport1 = new PortModel({ type: 'default' });
+    node1.addPort(outport1);
 
-    const node2 = new DefaultNodeModel();
+    const node2 = new NodeModel({ type: 'default' });
     node2.setCoords({ x: 1000, y: 0 });
     node2.setDimensions(nodesDefaultDimensions);
-    const inport = node2.addInPort({ name: 'inport2' });
+    const inport = new PortModel({ type: 'default' });
+    node2.addPort(inport);
 
     for (let index = 0; index < 2; index++) {
-      const nodeLoop = new DefaultNodeModel();
+      const nodeLoop = new NodeModel({ type: 'default' });
       nodeLoop.setCoords({
         x: 1000 * (Math.random() * 10),
         y: 300 + index * (Math.random() * 10) * 300,
       });
       nodeLoop.setDimensions(nodesDefaultDimensions);
-      const inportLoop = nodeLoop.addInPort({ name: `inport${index + 3}` });
+      const inportLoop = new PortModel({ type: 'default' });
+      node2.addPort(inport);
+      nodeLoop.addPort(inportLoop);
 
       this.diagramModel.addNode(nodeLoop);
 
       const linkLoop = outport1.link(inportLoop);
-      this.diagramModel.addLink(linkLoop);
+      if (linkLoop) {
+        this.diagramModel.addLink(linkLoop);
+      }
     }
 
-    const link = outport1.link(inport);
-
-    this.diagramModel.addAll(node1, node2, link);
+    this.diagramModel.addAll(node1, node2);
 
     this.diagramEngine.zoomToFit();
   }

@@ -6,26 +6,24 @@ import {
   Renderer2,
 } from '@angular/core';
 import { AbstractAngularFactory } from '@rxzu/angular';
-import { DefaultPortModel } from '@rxzu/core';
+import { PortModel } from '@rxzu/core';
 import { Observable } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { CustomPortComponent } from './custom.component';
 
-export class CustomPortFactory extends AbstractAngularFactory<
-  CustomPortComponent
-> {
+export class CustomPortFactory extends AbstractAngularFactory {
   constructor(
     private resolver: ComponentFactoryResolver,
     private renderer: Renderer2
   ) {
-    super('custom-port');
+    super('custom');
   }
 
   generateWidget({
     model,
     host,
   }: {
-    model: DefaultPortModel;
+    model: PortModel;
     host: ViewContainerRef;
   }): ComponentRef<CustomPortComponent> {
     const componentRef = host.createComponent(this.getRecipe());
@@ -35,16 +33,19 @@ export class CustomPortFactory extends AbstractAngularFactory<
 
     // data attributes
     this.renderer.setAttribute(rootNode, 'data-portid', model.id);
-    this.renderer.setAttribute(rootNode, 'data-name', model.getName());
+    const name = model.getName();
+    if (name) {
+      this.renderer.setAttribute(rootNode, 'data-name', name);
+    }
 
-    model.in
-      ? this.renderer.addClass(rootNode, 'in')
-      : this.renderer.addClass(rootNode, 'out');
+    // model.in
+    //   ? this.renderer.addClass(rootNode, 'in')
+    //   : this.renderer.addClass(rootNode, 'out');
 
     // assign all passed properties to node initialization.
-    Object.entries(model).forEach(([key, value]) => {
-      componentRef.instance[key] = value;
-    });
+    // Object.entries(model).forEach(([key, value]: [string, any]) => {
+    //   componentRef.instance[key] = value;
+    // });
 
     // this method will add classes to all ports that have links
     this.isConnected(model).subscribe((connected) => {
@@ -64,7 +65,7 @@ export class CustomPortFactory extends AbstractAngularFactory<
     return this.resolver.resolveComponentFactory(CustomPortComponent);
   }
 
-  isConnected(port: DefaultPortModel): Observable<boolean> {
+  isConnected(port: PortModel): Observable<boolean> {
     return port.selectLinks().pipe(
       takeUntil(port.onEntityDestroy()),
       map((links) => Object.keys(links).length > 0)

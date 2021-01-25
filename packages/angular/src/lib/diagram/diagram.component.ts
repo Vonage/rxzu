@@ -24,7 +24,7 @@ import {
 import { ZonedClass, OutsideZone } from '../utils';
 
 @Component({
-  selector: 'ngdx-diagram',
+  selector: 'rxzu-diagram',
   templateUrl: 'diagram.component.html',
   styleUrls: ['diagram.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -181,7 +181,7 @@ export class RxZuDiagramComponent
       return null;
     }
 
-    return this.host.querySelector('.ngdx-nodes-layer');
+    return this.host.querySelector('.rxzu-nodes-layer');
   }
 
   protected getLinksLayer(): HTMLDivElement | null {
@@ -189,6 +189,6 @@ export class RxZuDiagramComponent
       return null;
     }
 
-    return this.host.querySelector('.ngdx-links-layer');
+    return this.host.querySelector('.rxzu-links-layer');
   }
 }
