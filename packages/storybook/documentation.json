@@ -127,10 +127,10 @@
         },
         {
             "name": "DefaultLabelFactory",
-            "id": "class-DefaultLabelFactory-6a2332027676cc58ed21e8dd8a68ce2c",
+            "id": "class-DefaultLabelFactory-e9d16c8847bde5e1c126ea1333004474",
             "file": "packages/angular/src/lib/defaults/factories/default-label.factory.ts",
             "type": "class",
-            "sourceCode": "import {\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactoryResolver,\n  ComponentFactory,\n  Renderer2,\n} from '@angular/core';\nimport { LabelModel } from '@rxzu/core';\nimport { DefaultLabelComponent } from '../components/default-label/default-label.component';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultLabelFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n  }: {\n    model: LabelModel;\n    host: ViewContainerRef;\n  }): ComponentRef<DefaultLabelComponent> {\n    const componentRef = host.createComponent(this.getRecipe());\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for link\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-labelid', model.id);\n\n    // on destroy make sure to destroy the componentRef\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    componentRef.instance.ngOnInit();\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultLabelComponent> {\n    return this.resolver.resolveComponentFactory(DefaultLabelComponent);\n  }\n}\n",
+            "sourceCode": "import {\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactoryResolver,\n  ComponentFactory,\n  Renderer2,\n} from '@angular/core';\nimport { LabelModel } from '@rxzu/core';\nimport { DefaultLabelComponent } from '../components/default-label/default-label.component';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultLabelFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n  }: {\n    model: LabelModel;\n    host: ViewContainerRef;\n  }): ComponentRef<DefaultLabelComponent> {\n    const componentRef = host.createComponent(this.getRecipe());\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for link\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-labelid', model.id);\n\n    // on destroy make sure to destroy the componentRef\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    // assign all passed properties to node initialization.\n    Object.entries(model).forEach(([key, value]: [string, any]) => {\n      (componentRef.instance as any)[key] = value;\n    });\n\n    componentRef.instance.ngOnInit();\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultLabelComponent> {\n    return this.resolver.resolveComponentFactory(DefaultLabelComponent);\n  }\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -190,7 +190,7 @@
                     "optional": false,
                     "returnType": "ComponentFactory<DefaultLabelComponent>",
                     "typeParameters": [],
-                    "line": 47
+                    "line": 52
                 },
                 {
                     "name": "generateWidget",
@@ -228,10 +228,10 @@
         },
         {
             "name": "DefaultLinkFactory",
-            "id": "class-DefaultLinkFactory-cb62d085fa2b85e3f4af6ea2d86fdbbc",
+            "id": "class-DefaultLinkFactory-2241974909170d333ef8582100099763",
             "file": "packages/angular/src/lib/defaults/factories/default-link.factory.ts",
             "type": "class",
-            "sourceCode": "import { DefaultLinkComponent } from '../components/default-link/default-link.component';\nimport {\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactoryResolver,\n  ComponentFactory,\n  Renderer2,\n} from '@angular/core';\nimport { LinkModel } from '@rxzu/core';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultLinkFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n  }: {\n    model: LinkModel;\n    host: ViewContainerRef;\n  }): ComponentRef<DefaultLinkComponent> {\n    const componentRef = host.createComponent(this.getRecipe());\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for link\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n    this.renderer.addClass(rootNode, 'label');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-linkid', model.id);\n\n    // on destroy make sure to destroy the componentRef\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    componentRef.instance.ngOnInit();\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultLinkComponent> {\n    return this.resolver.resolveComponentFactory(DefaultLinkComponent);\n  }\n}\n",
+            "sourceCode": "import { DefaultLinkComponent } from '../components/default-link/default-link.component';\nimport {\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactoryResolver,\n  ComponentFactory,\n  Renderer2,\n} from '@angular/core';\nimport { LinkModel } from '@rxzu/core';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultLinkFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n  }: {\n    model: LinkModel;\n    host: ViewContainerRef;\n  }): ComponentRef<DefaultLinkComponent> {\n    const componentRef = host.createComponent(this.getRecipe());\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for link\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n    this.renderer.addClass(rootNode, 'label');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-linkid', model.id);\n\n    // on destroy make sure to destroy the componentRef\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    // assign all passed properties to node initialization.\n    Object.entries(model).forEach(([key, value]: [string, any]) => {\n      (componentRef.instance as any)[key] = value;\n    });\n\n    componentRef.instance.ngOnInit();\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultLinkComponent> {\n    return this.resolver.resolveComponentFactory(DefaultLinkComponent);\n  }\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -291,7 +291,7 @@
                     "optional": false,
                     "returnType": "ComponentFactory<DefaultLinkComponent>",
                     "typeParameters": [],
-                    "line": 48
+                    "line": 53
                 },
                 {
                     "name": "generateWidget",
@@ -329,10 +329,10 @@
         },
         {
             "name": "DefaultNodeFactory",
-            "id": "class-DefaultNodeFactory-e99a9ec5d229f2ae23649074742ef86d",
+            "id": "class-DefaultNodeFactory-8552195e0562bc68ec49caf387a83772",
             "file": "packages/angular/src/lib/defaults/factories/default-node.factory.ts",
             "type": "class",
-            "sourceCode": "import { DefaultNodeComponent } from '../components/default-node/default-node.component';\nimport {\n  ComponentFactoryResolver,\n  ViewContainerRef,\n  ComponentFactory,\n  Renderer2,\n} from '@angular/core';\nimport { DiagramModel, NodeModel } from '@rxzu/core';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultNodeFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n    diagramModel,\n  }: {\n    model: NodeModel;\n    host: ViewContainerRef;\n    diagramModel: DiagramModel;\n  }): ViewContainerRef {\n    const componentRef = host.createComponent(this.getRecipe(), host.length);\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for node\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n    this.renderer.setStyle(rootNode, 'display', 'block');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-nodeid', model.id);\n\n    // subscribe to node coordinates\n    model.selectCoords().subscribe(({ x, y }) => {\n      this.renderer.setStyle(rootNode, 'left', `${x}px`);\n      this.renderer.setStyle(rootNode, 'top', `${y}px`);\n    });\n\n    model.selectionChanges().subscribe((e) => {\n      e.isSelected\n        ? this.renderer.addClass(rootNode, 'selected')\n        : this.renderer.removeClass(rootNode, 'selected');\n    });\n\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    componentRef.instance.setParent(diagramModel);\n    componentRef.instance.ngOnInit();\n    const portsHost = componentRef.instance.getPortsHost();\n    return portsHost;\n  }\n\n  getRecipe(): ComponentFactory<DefaultNodeComponent> {\n    return this.resolver.resolveComponentFactory(DefaultNodeComponent);\n  }\n}\n",
+            "sourceCode": "import { DefaultNodeComponent } from '../components/default-node/default-node.component';\nimport {\n  ComponentFactoryResolver,\n  ViewContainerRef,\n  ComponentFactory,\n  Renderer2,\n} from '@angular/core';\nimport { DiagramModel, NodeModel } from '@rxzu/core';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultNodeFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n    diagramModel,\n  }: {\n    model: NodeModel;\n    host: ViewContainerRef;\n    diagramModel: DiagramModel;\n  }): ViewContainerRef {\n    const componentRef = host.createComponent(this.getRecipe(), host.length);\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for node\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n    this.renderer.setStyle(rootNode, 'display', 'block');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-nodeid', model.id);\n\n    // subscribe to node coordinates\n    model.selectCoords().subscribe(({ x, y }) => {\n      this.renderer.setStyle(rootNode, 'left', `${x}px`);\n      this.renderer.setStyle(rootNode, 'top', `${y}px`);\n    });\n\n    model.selectionChanges().subscribe((e) => {\n      e.isSelected\n        ? this.renderer.addClass(rootNode, 'selected')\n        : this.renderer.removeClass(rootNode, 'selected');\n    });\n\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    // assign all passed properties to node initialization.\n    Object.entries(model).forEach(([key, value]: [string, any]) => {\n      (componentRef.instance as any)[key] = value;\n    });\n\n    componentRef.instance.setParent(diagramModel);\n    componentRef.instance.ngOnInit();\n    const portsHost = componentRef.instance.getPortsHost();\n    return portsHost;\n  }\n\n  getRecipe(): ComponentFactory<DefaultNodeComponent> {\n    return this.resolver.resolveComponentFactory(DefaultNodeComponent);\n  }\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -392,7 +392,7 @@
                     "optional": false,
                     "returnType": "ComponentFactory<DefaultNodeComponent>",
                     "typeParameters": [],
-                    "line": 62
+                    "line": 67
                 },
                 {
                     "name": "generateWidget",
@@ -430,10 +430,10 @@
         },
         {
             "name": "DefaultPortFactory",
-            "id": "class-DefaultPortFactory-19068166896d0a14216efe7b9b06fc57",
+            "id": "class-DefaultPortFactory-6b25cb4fabdd5c0edb4e3f2710ebfc01",
             "file": "packages/angular/src/lib/defaults/factories/default-port.factory.ts",
             "type": "class",
-            "sourceCode": "import {\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactory,\n  ComponentFactoryResolver,\n  Renderer2,\n} from '@angular/core';\nimport { PortModel } from '@rxzu/core';\nimport { DefaultPortComponent } from '../components/default-port/default-port.component';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultPortFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host: nodeHost,\n  }: {\n    model: PortModel;\n    host: ViewContainerRef;\n  }): ComponentRef<DefaultPortComponent> {\n    const componentRef = nodeHost.createComponent(this.getRecipe());\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement as HTMLElement;\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-portid', model.id);\n    const name = model.getName();\n    if (name) {\n      this.renderer.setAttribute(rootNode, 'data-name', name);\n    }\n\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    componentRef.instance.ngOnInit();\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultPortComponent> {\n    return this.resolver.resolveComponentFactory(DefaultPortComponent);\n  }\n}\n",
+            "sourceCode": "import {\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactory,\n  ComponentFactoryResolver,\n  Renderer2,\n} from '@angular/core';\nimport { PortModel } from '@rxzu/core';\nimport { DefaultPortComponent } from '../components/default-port/default-port.component';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultPortFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host: nodeHost,\n  }: {\n    model: PortModel;\n    host: ViewContainerRef;\n  }): ComponentRef<DefaultPortComponent> {\n    const componentRef = nodeHost.createComponent(this.getRecipe());\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement as HTMLElement;\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-portid', model.id);\n    const name = model.getName();\n    if (name) {\n      this.renderer.setAttribute(rootNode, 'data-name', name);\n    }\n\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    // assign all passed properties to node initialization.\n    Object.entries(model).forEach(([key, value]: [string, any]) => {\n      (componentRef.instance as any)[key] = value;\n    });\n\n    componentRef.instance.ngOnInit();\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultPortComponent> {\n    return this.resolver.resolveComponentFactory(DefaultPortComponent);\n  }\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -493,7 +493,7 @@
                     "optional": false,
                     "returnType": "ComponentFactory<DefaultPortComponent>",
                     "typeParameters": [],
-                    "line": 47
+                    "line": 52
                 },
                 {
                     "name": "generateWidget",

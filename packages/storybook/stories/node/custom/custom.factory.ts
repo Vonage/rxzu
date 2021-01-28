@@ -5,12 +5,10 @@ import {
   Renderer2,
 } from '@angular/core';
 import { AbstractAngularFactory } from '@rxzu/angular';
-import { DefaultNodeModel, DiagramModel } from '@rxzu/core';
+import { NodeModel, DiagramModel, NodeModelOptions } from '@rxzu/core';
 import { CustomNodeComponent } from './custom.component';
 
-export class CustomNodeFactory extends AbstractAngularFactory<
-  DefaultNodeModel
-> {
+export class CustomNodeFactory extends AbstractAngularFactory {
   constructor(
     private resolver: ComponentFactoryResolver,
     private renderer: Renderer2
@@ -23,7 +21,7 @@ export class CustomNodeFactory extends AbstractAngularFactory<
     host,
     diagramModel,
   }: {
-    model: DefaultNodeModel;
+    model: NodeModel;
     host: ViewContainerRef;
     diagramModel?: DiagramModel;
   }): ViewContainerRef {
@@ -56,11 +54,14 @@ export class CustomNodeFactory extends AbstractAngularFactory<
     });
 
     // assign all passed properties to node initialization.
-    Object.entries(model).forEach(([key, value]) => {
-      componentRef.instance[key] = value;
+    Object.entries(model).forEach(([key, value]: [string, any]) => {
+      (componentRef.instance as any)[key] = value;
     });
 
-    componentRef.instance.setParent(diagramModel);
+    if (diagramModel) {
+      componentRef.instance.setParent(diagramModel);
+    }
+
     componentRef.instance.ngOnInit();
     const portsHost = componentRef.instance.getPortsHost();
     return portsHost;

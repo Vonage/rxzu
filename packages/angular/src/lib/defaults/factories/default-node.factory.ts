@@ -53,6 +53,11 @@ export class DefaultNodeFactory extends AbstractAngularFactory {
       componentRef.destroy();
     });
 
+    // assign all passed properties to node initialization.
+    Object.entries(model).forEach(([key, value]: [string, any]) => {
+      (componentRef.instance as any)[key] = value;
+    });
+
     componentRef.instance.setParent(diagramModel);
     componentRef.instance.ngOnInit();
     const portsHost = componentRef.instance.getPortsHost();
