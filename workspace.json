@@ -71,11 +71,11 @@
         }
       }
     },
-    "shared-storybook": {
+    "angular-storybook": {
       "projectType": "library",
-      "root": "packages/storybook",
-      "sourceRoot": "packages/storybook",
-      "prefix": "sharedstorybook",
+      "root": "packages/angular-storybook",
+      "sourceRoot": "packages/angular-storybook",
+      "prefix": "angularstorybook",
       "architect": {
         "storybook": {
           "builder": "@nrwl/storybook:storybook",
@@ -83,7 +83,7 @@
             "uiFramework": "@storybook/angular",
             "port": 4400,
             "config": {
-              "configFolder": "packages/storybook/.storybook"
+              "configFolder": "packages/angular-storybook/.storybook"
             }
           },
           "configurations": {
@@ -96,9 +96,9 @@
           "builder": "@nrwl/storybook:build",
           "options": {
             "uiFramework": "@storybook/angular",
-            "outputPath": "dist/storybook/shared-storybook",
+            "outputPath": "dist/storybook/angular-storybook",
             "config": {
-              "configFolder": "packages/storybook/.storybook"
+              "configFolder": "packages/angular-storybook/.storybook"
             }
           },
           "configurations": {
@@ -114,29 +114,29 @@
         }
       }
     },
-    "rxzu-angular-e2e": {
-      "root": "apps/rxzu-angular-e2e",
-      "sourceRoot": "apps/rxzu-angular-e2e/src",
+    "angular-e2e": {
+      "root": "apps/angular-e2e",
+      "sourceRoot": "apps/angular-e2e/src",
       "projectType": "application",
       "architect": {
         "e2e": {
           "builder": "@nrwl/cypress:cypress",
           "options": {
-            "cypressConfig": "apps/rxzu-angular-e2e/cypress.json",
-            "tsConfig": "apps/rxzu-angular-e2e/tsconfig.e2e.json",
-            "devServerTarget": "shared-storybook:storybook"
+            "cypressConfig": "apps/angular-e2e/cypress.json",
+            "tsConfig": "apps/angular-e2e/tsconfig.e2e.json",
+            "devServerTarget": "angular-storybook:storybook"
           },
           "configurations": {
             "ci": {
-              "devServerTarget": "shared-storybook:storybook:ci"
+              "devServerTarget": "angular-storybook:storybook:ci"
             }
           }
         },
         "lint": {
           "builder": "@nrwl/linter:lint",
           "options": {
-            "tsConfig": ["apps/rxzu-angular-e2e/tsconfig.e2e.json"],
-            "exclude": ["**/node_modules/**", "!apps/rxzu-angular-e2e/**"]
+            "tsConfig": ["apps/angular-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**", "!apps/angular-e2e/**"]
           }
         }
       }

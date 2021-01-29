@@ -346,7 +346,6 @@ export class MouseManager {
 
     // are we going to connect a link to something?
     if (action instanceof MoveItemsAction) {
-      this.engine.stopFiringAction();
       const element = this.getElement(event);
       action.selectionModels.forEach((model) => {
         // only care about points connecting to things

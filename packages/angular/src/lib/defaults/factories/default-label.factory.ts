@@ -4,8 +4,10 @@ import {
   ComponentFactoryResolver,
   ComponentFactory,
   Renderer2,
+  Injector,
 } from '@angular/core';
 import { LabelModel } from '@rxzu/core';
+import { LABEL_MODEL } from '../../injection.tokens';
 import { DefaultLabelComponent } from '../components/default-label/default-label.component';
 import { AbstractAngularFactory } from './angular.factory';
 
@@ -24,7 +26,15 @@ export class DefaultLabelFactory extends AbstractAngularFactory {
     model: LabelModel;
     host: ViewContainerRef;
   }): ComponentRef<DefaultLabelComponent> {
-    const componentRef = host.createComponent(this.getRecipe());
+    const injector = Injector.create({
+      providers: [{ provide: LABEL_MODEL, useValue: model }],
+    });
+
+    const componentRef = host.createComponent(
+      this.getRecipe(),
+      undefined,
+      injector
+    );
 
     // attach coordinates and default positional behaviour to the generated component host
     const rootNode = componentRef.location.nativeElement;
@@ -40,12 +50,6 @@ export class DefaultLabelFactory extends AbstractAngularFactory {
       componentRef.destroy();
     });
 
-    // assign all passed properties to node initialization.
-    Object.entries(model).forEach(([key, value]: [string, any]) => {
-      (componentRef.instance as any)[key] = value;
-    });
-
-    componentRef.instance.ngOnInit();
     return componentRef;
   }
 

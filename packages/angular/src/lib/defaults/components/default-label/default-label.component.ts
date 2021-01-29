@@ -2,10 +2,11 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  Inject,
   OnInit,
 } from '@angular/core';
 import { LabelModel } from '@rxzu/core';
-import { takeUntil } from 'rxjs/operators';
+import { LABEL_MODEL } from '../../../injection.tokens';
 
 @Component({
   selector: 'rxzu-default-label',
@@ -13,18 +14,17 @@ import { takeUntil } from 'rxjs/operators';
   styleUrls: ['./default-label.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DefaultLabelComponent extends LabelModel implements OnInit {
-  constructor(private cdRef: ChangeDetectorRef) {
-    super({ type: 'rxzu-default-label' });
-  }
+export class DefaultLabelComponent implements OnInit {
+  constructor(
+    private cdRef: ChangeDetectorRef,
+    @Inject(LABEL_MODEL) public model: LabelModel
+  ) {}
 
   ngOnInit() {
-    this.selectCoords()
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe(() => {
-        this.cdRef.detectChanges();
-      });
+    this.model.selectCoords().subscribe(() => {
+      this.cdRef.detectChanges();
+    });
 
-    this.setPainted(true);
+    this.model.setPainted(true);
   }
 }

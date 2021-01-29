@@ -3,31 +3,34 @@
 
 <svg class="link-container">
   <!-- Link -->
-  <g [id]="id">
+  <g [id]="model.id">
     <path
-      attr.stroke-width="1"
-      attr.stroke="blue"
-      [attr.d]="selectPath() | async"
       class="default-link"
-      (mouseleave)="setHovered(false); onHover()"
-      (mouseenter)="setHovered(); onHover()"
-      [ngClass]="{ hovered: selectHovered() | async }"
+      stroke-width="1"
+      stroke="white"
+      [attr.d]="model.selectPath() | async"
+      (mouseleave)="model.setHovered(false); onHover()"
+      (mouseenter)="model.setHovered(); onHover()"
+      [ngClass]="{ hovered: model.selectHovered() | async }"
     ></path>
     <path
       class="default-link"
-      (mouseleave)="setHovered(false); onHover()"
-      (mouseenter)="setHovered(); onHover()"
-      [attr.stroke-width]="20"
-      attr.stroke="blue"
+      stroke="blue"
       stroke-linecap="round"
-      [attr.data-linkid]="id"
-      [attr.stroke-opacity]="(selectHovered() | async) ? '0.1' : '0'"
-      [attr.d]="selectPath() | async"
+      (mouseleave)="model.setHovered(false); onHover()"
+      (mouseenter)="model.setHovered(); onHover()"
+      [attr.stroke-width]="20"
+      [attr.data-linkid]="model.id"
+      [attr.stroke-opacity]="(model.selectHovered() | async) ? '0.1' : '0'"
+      [attr.d]="model.selectPath() | async"
     ></path>
   </g>
 
   <!-- Points -->
-  <g *ngFor="let point of getPoints(); trackBy: trackByPoints" [id]="point.id">
+  <g
+    *ngFor="let point of model.getPoints(); trackBy: trackByPoints"
+    [id]="point.id"
+  >
     <circle
       fill="currentColor"
       [attr.cx]="point.selectX() | async"
@@ -38,9 +41,9 @@
     />
     <circle
       [attr.data-pointid]="point.id"
-      [attr.data-linkid]="id"
-      (mouseleave)="point.setHovered(false); setHovered(false)"
-      (mouseenter)="point.setHovered(); setHovered()"
+      [attr.data-linkid]="model.id"
+      (mouseleave)="point.setHovered(false); model.setHovered(false)"
+      (mouseenter)="point.setHovered(); model.setHovered()"
       [attr.cx]="point.selectX() | async"
       [attr.cy]="point.selectY() | async"
       r="15"

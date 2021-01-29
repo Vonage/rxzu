@@ -1,0 +1,17 @@
+<div
+  [ngStyle]="{
+    transform:
+      'translate(' +
+      (model.selectCoords() | async).x +
+      'px, ' +
+      (model.selectCoords() | async).y +
+      'px)' +
+      'rotate(' +
+      (model.selectRotation() | async) +
+      'deg)'
+  }"
+>
+  <span class="default-label">
+    {{ model.selectText() | async }}
+  </span>
+</div>

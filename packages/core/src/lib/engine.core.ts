@@ -1,4 +1,4 @@
-import { filter, map, switchMap, take, takeUntil } from 'rxjs/operators';
+import { delay, filter, map, switchMap, take, takeUntil } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import { BaseEntity } from './base.entity';
 import { FactoriesManager } from './factories';
@@ -272,7 +272,8 @@ export class DiagramEngineCore {
           (canvas: HTMLElement | null | undefined): canvas is HTMLElement =>
             canvas !== null && canvas !== undefined
         ),
-        take(1)
+        take(1),
+        delay(0)
       )
       .subscribe((canvas) => {
         const diagramModel = this.getDiagramModel();
@@ -491,7 +492,6 @@ export class DiagramEngineCore {
     const stoppedAction = this.action$.getValue()?.action;
     if (stoppedAction) {
       this.action$.next({ action: stoppedAction, state: 'stopped' });
-      this.action$.next({ action: null, state: null });
       return stoppedAction;
     }
 

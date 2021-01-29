@@ -4,8 +4,10 @@ import {
   ComponentFactory,
   ComponentFactoryResolver,
   Renderer2,
+  Injector,
 } from '@angular/core';
 import { PortModel } from '@rxzu/core';
+import { PORT_MODEL } from '../../injection.tokens';
 import { DefaultPortComponent } from '../components/default-port/default-port.component';
 import { AbstractAngularFactory } from './angular.factory';
 
@@ -24,7 +26,14 @@ export class DefaultPortFactory extends AbstractAngularFactory {
     model: PortModel;
     host: ViewContainerRef;
   }): ComponentRef<DefaultPortComponent> {
-    const componentRef = nodeHost.createComponent(this.getRecipe());
+    const injector = Injector.create({
+      providers: [{ provide: PORT_MODEL, useValue: model }],
+    });
+    const componentRef = nodeHost.createComponent(
+      this.getRecipe(),
+      undefined,
+      injector
+    );
 
     // attach coordinates and default positional behaviour to the generated component host
     const rootNode = componentRef.location.nativeElement as HTMLElement;
@@ -32,6 +41,7 @@ export class DefaultPortFactory extends AbstractAngularFactory {
     // data attributes
     this.renderer.setAttribute(rootNode, 'data-portid', model.id);
     const name = model.getName();
+
     if (name) {
       this.renderer.setAttribute(rootNode, 'data-name', name);
     }
@@ -40,12 +50,6 @@ export class DefaultPortFactory extends AbstractAngularFactory {
       componentRef.destroy();
     });
 
-    // assign all passed properties to node initialization.
-    Object.entries(model).forEach(([key, value]: [string, any]) => {
-      (componentRef.instance as any)[key] = value;
-    });
-
-    componentRef.instance.ngOnInit();
     return componentRef;
   }
 

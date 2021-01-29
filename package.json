@@ -37,8 +37,8 @@
     "postinstall": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect",
-    "storybook": "yarn docs:json && nx run shared-storybook:storybook",
-    "docs:json": "compodoc -p ./packages/angular/tsconfig.lib.prod.json -e json -d ./packages/storybook",
+    "angular:storybook": "yarn docs:json && nx run angular-storybook:storybook",
+    "docs:json": "compodoc -p ./packages/angular/tsconfig.lib.prod.json -e json -d ./packages/angular-storybook",
     "run-many": "yarn docs:json && npx nx run-many --target=build --configuration=production --all"
   },
   "private": false,

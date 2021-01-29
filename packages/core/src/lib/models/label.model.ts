@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import { Coords, LabelModelOptions } from '../interfaces';
 import { createValueState, ValueState } from '../state';
 import { BaseModel } from './base.model';
@@ -28,15 +27,6 @@ export class LabelModel extends BaseModel<LinkModel> {
     );
   }
 
-  // serialize(): ILabelModel {
-  //   return {
-  //     ...super.serialize(),
-  //     type: this.getType(),
-  //     rotation: this.getRotation(),
-  //     coords: this.getCoords(),
-  //   };
-  // }
-
   getRotation() {
     return this.rotation$.value;
   }
@@ -53,7 +43,7 @@ export class LabelModel extends BaseModel<LinkModel> {
     this.rotation$.set(angle).emit();
   }
 
-  selectRotation(): Observable<number> {
+  selectRotation() {
     return this.rotation$.value$;
   }
 
@@ -61,7 +51,7 @@ export class LabelModel extends BaseModel<LinkModel> {
     this.coords$.set({ ...this.coords$.value, ...newCoords }).emit();
   }
 
-  selectCoords(): Observable<Coords> {
+  selectCoords() {
     return this.coords$.value$;
   }
 
@@ -69,11 +59,11 @@ export class LabelModel extends BaseModel<LinkModel> {
     this.text$.set(text).emit();
   }
 
-  getText(): string | null {
+  getText() {
     return this.text$.value;
   }
 
-  selectText(): Observable<string | null> {
+  selectText() {
     return this.text$.value$;
   }
 }

@@ -3,14 +3,14 @@
   [ngStyle]="{
     transform:
       'translate(' +
-      (selectCoords() | async)?.x +
+      (model.selectCoords() | async)?.x +
       'px, ' +
-      (selectCoords() | async)?.y +
+      (model.selectCoords() | async)?.y +
       'px)' +
       'rotate(' +
-      (selectRotation() | async) +
+      (model.selectRotation() | async) +
       'deg)'
   }"
 >
-  {{ selectText() | async }}
+  {{ model.selectText() | async }}
 </div>

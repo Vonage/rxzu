@@ -12,14 +12,12 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import { combineLatest, noop, Observable, of, ReplaySubject } from 'rxjs';
-import { filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import {
   DiagramEngineCore,
   SelectingAction,
   MouseManager,
-  isNil,
   DiagramModel,
-  BaseAction,
 } from '@rxzu/core';
 import { ZonedClass, OutsideZone } from '../utils';
 
@@ -51,7 +49,7 @@ export class RxZuDiagramComponent
 
   diagramEngine?: DiagramEngineCore;
   mouseManager?: MouseManager;
-  selectionBox$?: Observable<SelectingAction>;
+  selectionBox$?: Observable<SelectingAction | null>;
   destroyed$ = new ReplaySubject<boolean>(1);
 
   get host(): HTMLElement {
@@ -70,10 +68,9 @@ export class RxZuDiagramComponent
     if (!model || !this.canvas) {
       return;
     }
-
     this.diagramEngine = model.getDiagramEngine();
-
     this.mouseManager = this.diagramEngine.getMouseManager();
+
     this.diagramEngine.setCanvas(this.canvas.nativeElement);
 
     this.diagramEngine.setup({
@@ -110,20 +107,20 @@ export class RxZuDiagramComponent
     }
 
     this.selectionBox$ = this.diagramEngine.selectAction().pipe(
-      filter(
-        (a: {
-          action: BaseAction | null;
-          state: string | null;
-        }): a is { action: SelectingAction; state: 'firing' } =>
-          !isNil(a) &&
+      map((a) => {
+        if (
+          a &&
+          a.action &&
           a.action instanceof SelectingAction &&
           a.state === 'firing'
-      ),
-      map((a) => {
-        return a.action;
+        ) {
+          return a.action as SelectingAction;
+        } else {
+          return null;
+        }
       }),
       tap(() => this.cdRef.detectChanges())
-    ) as Observable<SelectingAction>;
+    );
   }
 
   @OutsideZone

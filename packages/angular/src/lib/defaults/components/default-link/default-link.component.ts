@@ -3,13 +3,14 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  OnInit,
+  Inject,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
 import { PointModel, generateCurvePath, Coords, LinkModel } from '@rxzu/core';
 import { combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { LINK_MODEL } from '../../../injection.tokens';
 
 @Component({
   selector: 'rxzu-default-link',
@@ -17,14 +18,15 @@ import { takeUntil } from 'rxjs/operators';
   styleUrls: ['./default-link.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DefaultLinkComponent
-  extends LinkModel
-  implements AfterViewInit, OnInit {
+export class DefaultLinkComponent implements AfterViewInit {
   @ViewChild('labelLayer', { read: ViewContainerRef, static: true })
   labelLayer!: ViewContainerRef;
 
-  constructor(private cdRef: ChangeDetectorRef) {
-    super({ type: 'rxzu-default-link' });
+  constructor(
+    @Inject(LINK_MODEL) public model: LinkModel,
+    private cdRef: ChangeDetectorRef
+  ) {
+    this.model.setPainted(true);
   }
 
   trackByPoints(i: number, point: PointModel) {
@@ -35,17 +37,13 @@ export class DefaultLinkComponent
     this.cdRef.detectChanges();
   }
 
-  ngOnInit() {
-    this.setPainted(true);
-  }
-
   ngAfterViewInit() {
-    const firstPCoords$ = this.getFirstPoint().selectCoords();
-    const lastPCoords$ = this.getLastPoint().selectCoords();
+    const firstPCoords$ = this.model.getFirstPoint().selectCoords();
+    const lastPCoords$ = this.model.getLastPoint().selectCoords();
 
     // Observe link coords and update drawing accordingly
     combineLatest([firstPCoords$, lastPCoords$])
-      .pipe(takeUntil(this.onEntityDestroy()))
+      .pipe(takeUntil(this.model.onEntityDestroy()))
       .subscribe(([firstPCoords, lastPCoords]) => {
         const points = [firstPCoords, lastPCoords];
 
@@ -66,9 +64,10 @@ export class DefaultLinkComponent
           lastPCoords,
           isStraight ? 0 : 50
         );
-        this.path$.set(path).emit();
+        this.model.setPath(path);
 
-        const label = this.getLabel();
+        const label = this.model.getLabel();
+
         // update label position
         if (label) {
           label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));
@@ -100,9 +99,5 @@ export class DefaultLinkComponent
       x: (firstPoint.x + secondPoint.x) / 2 + 20,
       y: (firstPoint.y + secondPoint.y) / 2 + 20,
     };
-  }
-
-  selectPath() {
-    return this.path$.value$;
   }
 }

@@ -15,7 +15,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
   protected extras$: ValueState<any>;
   protected label$: ValueState<LabelModel | null>;
   protected path$: ValueState<string | null>;
-  points$: ValueState<PointModel[]>;
+  protected points$: ValueState<PointModel[]>;
 
   constructor(options: LinkModelOptions) {
     super({ logPrefix: '[Link]', ...options });
@@ -92,6 +92,18 @@ export class LinkModel extends BaseModel<DiagramModel> {
     selector?: (extra: Partial<T>) => T[keyof T] | string | string[]
   ): Observable<T> {
     return this.extras$.select(selector);
+  }
+
+  setPath(path: string) {
+    this.path$.set(path).emit();
+  }
+
+  getPath() {
+    return this.path$.value;
+  }
+
+  selectPath() {
+    return this.path$.select();
   }
 
   destroy() {
