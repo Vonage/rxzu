@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import {
   AbstractAngularFactory,
-  DIAGRAM_MODEL,
   NODE_MODEL,
   NodeModel,
   DiagramModel,
@@ -25,17 +24,13 @@ export class CustomNodeFactory extends AbstractAngularFactory {
   generateWidget({
     model,
     host,
-    diagramModel,
   }: {
     model: NodeModel;
     host: ViewContainerRef;
     diagramModel: DiagramModel;
   }): ViewContainerRef {
     const injector = Injector.create({
-      providers: [
-        { provide: NODE_MODEL, useValue: model },
-        { provide: DIAGRAM_MODEL, useValue: diagramModel },
-      ],
+      providers: [{ provide: NODE_MODEL, useValue: model }],
     });
 
     const componentRef = host.createComponent(

@@ -16,10 +16,6 @@ export const PORT_MODEL: InjectionToken<string> = new InjectionToken(
   'port_model'
 );
 
-export const DIAGRAM_MODEL: InjectionToken<string> = new InjectionToken(
-  'diagram_model'
-);
-
 export const POINT_MODEL: InjectionToken<string> = new InjectionToken(
   'point_model'
 );

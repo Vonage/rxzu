@@ -338,8 +338,9 @@ export class DiagramEngineCore {
             const portsHost = nodeFactory.generateWidget({
               model: node,
               host: nodesHost,
-              diagramModel: this.diagramModel,
             });
+
+            node.setParent(diagramModel);
 
             node
               .selectPorts()

@@ -1,20 +1,14 @@
 import {
   Component,
-  OnInit,
   ChangeDetectionStrategy,
   ViewChild,
   ViewContainerRef,
   Inject,
   ElementRef,
   Renderer2,
-  ChangeDetectorRef,
+  AfterViewInit,
 } from '@angular/core';
-import {
-  DiagramModel,
-  DIAGRAM_MODEL,
-  NodeModel,
-  NODE_MODEL,
-} from '@rxzu/angular';
+import { DiagramModel, NodeModel, NODE_MODEL } from '@rxzu/angular';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -23,7 +17,7 @@ import { BehaviorSubject } from 'rxjs';
   styleUrls: ['./custom.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CustomNodeComponent {
+export class CustomNodeComponent implements AfterViewInit {
   @ViewChild('portsLayer', { read: ViewContainerRef, static: true })
   portsLayer!: ViewContainerRef;
   nodeContent$: BehaviorSubject<string>;
@@ -31,18 +25,19 @@ export class CustomNodeComponent {
 
   constructor(
     @Inject(NODE_MODEL) private model: NodeModel,
-    @Inject(DIAGRAM_MODEL) private diagramModel: DiagramModel,
     private rootEl: ElementRef,
     private renderer: Renderer2
   ) {
     this.nodeContent$ = new BehaviorSubject('Pick me!');
-    this.model.setParent(this.diagramModel);
     this.rootNode = this.rootEl.nativeElement;
     this.updateNodePosition();
+    this.model.setPainted(true);
+  }
+
+  ngAfterViewInit() {
     this.model.selectSelected().subscribe((selected) => {
       this.nodeContent$.next(selected ? 'Thank you 🙏' : 'Pick me!');
     });
-    this.model.setPainted(true);
   }
 
   getPortsHost() {

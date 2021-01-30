@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { DiagramModel, NodeModel } from '@rxzu/core';
 import { AbstractAngularFactory } from './angular.factory';
-import { DIAGRAM_MODEL, NODE_MODEL } from '../../injection.tokens';
+import { NODE_MODEL } from '../../injection.tokens';
 
 export class DefaultNodeFactory extends AbstractAngularFactory {
   constructor(
@@ -28,10 +28,7 @@ export class DefaultNodeFactory extends AbstractAngularFactory {
     diagramModel: DiagramModel;
   }): ViewContainerRef {
     const injector = Injector.create({
-      providers: [
-        { provide: NODE_MODEL, useValue: model },
-        { provide: DIAGRAM_MODEL, useValue: diagramModel },
-      ],
+      providers: [{ provide: NODE_MODEL, useValue: model }],
     });
 
     const componentRef = host.createComponent(

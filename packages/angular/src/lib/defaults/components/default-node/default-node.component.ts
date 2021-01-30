@@ -7,8 +7,8 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { DiagramModel, NodeModel } from '@rxzu/core';
-import { DIAGRAM_MODEL, NODE_MODEL } from '../../../injection.tokens';
+import { NodeModel } from '@rxzu/core';
+import { NODE_MODEL } from '../../../injection.tokens';
 
 @Component({
   selector: 'rxzu-default-node',
@@ -23,13 +23,11 @@ export class DefaultNodeComponent {
 
   constructor(
     @Inject(NODE_MODEL) public model: NodeModel,
-    @Inject(DIAGRAM_MODEL) private diagramModel: DiagramModel,
     private rootEl: ElementRef,
     private renderer: Renderer2
   ) {
     this.rootNode = this.rootEl.nativeElement;
     this.updateNodePosition();
-    this.model.setParent(this.diagramModel);
     this.model.setPainted(true);
   }
 
