@@ -7,7 +7,7 @@ import { DiagramEngine, DiagramModel, NodeModel } from '@rxzu/angular';
     class="demo-diagram"
     [model]="diagramModel"
   ></rxzu-diagram>`,
-  styleUrls: ['../demo-diagram.component.scss'],
+  styleUrls: ['../../demo-diagram.component.scss'],
 })
 export class DefaultNodeComponent implements OnInit {
   diagramModel: DiagramModel;

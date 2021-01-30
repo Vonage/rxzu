@@ -21,7 +21,7 @@ import { CustomNodeFactory } from './custom.factory';
     class="demo-diagram"
     [model]="diagramModel"
   ></rxzu-diagram>`,
-  styleUrls: ['../demo-diagram.component.scss'],
+  styleUrls: ['../../demo-diagram.component.scss'],
 })
 export class CustomNodeDiagramComponent implements OnInit, OnChanges {
   diagramModel: DiagramModel;

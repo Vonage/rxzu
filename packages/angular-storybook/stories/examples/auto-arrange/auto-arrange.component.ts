@@ -15,7 +15,7 @@ import {
     </div>
     <rxzu-diagram class="demo-diagram" [model]="diagramModel"></rxzu-diagram>
   `,
-  styleUrls: ['../demo-diagram.component.scss'],
+  styleUrls: ['../../demo-diagram.component.scss'],
 })
 export class AutoArrangeExampleStoryComponent implements OnInit {
   diagramModel: DiagramModel;

@@ -19,7 +19,7 @@ import { CustomPortFactory } from './custom.factory';
     class="demo-diagram"
     [model]="diagramModel"
   ></rxzu-diagram>`,
-  styleUrls: ['../demo-diagram.component.scss'],
+  styleUrls: ['../../demo-diagram.component.scss'],
 })
 export class CustomPortDiagramComponent implements OnInit {
   diagramModel: DiagramModel;

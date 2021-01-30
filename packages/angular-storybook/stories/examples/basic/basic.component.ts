@@ -14,7 +14,7 @@ import {
     [inverseZoom]="true"
     [model]="diagramModel"
   ></rxzu-diagram>`,
-  styleUrls: ['../demo-diagram.component.scss'],
+  styleUrls: ['../../demo-diagram.component.scss'],
 })
 export class BasicExampleStoryComponent implements OnInit {
   diagramModel: DiagramModel;

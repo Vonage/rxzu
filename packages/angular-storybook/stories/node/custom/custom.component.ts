@@ -8,7 +8,7 @@ import {
   Renderer2,
   AfterViewInit,
 } from '@angular/core';
-import { DiagramModel, NodeModel, NODE_MODEL } from '@rxzu/angular';
+import { NodeModel, NODE_MODEL } from '@rxzu/angular';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({

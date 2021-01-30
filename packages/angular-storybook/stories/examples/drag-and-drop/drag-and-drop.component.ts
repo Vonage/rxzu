@@ -25,7 +25,7 @@ import { DiagramEngine, DiagramModel, NodeModel } from '@rxzu/angular';
     ></rxzu-diagram>
   `,
   styleUrls: [
-    '../demo-diagram.component.scss',
+    '../../demo-diagram.component.scss',
     './drag-and-drop.component.scss',
   ],
 })

@@ -7,7 +7,7 @@ import {
   DefaultLinkComponent,
   DefaultLabelComponent,
   DefaultPortComponent,
-  RxZuDiagramsModule
+  RxZuDiagramsModule,
 } from '@rxzu/angular';
 
 export default {
@@ -21,7 +21,7 @@ export default {
         CustomPortComponent,
         DefaultLinkComponent,
         DefaultLabelComponent,
-        DefaultPortComponent
+        DefaultPortComponent,
       ],
       imports: [CommonModule, RxZuDiagramsModule],
       entryComponents: [
@@ -29,17 +29,12 @@ export default {
         DefaultLinkComponent,
         CustomPortComponent,
         DefaultLabelComponent,
-        DefaultPortComponent
-      ]
-    })
-  ]
+        DefaultPortComponent,
+      ],
+    }),
+  ],
 } as Meta;
 
 export const Default = DefaultNodeTemplate.bind({});
 
 export const Custom = CustomNodeTemplate.bind({});
-
-Custom.args = {
-  nodeHeight: 200,
-  nodeWidth: 200
-};

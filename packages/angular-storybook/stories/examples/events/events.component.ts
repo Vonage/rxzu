@@ -15,7 +15,7 @@ import { filter } from 'rxjs/operators';
     class="demo-diagram"
     [model]="diagramModel"
   ></rxzu-diagram>`,
-  styleUrls: ['../demo-diagram.component.scss'],
+  styleUrls: ['../../demo-diagram.component.scss'],
 })
 export class EventsExampleStoryComponent implements OnInit {
   diagramModel: DiagramModel;
