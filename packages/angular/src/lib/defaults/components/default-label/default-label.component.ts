@@ -1,25 +1,30 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { DefaultLabelModel } from '@rxzu/core';
-import { takeUntil } from 'rxjs/operators';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Inject,
+  OnInit,
+} from '@angular/core';
+import { LabelModel } from '@rxzu/core';
+import { LABEL_MODEL } from '../../../injection.tokens';
 
 @Component({
-  selector: 'ngdx-default-label',
+  selector: 'rxzu-default-label',
   templateUrl: './default-label.component.html',
   styleUrls: ['./default-label.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DefaultLabelComponent extends DefaultLabelModel implements OnInit {
-  constructor(private cdRef: ChangeDetectorRef) {
-    super('ngdx-default-label');
-  }
+export class DefaultLabelComponent implements OnInit {
+  constructor(
+    private cdRef: ChangeDetectorRef,
+    @Inject(LABEL_MODEL) public model: LabelModel
+  ) {}
 
   ngOnInit() {
-    this.selectCoords()
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe(() => {
-        this.cdRef.detectChanges();
-      });
+    this.model.selectCoords().subscribe(() => {
+      this.cdRef.detectChanges();
+    });
 
-    this.setPainted(true);
+    this.model.setPainted(true);
   }
 }

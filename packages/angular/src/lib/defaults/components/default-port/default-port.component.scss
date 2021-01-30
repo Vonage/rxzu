@@ -6,16 +6,4 @@
   border: 1px solid gray;
   background-color: lightgray;
   margin: 10px 0;
-
-  &:hover {
-    background-color: green;
-  }
-
-  &.out {
-    right: -195px;
-  }
-
-  &.in {
-    left: -5px;
-  }
 }

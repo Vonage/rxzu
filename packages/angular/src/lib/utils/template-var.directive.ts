@@ -1,4 +1,10 @@
-import { Directive, EmbeddedViewRef, Input, TemplateRef, ViewContainerRef } from '@angular/core';
+import {
+  Directive,
+  EmbeddedViewRef,
+  Input,
+  TemplateRef,
+  ViewContainerRef,
+} from '@angular/core';
 
 class TemplateVarContext {
   $implicit: any;
@@ -6,10 +12,10 @@ class TemplateVarContext {
 }
 
 @Directive({
-  selector: '[templateVar]'
+  selector: '[templateVar]',
 })
 export class TemplateVarDirective {
-  view: EmbeddedViewRef<any>;
+  view: EmbeddedViewRef<any> | null = null;
 
   protected context = new TemplateVarContext();
 
@@ -19,7 +25,10 @@ export class TemplateVarDirective {
     this.updateView();
   }
 
-  constructor(protected vcRef: ViewContainerRef, protected templateRef: TemplateRef<any>) {}
+  constructor(
+    protected vcRef: ViewContainerRef,
+    protected templateRef: TemplateRef<any>
+  ) {}
 
   updateView() {
     if (!this.view) {

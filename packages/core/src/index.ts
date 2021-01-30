@@ -3,7 +3,6 @@ export * from './lib/interfaces';
 export * from './lib/models';
 export * from './lib/utils';
 export * from './lib/factories';
-export * from './lib/defaults';
 export * from './lib/managers';
 export * from './lib/plugins';
 

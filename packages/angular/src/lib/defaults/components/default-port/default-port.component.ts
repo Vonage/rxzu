@@ -1,18 +1,15 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { DefaultPortModel } from '@rxzu/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { PortModel } from '@rxzu/core';
+import { PORT_MODEL } from '../../../injection.tokens';
 
 @Component({
-  selector: 'ngdx-default-port',
+  selector: 'rxzu-default-port',
   templateUrl: './default-port.component.html',
   styleUrls: ['./default-port.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DefaultPortComponent extends DefaultPortModel implements OnInit {
-  constructor() {
-    super({ type: 'ngdx-default-port' });
-  }
-
-  ngOnInit() {
-    this.setPainted(true);
+export class DefaultPortComponent {
+  constructor(@Inject(PORT_MODEL) public model: PortModel) {
+    this.model.setPainted(true);
   }
 }

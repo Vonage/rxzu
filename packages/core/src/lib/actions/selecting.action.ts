@@ -19,6 +19,14 @@ export class SelectingAction extends BaseAction {
     super(mouseX, mouseY);
     this.mouseX2 = mouseX;
     this.mouseY2 = mouseY;
+    this.dimensions = {
+      top: 0,
+      left: 0,
+      width: 0,
+      height: 0,
+      right: 0,
+      bottom: 0,
+    };
   }
 
   getBoxDimensions() {
@@ -28,7 +36,7 @@ export class SelectingAction extends BaseAction {
       width: Math.abs(this.mouseX2 - this.mouseX),
       height: Math.abs(this.mouseY2 - this.mouseY),
       right: this.mouseX2 < this.mouseX ? this.mouseX : this.mouseX2,
-      bottom: this.mouseY2 < this.mouseY ? this.mouseY : this.mouseY2
+      bottom: this.mouseY2 < this.mouseY ? this.mouseY : this.mouseY2,
     };
     return this.dimensions;
   }

@@ -5,13 +5,13 @@ import {
   ComponentFactoryResolver,
   ComponentFactory,
   Renderer2,
+  Injector,
 } from '@angular/core';
-import { DefaultLinkModel } from '@rxzu/core';
+import { LinkModel } from '@rxzu/core';
 import { AbstractAngularFactory } from './angular.factory';
+import { LINK_MODEL } from '../../injection.tokens';
 
-export class DefaultLinkFactory extends AbstractAngularFactory<
-  DefaultLinkComponent
-> {
+export class DefaultLinkFactory extends AbstractAngularFactory {
   constructor(
     protected resolver: ComponentFactoryResolver,
     protected renderer: Renderer2
@@ -23,17 +23,24 @@ export class DefaultLinkFactory extends AbstractAngularFactory<
     model,
     host,
   }: {
-    model: DefaultLinkModel;
+    model: LinkModel;
     host: ViewContainerRef;
   }): ComponentRef<DefaultLinkComponent> {
-    const componentRef = host.createComponent(this.getRecipe());
+    const injector = Injector.create({
+      providers: [{ provide: LINK_MODEL, useValue: model }],
+    });
+
+    const componentRef = host.createComponent(
+      this.getRecipe(),
+      undefined,
+      injector
+    );
 
     // attach coordinates and default positional behaviour to the generated component host
     const rootNode = componentRef.location.nativeElement;
 
     // default style for link
     this.renderer.setStyle(rootNode, 'position', 'absolute');
-    this.renderer.addClass(rootNode, 'label');
 
     // data attributes
     this.renderer.setAttribute(rootNode, 'data-linkid', model.id);
@@ -43,12 +50,6 @@ export class DefaultLinkFactory extends AbstractAngularFactory<
       componentRef.destroy();
     });
 
-    // assign all passed properties to link initialization.
-    Object.entries(model).forEach(([key, value]) => {
-      componentRef.instance[key] = value;
-    });
-
-    componentRef.instance.ngOnInit();
     return componentRef;
   }
 

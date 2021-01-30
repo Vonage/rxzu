@@ -1,7 +1,6 @@
 import { Observable } from 'rxjs';
-import { Coords } from '../interfaces/coords.interface';
-import { SerializedLinkModel } from '../interfaces/serialization.interface';
-import { createValueState } from '../state';
+import { Coords, LinkModelOptions } from '../interfaces';
+import { createValueState, ValueState } from '../state';
 import { ID } from '../utils/tool-kit.util';
 import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
@@ -10,61 +9,78 @@ import { PointModel } from './point.model';
 import { PortModel } from './port.model';
 
 export class LinkModel extends BaseModel<DiagramModel> {
-  protected name$ = createValueState<string>(
-    null,
-    this.entityPipe('targetPort')
-  );
-  protected sourcePort$ = createValueState<PortModel | null>(
-    null,
-    this.entityPipe('targetPort')
-  );
-  protected targetPort$ = createValueState<PortModel | null>(
-    null,
-    this.entityPipe('targetPort')
-  );
-  protected extras$ = createValueState<any>({}, this.entityPipe('extras'));
-  protected label$ = createValueState<LabelModel>(
-    null,
-    this.entityPipe('label')
-  );
-  path$ = createValueState<string>(null, this.entityPipe('path'));
-  points$ = createValueState<PointModel[]>(
-    [
-      new PointModel(this, { x: 0, y: 0 }),
-      new PointModel(this, { x: 0, y: 0 }),
-    ],
-    this.entityPipe('points')
-  );
+  protected name$: ValueState<string>;
+  protected sourcePort$: ValueState<PortModel | null>;
+  protected targetPort$: ValueState<PortModel | null>;
+  protected extras$: ValueState<any>;
+  protected label$: ValueState<LabelModel | null>;
+  protected path$: ValueState<string | null>;
+  protected points$: ValueState<PointModel[]>;
 
-  constructor(linkType = 'default', id?: string, logPrefix = '[Link]') {
-    super(linkType, id, logPrefix);
-  }
+  constructor(options: LinkModelOptions) {
+    super({ logPrefix: '[Link]', ...options });
 
-  serialize(): SerializedLinkModel {
-    const serializedPoints = this.points$.value.map((point) =>
-      point.serialize()
+    this.name$ = createValueState<string>(
+      options.name ?? '',
+      this.entityPipe('targetPort')
     );
-    const label = this.getLabel()?.serialize();
-    return {
-      ...super.serialize(),
-      name: this.getName(),
-      sourcePort: this.getSourcePort().id,
-      targetPort: this.getTargetPort().id,
-      extras: this.getExtras(),
-      points: serializedPoints,
-      label,
-    };
+    this.sourcePort$ = createValueState<PortModel | null>(
+      options.sourcePort ?? null,
+      this.entityPipe('targetPort')
+    );
+    this.targetPort$ = createValueState<PortModel | null>(
+      options.targetPort ?? null,
+      this.entityPipe('targetPort')
+    );
+
+    this.extras$ = createValueState(
+      options.extras ?? {},
+      this.entityPipe('extras')
+    );
+
+    this.label$ = createValueState<LabelModel | null>(
+      options.label ?? null,
+      this.entityPipe('label')
+    );
+
+    this.path$ = createValueState<string | null>(null, this.entityPipe('path'));
+    this.points$ = createValueState(
+      [
+        new PointModel({ parent: this, type: 'default' }),
+        new PointModel({ parent: this, type: 'default' }),
+      ],
+      this.entityPipe('points')
+    );
   }
+
+  // serialize(): ILinkModel & {
+  //   sourcePortId: string | null;
+  //   targetPortId: string | null;
+  // } {
+  //   const serializedPoints = this.points$.value.map((point) =>
+  //     point.serialize()
+  //   );
+  //   const label = this.getLabel()?.serialize();
+  //   return {
+  //     ...super.serialize(),
+  //     name: this.getName(),
+  //     sourcePortId: this.getSourcePort()?.id ?? null,
+  //     targetPortId: this.getTargetPort()?.id ?? null,
+  //     extras: this.getExtras(),
+  //     points: serializedPoints,
+  //     label,
+  //   };
+  // }
 
   setName(name: string) {
     this.name$.set(name).emit();
   }
 
-  getName(): string {
+  getName(): string | undefined {
     return this.name$.value;
   }
 
-  setExtras(extras: any) {
+  setExtras<E>(extras: Partial<E>) {
     this.extras$.set(extras).emit();
   }
 
@@ -72,26 +88,33 @@ export class LinkModel extends BaseModel<DiagramModel> {
     return this.extras$.value;
   }
 
-  selectExtras<E = any>(
-    selector?: (extra: E) => E[keyof E] | string | string[]
-  ): Observable<E> {
+  selectExtras<T>(
+    selector?: (extra: Partial<T>) => T[keyof T] | string | string[]
+  ): Observable<T> {
     return this.extras$.select(selector);
+  }
+
+  setPath(path: string) {
+    this.path$.set(path).emit();
+  }
+
+  getPath() {
+    return this.path$.value;
+  }
+
+  selectPath() {
+    return this.path$.select();
   }
 
   destroy() {
     this.resetLabel();
-    if (this.sourcePort$.value) {
-      this.sourcePort$.value.removeLink(this);
-    }
-
-    if (this.targetPort$.value) {
-      this.targetPort$.value.removeLink(this);
-    }
+    this.sourcePort$.value?.removeLink(this);
+    this.targetPort$.value?.removeLink(this);
 
     super.destroy();
   }
 
-  doClone(lookupTable = {}, clone) {
+  doClone(lookupTable = {}, clone: this) {
     clone.setPoints(
       this.getPoints().map((point: PointModel) => {
         return point.clone(lookupTable);
@@ -114,16 +137,16 @@ export class LinkModel extends BaseModel<DiagramModel> {
     return this.points$.value.indexOf(point);
   }
 
-  getPointModel(id: ID): PointModel | null {
+  getPointModel(id?: ID | null): PointModel | undefined {
     for (const point of this.points$.value) {
       if (point.id === id) {
         return point;
       }
     }
-    return null;
+    return undefined;
   }
 
-  getPortForPoint(point: PointModel): PortModel {
+  getPortForPoint(point: PointModel): PortModel | null {
     if (
       this.sourcePort$.value !== null &&
       this.getFirstPoint().id === point.id
@@ -141,7 +164,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
     return null;
   }
 
-  getPointForPort(port: PortModel): PointModel {
+  getPointForPort(port: PortModel): PointModel | null {
     if (
       this.sourcePort$.value !== null &&
       this.sourcePort$.value.id === port.id
@@ -172,29 +195,25 @@ export class LinkModel extends BaseModel<DiagramModel> {
       port.addLink(this);
     }
 
-    if (this.getSourcePort() !== null) {
-      this.getSourcePort().removeLink(this);
-    }
+    this.getSourcePort()?.removeLink(this);
 
     this.sourcePort$.set(port).emit();
   }
 
-  getSourcePort(): PortModel {
+  getSourcePort(): PortModel | null {
     return this.sourcePort$.value;
   }
 
-  getTargetPort(): PortModel {
+  getTargetPort(): PortModel | null {
     return this.targetPort$.value;
   }
 
-  setTargetPort(port: PortModel) {
+  setTargetPort(port: PortModel | null) {
     if (port !== null) {
       port.addLink(this);
     }
 
-    if (this.getTargetPort() !== null) {
-      this.getTargetPort().removeLink(this);
-    }
+    this.getTargetPort()?.removeLink(this);
 
     this.targetPort$.set(port).emit();
   }
@@ -227,7 +246,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
     return this.label$.value$;
   }
 
-  getLabel(): LabelModel {
+  getLabel(): LabelModel | null {
     return this.label$.value;
   }
 
@@ -235,8 +254,6 @@ export class LinkModel extends BaseModel<DiagramModel> {
     const currentLabel = this.getLabel();
 
     if (currentLabel) {
-      currentLabel.setParent(null);
-      currentLabel.setPainted(false);
       currentLabel.destroy();
     }
   }
@@ -267,7 +284,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
   }
 
   generatePoint({ x = 0, y = 0 }: Coords): PointModel {
-    return new PointModel(this, { x, y });
+    return new PointModel({ parent: this, coords: { x, y }, type: 'default' });
   }
 
   setLocked(locked = true) {

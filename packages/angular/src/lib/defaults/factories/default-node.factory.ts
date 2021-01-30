@@ -4,13 +4,13 @@ import {
   ViewContainerRef,
   ComponentFactory,
   Renderer2,
+  Injector,
 } from '@angular/core';
-import { DefaultNodeModel, DiagramModel } from '@rxzu/core';
+import { DiagramModel, NodeModel } from '@rxzu/core';
 import { AbstractAngularFactory } from './angular.factory';
+import { NODE_MODEL } from '../../injection.tokens';
 
-export class DefaultNodeFactory extends AbstractAngularFactory<
-  DefaultNodeComponent
-> {
+export class DefaultNodeFactory extends AbstractAngularFactory {
   constructor(
     protected resolver: ComponentFactoryResolver,
     protected renderer: Renderer2
@@ -23,11 +23,19 @@ export class DefaultNodeFactory extends AbstractAngularFactory<
     host,
     diagramModel,
   }: {
-    model: DefaultNodeModel;
+    model: NodeModel;
     host: ViewContainerRef;
-    diagramModel?: DiagramModel;
+    diagramModel: DiagramModel;
   }): ViewContainerRef {
-    const componentRef = host.createComponent(this.getRecipe(), host.length);
+    const injector = Injector.create({
+      providers: [{ provide: NODE_MODEL, useValue: model }],
+    });
+
+    const componentRef = host.createComponent(
+      this.getRecipe(),
+      undefined,
+      injector
+    );
 
     // attach coordinates and default positional behaviour to the generated component host
     const rootNode = componentRef.location.nativeElement;
@@ -39,29 +47,10 @@ export class DefaultNodeFactory extends AbstractAngularFactory<
     // data attributes
     this.renderer.setAttribute(rootNode, 'data-nodeid', model.id);
 
-    // subscribe to node coordinates
-    model.selectCoords().subscribe(({ x, y }) => {
-      this.renderer.setStyle(rootNode, 'left', `${x}px`);
-      this.renderer.setStyle(rootNode, 'top', `${y}px`);
-    });
-
-    model.selectionChanges().subscribe((e) => {
-      e.isSelected
-        ? this.renderer.addClass(rootNode, 'selected')
-        : this.renderer.removeClass(rootNode, 'selected');
-    });
-
     model.onEntityDestroy().subscribe(() => {
       componentRef.destroy();
     });
 
-    // assign all passed properties to node initialization.
-    Object.entries(model).forEach(([key, value]) => {
-      componentRef.instance[key] = value;
-    });
-
-    componentRef.instance.setParent(diagramModel);
-    componentRef.instance.ngOnInit();
     const portsHost = componentRef.instance.getPortsHost();
     return portsHost;
   }
