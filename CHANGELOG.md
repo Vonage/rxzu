@@ -1,3 +1,20 @@
+# [2.0.0](https://github.com/Vonage/rxzu/compare/v1.5.3...v2.0.0) (2021-01-30)
+
+
+### Bug Fixes
+
+* **angular:** enable strict mode ([6c30470](https://github.com/Vonage/rxzu/commit/6c304708118f40043fc105f51f9aec273b3340b9))
+
+
+### Features
+
+* **strict typescript:** strict mode enabled on all libraries and storybook ([5e967c8](https://github.com/Vonage/rxzu/commit/5e967c8bdb32d27458fe31355b1b220a702d4ac6))
+
+
+### BREAKING CHANGES
+
+* **strict typescript:** angular components no longer extend base models | factories structure changed
+
 ## [1.5.3](https://github.com/Vonage/rxzu/compare/v1.5.2...v1.5.3) (2021-01-10)
 
 
