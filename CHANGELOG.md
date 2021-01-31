@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/Vonage/rxzu/compare/v2.0.1...v2.0.2) (2021-01-31)
+
+
+### Bug Fixes
+
+* **ctx menu:** chrome bug when clicking right mouse button, mouse up isn't fired ([9b1b383](https://github.com/Vonage/rxzu/commit/9b1b383347b5a8ea67d0cb3af92347978bfb8ede))
+
 ## [2.0.1](https://github.com/Vonage/rxzu/compare/v2.0.0...v2.0.1) (2021-01-31)
 
 
