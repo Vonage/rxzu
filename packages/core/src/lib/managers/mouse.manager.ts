@@ -1,4 +1,4 @@
-import { fromEvent, merge } from 'rxjs';
+import { fromEvent, merge, race } from 'rxjs';
 import { tap, take, takeUntil } from 'rxjs/operators';
 import {
   SelectingAction,
@@ -532,7 +532,10 @@ export class MouseManager {
   }
 
   protected createMouseListeners() {
-    const mouseUp$ = fromEvent<MouseEvent>(document, 'mouseup').pipe(
+    const mouseUp$ = race([
+      fromEvent<MouseEvent>(document, 'mouseup'),
+      fromEvent<MouseEvent>(document, 'contextmenu'),
+    ]).pipe(
       tap((e) => this.onMouseUp(e)),
       take(1)
     );
