@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/Vonage/rxzu/compare/v2.0.0...v2.0.1) (2021-01-31)
+
+
+### Bug Fixes
+
+* **multiple select:** if point is attached to port, don't select ([f008d13](https://github.com/Vonage/rxzu/commit/f008d13992877a5168a40e54f2d7abda7596bb68))
+
 # [2.0.0](https://github.com/Vonage/rxzu/compare/v1.5.3...v2.0.0) (2021-01-30)
 
 
