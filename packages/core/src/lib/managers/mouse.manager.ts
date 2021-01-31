@@ -133,11 +133,13 @@ export class MouseManager {
           let allSelected = true;
 
           link.getPoints().forEach((point) => {
+            const pointPort = point.getParent().getPortForPoint(point);
             if (
               (action as SelectingAction).containsElement(
                 point.getCoords(),
                 this.engine.getDiagramModel()
-              )
+              ) &&
+              !pointPort
             ) {
               point.setSelected();
             } else {
