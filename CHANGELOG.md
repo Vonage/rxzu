@@ -1,3 +1,14 @@
+# [2.1.0](https://github.com/Vonage/rxzu/compare/v2.0.2...v2.1.0) (2021-02-09)
+
+
+### Features
+
+* **genral:** add the ability to zoom to fit and zoom to nodes ([94dea1b](https://github.com/Vonage/rxzu/commit/94dea1b84c4b10723f6865a651699e2cdb7bacb2))
+* **genral:** add the ability to zoom to fit and zoom to nodes ([8580874](https://github.com/Vonage/rxzu/commit/8580874687e2a1f74e6a02575d6aa434ac03c009))
+* **genral:** fix comments ([0d9526f](https://github.com/Vonage/rxzu/commit/0d9526f98eb914316a1d7d1e3ae8ce4de3c13832))
+* **genral:** fix comments ([bf70291](https://github.com/Vonage/rxzu/commit/bf70291236d855034a1c87490dfdbfa46267cdcb))
+* **genral:** fix comments ([cfac5f3](https://github.com/Vonage/rxzu/commit/cfac5f3d209b843565914384e446297ce19a9847))
+
 ## [2.0.2](https://github.com/Vonage/rxzu/compare/v2.0.1...v2.0.2) (2021-01-31)
 
 
