@@ -6,6 +6,8 @@ import { DragAndDropExampleStoryComponent } from './drag-and-drop/drag-and-drop.
 import { DynamicPortsExampleStoryComponent } from './dynamic-ports/dynamic-ports.component';
 import { EventsExampleStoryComponent } from './events/events.component';
 import { PerformanceExampleStoryComponent } from './performance/performance.component';
+import { ZoomToFitExampleStoryComponent } from './zoom-to-fit/zoom-to-fit.component';
+import { ZoomToNodeExampleStoryComponent} from './zoom-to-node/zoom-to-node.component';
 
 export const BasicDiagramTemplate: Story<BasicExampleStoryComponent> = (
   args: any
@@ -48,3 +50,18 @@ export const DragAndDropDiagramTemplate: Story<DragAndDropExampleStoryComponent>
   component: DragAndDropExampleStoryComponent,
   props: args,
 });
+
+export const ZoomToFitDiagramTemplate: Story<ZoomToFitExampleStoryComponent> = (
+  args: any
+) => ({
+  component: ZoomToFitExampleStoryComponent,
+  props: args,
+});
+
+export const ZoomToNodeDiagramTemplate: Story<ZoomToNodeExampleStoryComponent> = (
+  args: any
+) => ({
+  component: ZoomToNodeExampleStoryComponent,
+  props: args,
+});
+
