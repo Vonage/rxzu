@@ -7,6 +7,8 @@ import {
   DynamicPortsDiagramTemplate,
   EventsDiagramTemplate,
   PerformanceDiagramTemplate,
+  ZoomToFitDiagramTemplate,
+  ZoomToNodeDiagramTemplate
 } from './examples.template';
 import { BasicExampleStoryComponent } from './basic/basic.component';
 import { AutoArrangeExampleStoryComponent } from './auto-arrange/auto-arrange.component';
@@ -20,7 +22,8 @@ import {
   DagrePlugin,
 } from '@rxzu/angular';
 import { DragAndDropExampleStoryComponent } from './drag-and-drop/drag-and-drop.component';
-
+import { ZoomToFitExampleStoryComponent } from './zoom-to-fit/zoom-to-fit.component';
+import { ZoomToNodeExampleStoryComponent } from './zoom-to-node/zoom-to-node.component';
 export default {
   title: 'Examples',
   component: DefaultLinkComponent,
@@ -33,6 +36,8 @@ export default {
         AutoArrangeExampleStoryComponent,
         PerformanceExampleStoryComponent,
         DragAndDropExampleStoryComponent,
+        ZoomToFitExampleStoryComponent,
+        ZoomToNodeExampleStoryComponent,
         DefaultLinkComponent,
         DefaultLabelComponent,
         DefaultPortComponent,
@@ -60,3 +65,7 @@ export const Performance = PerformanceDiagramTemplate.bind({});
 export const DynamicPorts = DynamicPortsDiagramTemplate.bind({});
 
 export const DragAndDrop = DragAndDropDiagramTemplate.bind({});
+
+export const ZoomToFit = ZoomToFitDiagramTemplate.bind({});
+
+export const ZoomToNode = ZoomToNodeDiagramTemplate.bind({});

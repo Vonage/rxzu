@@ -85,10 +85,10 @@ export class DiagramEngineCore {
     if (selector === null) {
       throw new Error(
         'Cannot find Node Port element with node id: [' +
-          port.getParent().id +
-          '] and port id: [' +
-          port.id +
-          ']'
+        port.getParent().id +
+        '] and port id: [' +
+        port.id +
+        ']'
       );
     }
     return selector as HTMLElement;
@@ -112,11 +112,11 @@ export class DiagramEngineCore {
       x:
         sourceElement.offsetWidth / 2 +
         (rel.x - diagramModel.getOffsetX()) /
-          (diagramModel.getZoomLevel() / 100.0),
+        (diagramModel.getZoomLevel() / 100.0),
       y:
         sourceElement.offsetHeight / 2 +
         (rel.y - diagramModel.getOffsetY()) /
-          (diagramModel.getZoomLevel() / 100.0),
+        (diagramModel.getZoomLevel() / 100.0),
     };
   }
 
@@ -137,11 +137,11 @@ export class DiagramEngineCore {
     return {
       x:
         (sourceRect.x - diagramModel.getOffsetX()) /
-          (diagramModel.getZoomLevel() / 100.0) -
+        (diagramModel.getZoomLevel() / 100.0) -
         canvasRect.left,
       y:
         (sourceRect.y - diagramModel.getOffsetY()) /
-          (diagramModel.getZoomLevel() / 100.0) -
+        (diagramModel.getZoomLevel() / 100.0) -
         canvasRect.top,
       width: sourceRect.width,
       height: sourceRect.height,
@@ -165,11 +165,11 @@ export class DiagramEngineCore {
     return {
       x:
         (sourceRect.x - diagramModel.getOffsetX()) /
-          (diagramModel.getZoomLevel() / 100.0) -
+        (diagramModel.getZoomLevel() / 100.0) -
         canvasRect.left,
       y:
         (sourceRect.y - diagramModel.getOffsetY()) /
-          (diagramModel.getZoomLevel() / 100.0) -
+        (diagramModel.getZoomLevel() / 100.0) -
         canvasRect.top,
       width: sourceRect.width,
       height: sourceRect.height,
@@ -194,11 +194,11 @@ export class DiagramEngineCore {
       x:
         sourceElement.offsetWidth / 2 +
         (rel.x - diagramModel.getOffsetX()) /
-          (diagramModel.getZoomLevel() / 100.0),
+        (diagramModel.getZoomLevel() / 100.0),
       y:
         sourceElement.offsetHeight / 2 +
         (rel.y - diagramModel.getOffsetY()) /
-          (diagramModel.getZoomLevel() / 100.0),
+        (diagramModel.getZoomLevel() / 100.0),
     };
   }
 
@@ -262,38 +262,113 @@ export class DiagramEngineCore {
   }
 
   /**
-   * fit the canvas zoom levels to the elements contained.
-   * @param additionalZoomFactor allow for further zooming out to make sure edges doesn't cut
+   * Get the bounding rectangle of the input group of nodes
+   * @param nodes the group of nodes to calculate the retcangle
+   * @param margin the desired margin to include when calc the rect
+   * @returns The total width and height of the nodes, most top and most left points of the nodes group
    */
-  zoomToFit(additionalZoomFactor = 0.005) {
-    this.canvas$.value$
-      .pipe(
-        filter(
-          (canvas: HTMLElement | null | undefined): canvas is HTMLElement =>
-            canvas !== null && canvas !== undefined
-        ),
-        take(1),
-        delay(0)
-      )
-      .subscribe((canvas) => {
-        const diagramModel = this.getDiagramModel();
-        const xFactor = canvas.clientWidth / canvas.scrollWidth;
-        const yFactor = canvas.clientHeight / canvas.scrollHeight;
-        const zoomFactor = xFactor < yFactor ? xFactor : yFactor;
+  getNodeLayersRect(nodes: NodeModel[], margin = 0) {
+    if (!nodes || nodes.length === 0) {
+      return { width: 0, height: 0, top: 0, left: 0 };
+    }
 
-        let newZoomLvl =
-          diagramModel.getZoomLevel() * (zoomFactor - additionalZoomFactor);
-        const maxZoomOut = diagramModel.getMaxZoomOut();
+    const firstNode = nodes[0];
+    const { x: firstNodeXCoords, y: firstNodeYCoords } = firstNode.getCoords();
 
-        if (maxZoomOut && newZoomLvl < maxZoomOut) {
-          newZoomLvl = maxZoomOut;
-        }
+    let rightNodeWidth = firstNode.getWidth();
+    let bottomNodeHeight = firstNode.getHeight();
 
-        diagramModel.setZoomLevel(newZoomLvl);
+    let minX = firstNodeXCoords;
+    let maxX = firstNodeXCoords;
+    let minY = firstNodeYCoords;
+    let maxY = firstNodeYCoords;
 
-        // TODO: either block the canvas movement on 0,0 or detect the top left furthest element and set the offest to its edges
-        diagramModel.setOffset(0, 0);
-      });
+    // Go over all nodes and calc the min, max points of all of them
+    nodes.forEach(node => {
+      const { x, y } = node.getCoords();
+      if (x < minX) minX = x;
+      if (x > maxX) {
+        maxX = x;
+        rightNodeWidth = node.getWidth();
+      }
+      if (y < minY) minY = y;
+      if (y > maxY) {
+        maxY = y;
+        bottomNodeHeight = node.getHeight();
+      }
+    })
+
+    // Calc the rect, adding the desired margin.
+    return {
+      width: (maxX - minX + rightNodeWidth) + (2 * margin),
+      height: (maxY - minY + bottomNodeHeight) + (2 * margin),
+      top: minY - margin,
+      left: minX - margin
+    }
+  }
+
+  /**
+   * Set zoom and offset so that all nodes of the diagram will be seen at view
+   */
+  zoomToFit(margin = 100) {
+    const diagramModel = this.getDiagramModel();
+    if (diagramModel) {
+      const allNodes = diagramModel.getNodesArray();
+      if (allNodes?.length > 0) {
+        this.zoomToNodes(allNodes, margin);
+      }
+    }
+  }
+
+  /**
+  * Set zoom and offset so that all input nodes will be seen at view
+  * @param nodes set zoom and offset so that all those node will be seen at view
+  * @param margin the desired margin of the nodes in px
+  */
+  zoomToNodes(nodes: NodeModel[], margin = 100) {
+    if (nodes?.length > 0) {
+      const diagramModel = this.getDiagramModel();
+      if (diagramModel) {
+        this.canvas$.value$
+          .pipe(
+            filter(
+              (canvas: HTMLElement | null | undefined): canvas is HTMLElement =>
+                canvas !== null && canvas !== undefined
+            ),
+            take(1),
+            delay(0)
+          )
+          .subscribe((canvas) => {
+            // Get nodes layers bounding rect with the desired margin
+            const nodesLayersRect = this.getNodeLayersRect(nodes, margin);
+
+            // Calculate the zoom factor and set the new zoom
+            const xFactor = canvas.clientWidth / nodesLayersRect?.width;
+            const yFactor = canvas.clientHeight / nodesLayersRect.height;
+            const zoomFactor = Math.min(xFactor, yFactor);
+            diagramModel.setZoomLevel(zoomFactor * 100);
+
+            // Get canavas top and left values including the offset
+            const canvasRect = canvas.getBoundingClientRect();
+            const canvasRelativeTopLeftPoint = {
+              top: diagramModel.getOffsetY() + canvasRect.top,
+              left: diagramModel.getOffsetX() + canvasRect.left
+            };
+
+            // Calc nodes rect top left values
+            const nodesRectTopLeftPoint = {
+              top: canvasRelativeTopLeftPoint.top + (nodesLayersRect.top * zoomFactor),
+              left: canvasRelativeTopLeftPoint.left + (nodesLayersRect.left * zoomFactor)
+            };
+
+            // Set the new offset to the diagram
+            diagramModel.setOffset(
+              canvasRelativeTopLeftPoint.left - nodesRectTopLeftPoint.left,
+              canvasRelativeTopLeftPoint.top - nodesRectTopLeftPoint.top
+            );
+          })
+      }
+    }
   }
 
   setup({
@@ -424,7 +499,7 @@ export class DiagramEngineCore {
               }
               link
                 .getPoints()
-                [link.getPoints().length - 1].setCoords(portCenter);
+              [link.getPoints().length - 1].setCoords(portCenter);
             }
 
             // Render link component
@@ -523,3 +598,4 @@ export class DiagramEngineCore {
     return false;
   }
 }
+
