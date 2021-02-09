@@ -262,7 +262,7 @@ export class DiagramEngineCore {
   }
 
   /**
-   * Get the bounding rectangle of the input group of nodes
+   * @description get the bounding rectangle of the input group of nodes
    * @param nodes the group of nodes to calculate the retcangle
    * @param margin the desired margin to include when calc the rect (in px)
    * @returns the total width and height of the nodes, most top and most left points of the nodes group
@@ -309,7 +309,8 @@ export class DiagramEngineCore {
   }
 
   /**
-   * Set zoom and offset so that all nodes of the diagram will be seen at view
+   * @description get the bounding rectangle of the input group of nodes
+   * @param margin allow for further zooming out to make sure edges doesn't cut (in px)
    */
   zoomToFit(margin = 100) {
     const diagramModel = this.getDiagramModel();
@@ -322,7 +323,7 @@ export class DiagramEngineCore {
   }
 
   /**
-  * Fit the canvas zoom levels and offset to the nodes contained.
+  * @description fit the canvas zoom levels and offset to the nodes contained.
   * @param nodes set zoom and offset so that all those node will be seen at view
   * @param margin allow for further zooming out to make sure edges doesn't cut (in px)
   */
@@ -334,35 +335,45 @@ export class DiagramEngineCore {
     const diagramModel = this.getDiagramModel();
 
     if (diagramModel) {
-      const canvas = this.getCanvas();
-      
-      // get nodes layers bounding rect with the desired margin
-      const nodesLayersRect = this.getNodeLayersRect(nodes, margin);
+      this.canvas$.value$
+        .pipe(
+          filter(
+            (canvas: HTMLElement | null | undefined): canvas is HTMLElement =>
+              canvas !== null && canvas !== undefined
+          ),
+          take(1),
+          delay(0)
+        )
+        .subscribe((canvas) => {
 
-      // calculate the zoom factor and set the new zoom
-      const xFactor = canvas.clientWidth / nodesLayersRect?.width;
-      const yFactor = canvas.clientHeight / nodesLayersRect.height;
-      const zoomFactor = Math.min(xFactor, yFactor);
-      diagramModel.setZoomLevel(zoomFactor * 100);
+          // get nodes layers bounding rect with the desired margin
+          const nodesLayersRect = this.getNodeLayersRect(nodes, margin);
 
-      // get canvas top and left values including the offset
-      const canvasRect = canvas.getBoundingClientRect();
-      const canvasRelativeTopLeftPoint = {
-        top: diagramModel.getOffsetY() + canvasRect.top,
-        left: diagramModel.getOffsetX() + canvasRect.left
-      };
+          // calculate the zoom factor and set the new zoom
+          const xFactor = canvas.clientWidth / nodesLayersRect?.width;
+          const yFactor = canvas.clientHeight / nodesLayersRect.height;
+          const zoomFactor = Math.min(xFactor, yFactor);
+          diagramModel.setZoomLevel(zoomFactor * 100);
 
-      // calc nodes rect top left values
-      const nodesRectTopLeftPoint = {
-        top: canvasRelativeTopLeftPoint.top + (nodesLayersRect.top * zoomFactor),
-        left: canvasRelativeTopLeftPoint.left + (nodesLayersRect.left * zoomFactor)
-      };
+          // get canvas top and left values including the offset
+          const canvasRect = canvas.getBoundingClientRect();
+          const canvasRelativeTopLeftPoint = {
+            top: diagramModel.getOffsetY() + canvasRect.top,
+            left: diagramModel.getOffsetX() + canvasRect.left
+          };
 
-      // set the new offset to the diagram
-      diagramModel.setOffset(
-        canvasRelativeTopLeftPoint.left - nodesRectTopLeftPoint.left,
-        canvasRelativeTopLeftPoint.top - nodesRectTopLeftPoint.top
-      );
+          // calc nodes rect top left values
+          const nodesRectTopLeftPoint = {
+            top: canvasRelativeTopLeftPoint.top + (nodesLayersRect.top * zoomFactor),
+            left: canvasRelativeTopLeftPoint.left + (nodesLayersRect.left * zoomFactor)
+          };
+
+          // set the new offset to the diagram
+          diagramModel.setOffset(
+            canvasRelativeTopLeftPoint.left - nodesRectTopLeftPoint.left,
+            canvasRelativeTopLeftPoint.top - nodesRectTopLeftPoint.top
+          );
+        })
     }
   }
 
