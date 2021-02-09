@@ -332,9 +332,10 @@ export class DiagramEngineCore {
       return;
     }
     const diagramModel = this.getDiagramModel();
-    
+
     if (diagramModel) {
       const canvas = this.getCanvas();
+      
       // get nodes layers bounding rect with the desired margin
       const nodesLayersRect = this.getNodeLayersRect(nodes, margin);
 
