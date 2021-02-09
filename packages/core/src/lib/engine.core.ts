@@ -264,7 +264,7 @@ export class DiagramEngineCore {
   /**
    * Get the bounding rectangle of the input group of nodes
    * @param nodes the group of nodes to calculate the retcangle
-   * @param margin the desired margin to include when calc the rect
+   * @param margin the desired margin to include when calc the rect (in px)
    * @returns The total width and height of the nodes, most top and most left points of the nodes group
    */
   getNodeLayersRect(nodes: NodeModel[], margin = 0) {
@@ -321,9 +321,9 @@ export class DiagramEngineCore {
   }
 
   /**
-  * Set zoom and offset so that all input nodes will be seen at view
+  * fit the canvas zoom levels and offset to the nodes contained.
   * @param nodes set zoom and offset so that all those node will be seen at view
-  * @param margin the desired margin of the nodes in px
+  * @param margin allow for further zooming out to make sure edges doesn't cut (in px)
   */
   zoomToNodes(nodes: NodeModel[], margin = 100) {
     if (nodes?.length > 0) {
