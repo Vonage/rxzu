@@ -1,3 +1,13 @@
+## [2.1.1](https://github.com/Vonage/rxzu/compare/v2.1.0...v2.1.1) (2021-02-10)
+
+
+### Bug Fixes
+
+* **node layers rect:** calc right and top nodes including the width and height ([75423c8](https://github.com/Vonage/rxzu/commit/75423c844e0cd2e8551118b974fa53bb714aae13))
+* **node layers rect:** calc right and top nodes including the with and height ([c74eb12](https://github.com/Vonage/rxzu/commit/c74eb12d35116cf2163b2c669d1ad9385d30b345))
+* **node layers rect:** calc right and top nodes including the with and height ([8926af1](https://github.com/Vonage/rxzu/commit/8926af12e560f4bd40fd886f82aef4c4bf0205dc))
+* **node layers rect:** calc right and top nodes including the with and height ([37a6860](https://github.com/Vonage/rxzu/commit/37a6860bb42b693664ea7a37b541c71adbd89e85))
+
 # [2.1.0](https://github.com/Vonage/rxzu/compare/v2.0.2...v2.1.0) (2021-02-09)
 
 
