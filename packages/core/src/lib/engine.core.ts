@@ -297,7 +297,7 @@ export class DiagramEngineCore {
       // if this node located at the leftmost point
       if (x < minX) minX = x;
 
-      // if this node location at the topnost point
+      // if this node location at the topmost point
       if (y < minY) minY = y;
 
       // if this node located at the rightmost point including the width
