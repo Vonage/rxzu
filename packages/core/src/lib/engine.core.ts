@@ -294,18 +294,18 @@ export class DiagramEngineCore {
       const nodeElement = this.getNodeElement(node);
       const { clientWidth, clientHeight } = nodeElement;
 
-      // If this node located at the leftmost point
+      // if this node located at the leftmost point
       if (x < minX) minX = x;
 
-      // If this node location at the topnost point
+      // if this node location at the topnost point
       if (y < minY) minY = y;
 
-      // If this ndoe located at the rightmost point including the width
+      // if this node located at the rightmost point including the width
       if (x + clientWidth > maxX + rightNodeWidth) {
         maxX = x;
         rightNodeWidth = clientWidth;
       }
-      // If this ndoe located at the bottommost point including the width
+      // if this node located at the bottommost point including the height
       if (y + clientHeight > maxY + bottomNodeHeight) {
         maxY = y;
         bottomNodeHeight = clientHeight;
