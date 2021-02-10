@@ -286,16 +286,29 @@ export class DiagramEngineCore {
 
     // go over all nodes and calc the min, max points of all of them
     nodes.forEach(node => {
+
+      // get coords of current node
       const { x, y } = node.getCoords();
+
+      // get client width and client height of current node
+      const nodeElement = this.getNodeElement(node);
+      const { clientWidth, clientHeight } = nodeElement;
+
+      // If this node located at the leftmost point
       if (x < minX) minX = x;
-      if (x > maxX) {
-        maxX = x;
-        rightNodeWidth = node.getWidth();
-      }
+
+      // If this node location at the topnost point
       if (y < minY) minY = y;
-      if (y > maxY) {
+
+      // If this ndoe located at the rightmost point including the width
+      if (x + clientWidth > maxX + rightNodeWidth) {
+        maxX = x;
+        rightNodeWidth = clientWidth;
+      }
+      // If this ndoe located at the bottommost point including the width
+      if (y + clientHeight > maxY + bottomNodeHeight) {
         maxY = y;
-        bottomNodeHeight = node.getHeight();
+        bottomNodeHeight = clientHeight;
       }
     })
 
