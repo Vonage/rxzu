@@ -1,3 +1,10 @@
+## [2.1.2](https://github.com/Vonage/rxzu/compare/v2.1.1...v2.1.2) (2021-02-18)
+
+
+### Bug Fixes
+
+* **auto arrange:** fix DagrePlugin set coordinates ([c47e929](https://github.com/Vonage/rxzu/commit/c47e929799f9c6bf421f53841767d91683b05040))
+
 ## [2.1.1](https://github.com/Vonage/rxzu/compare/v2.1.0...v2.1.1) (2021-02-10)
 
 
