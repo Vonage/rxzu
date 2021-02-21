@@ -1,3 +1,10 @@
+## [2.1.3](https://github.com/Vonage/rxzu/compare/v2.1.2...v2.1.3) (2021-02-21)
+
+
+### Bug Fixes
+
+* **select action:** fix checking if element is contains in box,now also check the bottom right point ([ca0e178](https://github.com/Vonage/rxzu/commit/ca0e178edb055e1670ea74fd2491dccb88c25df5))
+
 ## [2.1.2](https://github.com/Vonage/rxzu/compare/v2.1.1...v2.1.2) (2021-02-18)
 
 
