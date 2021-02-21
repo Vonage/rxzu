@@ -261,6 +261,29 @@ export class DiagramEngineCore {
     return model.getLocked();
   }
 
+   /**
+   * @description get node rectangle points (top left, top right, bottom left, bottom right)
+   */
+  getNodeRectPoints(node: NodeModel) {
+    if (!node) {
+      console.warn('[RxZu] No input node were found');
+      return;
+    }
+    
+    const width = node.getWidth();
+    const height = node.getHeight();
+
+    // get top left point of node
+    const { x, y } = node.getCoords();
+
+    return {
+      topLeft: { x, y },
+      topRight: { x: x + width, y },
+      bottomLeft: { x: x, y: y + height },
+      bottomRight: { x: x + width, y: y + height },
+    }
+  }
+
   /**
    * @description get the bounding rectangle of the input group of nodes
    * @param nodes the group of nodes to calculate the retcangle
