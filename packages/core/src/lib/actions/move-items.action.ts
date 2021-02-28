@@ -2,7 +2,7 @@ import { BaseAction } from './base.action';
 import { PointModel } from '../models/point.model';
 import { NodeModel } from '../models/node.model';
 import { LinkModel } from '../models/link.model';
-import { DiagramEngineCore } from '../engine.core';
+import { DiagramEngine } from '../engine.core';
 import { SelectionModel } from '../interfaces/move-selection.interface';
 import { PortModel } from '../models';
 
@@ -13,7 +13,7 @@ export class MoveItemsAction extends BaseAction {
   constructor(
     mouseX: number,
     mouseY: number,
-    diagramEngine: DiagramEngineCore
+    diagramEngine: DiagramEngine
   ) {
     super(mouseX, mouseY);
     this.moved = false;

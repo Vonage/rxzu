@@ -9,7 +9,7 @@ export class LabelModel extends BaseModel<LinkModel> {
   protected text$: ValueState<string | null>;
 
   constructor(options: LabelModelOptions) {
-    super(options);
+    super({ entityType: 'label', ...options });
 
     this.coords$ = createValueState(
       options.coords ?? { x: 0, y: 0 },

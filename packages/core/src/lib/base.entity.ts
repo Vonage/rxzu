@@ -11,17 +11,18 @@ import {
   withLog as _withLog,
 } from './utils/tool-kit.util';
 import { HashMap } from './utils/types';
-
-export type BaseEntityType = 'node' | 'link' | 'port' | 'point';
+import { BaseEntityType } from './interfaces';
 
 export class BaseEntity {
   protected _id: ID;
   protected destroyed$: Subject<void>;
   protected locked$: ValueState<boolean>;
+  protected readonly _entityType: BaseEntityType;
   protected readonly _logPrefix: string;
 
-  constructor(options: { id?: ID; logPrefix?: string }) {
+  constructor(options: { id?: ID; logPrefix?: string, entityType: BaseEntityType }) {
     this._id = options.id || UID();
+    this._entityType = options.entityType;
     this._logPrefix = `${options.logPrefix ?? ''}`;
     this.destroyed$ = new Subject<void>();
     this.locked$ = createValueState<boolean>(false, this.entityPipe('locked'));
@@ -33,6 +34,10 @@ export class BaseEntity {
 
   set id(id: ID) {
     this._id = id;
+  }
+
+  get entityType(): BaseEntityType {
+    return this._entityType;
   }
 
   log(message: string, ...args: any): void {

@@ -1,15 +1,10 @@
 import { Meta, moduleMetadata } from '@storybook/angular';
 import { CommonModule } from '@angular/common';
 import { DefaultLinkTemplate, CustomLinkTemplate } from './link.template';
-import { DefaultLinkStoryComponent } from './default/default.component';
 import { CustomLinkComponent } from './custom/custom-link.component';
-import {
-  DefaultLinkComponent,
-  DefaultNodeComponent,
-  DefaultLabelComponent,
-  DefaultPortComponent,
-  RxZuDiagramsModule
-} from '@rxzu/angular';
+import { DefaultLinkComponent, RxZuDefaultsModule, RxZuModule } from '@rxzu/angular';
+import { DefaultLinkStoryComponent } from './default/default.component';
+import { CustomLinkDiagramComponent } from './custom/diagram.component';
 
 export default {
   title: 'Link',
@@ -17,22 +12,10 @@ export default {
   parameters: { docs: { iframeHeight: '400px' } },
   decorators: [
     moduleMetadata({
-      declarations: [
-        DefaultNodeComponent,
-        CustomLinkComponent,
-        DefaultLinkStoryComponent,
-        DefaultLinkComponent,
-        DefaultLabelComponent,
-        DefaultPortComponent
-      ],
-      imports: [CommonModule, RxZuDiagramsModule],
-      entryComponents: [
-        DefaultNodeComponent,
-        DefaultLinkComponent,
-        CustomLinkComponent,
-        DefaultLabelComponent,
-        DefaultPortComponent
-      ]
+      declarations: [CustomLinkComponent, DefaultLinkStoryComponent, CustomLinkDiagramComponent],
+      imports: [CommonModule, RxZuDefaultsModule],
+      providers: [RxZuModule.registerComponent({ type: 'custom', entityType: 'link', comp: CustomLinkComponent })],
+      entryComponents: [CustomLinkComponent]
     })
   ]
 } as Meta;

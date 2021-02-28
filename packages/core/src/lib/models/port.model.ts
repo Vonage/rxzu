@@ -11,6 +11,7 @@ import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { NodeModel } from './node.model';
 import { Coords, Dimensions, PortModelOptions } from '../interfaces';
+import { DiagramEngine } from '../engine.core';
 
 export class PortModel extends BaseModel<NodeModel> {
   protected coords$: ValueState<Coords>;
@@ -26,7 +27,7 @@ export class PortModel extends BaseModel<NodeModel> {
   protected links$: EntityState<LinkModel>;
 
   constructor(options: PortModelOptions) {
-    super({ linkType: 'default', logPrefix: '[Port]', ...options });
+    super({ linkType: 'default', logPrefix: '[Port]', entityType: 'port', ...options });
 
     this.coords$ = createValueState(
       options.coords ?? { x: 0, y: 0 },
@@ -195,12 +196,9 @@ export class PortModel extends BaseModel<NodeModel> {
     y: number;
     width: number;
     height: number;
-  }) {
+  }, engine?: DiagramEngine) {
     this.coords$.set({ x, y }).emit();
     this.dimensions$.set({ width, height }).emit();
-
-    // TODO: add a cleaner way to get the engine without traveling through parents
-    const engine = this.getParent()?.getParent()?.getDiagramEngine();
 
     if (!engine) {
       this.log(`Couldn't find DiagramEngine when updating coords. skipping`);

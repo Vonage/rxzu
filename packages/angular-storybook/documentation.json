@@ -2,6 +2,39 @@
     "pipes": [],
     "interfaces": [
         {
+            "name": "ComponentProviderOptions",
+            "id": "interface-ComponentProviderOptions-6ff8a432c3ac918402ac6f2386b6310c",
+            "file": "packages/angular/src/lib/injection.tokens.ts",
+            "type": "interface",
+            "sourceCode": "import { InjectionToken, Provider, Type } from '@angular/core';\nimport { BaseEntityType, BaseModel, toCompRegistryKey } from '@rxzu/core';\n\nexport const MODEL: InjectionToken<BaseModel> = new InjectionToken('MODEL');\n\nexport interface ComponentProviderOptions<T = any> {entityType: BaseEntityType, type: string, comp: Type<T>}\n\nexport const COMPONENT: InjectionToken<Omit<ComponentProviderOptions, 'entityType'>> = new InjectionToken('COMPONENT');\n\nexport function componentProviderOptionToProvider({ entityType, type, comp }: ComponentProviderOptions): Provider {\n  return {\n    provide: COMPONENT,\n    multi: true,\n    useValue: { type: toCompRegistryKey(entityType, type), comp }\n  }\n}\n",
+            "properties": [
+                {
+                    "name": "comp",
+                    "type": "Type<T>",
+                    "optional": false,
+                    "description": "",
+                    "line": 6
+                },
+                {
+                    "name": "entityType",
+                    "type": "BaseEntityType",
+                    "optional": false,
+                    "description": "",
+                    "line": 6
+                },
+                {
+                    "name": "type",
+                    "type": "string",
+                    "optional": false,
+                    "description": "",
+                    "line": 6
+                }
+            ],
+            "indexSignatures": [],
+            "kind": 150,
+            "methods": []
+        },
+        {
             "name": "ZonedClass",
             "id": "interface-ZonedClass-e25d4af36bea6b7cde4b97b6a6b47e3a",
             "file": "packages/angular/src/lib/utils/decorators.ts",
@@ -23,8 +56,8 @@
     ],
     "injectables": [
         {
-            "name": "DiagramEngine",
-            "id": "injectable-DiagramEngine-7ff710c334c4ae64ecafaae1ce38e193",
+            "name": "EngineService",
+            "id": "injectable-EngineService-262d550fef97c74d2f0b74412de3b074",
             "file": "packages/angular/src/lib/engine.service.ts",
             "properties": [
                 {
@@ -32,24 +65,15 @@
                     "type": "Renderer2",
                     "optional": false,
                     "description": "",
-                    "line": 18,
+                    "line": 12,
                     "modifierKind": [
                         113
                     ]
                 }
             ],
-            "methods": [
-                {
-                    "name": "registerDefaultFactories",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "void",
-                    "typeParameters": [],
-                    "line": 28
-                }
-            ],
+            "methods": [],
             "description": "",
-            "sourceCode": "import {\n  ComponentFactoryResolver,\n  Injectable,\n  Renderer2,\n  RendererFactory2,\n} from '@angular/core';\nimport { AbstractFactory, DiagramEngineCore } from '@rxzu/core';\nimport {\n  DefaultLabelFactory,\n  DefaultLinkFactory,\n  DefaultNodeFactory,\n  DefaultPortFactory,\n} from './defaults';\nimport { RxZuDiagramsModule } from './main.module';\n\n@Injectable({ providedIn: RxZuDiagramsModule })\nexport class DiagramEngine extends DiagramEngineCore {\n  protected _renderer: Renderer2;\n\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected rendererFactory: RendererFactory2\n  ) {\n    super();\n    this._renderer = this.rendererFactory.createRenderer(null, null);\n  }\n\n  registerDefaultFactories() {\n    const factoriesManager = this.getFactoriesManager();\n    factoriesManager.registerFactory({\n      type: 'nodeFactories',\n      factory: new DefaultNodeFactory(this.resolver, this._renderer) as AbstractFactory<any, any>,\n    });\n\n    factoriesManager.registerFactory({\n      type: 'linkFactories',\n      factory: new DefaultLinkFactory(this.resolver, this._renderer) as AbstractFactory<any, any>,\n    });\n\n    factoriesManager.registerFactory({\n      type: 'portFactories',\n      factory: new DefaultPortFactory(this.resolver, this._renderer) as AbstractFactory<any, any>,\n    });\n\n    factoriesManager.registerFactory({\n      type: 'labelFactories',\n      factory: new DefaultLabelFactory(this.resolver, this._renderer) as AbstractFactory<any, any>,\n    });\n  }\n}\n",
+            "sourceCode": "import {\n  ComponentFactoryResolver,\n  Injectable,\n  Renderer2,\n  RendererFactory2\n} from '@angular/core';\nimport { DiagramEngine } from '@rxzu/core';\nimport { FactoryService } from './factory.service';\n\n@Injectable()\nexport class EngineService extends DiagramEngine {\n  protected _renderer: Renderer2;\n\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected rendererFactory: RendererFactory2,\n    protected factory: FactoryService\n  ) {\n    super(factory);\n    this._renderer = this.rendererFactory.createRenderer(null, null);\n  }\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
@@ -61,9 +85,13 @@
                     {
                         "name": "rendererFactory",
                         "type": "RendererFactory2"
+                    },
+                    {
+                        "name": "factory",
+                        "type": "FactoryService"
                     }
                 ],
-                "line": 18,
+                "line": 12,
                 "jsdoctags": [
                     {
                         "name": "resolver",
@@ -78,39 +106,41 @@
                         "tagName": {
                             "text": "param"
                         }
+                    },
+                    {
+                        "name": "factory",
+                        "type": "FactoryService",
+                        "tagName": {
+                            "text": "param"
+                        }
                     }
                 ]
             },
-            "extends": "DiagramEngineCore",
+            "extends": "DiagramEngine",
             "type": "injectable"
-        }
-    ],
-    "classes": [
+        },
         {
-            "name": "AbstractAngularFactory",
-            "id": "class-AbstractAngularFactory-af7945d57785a0304feffa428903e507",
-            "file": "packages/angular/src/lib/defaults/factories/angular.factory.ts",
-            "type": "class",
-            "sourceCode": "import { ComponentRef, ViewContainerRef } from '@angular/core';\nimport { BaseModel, AbstractFactory, DiagramModel } from '@rxzu/core';\n\nexport abstract class AbstractAngularFactory<\n  R = ViewContainerRef,\n  Y = ComponentRef<BaseModel>\n> extends AbstractFactory<R, Y> {\n  abstract generateWidget({\n    model,\n    host,\n    diagramModel,\n  }: {\n    model: any;\n    host: R;\n    diagramModel?: DiagramModel;\n  }): Y | any;\n}\n",
+            "name": "FactoryService",
+            "id": "injectable-FactoryService-2c34c02c3519ce3a423a8a68b3b0b4e1",
+            "file": "packages/angular/src/lib/factory.service.ts",
             "properties": [],
             "methods": [
                 {
-                    "name": "generateWidget",
+                    "name": "resolveComponent",
                     "args": [
                         {
-                            "type": "literal type"
+                            "type": "WidgetOptions<M | ViewContainerRef>"
                         }
                     ],
                     "optional": false,
-                    "returnType": "Y | any",
-                    "typeParameters": [],
-                    "line": 8,
-                    "modifierKind": [
-                        117
+                    "returnType": "ComponentRef | null",
+                    "typeParameters": [
+                        "M"
                     ],
+                    "line": 19,
                     "jsdoctags": [
                         {
-                            "type": "literal type",
+                            "type": "WidgetOptions<M | ViewContainerRef>",
                             "tagName": {
                                 "text": "param"
                             }
@@ -118,227 +148,18 @@
                     ]
                 }
             ],
-            "indexSignatures": [],
-            "extends": "AbstractFactory",
-            "inputsClass": [],
-            "outputsClass": [],
-            "hostBindings": [],
-            "hostListeners": []
-        },
-        {
-            "name": "DefaultLabelFactory",
-            "id": "class-DefaultLabelFactory-635932d107d73f1e2d552752e9870986",
-            "file": "packages/angular/src/lib/defaults/factories/default-label.factory.ts",
-            "type": "class",
-            "sourceCode": "import {\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactoryResolver,\n  ComponentFactory,\n  Renderer2,\n  Injector,\n} from '@angular/core';\nimport { LabelModel } from '@rxzu/core';\nimport { LABEL_MODEL } from '../../injection.tokens';\nimport { DefaultLabelComponent } from '../components/default-label/default-label.component';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultLabelFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n  }: {\n    model: LabelModel;\n    host: ViewContainerRef;\n  }): ComponentRef<DefaultLabelComponent> {\n    const injector = Injector.create({\n      providers: [{ provide: LABEL_MODEL, useValue: model }],\n    });\n\n    const componentRef = host.createComponent(\n      this.getRecipe(),\n      undefined,\n      injector\n    );\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for link\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-labelid', model.id);\n\n    // on destroy make sure to destroy the componentRef\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultLabelComponent> {\n    return this.resolver.resolveComponentFactory(DefaultLabelComponent);\n  }\n}\n",
+            "description": "",
+            "sourceCode": "import {\n  ComponentFactoryResolver, ComponentRef,\n  Injectable,\n  Injector, Renderer2,\n  Type,\n  ViewContainerRef\n} from '@angular/core';\nimport { AbstractFactory, BaseModel, WidgetOptions } from '@rxzu/core';\nimport { RegistryService } from './registry.service';\nimport { MODEL } from './injection.tokens';\n\n@Injectable()\nexport class FactoryService extends AbstractFactory<Type<any>, ComponentRef<any>> {\n\n  constructor(registry: RegistryService, private cfr: ComponentFactoryResolver, private renderer: Renderer2) {\n    super(registry);\n  }\n\n  resolveComponent<M extends BaseModel>({ model, host, index, diagramModel }: WidgetOptions<M, ViewContainerRef>): ComponentRef<any> | null {\n    const cmp = this.get(model);\n    if (!cmp) return null;\n\n    const injector = Injector.create({ providers: [{ provide: MODEL, useValue: model }], parent: host.injector });\n    const ref = host.createComponent(this.cfr.resolveComponentFactory(cmp), index, injector);\n\n    this.renderer.setAttribute(ref.location.nativeElement, 'data-id', model.id);\n\n    return ref;\n  }\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
                 "args": [
                     {
-                        "name": "resolver",
-                        "type": "ComponentFactoryResolver"
+                        "name": "registry",
+                        "type": "RegistryService"
                     },
                     {
-                        "name": "renderer",
-                        "type": "Renderer2"
-                    }
-                ],
-                "line": 14,
-                "jsdoctags": [
-                    {
-                        "name": "resolver",
-                        "type": "ComponentFactoryResolver",
-                        "tagName": {
-                            "text": "param"
-                        }
-                    },
-                    {
-                        "name": "renderer",
-                        "type": "Renderer2",
-                        "tagName": {
-                            "text": "param"
-                        }
-                    }
-                ]
-            },
-            "properties": [],
-            "methods": [
-                {
-                    "name": "generateWidget",
-                    "args": [
-                        {
-                            "type": "literal type"
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "ComponentRef<DefaultLabelComponent>",
-                    "typeParameters": [],
-                    "line": 22,
-                    "jsdoctags": [
-                        {
-                            "type": "literal type",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "getRecipe",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "ComponentFactory<DefaultLabelComponent>",
-                    "typeParameters": [],
-                    "line": 56
-                },
-                {
-                    "name": "generateWidget",
-                    "args": [
-                        {
-                            "type": "literal type"
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "Y | any",
-                    "typeParameters": [],
-                    "line": 8,
-                    "modifierKind": [
-                        117
-                    ],
-                    "jsdoctags": [
-                        {
-                            "type": "literal type",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ],
-                    "inheritance": {
-                        "file": "AbstractAngularFactory"
-                    }
-                }
-            ],
-            "indexSignatures": [],
-            "extends": "AbstractAngularFactory",
-            "inputsClass": [],
-            "outputsClass": [],
-            "hostBindings": [],
-            "hostListeners": []
-        },
-        {
-            "name": "DefaultLinkFactory",
-            "id": "class-DefaultLinkFactory-7e334d3e5236b7bc5b65b07fbaa6416d",
-            "file": "packages/angular/src/lib/defaults/factories/default-link.factory.ts",
-            "type": "class",
-            "sourceCode": "import { DefaultLinkComponent } from '../components/default-link/default-link.component';\nimport {\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactoryResolver,\n  ComponentFactory,\n  Renderer2,\n  Injector,\n} from '@angular/core';\nimport { LinkModel } from '@rxzu/core';\nimport { AbstractAngularFactory } from './angular.factory';\nimport { LINK_MODEL } from '../../injection.tokens';\n\nexport class DefaultLinkFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n  }: {\n    model: LinkModel;\n    host: ViewContainerRef;\n  }): ComponentRef<DefaultLinkComponent> {\n    const injector = Injector.create({\n      providers: [{ provide: LINK_MODEL, useValue: model }],\n    });\n\n    const componentRef = host.createComponent(\n      this.getRecipe(),\n      undefined,\n      injector\n    );\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for link\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-linkid', model.id);\n\n    // on destroy make sure to destroy the componentRef\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultLinkComponent> {\n    return this.resolver.resolveComponentFactory(DefaultLinkComponent);\n  }\n}\n",
-            "constructorObj": {
-                "name": "constructor",
-                "description": "",
-                "args": [
-                    {
-                        "name": "resolver",
-                        "type": "ComponentFactoryResolver"
-                    },
-                    {
-                        "name": "renderer",
-                        "type": "Renderer2"
-                    }
-                ],
-                "line": 14,
-                "jsdoctags": [
-                    {
-                        "name": "resolver",
-                        "type": "ComponentFactoryResolver",
-                        "tagName": {
-                            "text": "param"
-                        }
-                    },
-                    {
-                        "name": "renderer",
-                        "type": "Renderer2",
-                        "tagName": {
-                            "text": "param"
-                        }
-                    }
-                ]
-            },
-            "properties": [],
-            "methods": [
-                {
-                    "name": "generateWidget",
-                    "args": [
-                        {
-                            "type": "literal type"
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "ComponentRef<DefaultLinkComponent>",
-                    "typeParameters": [],
-                    "line": 22,
-                    "jsdoctags": [
-                        {
-                            "type": "literal type",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "getRecipe",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "ComponentFactory<DefaultLinkComponent>",
-                    "typeParameters": [],
-                    "line": 56
-                },
-                {
-                    "name": "generateWidget",
-                    "args": [
-                        {
-                            "type": "literal type"
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "Y | any",
-                    "typeParameters": [],
-                    "line": 8,
-                    "modifierKind": [
-                        117
-                    ],
-                    "jsdoctags": [
-                        {
-                            "type": "literal type",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ],
-                    "inheritance": {
-                        "file": "AbstractAngularFactory"
-                    }
-                }
-            ],
-            "indexSignatures": [],
-            "extends": "AbstractAngularFactory",
-            "inputsClass": [],
-            "outputsClass": [],
-            "hostBindings": [],
-            "hostListeners": []
-        },
-        {
-            "name": "DefaultNodeFactory",
-            "id": "class-DefaultNodeFactory-5f2205d188f41b7c890558d3db2bb063",
-            "file": "packages/angular/src/lib/defaults/factories/default-node.factory.ts",
-            "type": "class",
-            "sourceCode": "import { DefaultNodeComponent } from '../components/default-node/default-node.component';\nimport {\n  ComponentFactoryResolver,\n  ViewContainerRef,\n  ComponentFactory,\n  Renderer2,\n  Injector,\n} from '@angular/core';\nimport { DiagramModel, NodeModel } from '@rxzu/core';\nimport { AbstractAngularFactory } from './angular.factory';\nimport { NODE_MODEL } from '../../injection.tokens';\n\nexport class DefaultNodeFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host,\n    diagramModel,\n  }: {\n    model: NodeModel;\n    host: ViewContainerRef;\n    diagramModel: DiagramModel;\n  }): ViewContainerRef {\n    const injector = Injector.create({\n      providers: [{ provide: NODE_MODEL, useValue: model }],\n    });\n\n    const componentRef = host.createComponent(\n      this.getRecipe(),\n      undefined,\n      injector\n    );\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement;\n\n    // default style for node\n    this.renderer.setStyle(rootNode, 'position', 'absolute');\n    this.renderer.setStyle(rootNode, 'display', 'block');\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-nodeid', model.id);\n\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    const portsHost = componentRef.instance.getPortsHost();\n    return portsHost;\n  }\n\n  getRecipe(): ComponentFactory<DefaultNodeComponent> {\n    return this.resolver.resolveComponentFactory(DefaultNodeComponent);\n  }\n}\n",
-            "constructorObj": {
-                "name": "constructor",
-                "description": "",
-                "args": [
-                    {
-                        "name": "resolver",
+                        "name": "cfr",
                         "type": "ComponentFactoryResolver"
                     },
                     {
@@ -349,7 +170,14 @@
                 "line": 13,
                 "jsdoctags": [
                     {
-                        "name": "resolver",
+                        "name": "registry",
+                        "type": "RegistryService",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "cfr",
                         "type": "ComponentFactoryResolver",
                         "tagName": {
                             "text": "param"
@@ -364,171 +192,42 @@
                     }
                 ]
             },
-            "properties": [],
-            "methods": [
-                {
-                    "name": "generateWidget",
-                    "args": [
-                        {
-                            "type": "literal type"
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "ViewContainerRef",
-                    "typeParameters": [],
-                    "line": 21,
-                    "jsdoctags": [
-                        {
-                            "type": "literal type",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "getRecipe",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "ComponentFactory<DefaultNodeComponent>",
-                    "typeParameters": [],
-                    "line": 58
-                },
-                {
-                    "name": "generateWidget",
-                    "args": [
-                        {
-                            "type": "literal type"
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "Y | any",
-                    "typeParameters": [],
-                    "line": 8,
-                    "modifierKind": [
-                        117
-                    ],
-                    "jsdoctags": [
-                        {
-                            "type": "literal type",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ],
-                    "inheritance": {
-                        "file": "AbstractAngularFactory"
-                    }
-                }
-            ],
-            "indexSignatures": [],
-            "extends": "AbstractAngularFactory",
-            "inputsClass": [],
-            "outputsClass": [],
-            "hostBindings": [],
-            "hostListeners": []
+            "extends": "AbstractFactory",
+            "type": "injectable"
         },
         {
-            "name": "DefaultPortFactory",
-            "id": "class-DefaultPortFactory-e7221eec9804db9fd5f1ea0f636f8a6b",
-            "file": "packages/angular/src/lib/defaults/factories/default-port.factory.ts",
-            "type": "class",
-            "sourceCode": "import {\n  ViewContainerRef,\n  ComponentRef,\n  ComponentFactory,\n  ComponentFactoryResolver,\n  Renderer2,\n  Injector,\n} from '@angular/core';\nimport { PortModel } from '@rxzu/core';\nimport { PORT_MODEL } from '../../injection.tokens';\nimport { DefaultPortComponent } from '../components/default-port/default-port.component';\nimport { AbstractAngularFactory } from './angular.factory';\n\nexport class DefaultPortFactory extends AbstractAngularFactory {\n  constructor(\n    protected resolver: ComponentFactoryResolver,\n    protected renderer: Renderer2\n  ) {\n    super('default');\n  }\n\n  generateWidget({\n    model,\n    host: nodeHost,\n  }: {\n    model: PortModel;\n    host: ViewContainerRef;\n  }): ComponentRef<DefaultPortComponent> {\n    const injector = Injector.create({\n      providers: [{ provide: PORT_MODEL, useValue: model }],\n    });\n    const componentRef = nodeHost.createComponent(\n      this.getRecipe(),\n      undefined,\n      injector\n    );\n\n    // attach coordinates and default positional behaviour to the generated component host\n    const rootNode = componentRef.location.nativeElement as HTMLElement;\n\n    // data attributes\n    this.renderer.setAttribute(rootNode, 'data-portid', model.id);\n    const name = model.getName();\n\n    if (name) {\n      this.renderer.setAttribute(rootNode, 'data-name', name);\n    }\n\n    model.onEntityDestroy().subscribe(() => {\n      componentRef.destroy();\n    });\n\n    return componentRef;\n  }\n\n  getRecipe(): ComponentFactory<DefaultPortComponent> {\n    return this.resolver.resolveComponentFactory(DefaultPortComponent);\n  }\n}\n",
+            "name": "RegistryService",
+            "id": "injectable-RegistryService-cf7134082905d17d3da0af733605cf4f",
+            "file": "packages/angular/src/lib/registry.service.ts",
+            "properties": [],
+            "methods": [],
+            "description": "",
+            "sourceCode": "import { Inject, Injectable, Optional, SkipSelf, Type } from '@angular/core';\nimport { AbstractRegistry } from '@rxzu/core';\n\n@Injectable({ providedIn: 'root' })\nexport class RegistryService extends AbstractRegistry<Type<any>> {\n\n  constructor(@Optional() @SkipSelf() @Inject(RegistryService) parent: RegistryService | null) {\n    super(parent);\n  }\n}\n",
             "constructorObj": {
                 "name": "constructor",
                 "description": "",
                 "args": [
                     {
-                        "name": "resolver",
-                        "type": "ComponentFactoryResolver"
-                    },
-                    {
-                        "name": "renderer",
-                        "type": "Renderer2"
+                        "name": "parent",
+                        "type": "RegistryService | null"
                     }
                 ],
-                "line": 14,
+                "line": 5,
                 "jsdoctags": [
                     {
-                        "name": "resolver",
-                        "type": "ComponentFactoryResolver",
-                        "tagName": {
-                            "text": "param"
-                        }
-                    },
-                    {
-                        "name": "renderer",
-                        "type": "Renderer2",
+                        "name": "parent",
+                        "type": "RegistryService | null",
                         "tagName": {
                             "text": "param"
                         }
                     }
                 ]
             },
-            "properties": [],
-            "methods": [
-                {
-                    "name": "generateWidget",
-                    "args": [
-                        {
-                            "type": "literal type"
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "ComponentRef<DefaultPortComponent>",
-                    "typeParameters": [],
-                    "line": 22,
-                    "jsdoctags": [
-                        {
-                            "type": "literal type",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "getRecipe",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "ComponentFactory<DefaultPortComponent>",
-                    "typeParameters": [],
-                    "line": 56
-                },
-                {
-                    "name": "generateWidget",
-                    "args": [
-                        {
-                            "type": "literal type"
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "Y | any",
-                    "typeParameters": [],
-                    "line": 8,
-                    "modifierKind": [
-                        117
-                    ],
-                    "jsdoctags": [
-                        {
-                            "type": "literal type",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ],
-                    "inheritance": {
-                        "file": "AbstractAngularFactory"
-                    }
-                }
-            ],
-            "indexSignatures": [],
-            "extends": "AbstractAngularFactory",
-            "inputsClass": [],
-            "outputsClass": [],
-            "hostBindings": [],
-            "hostListeners": []
-        },
+            "extends": "AbstractRegistry",
+            "type": "injectable"
+        }
+    ],
+    "classes": [
         {
             "name": "TemplateVarContext",
             "id": "class-TemplateVarContext-a31c3786aab76309a86889750d089e0b",
@@ -672,11 +371,12 @@
     "components": [
         {
             "name": "DefaultLabelComponent",
-            "id": "component-DefaultLabelComponent-6206000a6f8907ae1852308ec67ee7a4",
+            "id": "component-DefaultLabelComponent-d8b4189bd4750534f48834505009d847",
             "file": "packages/angular/src/lib/defaults/components/default-label/default-label.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
             "entryComponents": [],
+            "host": {},
             "inputs": [],
             "outputs": [],
             "providers": [],
@@ -697,11 +397,19 @@
                     "type": "LabelModel",
                     "optional": false,
                     "description": "",
-                    "line": 20,
+                    "line": 23,
                     "decorators": [
                         {
+                            "name": "Optional",
+                            "stringifiedArguments": ""
+                        },
+                        {
+                            "name": "Host",
+                            "stringifiedArguments": ""
+                        },
+                        {
                             "name": "Inject",
-                            "stringifiedArguments": "LABEL_MODEL"
+                            "stringifiedArguments": "MODEL"
                         }
                     ],
                     "modifierKind": [
@@ -716,7 +424,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 23
+                    "line": 28
                 }
             ],
             "hostBindings": [],
@@ -724,11 +432,11 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  Inject,\n  OnInit,\n} from '@angular/core';\nimport { LabelModel } from '@rxzu/core';\nimport { LABEL_MODEL } from '../../../injection.tokens';\n\n@Component({\n  selector: 'rxzu-default-label',\n  templateUrl: './default-label.component.html',\n  styleUrls: ['./default-label.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultLabelComponent implements OnInit {\n  constructor(\n    private cdRef: ChangeDetectorRef,\n    @Inject(LABEL_MODEL) public model: LabelModel\n  ) {}\n\n  ngOnInit() {\n    this.model.selectCoords().subscribe(() => {\n      this.cdRef.detectChanges();\n    });\n\n    this.model.setPainted(true);\n  }\n}\n",
+            "sourceCode": "import {\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component, Host,\n  Inject,\n  OnInit, Optional\n} from '@angular/core';\nimport { LabelModel } from '@rxzu/core';\nimport { MODEL } from '../../../injection.tokens';\n\n@Component({\n  selector: 'rxzu-default-label',\n  templateUrl: './default-label.component.html',\n  styleUrls: ['./default-label.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n  host: {\n    '[attr.data-labelid]': `model?.id`\n  }\n})\nexport class DefaultLabelComponent implements OnInit {\n  constructor(\n    private cdRef: ChangeDetectorRef,\n    @Optional() @Host() @Inject(MODEL) public model: LabelModel\n  ) {\n    console.log(model?.getType());\n  }\n\n  ngOnInit() {\n    this.model.selectCoords().subscribe(() => {\n      this.cdRef.detectChanges();\n    });\n\n    this.model.setPainted(true);\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
-                    "data": ".default-label {\n  color: white;\n  user-select: none;\n}\n",
+                    "data": ":host {\n  position: absolute;\n}\n\n.default-label {\n  color: white;\n  user-select: none;\n}\n",
                     "styleUrl": "./default-label.component.scss"
                 }
             ],
@@ -746,7 +454,7 @@
                         "type": "LabelModel"
                     }
                 ],
-                "line": 17,
+                "line": 20,
                 "jsdoctags": [
                     {
                         "name": "cdRef",
@@ -771,11 +479,12 @@
         },
         {
             "name": "DefaultLinkComponent",
-            "id": "component-DefaultLinkComponent-9ce5eb65ec9b78fdce5f543701368157",
+            "id": "component-DefaultLinkComponent-69c4fbe9d4061cad7f9e925be7acf2a2",
             "file": "packages/angular/src/lib/defaults/components/default-link/default-link.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
             "entryComponents": [],
+            "host": {},
             "inputs": [],
             "outputs": [],
             "providers": [],
@@ -796,7 +505,7 @@
                     "type": "ViewContainerRef",
                     "optional": false,
                     "description": "",
-                    "line": 23,
+                    "line": 27,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -809,11 +518,19 @@
                     "type": "LinkModel",
                     "optional": false,
                     "description": "",
-                    "line": 26,
+                    "line": 30,
                     "decorators": [
                         {
+                            "name": "Optional",
+                            "stringifiedArguments": ""
+                        },
+                        {
+                            "name": "Host",
+                            "stringifiedArguments": ""
+                        },
+                        {
                             "name": "Inject",
-                            "stringifiedArguments": "LINK_MODEL"
+                            "stringifiedArguments": "MODEL"
                         }
                     ],
                     "modifierKind": [
@@ -837,7 +554,7 @@
                     "optional": false,
                     "returnType": "Coords",
                     "typeParameters": [],
-                    "line": 97,
+                    "line": 105,
                     "jsdoctags": [
                         {
                             "name": "firstPoint",
@@ -870,7 +587,7 @@
                     "optional": false,
                     "returnType": "number",
                     "typeParameters": [],
-                    "line": 80,
+                    "line": 88,
                     "jsdoctags": [
                         {
                             "name": "firstPoint",
@@ -894,7 +611,15 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 40
+                    "line": 48
+                },
+                {
+                    "name": "ngOnInit",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 36
                 },
                 {
                     "name": "onHover",
@@ -902,7 +627,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 36
+                    "line": 44
                 },
                 {
                     "name": "trackByPoints",
@@ -919,7 +644,7 @@
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 32,
+                    "line": 40,
                     "jsdoctags": [
                         {
                             "name": "i",
@@ -943,11 +668,11 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  Inject,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { PointModel, generateCurvePath, Coords, LinkModel } from '@rxzu/core';\nimport { combineLatest } from 'rxjs';\nimport { takeUntil } from 'rxjs/operators';\nimport { LINK_MODEL } from '../../../injection.tokens';\n\n@Component({\n  selector: 'rxzu-default-link',\n  templateUrl: './default-link.component.html',\n  styleUrls: ['./default-link.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultLinkComponent implements AfterViewInit {\n  @ViewChild('labelLayer', { read: ViewContainerRef, static: true })\n  labelLayer!: ViewContainerRef;\n\n  constructor(\n    @Inject(LINK_MODEL) public model: LinkModel,\n    private cdRef: ChangeDetectorRef\n  ) {\n    this.model.setPainted(true);\n  }\n\n  trackByPoints(i: number, point: PointModel) {\n    return point.id;\n  }\n\n  onHover() {\n    this.cdRef.detectChanges();\n  }\n\n  ngAfterViewInit() {\n    const firstPCoords$ = this.model.getFirstPoint().selectCoords();\n    const lastPCoords$ = this.model.getLastPoint().selectCoords();\n\n    // Observe link coords and update drawing accordingly\n    combineLatest([firstPCoords$, lastPCoords$])\n      .pipe(takeUntil(this.model.onEntityDestroy()))\n      .subscribe(([firstPCoords, lastPCoords]) => {\n        const points = [firstPCoords, lastPCoords];\n\n        // handle regular links\n        // draw the smoothing\n        // if the points are too close, just draw a straight line\n        const isHorizontal =\n          Math.abs(firstPCoords.x - lastPCoords.x) >\n          Math.abs(firstPCoords.y - lastPCoords.y);\n        const xOrY = isHorizontal ? 'x' : 'y';\n        let isStraight = false;\n        if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 50) {\n          isStraight = true;\n        }\n\n        const path = generateCurvePath(\n          firstPCoords,\n          lastPCoords,\n          isStraight ? 0 : 50\n        );\n        this.model.setPath(path);\n\n        const label = this.model.getLabel();\n\n        // update label position\n        if (label) {\n          label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));\n        }\n\n        this.cdRef.detectChanges();\n      });\n  }\n\n  calcLabelIncline(firstPoint: Coords, secondPoint: Coords): number {\n    const dy = secondPoint.y - firstPoint.y;\n    const dx = secondPoint.x - firstPoint.x;\n\n    if (dx === 0) {\n      return 0;\n    }\n\n    let inclineAngel = (Math.atan(dy / dx) * 180) / Math.PI;\n\n    if (inclineAngel < 0) {\n      inclineAngel += 180;\n    }\n\n    return inclineAngel;\n  }\n\n  calcCenterOfPath(firstPoint: Coords, secondPoint: Coords): Coords {\n    return {\n      x: (firstPoint.x + secondPoint.x) / 2 + 20,\n      y: (firstPoint.y + secondPoint.y) / 2 + 20,\n    };\n  }\n}\n",
+            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component, Host,\n  Inject, OnInit, Optional,\n  ViewChild,\n  ViewContainerRef\n} from '@angular/core';\nimport { PointModel, generateCurvePath, Coords, LinkModel } from '@rxzu/core';\nimport { combineLatest } from 'rxjs';\nimport { takeUntil } from 'rxjs/operators';\nimport { MODEL } from '../../../injection.tokens';\n\n@Component({\n  selector: 'rxzu-default-link',\n  templateUrl: './default-link.component.html',\n  styleUrls: ['./default-link.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n  host: {\n    '[attr.data-linkid]': `model?.id`,\n    '[attr.data-name]': `model?.getName()`\n  }\n})\nexport class DefaultLinkComponent implements OnInit, AfterViewInit {\n  @ViewChild('labelLayer', { read: ViewContainerRef, static: true })\n  labelLayer!: ViewContainerRef;\n\n  constructor(\n    @Optional() @Host() @Inject(MODEL) public model: LinkModel,\n    private cdRef: ChangeDetectorRef\n  ) {\n    console.log(model?.getType());\n  }\n\n  ngOnInit() {\n    this.model.setPainted(true);\n  }\n\n  trackByPoints(i: number, point: PointModel) {\n    return point.id;\n  }\n\n  onHover() {\n    this.cdRef.detectChanges();\n  }\n\n  ngAfterViewInit() {\n    const firstPCoords$ = this.model.getFirstPoint().selectCoords();\n    const lastPCoords$ = this.model.getLastPoint().selectCoords();\n\n    // Observe link coords and update drawing accordingly\n    combineLatest([firstPCoords$, lastPCoords$])\n      .pipe(takeUntil(this.model.onEntityDestroy()))\n      .subscribe(([firstPCoords, lastPCoords]) => {\n        const points = [firstPCoords, lastPCoords];\n\n        // handle regular links\n        // draw the smoothing\n        // if the points are too close, just draw a straight line\n        const isHorizontal =\n          Math.abs(firstPCoords.x - lastPCoords.x) >\n          Math.abs(firstPCoords.y - lastPCoords.y);\n        const xOrY = isHorizontal ? 'x' : 'y';\n        let isStraight = false;\n        if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 50) {\n          isStraight = true;\n        }\n\n        const path = generateCurvePath(\n          firstPCoords,\n          lastPCoords,\n          isStraight ? 0 : 50\n        );\n        this.model.setPath(path);\n\n        const label = this.model.getLabel();\n\n        // update label position\n        if (label) {\n          label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));\n        }\n\n        this.cdRef.detectChanges();\n      });\n  }\n\n  calcLabelIncline(firstPoint: Coords, secondPoint: Coords): number {\n    const dy = secondPoint.y - firstPoint.y;\n    const dx = secondPoint.x - firstPoint.x;\n\n    if (dx === 0) {\n      return 0;\n    }\n\n    let inclineAngel = (Math.atan(dy / dx) * 180) / Math.PI;\n\n    if (inclineAngel < 0) {\n      inclineAngel += 180;\n    }\n\n    return inclineAngel;\n  }\n\n  calcCenterOfPath(firstPoint: Coords, secondPoint: Coords): Coords {\n    return {\n      x: (firstPoint.x + secondPoint.x) / 2 + 20,\n      y: (firstPoint.y + secondPoint.y) / 2 + 20,\n    };\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
-                    "data": ".link-container {\n  position: relative;\n  fill: none;\n  overflow: visible;\n  pointer-events: all;\n}\n\n.default-link {\n  fill: none;\n  overflow: visible;\n\n  @keyframes dash {\n    from {\n      stroke-dashoffset: 24;\n    }\n    to {\n      stroke-dashoffset: 0;\n    }\n  }\n\n  &.hovered {\n    stroke: rgb(0, 192, 255);\n    stroke-dasharray: 10, 2;\n    animation: dash 1s linear infinite;\n  }\n}\n\n.default-point {\n  color: lightgray;\n  overflow: visible;\n  pointer-events: all;\n\n  &.hovered {\n    color: rgb(0, 192, 255);\n  }\n}\n",
+                    "data": ":host {\n  position: absolute;\n}\n\n.link-container {\n  position: relative;\n  fill: none;\n  overflow: visible;\n  pointer-events: all;\n}\n\n.default-link {\n  fill: none;\n  overflow: visible;\n\n  @keyframes dash {\n    from {\n      stroke-dashoffset: 24;\n    }\n    to {\n      stroke-dashoffset: 0;\n    }\n  }\n\n  &.hovered {\n    stroke: rgb(0, 192, 255);\n    stroke-dasharray: 10, 2;\n    animation: dash 1s linear infinite;\n  }\n}\n\n.default-point {\n  color: lightgray;\n  overflow: visible;\n  pointer-events: all;\n\n  &.hovered {\n    color: rgb(0, 192, 255);\n  }\n}\n",
                     "styleUrl": "./default-link.component.scss"
                 }
             ],
@@ -965,7 +690,7 @@
                         "type": "ChangeDetectorRef"
                     }
                 ],
-                "line": 23,
+                "line": 27,
                 "jsdoctags": [
                     {
                         "name": "model",
@@ -984,17 +709,19 @@
                 ]
             },
             "implements": [
+                "OnInit",
                 "AfterViewInit"
             ],
             "templateData": "<!-- Label Host -->\n<ng-template #labelLayer></ng-template>\n\n<svg class=\"link-container\">\n  <!-- Link -->\n  <g [id]=\"model.id\">\n    <path\n      class=\"default-link\"\n      stroke-width=\"1\"\n      stroke=\"white\"\n      [attr.d]=\"model.selectPath() | async\"\n      (mouseleave)=\"model.setHovered(false); onHover()\"\n      (mouseenter)=\"model.setHovered(); onHover()\"\n      [ngClass]=\"{ hovered: model.selectHovered() | async }\"\n    ></path>\n    <path\n      class=\"default-link\"\n      stroke=\"blue\"\n      stroke-linecap=\"round\"\n      (mouseleave)=\"model.setHovered(false); onHover()\"\n      (mouseenter)=\"model.setHovered(); onHover()\"\n      [attr.stroke-width]=\"20\"\n      [attr.data-linkid]=\"model.id\"\n      [attr.stroke-opacity]=\"(model.selectHovered() | async) ? '0.1' : '0'\"\n      [attr.d]=\"model.selectPath() | async\"\n    ></path>\n  </g>\n\n  <!-- Points -->\n  <g\n    *ngFor=\"let point of model.getPoints(); trackBy: trackByPoints\"\n    [id]=\"point.id\"\n  >\n    <circle\n      fill=\"currentColor\"\n      [attr.cx]=\"point.selectX() | async\"\n      [attr.cy]=\"point.selectY() | async\"\n      r=\"5\"\n      class=\"default-point\"\n      [ngClass]=\"{ hovered: point.selectHovered() | async }\"\n    />\n    <circle\n      [attr.data-pointid]=\"point.id\"\n      [attr.data-linkid]=\"model.id\"\n      (mouseleave)=\"point.setHovered(false); model.setHovered(false)\"\n      (mouseenter)=\"point.setHovered(); model.setHovered()\"\n      [attr.cx]=\"point.selectX() | async\"\n      [attr.cy]=\"point.selectY() | async\"\n      r=\"15\"\n      [attr.opacity]=\"0\"\n      [ngClass]=\"{ selected: point.selectSelected() | async }\"\n    />\n  </g>\n</svg>\n"
         },
         {
             "name": "DefaultNodeComponent",
-            "id": "component-DefaultNodeComponent-879dc641bfff9a51050740bc8a8474f1",
+            "id": "component-DefaultNodeComponent-34cdcd125da3fb64bf4dd235e08e1060",
             "file": "packages/angular/src/lib/defaults/components/default-node/default-node.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
             "entryComponents": [],
+            "host": {},
             "inputs": [],
             "outputs": [],
             "providers": [],
@@ -1015,11 +742,19 @@
                     "type": "NodeModel",
                     "optional": false,
                     "description": "",
-                    "line": 25,
+                    "line": 33,
                     "decorators": [
                         {
+                            "name": "Host",
+                            "stringifiedArguments": ""
+                        },
+                        {
+                            "name": "Optional",
+                            "stringifiedArguments": ""
+                        },
+                        {
                             "name": "Inject",
-                            "stringifiedArguments": "NODE_MODEL"
+                            "stringifiedArguments": "MODEL"
                         }
                     ],
                     "modifierKind": [
@@ -1027,11 +762,21 @@
                     ]
                 },
                 {
+                    "name": "portDiffers",
+                    "type": "IterableDiffer<PortModel>",
+                    "optional": false,
+                    "description": "",
+                    "line": 27,
+                    "modifierKind": [
+                        112
+                    ]
+                },
+                {
                     "name": "portsLayer",
                     "type": "ViewContainerRef",
                     "optional": false,
                     "description": "",
-                    "line": 21,
+                    "line": 29,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1044,17 +789,58 @@
                     "type": "HTMLElement",
                     "optional": false,
                     "description": "",
-                    "line": 22
+                    "line": 30
                 }
             ],
             "methodsClass": [
+                {
+                    "name": "applyPortChanges",
+                    "args": [
+                        {
+                            "name": "changes",
+                            "type": "IterableChanges<PortModel> | null"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 88,
+                    "modifierKind": [
+                        112
+                    ],
+                    "jsdoctags": [
+                        {
+                            "name": "changes",
+                            "type": "IterableChanges<PortModel> | null",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
                 {
                     "name": "getPortsHost",
                     "args": [],
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 34
+                    "line": 51
+                },
+                {
+                    "name": "ngOnInit",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 45
+                },
+                {
+                    "name": "paintPorts",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "Observable<boolean>",
+                    "typeParameters": [],
+                    "line": 63
                 },
                 {
                     "name": "updateNodePosition",
@@ -1062,7 +848,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 38
+                    "line": 55
                 }
             ],
             "hostBindings": [],
@@ -1070,11 +856,11 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  ChangeDetectionStrategy,\n  Component,\n  ElementRef,\n  Inject,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { NodeModel } from '@rxzu/core';\nimport { NODE_MODEL } from '../../../injection.tokens';\n\n@Component({\n  selector: 'rxzu-default-node',\n  templateUrl: './default-node.component.html',\n  styleUrls: ['./default-node.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultNodeComponent {\n  @ViewChild('portsLayer', { read: ViewContainerRef, static: true })\n  portsLayer!: ViewContainerRef;\n  rootNode: HTMLElement;\n\n  constructor(\n    @Inject(NODE_MODEL) public model: NodeModel,\n    private rootEl: ElementRef,\n    private renderer: Renderer2\n  ) {\n    this.rootNode = this.rootEl.nativeElement;\n    this.updateNodePosition();\n    this.model.setPainted(true);\n  }\n\n  getPortsHost() {\n    return this.portsLayer;\n  }\n\n  updateNodePosition() {\n    // default position for node\n    this.renderer.setStyle(this.rootNode, 'position', 'absolute');\n    this.renderer.setStyle(this.rootNode, 'display', 'block');\n\n    // subscribe to node coordinates\n    this.model.selectCoords().subscribe(({ x, y }) => {\n      this.renderer.setStyle(this.rootNode, 'left', `${x}px`);\n      this.renderer.setStyle(this.rootNode, 'top', `${y}px`);\n    });\n  }\n}\n",
+            "sourceCode": "import {\n  ChangeDetectionStrategy,\n  Component,\n  ElementRef, Host,\n  Inject, IterableChanges, IterableDiffer, IterableDiffers, OnInit, Optional,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef\n} from '@angular/core';\nimport { NodeModel, PortModel } from '@rxzu/core';\nimport { MODEL } from '../../../injection.tokens';\nimport { filter, mapTo, pluck, switchMap, take, takeUntil } from 'rxjs/operators';\nimport { combineLatest, Observable } from 'rxjs';\nimport { RxZuDiagramComponent } from '../../../diagram/diagram.component';\nimport { FactoryService } from '../../../factory.service';\n\n@Component({\n  selector: 'rxzu-default-node',\n  templateUrl: './default-node.component.html',\n  styleUrls: ['./default-node.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n  host: {\n    '[attr.data-nodeid]': `model?.id`\n  }\n})\nexport class DefaultNodeComponent implements OnInit {\n  private portDiffers: IterableDiffer<PortModel>;\n  @ViewChild('portsLayer', { read: ViewContainerRef, static: true })\n  portsLayer!: ViewContainerRef;\n  rootNode: HTMLElement;\n\n  constructor(\n    @Host() @Optional() @Inject(MODEL) public model: NodeModel,\n    private factory: FactoryService,\n    private diagram: RxZuDiagramComponent,\n    private rootEl: ElementRef,\n    private renderer: Renderer2,\n    iterableDiffers: IterableDiffers\n  ) {\n    this.rootNode = this.rootEl.nativeElement;\n    console.log(model?.getType());\n    this.portDiffers = iterableDiffers.find([]).create<PortModel>((index, item) => item.id);\n  }\n\n  ngOnInit() {\n    this.updateNodePosition();\n    this.paintPorts();\n    this.model.setPainted(true);\n  }\n\n  getPortsHost() {\n    return this.portsLayer;\n  }\n\n  updateNodePosition() {\n    // subscribe to node coordinates\n    this.model.selectCoords().pipe(takeUntil(this.model.onEntityDestroy())).subscribe(({ x, y }) => {\n      this.renderer.setStyle(this.rootNode, 'left', `${x}px`);\n      this.renderer.setStyle(this.rootNode, 'top', `${y}px`);\n    });\n  }\n\n  paintPorts(): Observable<boolean> {\n    return this.model\n      .selectPorts()\n      .pipe(\n        takeUntil(this.model.onEntityDestroy()),\n        filter(\n          (\n            ports: PortModel[] | null | undefined\n          ): ports is PortModel[] =>\n            ports !== null && ports !== undefined\n        ),\n        switchMap(ports => {\n          const changes = this.portDiffers.diff(ports);\n          this.applyPortChanges(changes);\n          return combineLatest(ports.map((port) => port.paintChanges().pipe(\n            pluck('isPainted'),\n            filter<boolean>(Boolean),\n            take(1))\n          ));\n        }),\n        filter((val) => val !== null),\n        mapTo(true)\n      );\n  }\n\n  private applyPortChanges(changes: IterableChanges<PortModel> | null): void {\n    changes?.forEachAddedItem(({ item, currentIndex, previousIndex }) => {\n      if (!item.getPainted().isPainted) {\n        if (!this.factory.has(item)) {\n          return;\n        }\n\n        this.factory.generateWidget({\n          model: item,\n          host: this.getPortsHost(),\n          index: currentIndex ?? undefined\n        });\n        return;\n      }\n      // tslint:disable-next-line:no-unused-expression\n      currentIndex && console.log(this.getPortsHost().get(currentIndex));\n    });\n    changes?.forEachRemovedItem(record => {\n      record.item.destroy();\n    });\n    changes?.forEachMovedItem(({ previousIndex, currentIndex, item }) => {\n      if (typeof previousIndex === 'number' && typeof currentIndex === 'number' && previousIndex !== currentIndex) {\n        const view = this.getPortsHost().get(previousIndex);\n        if (view) {\n          this.getPortsHost().move(view, currentIndex);\n          this.model.updatePortCoords(item, this.diagram.diagramEngine);\n        }\n      }\n    });\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
-                    "data": ".default-node {\n  &.selected {\n    background-color: honeydew;\n  }\n\n  &.hovered {\n    background-color: gainsboro;\n  }\n\n  pointer-events: all;\n  width: 100%;\n  border-radius: 10px;\n  user-select: none;\n  cursor: auto;\n  background-color: white;\n}\n\n.ports {\n  flex-grow: 1;\n  display: flex;\n  flex-direction: column;\n}\n",
+                    "data": ":host {\n  display: block;\n  position: absolute;\n}\n\n.default-node {\n  &.selected {\n    background-color: honeydew;\n  }\n\n  &.hovered {\n    background-color: gainsboro;\n  }\n\n  pointer-events: all;\n  width: 100%;\n  border-radius: 10px;\n  user-select: none;\n  cursor: auto;\n  background-color: white;\n}\n\n.ports {\n  flex-grow: 1;\n  display: flex;\n  flex-direction: column;\n}\n",
                     "styleUrl": "./default-node.component.scss"
                 }
             ],
@@ -1088,19 +874,45 @@
                         "type": "NodeModel"
                     },
                     {
+                        "name": "factory",
+                        "type": "FactoryService"
+                    },
+                    {
+                        "name": "diagram",
+                        "type": "RxZuDiagramComponent"
+                    },
+                    {
                         "name": "rootEl",
                         "type": "ElementRef"
                     },
                     {
                         "name": "renderer",
                         "type": "Renderer2"
+                    },
+                    {
+                        "name": "iterableDiffers",
+                        "type": "IterableDiffers"
                     }
                 ],
-                "line": 22,
+                "line": 30,
                 "jsdoctags": [
                     {
                         "name": "model",
                         "type": "NodeModel",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "factory",
+                        "type": "FactoryService",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "diagram",
+                        "type": "RxZuDiagramComponent",
                         "tagName": {
                             "text": "param"
                         }
@@ -1118,18 +930,29 @@
                         "tagName": {
                             "text": "param"
                         }
+                    },
+                    {
+                        "name": "iterableDiffers",
+                        "type": "IterableDiffers",
+                        "tagName": {
+                            "text": "param"
+                        }
                     }
                 ]
             },
+            "implements": [
+                "OnInit"
+            ],
             "templateData": "<div\n  class=\"default-node\"\n  [ngClass]=\"{\n    selected: model.selectSelected() | async,\n    hovered: model.selectHovered() | async\n  }\"\n  [ngStyle]=\"{\n    'height.px': model.selectHeight() | async,\n    'width.px': model.selectWidth() | async\n  }\"\n  (mouseover)=\"model.setHovered()\"\n  (mouseout)=\"model.setHovered(false)\"\n>\n  <div class=\"ports\">\n    <ng-template #portsLayer></ng-template>\n  </div>\n</div>\n"
         },
         {
             "name": "DefaultPortComponent",
-            "id": "component-DefaultPortComponent-5a6fbe242264b695398a4101b2417288",
+            "id": "component-DefaultPortComponent-07bb7a315cf42122d702c092bec80510",
             "file": "packages/angular/src/lib/defaults/components/default-port/default-port.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
             "entryComponents": [],
+            "host": {},
             "inputs": [],
             "outputs": [],
             "providers": [],
@@ -1150,11 +973,19 @@
                     "type": "PortModel",
                     "optional": false,
                     "description": "",
-                    "line": 12,
+                    "line": 16,
                     "decorators": [
                         {
+                            "name": "Optional",
+                            "stringifiedArguments": ""
+                        },
+                        {
+                            "name": "Host",
+                            "stringifiedArguments": ""
+                        },
+                        {
                             "name": "Inject",
-                            "stringifiedArguments": "PORT_MODEL"
+                            "stringifiedArguments": "MODEL"
                         }
                     ],
                     "modifierKind": [
@@ -1168,7 +999,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';\nimport { PortModel } from '@rxzu/core';\nimport { PORT_MODEL } from '../../../injection.tokens';\n\n@Component({\n  selector: 'rxzu-default-port',\n  templateUrl: './default-port.component.html',\n  styleUrls: ['./default-port.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class DefaultPortComponent {\n  constructor(@Inject(PORT_MODEL) public model: PortModel) {\n    this.model.setPainted(true);\n  }\n}\n",
+            "sourceCode": "import { ChangeDetectionStrategy, Component, Host, Inject, Optional } from '@angular/core';\nimport { PortModel } from '@rxzu/core';\nimport { MODEL } from '../../../injection.tokens';\n\n@Component({\n  selector: 'rxzu-default-port',\n  templateUrl: './default-port.component.html',\n  styleUrls: ['./default-port.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n  host: {\n    '[attr.data-portid]': `model?.id`,\n    '[attr.data-name]': `model?.getName()`\n  }\n})\nexport class DefaultPortComponent {\n  constructor(@Optional() @Host() @Inject(MODEL) public model: PortModel) {\n    this.model.setPainted(true);\n    console.log(model?.getType());\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -1186,7 +1017,7 @@
                         "type": "PortModel"
                     }
                 ],
-                "line": 11,
+                "line": 15,
                 "jsdoctags": [
                     {
                         "name": "model",
@@ -1201,14 +1032,25 @@
         },
         {
             "name": "RxZuDiagramComponent",
-            "id": "component-RxZuDiagramComponent-087eadcaf950d5c7e88f4817e126c6ec",
+            "id": "component-RxZuDiagramComponent-c3bfe2e16ad5c18e8c3ff0b2d7a6e0af",
             "file": "packages/angular/src/lib/diagram/diagram.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
             "entryComponents": [],
+            "exportAs": "RxzuDiagram",
             "inputs": [],
             "outputs": [],
-            "providers": [],
+            "providers": [
+                {
+                    "name": "EngineService"
+                },
+                {
+                    "name": "RegistryService"
+                },
+                {
+                    "name": "FactoryService"
+                }
+            ],
             "selector": "rxzu-diagram",
             "styleUrls": [
                 "diagram.component.scss"
@@ -1222,32 +1064,32 @@
                 {
                     "name": "allowCanvasTranslation",
                     "defaultValue": "true",
-                    "line": 34
+                    "line": 35
                 },
                 {
                     "name": "allowCanvasZoom",
                     "defaultValue": "true",
-                    "line": 33
+                    "line": 34
                 },
                 {
                     "name": "allowLooseLinks",
                     "defaultValue": "true",
-                    "line": 36
+                    "line": 37
                 },
                 {
                     "name": "inverseZoom",
                     "defaultValue": "true",
-                    "line": 35
+                    "line": 36
                 },
                 {
                     "name": "maxZoomIn",
                     "defaultValue": "0",
-                    "line": 38
+                    "line": 39
                 },
                 {
                     "name": "maxZoomOut",
                     "defaultValue": "0",
-                    "line": 37
+                    "line": 38
                 },
                 {
                     "name": "model",
@@ -1256,9 +1098,14 @@
                     "type": "DiagramModel | null"
                 },
                 {
+                    "name": "options",
+                    "line": 33,
+                    "type": "DiagramModelOptions"
+                },
+                {
                     "name": "portMagneticRadius",
                     "defaultValue": "30",
-                    "line": 39
+                    "line": 40
                 }
             ],
             "outputsClass": [],
@@ -1268,7 +1115,7 @@
                     "type": "ElementRef",
                     "optional": true,
                     "description": "",
-                    "line": 48,
+                    "line": 49,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1286,17 +1133,21 @@
                 },
                 {
                     "name": "diagramEngine",
-                    "type": "DiagramEngineCore",
-                    "optional": true,
+                    "type": "EngineService",
+                    "optional": false,
                     "description": "",
-                    "line": 50
+                    "line": 60,
+                    "modifierKind": [
+                        114,
+                        132
+                    ]
                 },
                 {
                     "name": "linksLayer",
                     "type": "ViewContainerRef",
                     "optional": true,
                     "description": "",
-                    "line": 45,
+                    "line": 46,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1316,7 +1167,7 @@
                     "type": "NgZone",
                     "optional": false,
                     "description": "",
-                    "line": 60,
+                    "line": 61,
                     "modifierKind": [
                         114
                     ]
@@ -1326,7 +1177,7 @@
                     "type": "ViewContainerRef",
                     "optional": true,
                     "description": "",
-                    "line": 42,
+                    "line": 43,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1349,7 +1200,7 @@
                     "optional": false,
                     "returnType": "HTMLDivElement | null",
                     "typeParameters": [],
-                    "line": 184,
+                    "line": 189,
                     "modifierKind": [
                         113
                     ]
@@ -1360,7 +1211,7 @@
                     "optional": false,
                     "returnType": "HTMLDivElement | null",
                     "typeParameters": [],
-                    "line": 176,
+                    "line": 181,
                     "modifierKind": [
                         113
                     ]
@@ -1371,7 +1222,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 104
+                    "line": 105
                 },
                 {
                     "name": "initSubs",
@@ -1379,7 +1230,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 158,
+                    "line": 163,
                     "modifierKind": [
                         113
                     ]
@@ -1390,7 +1241,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 66
+                    "line": 67
                 },
                 {
                     "name": "ngOnDestroy",
@@ -1398,7 +1249,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 99
+                    "line": 100
                 },
                 {
                     "name": "onMouseDown",
@@ -1411,7 +1262,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 137,
+                    "line": 138,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1438,7 +1289,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 132,
+                    "line": 133,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1465,7 +1316,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 127,
+                    "line": 128,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1492,7 +1343,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 142,
+                    "line": 143,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1527,7 +1378,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 147,
+                    "line": 152,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1559,6 +1410,30 @@
                             }
                         }
                     ]
+                },
+                {
+                    "name": "zoomToFit",
+                    "args": [
+                        {
+                            "name": "additionalZoomFactor",
+                            "type": "number",
+                            "optional": true
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 147,
+                    "jsdoctags": [
+                        {
+                            "name": "additionalZoomFactor",
+                            "type": "number",
+                            "optional": true,
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
                 }
             ],
             "hostBindings": [],
@@ -1566,7 +1441,7 @@
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  Input,\n  NgZone,\n  OnDestroy,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { combineLatest, noop, Observable, of, ReplaySubject } from 'rxjs';\nimport { map, switchMap, takeUntil, tap } from 'rxjs/operators';\nimport {\n  DiagramEngineCore,\n  SelectingAction,\n  MouseManager,\n  DiagramModel,\n} from '@rxzu/core';\nimport { ZonedClass, OutsideZone } from '../utils';\n\n@Component({\n  selector: 'rxzu-diagram',\n  templateUrl: 'diagram.component.html',\n  styleUrls: ['diagram.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class RxZuDiagramComponent\n  implements AfterViewInit, OnDestroy, ZonedClass {\n  @Input('model') diagramModel: DiagramModel | null = null;\n  @Input() allowCanvasZoom = true;\n  @Input() allowCanvasTranslation = true;\n  @Input() inverseZoom = true;\n  @Input() allowLooseLinks = true;\n  @Input() maxZoomOut = 0;\n  @Input() maxZoomIn = 0;\n  @Input() portMagneticRadius = 30;\n\n  @ViewChild('nodesLayer', { read: ViewContainerRef })\n  nodesLayer?: ViewContainerRef;\n\n  @ViewChild('linksLayer', { read: ViewContainerRef })\n  linksLayer?: ViewContainerRef;\n\n  @ViewChild('canvas', { read: ElementRef })\n  canvas?: ElementRef;\n\n  diagramEngine?: DiagramEngineCore;\n  mouseManager?: MouseManager;\n  selectionBox$?: Observable<SelectingAction | null>;\n  destroyed$ = new ReplaySubject<boolean>(1);\n\n  get host(): HTMLElement {\n    return this.elRef.nativeElement;\n  }\n\n  constructor(\n    public ngZone: NgZone,\n    protected renderer: Renderer2,\n    protected cdRef: ChangeDetectorRef,\n    protected elRef: ElementRef<HTMLElement>\n  ) {}\n\n  ngAfterViewInit() {\n    const model = this.diagramModel;\n    if (!model || !this.canvas) {\n      return;\n    }\n    this.diagramEngine = model.getDiagramEngine();\n    this.mouseManager = this.diagramEngine.getMouseManager();\n\n    this.diagramEngine.setCanvas(this.canvas.nativeElement);\n\n    this.diagramEngine.setup({\n      ...this,\n    });\n\n    (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)\n      .pipe(\n        switchMap(() => {\n          if (!this.diagramEngine) {\n            return of(null);\n          }\n\n          return this.diagramEngine.paintLinks(this.linksLayer) as Observable<\n            void\n          >;\n        })\n      )\n      .subscribe(() => {\n        this.initSubs();\n        this.initSelectionBox();\n        this.cdRef.detectChanges();\n      });\n  }\n\n  ngOnDestroy() {\n    this.destroyed$.next(true);\n    this.destroyed$.complete();\n  }\n\n  initSelectionBox() {\n    if (!this.diagramEngine) {\n      return;\n    }\n\n    this.selectionBox$ = this.diagramEngine.selectAction().pipe(\n      map((a) => {\n        if (\n          a &&\n          a.action &&\n          a.action instanceof SelectingAction &&\n          a.state === 'firing'\n        ) {\n          return a.action as SelectingAction;\n        } else {\n          return null;\n        }\n      }),\n      tap(() => this.cdRef.detectChanges())\n    );\n  }\n\n  @OutsideZone\n  onMouseUp(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseUp(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseMove(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseMove(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseDown(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseDown(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseWheel(event: WheelEvent) {\n    this.mouseManager ? this.mouseManager.onMouseWheel(event) : noop();\n  }\n\n  @OutsideZone\n  protected setLayerStyles(x: number, y: number, zoom: number): void {\n    const nodesLayer = this.getNodesLayer();\n    const linksLayer = this.getLinksLayer();\n\n    const style = 'transform';\n    const value = `translate(${x}px, ${y}px) scale(${zoom / 100.0})`;\n\n    this.renderer.setStyle(nodesLayer, style, value);\n    this.renderer.setStyle(linksLayer, style, value);\n  }\n\n  protected initSubs() {\n    const diagramModel = this.diagramEngine?.getDiagramModel();\n    if (!diagramModel) {\n      return;\n    }\n\n    combineLatest([\n      diagramModel.selectOffsetX(),\n      diagramModel.selectOffsetY(),\n      diagramModel.selectZoomLevel(),\n    ])\n      .pipe(\n        tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),\n        takeUntil(this.destroyed$)\n      )\n      .subscribe();\n  }\n\n  protected getNodesLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-nodes-layer');\n  }\n\n  protected getLinksLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-links-layer');\n  }\n}\n",
+            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  Input,\n  NgZone,\n  OnDestroy,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { combineLatest, noop, Observable, of, ReplaySubject } from 'rxjs';\nimport { map, switchMap, takeUntil, tap } from 'rxjs/operators';\nimport { SelectingAction, MouseManager, DiagramModel, DiagramModelOptions } from '@rxzu/core';\nimport { ZonedClass, OutsideZone } from '../utils';\nimport { EngineService } from '../engine.service';\nimport { RegistryService } from '../registry.service';\nimport { FactoryService } from '../factory.service';\n\n@Component({\n  selector: 'rxzu-diagram',\n  exportAs: 'RxzuDiagram',\n  templateUrl: 'diagram.component.html',\n  styleUrls: ['diagram.component.scss'],\n  providers: [EngineService, RegistryService, FactoryService],\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class RxZuDiagramComponent\n  implements AfterViewInit, OnDestroy, ZonedClass {\n  @Input('model') diagramModel: DiagramModel | null = null;\n  @Input() options?: DiagramModelOptions;\n  @Input() allowCanvasZoom = true;\n  @Input() allowCanvasTranslation = true;\n  @Input() inverseZoom = true;\n  @Input() allowLooseLinks = true;\n  @Input() maxZoomOut = 0;\n  @Input() maxZoomIn = 0;\n  @Input() portMagneticRadius = 30;\n\n  @ViewChild('nodesLayer', { read: ViewContainerRef })\n  nodesLayer?: ViewContainerRef;\n\n  @ViewChild('linksLayer', { read: ViewContainerRef })\n  linksLayer?: ViewContainerRef;\n\n  @ViewChild('canvas', { read: ElementRef })\n  canvas?: ElementRef;\n\n  mouseManager?: MouseManager;\n  selectionBox$?: Observable<SelectingAction | null>;\n  destroyed$ = new ReplaySubject<boolean>(1);\n\n  get host(): HTMLElement {\n    return this.elRef.nativeElement;\n  }\n\n  constructor(\n    public readonly diagramEngine: EngineService,\n    public ngZone: NgZone,\n    protected renderer: Renderer2,\n    protected cdRef: ChangeDetectorRef,\n    protected elRef: ElementRef<HTMLElement>,\n  ) {}\n\n  ngAfterViewInit() {\n    this.diagramModel = this.diagramModel && this.diagramEngine.setModel(this.diagramModel) || this.diagramEngine.createModel(this.options);\n\n    if (!this.canvas) {\n      return;\n    }\n    this.mouseManager = this.diagramEngine.getMouseManager();\n\n    this.diagramEngine.setCanvas(this.canvas.nativeElement);\n\n    this.diagramEngine.setup({\n      ...this,\n    });\n\n    (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)\n      .pipe(\n        switchMap(() => {\n          if (!this.diagramEngine) {\n            return of(null);\n          }\n\n          return this.diagramEngine.paintLinks(this.linksLayer) as Observable<\n            void\n          >;\n        })\n      )\n      .subscribe(() => {\n        this.initSubs();\n        this.initSelectionBox();\n        this.cdRef.detectChanges();\n      });\n  }\n\n  ngOnDestroy() {\n    this.destroyed$.next(true);\n    this.destroyed$.complete();\n  }\n\n  initSelectionBox() {\n    if (!this.diagramEngine) {\n      return;\n    }\n\n    this.selectionBox$ = this.diagramEngine.selectAction().pipe(\n      map((a) => {\n        if (\n          a &&\n          a.action &&\n          a.action instanceof SelectingAction &&\n          a.state === 'firing'\n        ) {\n          return a.action as SelectingAction;\n        } else {\n          return null;\n        }\n      }),\n      tap(() => this.cdRef.detectChanges())\n    );\n  }\n\n  @OutsideZone\n  onMouseUp(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseUp(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseMove(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseMove(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseDown(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseDown(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseWheel(event: WheelEvent) {\n    this.mouseManager ? this.mouseManager.onMouseWheel(event) : noop();\n  }\n\n  zoomToFit(additionalZoomFactor?: number): void {\n    this.diagramEngine.zoomToFit(additionalZoomFactor);\n  }\n\n  @OutsideZone\n  protected setLayerStyles(x: number, y: number, zoom: number): void {\n    const nodesLayer = this.getNodesLayer();\n    const linksLayer = this.getLinksLayer();\n\n    const style = 'transform';\n    const value = `translate(${x}px, ${y}px) scale(${zoom / 100.0})`;\n\n    this.renderer.setStyle(nodesLayer, style, value);\n    this.renderer.setStyle(linksLayer, style, value);\n  }\n\n  protected initSubs() {\n    const diagramModel = this.diagramEngine?.getDiagramModel();\n    if (!diagramModel) {\n      return;\n    }\n\n    combineLatest([\n      diagramModel.selectOffsetX(),\n      diagramModel.selectOffsetY(),\n      diagramModel.selectZoomLevel(),\n    ])\n      .pipe(\n        tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),\n        takeUntil(this.destroyed$)\n      )\n      .subscribe();\n  }\n\n  protected getNodesLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-nodes-layer');\n  }\n\n  protected getLinksLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-links-layer');\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -1579,6 +1454,10 @@
                 "name": "constructor",
                 "description": "",
                 "args": [
+                    {
+                        "name": "diagramEngine",
+                        "type": "EngineService"
+                    },
                     {
                         "name": "ngZone",
                         "type": "NgZone"
@@ -1598,6 +1477,13 @@
                 ],
                 "line": 57,
                 "jsdoctags": [
+                    {
+                        "name": "diagramEngine",
+                        "type": "EngineService",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
                     {
                         "name": "ngZone",
                         "type": "NgZone",
@@ -1649,7 +1535,7 @@
     ],
     "modules": [
         {
-            "name": "DefaultLabelModule",
+            "name": "RxZuDefaultsModule",
             "children": [
                 {
                     "type": "providers",
@@ -1660,115 +1546,13 @@
                     "elements": [
                         {
                             "name": "DefaultLabelComponent"
-                        }
-                    ]
-                },
-                {
-                    "type": "imports",
-                    "elements": []
-                },
-                {
-                    "type": "exports",
-                    "elements": [
-                        {
-                            "name": "DefaultLabelComponent"
-                        }
-                    ]
-                },
-                {
-                    "type": "bootstrap",
-                    "elements": []
-                },
-                {
-                    "type": "classes",
-                    "elements": []
-                }
-            ]
-        },
-        {
-            "name": "DefaultLinkModule",
-            "children": [
-                {
-                    "type": "providers",
-                    "elements": []
-                },
-                {
-                    "type": "declarations",
-                    "elements": [
+                        },
                         {
                             "name": "DefaultLinkComponent"
-                        }
-                    ]
-                },
-                {
-                    "type": "imports",
-                    "elements": []
-                },
-                {
-                    "type": "exports",
-                    "elements": [
-                        {
-                            "name": "DefaultLinkComponent"
-                        }
-                    ]
-                },
-                {
-                    "type": "bootstrap",
-                    "elements": []
-                },
-                {
-                    "type": "classes",
-                    "elements": []
-                }
-            ]
-        },
-        {
-            "name": "DefaultNodeModule",
-            "children": [
-                {
-                    "type": "providers",
-                    "elements": []
-                },
-                {
-                    "type": "declarations",
-                    "elements": [
+                        },
                         {
                             "name": "DefaultNodeComponent"
-                        }
-                    ]
-                },
-                {
-                    "type": "imports",
-                    "elements": []
-                },
-                {
-                    "type": "exports",
-                    "elements": [
-                        {
-                            "name": "DefaultNodeComponent"
-                        }
-                    ]
-                },
-                {
-                    "type": "bootstrap",
-                    "elements": []
-                },
-                {
-                    "type": "classes",
-                    "elements": []
-                }
-            ]
-        },
-        {
-            "name": "DefaultPortModule",
-            "children": [
-                {
-                    "type": "providers",
-                    "elements": []
-                },
-                {
-                    "type": "declarations",
-                    "elements": [
+                        },
                         {
                             "name": "DefaultPortComponent"
                         }
@@ -1776,11 +1560,24 @@
                 },
                 {
                     "type": "imports",
-                    "elements": []
+                    "elements": [
+                        {
+                            "name": "RxZuModule"
+                        }
+                    ]
                 },
                 {
                     "type": "exports",
                     "elements": [
+                        {
+                            "name": "DefaultLabelComponent"
+                        },
+                        {
+                            "name": "DefaultLinkComponent"
+                        },
+                        {
+                            "name": "DefaultNodeComponent"
+                        },
                         {
                             "name": "DefaultPortComponent"
                         }
@@ -1797,7 +1594,7 @@
             ]
         },
         {
-            "name": "RxZuDiagramsModule",
+            "name": "RxZuModule",
             "children": [
                 {
                     "type": "providers",
@@ -1840,47 +1637,57 @@
     "miscellaneous": {
         "variables": [
             {
-                "name": "LABEL_MODEL",
+                "name": "COMPONENT",
                 "ctype": "miscellaneous",
                 "subtype": "variable",
                 "file": "packages/angular/src/lib/injection.tokens.ts",
-                "type": "InjectionToken<string>",
-                "defaultValue": "new InjectionToken(\n  'label_model'\n)"
+                "type": "InjectionToken<Omit<ComponentProviderOptions, entityType>>",
+                "defaultValue": "new InjectionToken('COMPONENT')"
             },
             {
-                "name": "LINK_MODEL",
+                "name": "COMPONENTS",
                 "ctype": "miscellaneous",
                 "subtype": "variable",
-                "file": "packages/angular/src/lib/injection.tokens.ts",
-                "type": "InjectionToken<string>",
-                "defaultValue": "new InjectionToken(\n  'link_model'\n)"
+                "file": "packages/angular/src/lib/defaults/defaults.module.ts",
+                "type": "[]",
+                "defaultValue": "[DefaultLinkComponent, DefaultLabelComponent, DefaultPortComponent, DefaultNodeComponent]"
             },
             {
-                "name": "NODE_MODEL",
+                "name": "DEFAULTS",
                 "ctype": "miscellaneous",
                 "subtype": "variable",
-                "file": "packages/angular/src/lib/injection.tokens.ts",
-                "type": "InjectionToken<string>",
-                "defaultValue": "new InjectionToken(\n  'node_model'\n)"
+                "file": "packages/angular/src/lib/defaults/defaults.module.ts",
+                "type": "ComponentProviderOptions[]",
+                "defaultValue": "[\n  {\n    entityType: 'node',\n    type: 'default',\n    comp: DefaultNodeComponent\n  },\n  {\n    entityType: 'port',\n    type: 'default',\n    comp: DefaultPortComponent\n  }, {\n    entityType: 'link',\n    type: 'default',\n    comp: DefaultLinkComponent\n  },\n  {\n    entityType: 'label',\n    type: 'default',\n    comp: DefaultLabelComponent\n  }\n]"
             },
             {
-                "name": "POINT_MODEL",
+                "name": "MODEL",
                 "ctype": "miscellaneous",
                 "subtype": "variable",
                 "file": "packages/angular/src/lib/injection.tokens.ts",
-                "type": "InjectionToken<string>",
-                "defaultValue": "new InjectionToken(\n  'point_model'\n)"
-            },
-            {
-                "name": "PORT_MODEL",
-                "ctype": "miscellaneous",
-                "subtype": "variable",
-                "file": "packages/angular/src/lib/injection.tokens.ts",
-                "type": "InjectionToken<string>",
-                "defaultValue": "new InjectionToken(\n  'port_model'\n)"
+                "type": "InjectionToken<BaseModel>",
+                "defaultValue": "new InjectionToken('MODEL')"
             }
         ],
         "functions": [
+            {
+                "name": "componentProviderOptionToProvider",
+                "file": "packages/angular/src/lib/injection.tokens.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "description": "",
+                "args": [
+                    {}
+                ],
+                "returnType": "Provider",
+                "jsdoctags": [
+                    {
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
             {
                 "name": "OutsideZone",
                 "file": "packages/angular/src/lib/utils/decorators.ts",
@@ -1927,48 +1734,62 @@
         "groupedVariables": {
             "packages/angular/src/lib/injection.tokens.ts": [
                 {
-                    "name": "LABEL_MODEL",
+                    "name": "COMPONENT",
                     "ctype": "miscellaneous",
                     "subtype": "variable",
                     "file": "packages/angular/src/lib/injection.tokens.ts",
-                    "type": "InjectionToken<string>",
-                    "defaultValue": "new InjectionToken(\n  'label_model'\n)"
+                    "type": "InjectionToken<Omit<ComponentProviderOptions, entityType>>",
+                    "defaultValue": "new InjectionToken('COMPONENT')"
                 },
                 {
-                    "name": "LINK_MODEL",
+                    "name": "MODEL",
                     "ctype": "miscellaneous",
                     "subtype": "variable",
                     "file": "packages/angular/src/lib/injection.tokens.ts",
-                    "type": "InjectionToken<string>",
-                    "defaultValue": "new InjectionToken(\n  'link_model'\n)"
+                    "type": "InjectionToken<BaseModel>",
+                    "defaultValue": "new InjectionToken('MODEL')"
+                }
+            ],
+            "packages/angular/src/lib/defaults/defaults.module.ts": [
+                {
+                    "name": "COMPONENTS",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "packages/angular/src/lib/defaults/defaults.module.ts",
+                    "type": "[]",
+                    "defaultValue": "[DefaultLinkComponent, DefaultLabelComponent, DefaultPortComponent, DefaultNodeComponent]"
                 },
                 {
-                    "name": "NODE_MODEL",
+                    "name": "DEFAULTS",
                     "ctype": "miscellaneous",
                     "subtype": "variable",
-                    "file": "packages/angular/src/lib/injection.tokens.ts",
-                    "type": "InjectionToken<string>",
-                    "defaultValue": "new InjectionToken(\n  'node_model'\n)"
-                },
-                {
-                    "name": "POINT_MODEL",
-                    "ctype": "miscellaneous",
-                    "subtype": "variable",
-                    "file": "packages/angular/src/lib/injection.tokens.ts",
-                    "type": "InjectionToken<string>",
-                    "defaultValue": "new InjectionToken(\n  'point_model'\n)"
-                },
-                {
-                    "name": "PORT_MODEL",
-                    "ctype": "miscellaneous",
-                    "subtype": "variable",
-                    "file": "packages/angular/src/lib/injection.tokens.ts",
-                    "type": "InjectionToken<string>",
-                    "defaultValue": "new InjectionToken(\n  'port_model'\n)"
+                    "file": "packages/angular/src/lib/defaults/defaults.module.ts",
+                    "type": "ComponentProviderOptions[]",
+                    "defaultValue": "[\n  {\n    entityType: 'node',\n    type: 'default',\n    comp: DefaultNodeComponent\n  },\n  {\n    entityType: 'port',\n    type: 'default',\n    comp: DefaultPortComponent\n  }, {\n    entityType: 'link',\n    type: 'default',\n    comp: DefaultLinkComponent\n  },\n  {\n    entityType: 'label',\n    type: 'default',\n    comp: DefaultLabelComponent\n  }\n]"
                 }
             ]
         },
         "groupedFunctions": {
+            "packages/angular/src/lib/injection.tokens.ts": [
+                {
+                    "name": "componentProviderOptionToProvider",
+                    "file": "packages/angular/src/lib/injection.tokens.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "description": "",
+                    "args": [
+                        {}
+                    ],
+                    "returnType": "Provider",
+                    "jsdoctags": [
+                        {
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                }
+            ],
             "packages/angular/src/lib/utils/decorators.ts": [
                 {
                     "name": "OutsideZone",
@@ -2035,7 +1856,7 @@
                 "linktype": "component",
                 "name": "DefaultLinkComponent",
                 "coveragePercent": 0,
-                "coverageCount": "0/9",
+                "coverageCount": "0/10",
                 "status": "low"
             },
             {
@@ -2044,7 +1865,7 @@
                 "linktype": "component",
                 "name": "DefaultNodeComponent",
                 "coveragePercent": 0,
-                "coverageCount": "0/7",
+                "coverageCount": "0/11",
                 "status": "low"
             },
             {
@@ -2057,48 +1878,23 @@
                 "status": "low"
             },
             {
-                "filePath": "packages/angular/src/lib/defaults/factories/angular.factory.ts",
-                "type": "class",
-                "linktype": "classe",
-                "name": "AbstractAngularFactory",
+                "filePath": "packages/angular/src/lib/defaults/defaults.module.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "COMPONENTS",
                 "coveragePercent": 0,
-                "coverageCount": "0/2",
+                "coverageCount": "0/1",
                 "status": "low"
             },
             {
-                "filePath": "packages/angular/src/lib/defaults/factories/default-label.factory.ts",
-                "type": "class",
-                "linktype": "classe",
-                "name": "DefaultLabelFactory",
+                "filePath": "packages/angular/src/lib/defaults/defaults.module.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "DEFAULTS",
                 "coveragePercent": 0,
-                "coverageCount": "0/5",
-                "status": "low"
-            },
-            {
-                "filePath": "packages/angular/src/lib/defaults/factories/default-link.factory.ts",
-                "type": "class",
-                "linktype": "classe",
-                "name": "DefaultLinkFactory",
-                "coveragePercent": 0,
-                "coverageCount": "0/5",
-                "status": "low"
-            },
-            {
-                "filePath": "packages/angular/src/lib/defaults/factories/default-node.factory.ts",
-                "type": "class",
-                "linktype": "classe",
-                "name": "DefaultNodeFactory",
-                "coveragePercent": 0,
-                "coverageCount": "0/5",
-                "status": "low"
-            },
-            {
-                "filePath": "packages/angular/src/lib/defaults/factories/default-port.factory.ts",
-                "type": "class",
-                "linktype": "classe",
-                "name": "DefaultPortFactory",
-                "coveragePercent": 0,
-                "coverageCount": "0/5",
+                "coverageCount": "0/1",
                 "status": "low"
             },
             {
@@ -2107,24 +1903,41 @@
                 "linktype": "component",
                 "name": "RxZuDiagramComponent",
                 "coveragePercent": 0,
-                "coverageCount": "0/29",
+                "coverageCount": "0/31",
                 "status": "low"
             },
             {
                 "filePath": "packages/angular/src/lib/engine.service.ts",
                 "type": "injectable",
                 "linktype": "injectable",
-                "name": "DiagramEngine",
+                "name": "EngineService",
+                "coveragePercent": 0,
+                "coverageCount": "0/3",
+                "status": "low"
+            },
+            {
+                "filePath": "packages/angular/src/lib/factory.service.ts",
+                "type": "injectable",
+                "linktype": "injectable",
+                "name": "FactoryService",
+                "coveragePercent": 0,
+                "coverageCount": "0/3",
+                "status": "low"
+            },
+            {
+                "filePath": "packages/angular/src/lib/injection.tokens.ts",
+                "type": "interface",
+                "linktype": "interface",
+                "name": "ComponentProviderOptions",
                 "coveragePercent": 0,
                 "coverageCount": "0/4",
                 "status": "low"
             },
             {
                 "filePath": "packages/angular/src/lib/injection.tokens.ts",
-                "type": "variable",
-                "linktype": "miscellaneous",
-                "linksubtype": "variable",
-                "name": "LABEL_MODEL",
+                "type": "function",
+                "linksubtype": "function",
+                "name": "componentProviderOptionToProvider",
                 "coveragePercent": 0,
                 "coverageCount": "0/1",
                 "status": "low"
@@ -2134,7 +1947,7 @@
                 "type": "variable",
                 "linktype": "miscellaneous",
                 "linksubtype": "variable",
-                "name": "LINK_MODEL",
+                "name": "COMPONENT",
                 "coveragePercent": 0,
                 "coverageCount": "0/1",
                 "status": "low"
@@ -2144,29 +1957,18 @@
                 "type": "variable",
                 "linktype": "miscellaneous",
                 "linksubtype": "variable",
-                "name": "NODE_MODEL",
+                "name": "MODEL",
                 "coveragePercent": 0,
                 "coverageCount": "0/1",
                 "status": "low"
             },
             {
-                "filePath": "packages/angular/src/lib/injection.tokens.ts",
-                "type": "variable",
-                "linktype": "miscellaneous",
-                "linksubtype": "variable",
-                "name": "POINT_MODEL",
+                "filePath": "packages/angular/src/lib/registry.service.ts",
+                "type": "injectable",
+                "linktype": "injectable",
+                "name": "RegistryService",
                 "coveragePercent": 0,
-                "coverageCount": "0/1",
-                "status": "low"
-            },
-            {
-                "filePath": "packages/angular/src/lib/injection.tokens.ts",
-                "type": "variable",
-                "linktype": "miscellaneous",
-                "linksubtype": "variable",
-                "name": "PORT_MODEL",
-                "coveragePercent": 0,
-                "coverageCount": "0/1",
+                "coverageCount": "0/2",
                 "status": "low"
             },
             {

@@ -1,10 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import {
-  DiagramEngine,
-  DiagramModel,
-  NodeModel,
-  PortModel,
-} from '@rxzu/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { DiagramModel, NodeModel, PortModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
@@ -14,12 +9,13 @@ import {
   ></rxzu-diagram>`,
   styleUrls: ['../../demo-diagram.component.scss'],
 })
-export class DefaultPortComponent implements OnInit {
+export class DefaultPortStoryComponent implements OnInit {
   diagramModel: DiagramModel;
+  @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
-  constructor(private diagramEngine: DiagramEngine) {
-    this.diagramEngine.registerDefaultFactories();
-    this.diagramModel = this.diagramEngine.createModel();
+
+  constructor() {
+    this.diagramModel = new DiagramModel({ type: 'default' });
   }
 
   ngOnInit() {
@@ -36,6 +32,6 @@ export class DefaultPortComponent implements OnInit {
     node.addPort(outPort);
     this.diagramModel.addAll(node);
 
-    this.diagramModel.getDiagramEngine().zoomToFit();
+    this.diagram?.zoomToFit();
   }
 }

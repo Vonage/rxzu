@@ -3,13 +3,7 @@ import { CommonModule } from '@angular/common';
 import { DefaultLinkTemplate, CustomLinkTemplate } from './label.template';
 import { DefaultLabelStoryComponent } from './default/default.component';
 import { CustomLabelComponent } from './custom/custom-label.component';
-import {
-  DefaultLinkComponent,
-  DefaultNodeComponent,
-  DefaultLabelComponent,
-  DefaultPortComponent,
-  RxZuDiagramsModule
-} from '@rxzu/angular';
+import { DefaultLinkComponent, RxZuDefaultsModule, RxZuModule } from '@rxzu/angular';
 
 export default {
   title: 'Label',
@@ -18,20 +12,13 @@ export default {
   decorators: [
     moduleMetadata({
       declarations: [
-        DefaultNodeComponent,
         CustomLabelComponent,
-        DefaultLabelStoryComponent,
-        DefaultLinkComponent,
-        DefaultLabelComponent,
-        DefaultPortComponent
+        DefaultLabelStoryComponent
       ],
-      imports: [CommonModule, RxZuDiagramsModule],
+      imports: [CommonModule, RxZuDefaultsModule],
+      providers: [ RxZuModule.registerComponent({ comp: CustomLabelComponent, entityType: 'label', type: 'custom' })],
       entryComponents: [
-        DefaultNodeComponent,
-        DefaultLinkComponent,
-        CustomLabelComponent,
-        DefaultLabelComponent,
-        DefaultPortComponent
+        CustomLabelComponent
       ]
     })
   ]

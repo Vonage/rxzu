@@ -1,19 +1,5 @@
-import {
-  Component,
-  ComponentFactoryResolver,
-  Input,
-  OnInit,
-  Renderer2,
-} from '@angular/core';
-import {
-  DiagramEngine,
-  DiagramModel,
-  NodeModel,
-  LinkModel,
-  PortModel,
-  AbstractFactory,
-} from '@rxzu/angular';
-import { CustomLinkFactory } from './custom.factory';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { DiagramModel, NodeModel, LinkModel, PortModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
@@ -21,34 +7,22 @@ import { CustomLinkFactory } from './custom.factory';
     class="demo-diagram"
     [model]="diagramModel"
   ></rxzu-diagram>`,
-  styleUrls: ['../../demo-diagram.component.scss'],
+  styleUrls: ['../../demo-diagram.component.scss']
 })
 export class CustomLinkDiagramComponent implements OnInit {
   diagramModel: DiagramModel;
   @Input() nodeHeight = 200;
   @Input() nodeWidth = 200;
+  @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
-  constructor(
-    private diagramEngine: DiagramEngine,
-    private resolver: ComponentFactoryResolver,
-    private renderer: Renderer2
-  ) {
-    this.diagramEngine.registerDefaultFactories();
-    this.diagramEngine.getFactoriesManager().registerFactory({
-      type: 'linkFactories',
-      factory: new CustomLinkFactory(
-        this.resolver,
-        this.renderer
-      ) as AbstractFactory<any, any>,
-    });
-
-    this.diagramModel = this.diagramEngine.createModel();
+  constructor() {
+    this.diagramModel = new DiagramModel({ type: 'default' });
   }
 
   ngOnInit() {
     const nodesDefaultDimensions = {
       height: this.nodeHeight,
-      width: this.nodeWidth,
+      width: this.nodeWidth
     };
 
     const node1 = new NodeModel({
@@ -81,6 +55,6 @@ export class CustomLinkDiagramComponent implements OnInit {
 
     this.diagramModel.addAll(node1, node2, link);
 
-    this.diagramModel.getDiagramEngine().zoomToFit();
+    this.diagram?.zoomToFit();
   }
 }

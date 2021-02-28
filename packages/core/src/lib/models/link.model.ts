@@ -18,7 +18,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
   protected points$: ValueState<PointModel[]>;
 
   constructor(options: LinkModelOptions) {
-    super({ logPrefix: '[Link]', ...options });
+    super({ logPrefix: '[Link]', entityType: 'link', ...options });
 
     this.name$ = createValueState<string>(
       options.name ?? '',

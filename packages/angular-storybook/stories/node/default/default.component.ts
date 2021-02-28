@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { DiagramEngine, DiagramModel, NodeModel } from '@rxzu/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { DiagramModel, NodeModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
@@ -9,12 +9,12 @@ import { DiagramEngine, DiagramModel, NodeModel } from '@rxzu/angular';
   ></rxzu-diagram>`,
   styleUrls: ['../../demo-diagram.component.scss'],
 })
-export class DefaultNodeComponent implements OnInit {
+export class DefaultNodeStoryComponent implements OnInit {
   diagramModel: DiagramModel;
+  @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
-  constructor(private diagramEngine: DiagramEngine) {
-    this.diagramEngine.registerDefaultFactories();
-    this.diagramModel = this.diagramEngine.createModel();
+  constructor() {
+    this.diagramModel = new DiagramModel({ type: 'default' });
   }
 
   ngOnInit() {
@@ -27,6 +27,6 @@ export class DefaultNodeComponent implements OnInit {
     });
     this.diagramModel.addAll(node1);
 
-    this.diagramModel.getDiagramEngine().zoomToFit();
+    this.diagram?.zoomToFit();
   }
 }

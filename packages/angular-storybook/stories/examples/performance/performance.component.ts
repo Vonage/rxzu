@@ -1,11 +1,5 @@
-import { Component } from '@angular/core';
-import {
-  DiagramEngine,
-  DiagramModel,
-  NodeModel,
-  LabelModel,
-  PortModel,
-} from '@rxzu/angular';
+import { Component, ViewChild } from '@angular/core';
+import { DiagramModel, NodeModel, LabelModel, PortModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
@@ -26,16 +20,16 @@ export class PerformanceExampleStoryComponent {
   initialRenderTimer = 0;
   isResseted = false;
   numberOfNodes = 200;
+  @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
-  constructor(private diagramEngine: DiagramEngine) {
-    this.diagramEngine.registerDefaultFactories();
-    this.diagramModel = this.diagramEngine.createModel();
+  constructor() {
+    this.diagramModel = new DiagramModel({ type: 'default' });
     this.createDiagram();
   }
 
   createDiagram() {
     this.createNodes();
-    this.diagramEngine.zoomToFit();
+    this.diagram?.zoomToFit();
   }
 
   resetDiagram() {

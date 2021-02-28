@@ -8,7 +8,7 @@ export class PointModel extends BaseModel<LinkModel> {
   protected coords$: ValueState<Coords>;
 
   constructor(options: PointModelOptions) {
-    super({ logPrefix: '[Point]', ...options });
+    super({ logPrefix: '[Point]', entityType: 'point', ...options });
     this.coords$ = createValueState(
       options.coords ?? { x: 0, y: 0 },
       this.entityPipe('coords')

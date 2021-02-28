@@ -13,23 +13,24 @@ import {
 } from '@angular/core';
 import { combineLatest, noop, Observable, of, ReplaySubject } from 'rxjs';
 import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
-import {
-  DiagramEngineCore,
-  SelectingAction,
-  MouseManager,
-  DiagramModel,
-} from '@rxzu/core';
+import { SelectingAction, MouseManager, DiagramModel, DiagramModelOptions } from '@rxzu/core';
 import { ZonedClass, OutsideZone } from '../utils';
+import { EngineService } from '../engine.service';
+import { RegistryService } from '../registry.service';
+import { FactoryService } from '../factory.service';
 
 @Component({
   selector: 'rxzu-diagram',
+  exportAs: 'RxzuDiagram',
   templateUrl: 'diagram.component.html',
   styleUrls: ['diagram.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [EngineService, RegistryService, FactoryService],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RxZuDiagramComponent
   implements AfterViewInit, OnDestroy, ZonedClass {
   @Input('model') diagramModel: DiagramModel | null = null;
+  @Input() options?: DiagramModelOptions;
   @Input() allowCanvasZoom = true;
   @Input() allowCanvasTranslation = true;
   @Input() inverseZoom = true;
@@ -47,7 +48,6 @@ export class RxZuDiagramComponent
   @ViewChild('canvas', { read: ElementRef })
   canvas?: ElementRef;
 
-  diagramEngine?: DiagramEngineCore;
   mouseManager?: MouseManager;
   selectionBox$?: Observable<SelectingAction | null>;
   destroyed$ = new ReplaySubject<boolean>(1);
@@ -57,18 +57,19 @@ export class RxZuDiagramComponent
   }
 
   constructor(
+    public readonly diagramEngine: EngineService,
     public ngZone: NgZone,
     protected renderer: Renderer2,
     protected cdRef: ChangeDetectorRef,
-    protected elRef: ElementRef<HTMLElement>
+    protected elRef: ElementRef<HTMLElement>,
   ) {}
 
   ngAfterViewInit() {
-    const model = this.diagramModel;
-    if (!model || !this.canvas) {
+    this.diagramModel = this.diagramModel && this.diagramEngine.setModel(this.diagramModel) || this.diagramEngine.createModel(this.options);
+
+    if (!this.canvas) {
       return;
     }
-    this.diagramEngine = model.getDiagramEngine();
     this.mouseManager = this.diagramEngine.getMouseManager();
 
     this.diagramEngine.setCanvas(this.canvas.nativeElement);
@@ -141,6 +142,10 @@ export class RxZuDiagramComponent
   @OutsideZone
   onMouseWheel(event: WheelEvent) {
     this.mouseManager ? this.mouseManager.onMouseWheel(event) : noop();
+  }
+
+  zoomToFit(additionalZoomFactor?: number): void {
+    this.diagramEngine.zoomToFit(additionalZoomFactor);
   }
 
   @OutsideZone

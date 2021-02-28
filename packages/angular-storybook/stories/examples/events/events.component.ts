@@ -1,12 +1,5 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import {
-  DiagramModel,
-  NodeModel,
-  BaseAction,
-  PortModel,
-  BaseModel,
-  DiagramEngine,
-} from '@rxzu/angular';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { DiagramModel, NodeModel, BaseAction, PortModel, BaseModel, RxZuDiagramComponent } from '@rxzu/angular';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -19,15 +12,15 @@ import { filter } from 'rxjs/operators';
 })
 export class EventsExampleStoryComponent implements OnInit {
   diagramModel: DiagramModel;
+  @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
   @Output() events: EventEmitter<{
     action: BaseAction | null;
     state: string | null;
   }> = new EventEmitter();
 
-  constructor(private diagramEngine: DiagramEngine) {
-    this.diagramEngine.registerDefaultFactories();
-    this.diagramModel = this.diagramEngine.createModel();
+  constructor() {
+    this.diagramModel = new DiagramModel({ type: 'default' });
   }
 
   ngOnInit() {
@@ -75,13 +68,13 @@ export class EventsExampleStoryComponent implements OnInit {
 
     this.diagramModel.addAll(...models);
 
-    this.diagramModel.getDiagramEngine().zoomToFit();
+    this.diagram?.zoomToFit();
 
     this.subscribeToDiagramEvents();
   }
 
   subscribeToDiagramEvents() {
-    this.diagramEngine
+    this.diagram?.diagramEngine
       .selectAction()
       .pipe(filter((e) => e !== null))
       .subscribe((e) => this.events.emit(e));

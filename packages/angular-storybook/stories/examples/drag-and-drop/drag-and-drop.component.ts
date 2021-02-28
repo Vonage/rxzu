@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { DiagramEngine, DiagramModel, NodeModel } from '@rxzu/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { DiagramModel, NodeModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
@@ -37,10 +37,10 @@ export class DragAndDropExampleStoryComponent implements OnInit {
     { color: '#FFB5E8', type: 'default' },
     { color: '#85E3FF', type: 'default' },
   ];
+  @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
-  constructor(private diagramEngine: DiagramEngine) {
-    this.diagramEngine.registerDefaultFactories();
-    this.diagramModel = this.diagramEngine.createModel();
+  constructor() {
+    this.diagramModel = new DiagramModel({ type: 'default' });
   }
 
   ngOnInit() {}
@@ -75,18 +75,19 @@ export class DragAndDropExampleStoryComponent implements OnInit {
     if (e.dataTransfer) {
       const nodeType = e.dataTransfer.getData('type');
       const node = this.createNode(nodeType);
-      const droppedPoint = this.diagramEngine
-        .getMouseManager()
-        .getRelativePoint(e);
+      const mouseManager = this.diagram?.diagramEngine.getMouseManager();
+      if (mouseManager) {
+        const droppedPoint = mouseManager.getRelativePoint(e);
 
-      const coords = {
-        x: droppedPoint.x - this.nodesDefaultDimensions.width / 2,
-        y: droppedPoint.y - this.nodesDefaultDimensions.height / 2,
-      };
+        const coords = {
+          x: droppedPoint.x - this.nodesDefaultDimensions.width / 2,
+          y: droppedPoint.y - this.nodesDefaultDimensions.height / 2,
+        };
 
-      if (node) {
-        node.setCoords(coords);
-        this.diagramModel.addNode(node);
+        if (node) {
+          node.setCoords(coords);
+          this.diagramModel.addNode(node);
+        }
       }
     }
   }

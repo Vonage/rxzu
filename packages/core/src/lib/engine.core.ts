@@ -1,31 +1,29 @@
-import { delay, filter, map, switchMap, take, takeUntil } from 'rxjs/operators';
+import { delay, filter, map, pluck, switchMap, take, takeUntil } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import { BaseEntity } from './base.entity';
-import { FactoriesManager } from './factories';
 import { DiagramModel, PortModel, NodeModel, LabelModel } from './models';
 import { createValueState, ValueState } from './state';
 import { BaseAction, BaseActionState, SelectingAction } from './actions';
 import { DiagramModelOptions, EngineSetup } from './interfaces';
 import { MouseManager } from './managers';
+import { AbstractFactory } from './factories';
 
-export class DiagramEngineCore {
+export class DiagramEngine {
   protected canvas$: ValueState<HTMLElement | null>;
   protected action$ = new BehaviorSubject<{
     action: BaseAction | null;
     state: BaseActionState | null;
   }>({ action: null, state: null });
 
-  protected factoriesManager: FactoriesManager;
   protected mouseManager: MouseManager;
   protected diagramModel: DiagramModel | undefined;
 
-  constructor() {
-    this.factoriesManager = this.createFactoriesManager();
+  constructor(protected factory: AbstractFactory) {
     this.mouseManager = this.createMouseManager();
     this.canvas$ = createValueState<HTMLElement | null>(null);
   }
 
-  createMouseManager() {
+  createMouseManager(): MouseManager {
     if (this.mouseManager) {
       console.warn('[RxZu] Mouse Manager already initialized, bailing out.');
       return this.mouseManager;
@@ -34,32 +32,38 @@ export class DiagramEngineCore {
     return new MouseManager(this);
   }
 
-  createFactoriesManager() {
-    if (this.factoriesManager) {
-      this.factoriesManager.dispose();
-    }
-
-    return new FactoriesManager();
-  }
-
-  createModel(options?: DiagramModelOptions) {
+  setModel(model: DiagramModel): DiagramModel {
     if (this.diagramModel) {
       throw new Error(
         'diagram model already exists, please reset model prior to creating new diagram'
       );
     }
 
-    this.diagramModel = new DiagramModel(this, options ?? { type: 'default' });
+    this.diagramModel = model;
+
+    this.diagramModel.diagramEngine = this;
+
+    this.diagramModel.onEntityDestroy().subscribe(() => {
+      this.diagramModel = undefined;
+    });
+
+    return model;
+  }
+
+  createModel(options?: DiagramModelOptions): DiagramModel {
+    if (this.diagramModel) {
+      throw new Error(
+        'diagram model already exists, please reset model prior to creating new diagram'
+      );
+    }
+
+    this.diagramModel = new DiagramModel(options ?? { type: 'default' }, this);
 
     this.diagramModel.onEntityDestroy().subscribe(() => {
       this.diagramModel = undefined;
     });
 
     return this.diagramModel;
-  }
-
-  getFactoriesManager() {
-    return this.factoriesManager;
   }
 
   getMouseManager() {
@@ -443,58 +447,18 @@ export class DiagramEngineCore {
         const nodesPainted$ = [];
         for (const node of nodes.values()) {
           if (!node.getPainted().isPainted) {
-            const nodeFactory = this.getFactoriesManager().getFactory({
-              factoryType: 'nodeFactories',
-              modelType: node.getType(),
-            });
-
-            if (!nodeFactory) {
+            if (!this.factory.has(node)) {
               return of(null);
             }
 
-            const portsHost = nodeFactory.generateWidget({
+            this.factory.generateWidget({
               model: node,
-              host: nodesHost,
+              host: nodesHost
             });
 
             node.setParent(diagramModel);
 
-            node
-              .selectPorts()
-              .pipe(
-                filter(
-                  (
-                    ports: PortModel[] | null | undefined
-                  ): ports is PortModel[] =>
-                    ports !== null && ports !== undefined
-                )
-              )
-              .subscribe((ports) => {
-                ports.forEach((port) => {
-                  if (!port.getPainted().isPainted) {
-                    const portFactory = this.factoriesManager.getFactory({
-                      factoryType: 'portFactories',
-                      modelType: port.getType(),
-                    });
-
-                    if (!portFactory) {
-                      return;
-                    }
-
-                    portFactory.generateWidget({
-                      model: port,
-                      host: portsHost,
-                    });
-                  }
-                });
-              });
-
-            nodesPainted$.push(
-              node.paintChanges().pipe(
-                filter((paintE) => paintE.isPainted),
-                take(1)
-              )
-            );
+            nodesPainted$.push(node.paintChanges().pipe(pluck('isPainted'), filter<boolean>(Boolean), take(1)))
           }
         }
 
@@ -545,16 +509,11 @@ export class DiagramEngineCore {
             }
 
             // Render link component
-            const linkFactory = this.getFactoriesManager().getFactory({
-              factoryType: 'linkFactories',
-              modelType: link.getType(),
-            });
-
-            if (!linkFactory) {
+            if (!this.factory.has(link)) {
               return;
             }
 
-            linkFactory.generateWidget({ model: link, host: linksHost });
+            this.factory.generateWidget({ model: link, host: linksHost });
 
             // (canvas: HTMLElement | null | undefined): canvas is HTMLElement =>
             // Handle link label, if any
@@ -577,16 +536,11 @@ export class DiagramEngineCore {
 
   paintLabel(label: LabelModel, host: any) {
     if (!label.getPainted().isPainted) {
-      const labalFactory = this.getFactoriesManager().getFactory({
-        factoryType: 'labelFactories',
-        modelType: label.getType(),
-      });
-
-      if (!labalFactory) {
+      if (!this.factory.has(label)) {
         return;
       }
 
-      labalFactory.generateWidget({ model: label, host });
+      this.factory.generateWidget({ model: label, host });
     }
   }
 

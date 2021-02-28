@@ -1,11 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import {
-  DiagramEngine,
-  DiagramModel,
-  DagrePlugin,
-  NodeModel,
-  PortModel,
-} from '@rxzu/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { DiagramModel, DagrePlugin, NodeModel, PortModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
@@ -19,13 +13,10 @@ import {
 })
 export class AutoArrangeExampleStoryComponent implements OnInit {
   diagramModel: DiagramModel;
+  @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
-  constructor(
-    private diagramEngine: DiagramEngine,
-    private dagreEngine: DagrePlugin
-  ) {
-    this.diagramEngine.registerDefaultFactories();
-    this.diagramModel = this.diagramEngine.createModel();
+  constructor(private dagreEngine: DagrePlugin) {
+    this.diagramModel = new DiagramModel({ type: 'default' });
   }
 
   ngOnInit() {
@@ -63,7 +54,7 @@ export class AutoArrangeExampleStoryComponent implements OnInit {
 
     this.diagramModel.addAll(node1, node2);
 
-    this.diagramEngine.zoomToFit();
+    this.diagram?.zoomToFit();
   }
 
   autoArrange() {
@@ -71,6 +62,6 @@ export class AutoArrangeExampleStoryComponent implements OnInit {
       graph: { align: 'DL', rankdir: 'LR', ranksep: 150 },
     });
 
-    this.diagramEngine.zoomToFit();
+    this.diagram?.zoomToFit();
   }
 }

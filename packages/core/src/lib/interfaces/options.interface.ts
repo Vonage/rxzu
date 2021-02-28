@@ -8,6 +8,8 @@ import {
 import { Coords } from './coords.interface';
 import { Dimensions } from './dimensions.interface';
 
+export type BaseEntityType = 'node' | 'link' | 'port' | 'point' | 'label' | 'diagram';
+
 // export type Serializable =
 //   | string
 //   | number
@@ -20,6 +22,7 @@ import { Dimensions } from './dimensions.interface';
 
 export interface BaseEntityOptions {
   type: string;
+  entityType: BaseEntityType
   locked?: boolean;
   id?: string;
   logPrefix?: string;
@@ -29,7 +32,7 @@ export interface BaseModelOptions<E> extends BaseEntityOptions {
   parent?: E;
 }
 
-export interface DiagramModelOptions extends BaseEntityOptions {
+export interface DiagramModelOptions extends Omit<BaseEntityOptions, 'entityType'> {
   offsetX?: number;
   offsetY?: number;
   zoom?: number;
@@ -43,14 +46,14 @@ export interface DiagramModelOptions extends BaseEntityOptions {
   portMagneticRadius?: number;
 }
 
-export interface NodeModelOptions extends BaseModelOptions<DiagramModel> {
+export interface NodeModelOptions extends Omit<BaseModelOptions<DiagramModel>, 'entityType'> {
   coords?: Coords;
   dimensions?: Dimensions;
   ports?: PortModelOptions[];
   extras?: any;
 }
 
-export interface LinkModelOptions extends BaseModelOptions<DiagramModel> {
+export interface LinkModelOptions extends Omit<BaseModelOptions<DiagramModel>, 'entityType'> {
   points?: PointModelOptions[];
   name?: string;
   sourcePort?: PortModel;
@@ -59,7 +62,7 @@ export interface LinkModelOptions extends BaseModelOptions<DiagramModel> {
   label?: LabelModel;
 }
 
-export interface PortModelOptions extends BaseModelOptions<NodeModel> {
+export interface PortModelOptions extends Omit<BaseModelOptions<NodeModel>, 'entityType'> {
   coords?: Coords;
   name?: string;
   linkType?: string;
@@ -69,11 +72,11 @@ export interface PortModelOptions extends BaseModelOptions<NodeModel> {
   canCreateLinks?: boolean;
 }
 
-export interface PointModelOptions extends BaseModelOptions<LinkModel> {
+export interface PointModelOptions extends Omit<BaseModelOptions<LinkModel>, 'entityType'> {
   coords?: Coords;
 }
 
-export interface LabelModelOptions extends BaseModelOptions<LinkModel> {
+export interface LabelModelOptions extends Omit<BaseModelOptions<LinkModel>, 'entityType'> {
   rotation?: number;
   coords?: Coords;
   text?: string;

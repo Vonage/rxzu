@@ -1,5 +1,5 @@
-import { Component, Inject } from '@angular/core';
-import { PortModel, PORT_MODEL } from '@rxzu/angular';
+import { Component, Host, Inject } from '@angular/core';
+import { PortModel, MODEL } from '@rxzu/angular';
 
 @Component({
   selector: 'custom-port',
@@ -7,7 +7,8 @@ import { PortModel, PORT_MODEL } from '@rxzu/angular';
   styleUrls: ['./custom.component.scss'],
 })
 export class CustomPortComponent {
-  constructor(@Inject(PORT_MODEL) public model: PortModel) {
+  constructor(@Inject(MODEL) @Host() public model: PortModel) {
+    console.log(model);
     this.model.setPainted();
   }
 }

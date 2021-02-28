@@ -1,40 +1,28 @@
 import { Meta, moduleMetadata } from '@storybook/angular';
 import { CommonModule } from '@angular/common';
-import { DefaultNodeTemplate, CustomNodeTemplate } from './port.template';
+import { DefaultPortTemplate, CustomPortTemplate } from './port.template';
 import { CustomPortComponent } from './custom/custom.component';
 import {
-  DefaultNodeComponent,
-  DefaultLinkComponent,
-  DefaultLabelComponent,
   DefaultPortComponent,
-  RxZuDiagramsModule,
+  RxZuDefaultsModule, RxZuModule
 } from '@rxzu/angular';
+import { DefaultPortStoryComponent } from './default/default.component';
+import { CustomPortDiagramComponent } from './custom/diagram.component';
 
 export default {
   title: 'Port',
-  component: DefaultNodeComponent,
+  component: DefaultPortComponent,
   parameters: { docs: { iframeHeight: '400px' } },
   decorators: [
     moduleMetadata({
-      declarations: [
-        DefaultNodeComponent,
-        CustomPortComponent,
-        DefaultLinkComponent,
-        DefaultLabelComponent,
-        DefaultPortComponent,
-      ],
-      imports: [CommonModule, RxZuDiagramsModule],
-      entryComponents: [
-        DefaultNodeComponent,
-        DefaultLinkComponent,
-        CustomPortComponent,
-        DefaultLabelComponent,
-        DefaultPortComponent,
-      ],
+      declarations: [CustomPortComponent, DefaultPortStoryComponent, CustomPortDiagramComponent],
+      imports: [RxZuDefaultsModule],
+      providers: [RxZuModule.registerComponent({ entityType: 'port', type: 'custom', comp: CustomPortComponent})],
+      entryComponents: [CustomPortComponent],
     }),
   ],
 } as Meta;
 
-export const Default = DefaultNodeTemplate.bind({});
+export const Default = DefaultPortTemplate.bind({});
 
-export const Custom = CustomNodeTemplate.bind({});
+export const Custom = CustomPortTemplate.bind({});

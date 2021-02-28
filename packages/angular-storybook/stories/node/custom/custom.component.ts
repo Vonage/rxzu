@@ -6,9 +6,9 @@ import {
   Inject,
   ElementRef,
   Renderer2,
-  AfterViewInit,
+  AfterViewInit, Self, Optional
 } from '@angular/core';
-import { NodeModel, NODE_MODEL } from '@rxzu/angular';
+import { NodeModel, MODEL } from '@rxzu/angular';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -24,7 +24,7 @@ export class CustomNodeComponent implements AfterViewInit {
   rootNode: HTMLElement;
 
   constructor(
-    @Inject(NODE_MODEL) private model: NodeModel,
+    @Optional() @Inject(MODEL) @Self() private model: NodeModel,
     private rootEl: ElementRef,
     private renderer: Renderer2
   ) {

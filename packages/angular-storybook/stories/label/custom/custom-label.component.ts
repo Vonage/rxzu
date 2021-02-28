@@ -1,11 +1,11 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component,
+  Component, Host,
   Inject,
-  OnInit,
+  OnInit, Optional
 } from '@angular/core';
-import { LABEL_MODEL, LabelModel } from '@rxzu/angular';
+import { MODEL, LabelModel } from '@rxzu/angular';
 
 @Component({
   selector: 'custom-label',
@@ -15,7 +15,7 @@ import { LABEL_MODEL, LabelModel } from '@rxzu/angular';
 })
 export class CustomLabelComponent implements OnInit {
   constructor(
-    @Inject(LABEL_MODEL) public model: LabelModel,
+    @Inject(MODEL) @Host() @Optional() public model: LabelModel,
     private cdRef: ChangeDetectorRef
   ) {}
 

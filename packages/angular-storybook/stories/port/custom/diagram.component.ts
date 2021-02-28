@@ -1,17 +1,5 @@
-import {
-  Component,
-  ComponentFactoryResolver,
-  OnInit,
-  Renderer2,
-} from '@angular/core';
-import {
-  DiagramEngine,
-  AbstractFactory,
-  DiagramModel,
-  NodeModel,
-  PortModel,
-} from '@rxzu/angular';
-import { CustomPortFactory } from './custom.factory';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { DiagramModel, NodeModel, PortModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
@@ -23,21 +11,10 @@ import { CustomPortFactory } from './custom.factory';
 })
 export class CustomPortDiagramComponent implements OnInit {
   diagramModel: DiagramModel;
+  @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
-  constructor(
-    private diagramEngine: DiagramEngine,
-    private resolver: ComponentFactoryResolver,
-    private renderer: Renderer2
-  ) {
-    this.diagramEngine.registerDefaultFactories();
-    this.diagramEngine.getFactoriesManager().registerFactory({
-      type: 'portFactories',
-      factory: new CustomPortFactory(
-        this.resolver,
-        this.renderer
-      ) as AbstractFactory<any, any>,
-    });
-    this.diagramModel = this.diagramEngine.createModel();
+  constructor() {
+    this.diagramModel = new DiagramModel({ type: 'default' });
   }
 
   ngOnInit() {
@@ -53,6 +30,6 @@ export class CustomPortDiagramComponent implements OnInit {
 
     this.diagramModel.addAll(node);
 
-    this.diagramModel.getDiagramEngine().zoomToFit();
+    this.diagram?.zoomToFit();
   }
 }
