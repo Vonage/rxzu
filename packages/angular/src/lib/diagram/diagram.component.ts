@@ -4,6 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  HostListener,
   Input,
   NgZone,
   OnDestroy,
@@ -18,6 +19,7 @@ import {
   SelectingAction,
   MouseManager,
   DiagramModel,
+  KeyboardManager,
 } from '@rxzu/core';
 import { ZonedClass, OutsideZone } from '../utils';
 
@@ -49,6 +51,7 @@ export class RxZuDiagramComponent
 
   diagramEngine?: DiagramEngineCore;
   mouseManager?: MouseManager;
+  keyboardManager?: KeyboardManager;
   selectionBox$?: Observable<SelectingAction | null>;
   destroyed$ = new ReplaySubject<boolean>(1);
 
@@ -70,6 +73,8 @@ export class RxZuDiagramComponent
     }
     this.diagramEngine = model.getDiagramEngine();
     this.mouseManager = this.diagramEngine.getMouseManager();
+    this.keyboardManager = this.diagramEngine.getKeyboardManager();
+    
 
     this.diagramEngine.setCanvas(this.canvas.nativeElement);
 
@@ -126,6 +131,11 @@ export class RxZuDiagramComponent
   @OutsideZone
   onMouseUp(event: MouseEvent) {
     this.mouseManager ? this.mouseManager.onMouseUp(event) : noop();
+  }
+
+  @HostListener('window:keyup', ['$event'])
+  keyEvent(event: KeyboardEvent) {
+   this.keyboardManager ? this.keyboardManager.onKeyDown(event) : noop();
   }
 
   @OutsideZone

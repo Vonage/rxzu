@@ -1,10 +1,10 @@
-import { BaseAction } from './base.action';
+import { BaseMouseAction } from './base-mouse.action';
 import { PortModel } from '../models/port.model';
 import { NodeModel } from '../models/node.model';
 import { LinkModel } from '../models';
 
 // TODO: refactor into entity-created.action, and fire every time a new entity is created!
-export class LinkCreatedAction extends BaseAction {
+export class LinkCreatedAction extends BaseMouseAction {
   sourcePort?: PortModel | null;
   targetPort?: PortModel | null;
   link?: LinkModel | null;

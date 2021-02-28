@@ -2,7 +2,7 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import {
   DiagramModel,
   NodeModel,
-  BaseAction,
+  BaseMouseAction,
   PortModel,
   BaseModel,
   DiagramEngine,
@@ -21,7 +21,7 @@ export class EventsExampleStoryComponent implements OnInit {
   diagramModel: DiagramModel;
 
   @Output() events: EventEmitter<{
-    action: BaseAction | null;
+    action: BaseMouseAction | null;
     state: string | null;
   }> = new EventEmitter();
 

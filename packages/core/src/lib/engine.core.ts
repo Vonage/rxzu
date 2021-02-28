@@ -4,9 +4,10 @@ import { BaseEntity } from './base.entity';
 import { FactoriesManager } from './factories';
 import { DiagramModel, PortModel, NodeModel, LabelModel } from './models';
 import { createValueState, ValueState } from './state';
-import { BaseAction, BaseActionState, SelectingAction } from './actions';
+import { BaseMouseAction, BaseActionState, SelectingAction } from './actions';
 import { DiagramModelOptions, EngineSetup } from './interfaces';
-import { MouseManager } from './managers';
+import { KeyboardManager, MouseManager } from './managers';
+import { BaseAction } from './actions/base.action';
 
 export class DiagramEngineCore {
   protected canvas$: ValueState<HTMLElement | null>;
@@ -17,11 +18,13 @@ export class DiagramEngineCore {
 
   protected factoriesManager: FactoriesManager;
   protected mouseManager: MouseManager;
+  protected keyboardManager: KeyboardManager;
   protected diagramModel: DiagramModel | undefined;
 
   constructor() {
     this.factoriesManager = this.createFactoriesManager();
     this.mouseManager = this.createMouseManager();
+    this.keyboardManager = this.createKeyboardManager();
     this.canvas$ = createValueState<HTMLElement | null>(null);
   }
 
@@ -32,6 +35,15 @@ export class DiagramEngineCore {
     }
 
     return new MouseManager(this);
+  }
+
+  createKeyboardManager() {
+    if (this.keyboardManager) {
+      console.warn('[RxZu] Keyboard Manager already initialized, bailing out.');
+      return this.keyboardManager;
+    }
+
+    return new KeyboardManager(this);
   }
 
   createFactoriesManager() {
@@ -64,6 +76,10 @@ export class DiagramEngineCore {
 
   getMouseManager() {
     return this.mouseManager;
+  }
+
+  getKeyboardManager() {
+    return this.keyboardManager;
   }
 
   getNodeElement(node: NodeModel) {
@@ -628,7 +644,7 @@ export class DiagramEngineCore {
     return this.action$;
   }
 
-  setAction(action: BaseAction) {
+  setAction(action: BaseMouseAction) {
     this.action$.next({ action, state: 'firing' });
   }
 

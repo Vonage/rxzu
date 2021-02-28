@@ -1,9 +1,9 @@
-import { BaseAction } from './base.action';
+import { BaseMouseAction } from './base-mouse.action';
 import { PortModel } from '../models/port.model';
 import { NodeModel } from '../models/node.model';
 import { LinkModel } from '../models';
 
-export class LooseLinkDestroyed extends BaseAction {
+export class LooseLinkDestroyed extends BaseMouseAction {
   sourcePort: PortModel | null;
   link: LinkModel;
 
