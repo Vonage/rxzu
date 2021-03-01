@@ -1,5 +1,5 @@
 import { fromEvent, merge, race } from 'rxjs';
-import { tap, take, takeUntil } from 'rxjs/operators';
+import { tap, take, takeUntil, share } from 'rxjs/operators';
 import {
   SelectingAction,
   MoveItemsAction,
@@ -314,7 +314,6 @@ export class MouseManager {
           this.engine.getDiagramModel().clearSelection();
           link.getLastPoint().setSelected();
           this.engine.getDiagramModel().addLink(link);
-
           this.engine.startFiringAction(
             new MoveItemsAction(event.clientX, event.clientY, this.engine)
           );
@@ -460,7 +459,7 @@ export class MouseManager {
           }
         }
       });
-
+      
       this.engine.stopFiringAction();
     } else {
       this.engine.stopFiringAction();
@@ -537,6 +536,7 @@ export class MouseManager {
       fromEvent<MouseEvent>(document, 'contextmenu'),
     ]).pipe(
       tap((e) => this.onMouseUp(e)),
+      share(),
       take(1)
     );
 
