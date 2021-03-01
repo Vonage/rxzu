@@ -1,3 +1,10 @@
+## [2.1.4](https://github.com/Vonage/rxzu/compare/v2.1.3...v2.1.4) (2021-03-01)
+
+
+### Bug Fixes
+
+* **mouse manager:** fix mouse up triggered twice intead of one every time item is moved ([f453939](https://github.com/Vonage/rxzu/commit/f453939ffe20e91d32be4030e62e344f2ab4e1df))
+
 ## [2.1.3](https://github.com/Vonage/rxzu/compare/v2.1.2...v2.1.3) (2021-02-21)
 
 
