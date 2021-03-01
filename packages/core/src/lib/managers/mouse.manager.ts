@@ -114,15 +114,19 @@ export class MouseManager {
         .getDiagramModel()
         .getNodes()
         .forEach((node) => {
-          if (
-            (action as SelectingAction).containsElement(
-              node.getCoords(),
-              this.engine.getDiagramModel()
-            )
-          ) {
-            node.setSelected();
-          } else {
-            node.setSelected(false);
+          const nodeRectPoints = this.engine.getNodeRectPoints(node);
+          if (nodeRectPoints) {
+            if (
+              (action as SelectingAction).containsElement(
+                nodeRectPoints.topLeft,
+                nodeRectPoints.bottomRight,
+                this.engine.getDiagramModel()
+              )
+            ) {
+              node.setSelected();
+            } else {
+              node.setSelected(false);
+            }
           }
         });
 
@@ -134,9 +138,11 @@ export class MouseManager {
 
           link.getPoints().forEach((point) => {
             const pointPort = point.getParent().getPortForPoint(point);
+            const pointCoords =  point.getCoords();
             if (
               (action as SelectingAction).containsElement(
-                point.getCoords(),
+                pointCoords,
+                pointCoords,
                 this.engine.getDiagramModel()
               ) &&
               !pointPort

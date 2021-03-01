@@ -1,3 +1,38 @@
+## [2.1.3](https://github.com/Vonage/rxzu/compare/v2.1.2...v2.1.3) (2021-02-21)
+
+
+### Bug Fixes
+
+* **select action:** fix checking if element is contains in box,now also check the bottom right point ([ca0e178](https://github.com/Vonage/rxzu/commit/ca0e178edb055e1670ea74fd2491dccb88c25df5))
+
+## [2.1.2](https://github.com/Vonage/rxzu/compare/v2.1.1...v2.1.2) (2021-02-18)
+
+
+### Bug Fixes
+
+* **auto arrange:** fix DagrePlugin set coordinates ([c47e929](https://github.com/Vonage/rxzu/commit/c47e929799f9c6bf421f53841767d91683b05040))
+
+## [2.1.1](https://github.com/Vonage/rxzu/compare/v2.1.0...v2.1.1) (2021-02-10)
+
+
+### Bug Fixes
+
+* **node layers rect:** calc right and top nodes including the width and height ([75423c8](https://github.com/Vonage/rxzu/commit/75423c844e0cd2e8551118b974fa53bb714aae13))
+* **node layers rect:** calc right and top nodes including the with and height ([c74eb12](https://github.com/Vonage/rxzu/commit/c74eb12d35116cf2163b2c669d1ad9385d30b345))
+* **node layers rect:** calc right and top nodes including the with and height ([8926af1](https://github.com/Vonage/rxzu/commit/8926af12e560f4bd40fd886f82aef4c4bf0205dc))
+* **node layers rect:** calc right and top nodes including the with and height ([37a6860](https://github.com/Vonage/rxzu/commit/37a6860bb42b693664ea7a37b541c71adbd89e85))
+
+# [2.1.0](https://github.com/Vonage/rxzu/compare/v2.0.2...v2.1.0) (2021-02-09)
+
+
+### Features
+
+* **genral:** add the ability to zoom to fit and zoom to nodes ([94dea1b](https://github.com/Vonage/rxzu/commit/94dea1b84c4b10723f6865a651699e2cdb7bacb2))
+* **genral:** add the ability to zoom to fit and zoom to nodes ([8580874](https://github.com/Vonage/rxzu/commit/8580874687e2a1f74e6a02575d6aa434ac03c009))
+* **genral:** fix comments ([0d9526f](https://github.com/Vonage/rxzu/commit/0d9526f98eb914316a1d7d1e3ae8ce4de3c13832))
+* **genral:** fix comments ([bf70291](https://github.com/Vonage/rxzu/commit/bf70291236d855034a1c87490dfdbfa46267cdcb))
+* **genral:** fix comments ([cfac5f3](https://github.com/Vonage/rxzu/commit/cfac5f3d209b843565914384e446297ce19a9847))
+
 ## [2.0.2](https://github.com/Vonage/rxzu/compare/v2.0.1...v2.0.2) (2021-01-31)
 
 

@@ -64,8 +64,10 @@ export class DagrePlugin {
     layout(this.g, options.layout);
 
     this.g.nodes().forEach((v) => {
-      const { x, y } = this.g.node(v);
-      model.getNode(v)?.setCoords({ x, y });
+      // returns the width, height, the x-coordinate of the center of the node, and the y-coordinate of the center of the node
+      const { x, y, width, height } = this.g.node(v);
+      // update the new coordinates of the node
+      model.getNode(v)?.setCoords({ x: x - width / 2, y: y - height / 2 });
     });
 
     // also include links?
