@@ -19,7 +19,7 @@ import {
   SelectingAction,
   MouseManager,
   DiagramModel,
-  KeyboardManager,
+  KeyboardManager
 } from '@rxzu/core';
 import { ZonedClass, OutsideZone } from '../utils';
 
@@ -133,8 +133,8 @@ export class RxZuDiagramComponent
     this.mouseManager ? this.mouseManager.onMouseUp(event) : noop();
   }
 
-  @HostListener('window:keyup', ['$event'])
-  keyEvent(event: KeyboardEvent) {
+  @OutsideZone
+  onKeyUp(event: KeyboardEvent) {
    this.keyboardManager ? this.keyboardManager.onKeyDown(event) : noop();
   }
 

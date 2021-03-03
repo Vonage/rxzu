@@ -5,23 +5,22 @@ import { BaseAction } from './base.action';
 export class DeleteKeyPressed extends BaseAction {
   deletedModels: (NodeModel | PointModel | PortModel | LinkModel)[];
 
-  constructor(diagramEngine: DiagramEngineCore) {
+  constructor(diagramEngine: DiagramEngineCore, keyCode: number) {
     super();
-    const isNotLocked = (
-      item: NodeModel | PointModel | PortModel | LinkModel
-    ): item is NodeModel | PointModel | PortModel =>
-      !diagramEngine.isModelLocked(item);
+    this.deletedModels = [];
+    const keyCodes = [46, 8];
 
-    this.deletedModels = diagramEngine
-      .getDiagramModel()
-      .getSelectedItems()
-      .filter(isNotLocked);
+    if (keyCodes.indexOf(keyCode) !== -1) {
+      const isNotLocked = (
+        item: NodeModel | PointModel | PortModel | LinkModel
+      ): item is NodeModel | PointModel | PortModel =>
+        !diagramEngine.isModelLocked(item);
 
-    this.deletedModels.forEach(model => {
-      model.destroy();
-    })
+      this.deletedModels = diagramEngine
+        .getDiagramModel()
+        .getSelectedItems()
+        .filter(isNotLocked);
 
+    }
   }
-
-
 }
