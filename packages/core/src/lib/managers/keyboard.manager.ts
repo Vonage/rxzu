@@ -7,7 +7,7 @@ import { NodeModel, PointModel, PortModel, LinkModel } from '../models';
 
 export class KeyboardManager {
   protected engine: DiagramEngineCore;
-  clipboard$: BehaviorSubject<(NodeModel | PointModel | PortModel | LinkModel)[]>;
+  protected clipboard$: BehaviorSubject<(NodeModel | PointModel | PortModel | LinkModel)[]>;
 
   constructor(_diagramEngine: DiagramEngineCore) {
     this.engine = _diagramEngine;
