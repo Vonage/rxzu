@@ -20,7 +20,7 @@ export class EventsExampleStoryComponent implements OnInit {
   }> = new EventEmitter();
 
   constructor() {
-    this.diagramModel = new DiagramModel({ type: 'default' });
+    this.diagramModel = new DiagramModel({ name: 'default' });
   }
 
   ngOnInit() {
@@ -28,30 +28,30 @@ export class EventsExampleStoryComponent implements OnInit {
 
     const node1 = new NodeModel({
       coords: { x: 500, y: 300 },
-      type: 'default',
+      name: 'default',
       dimensions: nodesDefaultDimensions,
     });
-    const outPort = new PortModel({ type: 'default', name: 'outport1' });
+    const outPort = new PortModel({ name: 'default', name: 'outport1' });
     node1.addPort(outPort);
 
     const node2 = new NodeModel({
       coords: { x: 1000, y: 0 },
-      type: 'default',
+      name: 'default',
       dimensions: nodesDefaultDimensions,
     });
 
     node2.setDimensions(nodesDefaultDimensions);
-    const inPort = new PortModel({ type: 'default', name: 'inport2' });
+    const inPort = new PortModel({ name: 'default', name: 'inport2' });
     node2.addPort(inPort);
 
     for (let index = 0; index < 2; index++) {
       const nodeLoop = new NodeModel({
         coords: { x: 1000, y: 300 + index * 300 },
-        type: 'default',
+        name: 'default',
         dimensions: nodesDefaultDimensions,
       });
       const portLoop = new PortModel({
-        type: 'default',
+        name: 'default',
         name: `inport${index + 3}`,
       });
       nodeLoop.addPort(portLoop);

@@ -18,14 +18,14 @@ export class DynamicPortsExampleStoryComponent implements OnInit {
   @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
   constructor() {
-    this.diagramModel = new DiagramModel({ type: 'default' });
+    this.diagramModel = new DiagramModel({ name: 'default' });
   }
 
   ngOnInit() {
     const nodesDefaultDimensions = { height: 200, width: 200 };
 
     const node1 = new NodeModel({
-      type: 'default',
+      name: 'default',
       coords: { x: 500, y: 300 },
       dimensions: nodesDefaultDimensions,
       id: '1',
@@ -34,17 +34,17 @@ export class DynamicPortsExampleStoryComponent implements OnInit {
     const outPort1 = new PortModel({
       name: 'outport1',
       id: 'outport1',
-      type: 'default',
+      name: 'default',
     });
     const outPort2 = new PortModel({
       name: 'outport2',
       id: 'outport2',
-      type: 'default',
+      name: 'default',
     });
     const outPort3 = new PortModel({
       name: 'outport3',
       id: 'outport3',
-      type: 'default',
+      name: 'default',
     });
 
     node1.addPort(outPort1);
@@ -52,23 +52,23 @@ export class DynamicPortsExampleStoryComponent implements OnInit {
     node1.addPort(outPort3);
 
     const node2 = new NodeModel({
-      type: 'default',
+      name: 'default',
       coords: { x: 1000, y: 0 },
       dimensions: nodesDefaultDimensions,
     });
 
-    const inPort = new PortModel({ type: 'default', name: 'inport2' });
+    const inPort = new PortModel({ name: 'default', name: 'inport2' });
     node2.addPort(inPort);
 
     for (let index = 0; index < 2; index++) {
       const nodeLoop = new NodeModel({
-        type: 'default',
+        name: 'default',
         coords: { x: 1000, y: 300 + index * 300 },
         dimensions: nodesDefaultDimensions,
       });
 
       const loopPort = new PortModel({
-        type: 'default',
+        name: 'default',
         name: `inport${index + 3}`,
       });
       nodeLoop.addPort(loopPort);
@@ -96,7 +96,7 @@ export class DynamicPortsExampleStoryComponent implements OnInit {
 
     const numOfPorts = node.getPorts().values.length;
     const newPort = new PortModel({
-      type: 'default',
+      name: 'default',
       name: `inport${numOfPorts}`,
     });
     node.addPort(newPort);

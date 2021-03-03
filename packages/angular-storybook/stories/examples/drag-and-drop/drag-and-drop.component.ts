@@ -40,7 +40,7 @@ export class DragAndDropExampleStoryComponent implements OnInit {
   @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
   constructor() {
-    this.diagramModel = new DiagramModel({ type: 'default' });
+    this.diagramModel = new DiagramModel({ name: 'default' });
   }
 
   ngOnInit() {}
@@ -48,7 +48,7 @@ export class DragAndDropExampleStoryComponent implements OnInit {
   createNode(type: string) {
     const nodeData = this.nodesLibrary.find((nodeLib) => nodeLib.type === type);
     if (nodeData) {
-      const node = new NodeModel({ type: nodeData.type });
+      const node = new NodeModel({ name: nodeData.type });
       node.setExtras(nodeData);
       node.setDimensions(this.nodesDefaultDimensions);
 

@@ -2,12 +2,12 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component, Host,
+  Component, Host, HostBinding,
   Inject, OnInit, Optional,
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
-import { PointModel, generateCurvePath, Coords, LinkModel } from '@rxzu/core';
+import { PointModel, generateCurvePath, Coords, LinkModel, ID } from '@rxzu/core';
 import { combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { MODEL } from '../../../injection.tokens';
@@ -16,22 +16,24 @@ import { MODEL } from '../../../injection.tokens';
   selector: 'rxzu-default-link',
   templateUrl: './default-link.component.html',
   styleUrls: ['./default-link.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  host: {
-    '[attr.data-linkid]': `model?.id`,
-    '[attr.data-name]': `model?.getName()`
-  }
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DefaultLinkComponent implements OnInit, AfterViewInit {
   @ViewChild('labelLayer', { read: ViewContainerRef, static: true })
   labelLayer!: ViewContainerRef;
 
+  @HostBinding('attr.data-linkid') get linkId(): ID | undefined {
+    return this.model?.id;
+  }
+
+  @HostBinding('attr.data-name') get name(): string {
+    return this.model?.getName() ?? '';
+  }
+
   constructor(
     @Optional() @Host() @Inject(MODEL) public model: LinkModel,
     private cdRef: ChangeDetectorRef
-  ) {
-    console.log(model);
-  }
+  ) {}
 
   ngOnInit() {
     this.model.setPainted(true);

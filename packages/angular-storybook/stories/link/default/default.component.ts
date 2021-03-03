@@ -14,30 +14,30 @@ export class DefaultLinkStoryComponent implements OnInit {
   @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
   constructor() {
-    this.diagramModel = new DiagramModel({ type: 'default' });
+    this.diagramModel = new DiagramModel({ name: 'default' });
   }
 
   ngOnInit() {
     const nodesDefaultDimensions = { height: 200, width: 200 };
 
-    const node1 = new NodeModel({ type: 'default' });
+    const node1 = new NodeModel({ name: 'default' });
     node1.setCoords({ x: 500, y: 300 });
     node1.setDimensions(nodesDefaultDimensions);
 
-    const outport1 = new PortModel({ type: 'default', name: 'outport' });
+    const outport1 = new PortModel({ name: 'default', name: 'outport' });
     node1.addPort(outport1);
 
-    const node2 = new NodeModel({ type: 'default' });
+    const node2 = new NodeModel({ name: 'default' });
     node2.setCoords({ x: 1000, y: 0 });
     node2.setDimensions(nodesDefaultDimensions);
-    const inport = new PortModel({ type: 'default', name: 'inport' });
+    const inport = new PortModel({ name: 'default', name: 'inport' });
     node2.addPort(inport);
 
     for (let index = 0; index < 2; index++) {
-      const nodeLoop = new NodeModel({ type: 'default' });
+      const nodeLoop = new NodeModel({ name: 'default' });
       nodeLoop.setCoords({ x: 1000, y: 300 + index * 300 });
       nodeLoop.setDimensions(nodesDefaultDimensions);
-      const loopPort = new PortModel({ type: 'default' });
+      const loopPort = new PortModel({ name: 'default' });
       nodeLoop.addPort(loopPort);
       this.diagramModel.addNode(nodeLoop);
     }

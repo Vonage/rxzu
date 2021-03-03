@@ -36,7 +36,7 @@ export class DiagramModel extends BaseEntity {
     options: DiagramModelOptions,
     diagramEngine?: DiagramEngine
   ) {
-    super({ logPrefix: '[Diagram]', entityType: 'diagram' });
+    super({ ...options, logPrefix: '[Diagram]', type: 'diagram' });
 
     if (diagramEngine) {
       this._diagramEngine = diagramEngine;
@@ -92,7 +92,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   get diagramEngine(): DiagramEngine | undefined {
-    return this._diagramEngine
+    return this._diagramEngine;
   }
 
   getNodes(): EntityMap<NodeModel> {

@@ -57,7 +57,7 @@ export class DiagramEngine {
       );
     }
 
-    this.diagramModel = new DiagramModel(options ?? { type: 'default' }, this);
+    this.diagramModel = new DiagramModel(options ?? { name: 'default' }, this);
 
     this.diagramModel.onEntityDestroy().subscribe(() => {
       this.diagramModel = undefined;
@@ -273,7 +273,7 @@ export class DiagramEngine {
       console.warn('[RxZu] No input node were found');
       return;
     }
-    
+
     const width = node.getWidth();
     const height = node.getHeight();
 

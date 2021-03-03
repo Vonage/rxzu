@@ -1,3 +1,5 @@
-export function toCompRegistryKey(entityType: string, type: string): string {
-  return `${entityType}-${type}`;
+import { BaseEntityType } from '../interfaces';
+
+export function toRegistryKey(type: BaseEntityType, name: string): string {
+  return `${type}-${name}`;
 }

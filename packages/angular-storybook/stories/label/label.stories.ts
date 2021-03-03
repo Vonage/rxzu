@@ -16,7 +16,7 @@ export default {
         DefaultLabelStoryComponent
       ],
       imports: [CommonModule, RxZuDefaultsModule],
-      providers: [ RxZuModule.registerComponent({ comp: CustomLabelComponent, entityType: 'label', type: 'custom' })],
+      providers: [RxZuModule.registerComponent({ component: CustomLabelComponent, type: 'label', name: 'custom' })],
       entryComponents: [
         CustomLabelComponent
       ]

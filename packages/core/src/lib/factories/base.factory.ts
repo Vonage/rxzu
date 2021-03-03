@@ -1,7 +1,7 @@
 import { BaseModel, DiagramModel } from '../models';
 import { AbstractRegistry } from './base.registry';
 import { Observable, Subject } from 'rxjs';
-import { toCompRegistryKey } from '../utils';
+import { toRegistryKey } from '../utils';
 
 export interface WidgetOptions<M, H> {
   model: M;
@@ -32,11 +32,12 @@ export abstract class AbstractFactory<CompType = any, WidgetType = any, Resolved
   }
 
   has<M extends BaseModel>(model: M): boolean {
-    return this._registry.has(toCompRegistryKey(model.entityType, model.getType()));
+    return this._registry.has(toRegistryKey(model.type, model.getType()));
   }
 
   generateWidget<M extends BaseModel>(options: WidgetOptions<M, any>): WidgetType | null {
     if (!this.resolveComponent) throw new Error('resolveComponent is not implemented');
+    if (options.model.getPainted().isPainted) return null;
     this._beforeGenerate$.next();
     const widget = this.resolveComponent(options);
     this._afterGenerate$.next(widget);
@@ -47,6 +48,6 @@ export abstract class AbstractFactory<CompType = any, WidgetType = any, Resolved
   }
 
   protected get<M extends BaseModel>(model: M): CompType | undefined {
-    return this._registry.get(toCompRegistryKey(model.entityType, model.getType()));
+    return this._registry.get(toRegistryKey(model.type, model.getType()));
   }
 }

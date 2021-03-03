@@ -14,7 +14,7 @@ export default {
     moduleMetadata({
       declarations: [CustomLinkComponent, DefaultLinkStoryComponent, CustomLinkDiagramComponent],
       imports: [CommonModule, RxZuDefaultsModule],
-      providers: [RxZuModule.registerComponent({ type: 'custom', entityType: 'link', comp: CustomLinkComponent })],
+      providers: [RxZuModule.registerComponent({ name: 'custom', type: 'link', component: CustomLinkComponent })],
       entryComponents: [CustomLinkComponent]
     })
   ]

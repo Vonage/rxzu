@@ -21,8 +21,9 @@ export type BaseEntityType = 'node' | 'link' | 'port' | 'point' | 'label' | 'dia
 // export type SerializedModel = Record<string, Serializable>;
 
 export interface BaseEntityOptions {
-  type: string;
-  entityType: BaseEntityType
+  type: BaseEntityType
+  name: string;
+  displayName?: string;
   locked?: boolean;
   id?: string;
   logPrefix?: string;
@@ -32,7 +33,7 @@ export interface BaseModelOptions<E> extends BaseEntityOptions {
   parent?: E;
 }
 
-export interface DiagramModelOptions extends Omit<BaseEntityOptions, 'entityType'> {
+export interface DiagramModelOptions extends Omit<BaseEntityOptions, 'type'> {
   offsetX?: number;
   offsetY?: number;
   zoom?: number;
@@ -46,37 +47,35 @@ export interface DiagramModelOptions extends Omit<BaseEntityOptions, 'entityType
   portMagneticRadius?: number;
 }
 
-export interface NodeModelOptions extends Omit<BaseModelOptions<DiagramModel>, 'entityType'> {
+export interface NodeModelOptions extends Omit<BaseModelOptions<DiagramModel>, 'type'> {
   coords?: Coords;
   dimensions?: Dimensions;
   ports?: PortModelOptions[];
   extras?: any;
 }
 
-export interface LinkModelOptions extends Omit<BaseModelOptions<DiagramModel>, 'entityType'> {
+export interface LinkModelOptions extends Omit<BaseModelOptions<DiagramModel>, 'type'> {
   points?: PointModelOptions[];
-  name?: string;
   sourcePort?: PortModel;
   targetPort?: PortModel;
   extras?: any;
   label?: LabelModel;
 }
 
-export interface PortModelOptions extends Omit<BaseModelOptions<NodeModel>, 'entityType'> {
+export interface PortModelOptions extends Omit<BaseModelOptions<NodeModel>, 'type'> {
   coords?: Coords;
-  name?: string;
-  linkType?: string;
+  linkName?: string;
   maximumLinks?: number;
   magnetic?: boolean;
   dimensions?: Dimensions;
   canCreateLinks?: boolean;
 }
 
-export interface PointModelOptions extends Omit<BaseModelOptions<LinkModel>, 'entityType'> {
+export interface PointModelOptions extends Omit<BaseModelOptions<LinkModel>, 'type'> {
   coords?: Coords;
 }
 
-export interface LabelModelOptions extends Omit<BaseModelOptions<LinkModel>, 'entityType'> {
+export interface LabelModelOptions extends Omit<BaseModelOptions<LinkModel>, 'type'> {
   rotation?: number;
   coords?: Coords;
   text?: string;

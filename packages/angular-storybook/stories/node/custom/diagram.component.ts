@@ -22,7 +22,7 @@ export class CustomNodeDiagramComponent implements OnInit, OnChanges {
   @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
   constructor() {
-    this.diagramModel = new DiagramModel({ type: 'default' });
+    this.diagramModel = new DiagramModel({ name: 'default' });
   }
 
   ngOnInit() {
@@ -32,7 +32,7 @@ export class CustomNodeDiagramComponent implements OnInit, OnChanges {
     };
 
     const node1 = new NodeModel({
-      type: 'custom',
+      name: 'custom',
       coords: { x: 500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });

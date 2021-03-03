@@ -21,7 +21,7 @@ export class NodeModel extends BaseModel<DiagramModel> {
   protected dimensions$: ValueState<Dimensions>;
 
   constructor(options: NodeModelOptions) {
-    super({ logPrefix: '[Node]', entityType: 'node', ...options });
+    super({ ...options, logPrefix: '[Node]', type: 'node' });
 
     this.ports$ = createEntityState([], this.entityPipe('ports'));
     this.extras$ = createValueState(

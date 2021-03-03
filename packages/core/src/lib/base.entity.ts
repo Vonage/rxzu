@@ -11,21 +11,26 @@ import {
   withLog as _withLog,
 } from './utils/tool-kit.util';
 import { HashMap } from './utils/types';
-import { BaseEntityType } from './interfaces';
+import { BaseEntityOptions, BaseEntityType } from './interfaces';
 
 export class BaseEntity {
   protected _id: ID;
   protected destroyed$: Subject<void>;
   protected locked$: ValueState<boolean>;
-  protected readonly _entityType: BaseEntityType;
+  protected name$: ValueState<string>;
+  protected displayName$: ValueState<string>;
+
+  protected readonly _type: BaseEntityType;
   protected readonly _logPrefix: string;
 
-  constructor(options: { id?: ID; logPrefix?: string, entityType: BaseEntityType }) {
+  constructor(options: BaseEntityOptions) {
     this._id = options.id || UID();
-    this._entityType = options.entityType;
+    this._type = options.type;
     this._logPrefix = `${options.logPrefix ?? ''}`;
     this.destroyed$ = new Subject<void>();
-    this.locked$ = createValueState<boolean>(false, this.entityPipe('locked'));
+    this.locked$ = createValueState<boolean>(!!options.locked, this.entityPipe('locked'));
+    this.name$ = createValueState<string>(options.name ?? 'default', this.entityPipe('name'));
+    this.displayName$ = createValueState<string>(options.displayName ?? '', this.entityPipe('displayName'));
   }
 
   get id(): ID {
@@ -36,8 +41,8 @@ export class BaseEntity {
     this._id = id;
   }
 
-  get entityType(): BaseEntityType {
-    return this._entityType;
+  get type(): BaseEntityType {
+    return this._type;
   }
 
   log(message: string, ...args: any): void {

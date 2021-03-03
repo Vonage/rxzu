@@ -14,26 +14,26 @@ export class CustomLabelDiagramComponent implements OnInit {
   @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
   constructor() {
-    this.diagramModel = new DiagramModel({ type: 'default' });
+    this.diagramModel = new DiagramModel({ name: 'default' });
   }
 
   ngOnInit() {
     const nodesDefaultDimensions = { height: 200, width: 200 };
 
     const node1 = new NodeModel({
-      type: 'default',
+      name: 'default',
       coords: { x: 500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
-    const outPort = new PortModel({ type: 'default', name: 'outport' });
+    const outPort = new PortModel({ name: 'default', name: 'outport' });
     node1.addPort(outPort);
 
     const node2 = new NodeModel({
-      type: 'default',
+      name: 'default',
       coords: { x: 1500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
-    const inPort = new PortModel({ type: 'default', name: 'inport' });
+    const inPort = new PortModel({ name: 'default', name: 'inport' });
     node2.addPort(inPort);
 
     const link = outPort.link(inPort);
@@ -41,7 +41,7 @@ export class CustomLabelDiagramComponent implements OnInit {
     if (link) {
       const label = new LabelModel({
         text: "I'm a custom label",
-        type: 'custom',
+        name: 'custom',
       });
       link.setLocked();
       link.setLabel(label);

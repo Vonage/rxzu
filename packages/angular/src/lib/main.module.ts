@@ -4,7 +4,7 @@ import { RxZuDiagramComponent } from './diagram/diagram.component';
 import { TemplateVarDirective } from './utils';
 import { COMPONENT, ComponentProviderOptions, } from './injection.tokens';
 import { RegistryService } from './registry.service';
-import { toCompRegistryKey } from '@rxzu/core';
+import { toRegistryKey } from '@rxzu/core';
 
 @NgModule({
   declarations: [RxZuDiagramComponent, TemplateVarDirective],
@@ -12,12 +12,12 @@ import { toCompRegistryKey } from '@rxzu/core';
   exports: [RxZuDiagramComponent]
 })
 export class RxZuModule {
-  constructor(registry: RegistryService, @Inject(COMPONENT) @Optional() components: Omit<ComponentProviderOptions, 'entityType'>[]) {
-    components?.forEach(({ type, comp }) => registry.set(type, comp));
+  constructor(registry: RegistryService, @Inject(COMPONENT) @Optional() components: Omit<ComponentProviderOptions, 'type'>[]) {
+    components?.forEach(({ name, component }) => registry.set(name, component));
   }
 
-  static registerComponent({ entityType, type, comp }: ComponentProviderOptions): Provider {
-    return { provide: COMPONENT, multi: true, useValue: { type: toCompRegistryKey(entityType, type), comp } }
+  static registerComponent({ type, name, component }: ComponentProviderOptions): Provider {
+    return { provide: COMPONENT, multi: true, useValue: { name: toRegistryKey(type, name), component } }
   }
 
   static withComponents(components?: ComponentProviderOptions | ComponentProviderOptions[]): ModuleWithProviders<RxZuModule> {

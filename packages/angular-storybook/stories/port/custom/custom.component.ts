@@ -8,7 +8,6 @@ import { PortModel, MODEL } from '@rxzu/angular';
 })
 export class CustomPortComponent {
   constructor(@Inject(MODEL) @Host() public model: PortModel) {
-    console.log(model);
     this.model.setPainted();
   }
 }

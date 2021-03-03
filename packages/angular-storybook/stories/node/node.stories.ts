@@ -14,7 +14,7 @@ export default {
     moduleMetadata({
       declarations: [CustomNodeComponent, DefaultNodeStoryComponent, CustomNodeDiagramComponent],
       imports: [CommonModule, RxZuDefaultsModule],
-      providers: [RxZuModule.registerComponent({ entityType: 'node', type: 'custom', comp: CustomNodeComponent })],
+      providers: [RxZuModule.registerComponent({ type: 'node', name: 'custom', component: CustomNodeComponent })],
       entryComponents: [CustomNodeComponent]
     })
   ]

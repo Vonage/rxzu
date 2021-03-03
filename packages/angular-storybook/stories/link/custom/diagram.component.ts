@@ -16,7 +16,7 @@ export class CustomLinkDiagramComponent implements OnInit {
   @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
   constructor() {
-    this.diagramModel = new DiagramModel({ type: 'default' });
+    this.diagramModel = new DiagramModel({ name: 'default' });
   }
 
   ngOnInit() {
@@ -26,29 +26,29 @@ export class CustomLinkDiagramComponent implements OnInit {
     };
 
     const node1 = new NodeModel({
-      type: 'default',
+      name: 'default',
       coords: { x: 500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
 
     const outport1 = new PortModel({
       name: 'outport1',
-      linkType: 'custom-link',
+      linkName: 'custom-link',
       maximumLinks: 3,
-      type: 'default',
+      name: 'default',
     });
     node1.addPort(outport1);
 
     const node2 = new NodeModel({
-      type: 'default',
+      name: 'default',
       coords: { x: 1000, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
 
-    const inport = new PortModel({ type: 'default', name: 'inport2' });
+    const inport = new PortModel({ name: 'default', name: 'inport2' });
     node2.addPort(inport);
 
-    const link = new LinkModel({ type: 'custom-link' });
+    const link = new LinkModel({ name: 'custom-link' });
 
     link.setSourcePort(outport1);
     link.setTargetPort(inport);

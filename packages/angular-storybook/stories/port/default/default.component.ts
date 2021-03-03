@@ -15,19 +15,19 @@ export class DefaultPortStoryComponent implements OnInit {
 
 
   constructor() {
-    this.diagramModel = new DiagramModel({ type: 'default' });
+    this.diagramModel = new DiagramModel({ name: 'default' });
   }
 
   ngOnInit() {
     const nodesDefaultDimensions = { height: 200, width: 200 };
 
     const node = new NodeModel({
-      type: 'default',
+      name: 'default',
       coords: { x: 500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
-    const inPort = new PortModel({ type: 'default', name: 'inport' });
-    const outPort = new PortModel({ type: 'default', name: 'outport' });
+    const inPort = new PortModel({ name: 'default', name: 'inport' });
+    const outPort = new PortModel({ name: 'default', name: 'outport' });
     node.addPort(inPort);
     node.addPort(outPort);
     this.diagramModel.addAll(node);

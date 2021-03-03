@@ -9,16 +9,13 @@ import { BaseModelOptions } from '../interfaces/options.interface';
 import { createValueState, ValueState } from '../state';
 
 export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
-  protected readonly _type: string;
-
   protected parent$: ValueState<any>;
   protected selected$: ValueState<boolean>;
   protected hovered$: ValueState<boolean>;
   protected painted$: ValueState<PaintedEvent>;
 
   constructor(options: BaseModelOptions<any>) {
-    super({ id: options.id, logPrefix: options.logPrefix, entityType: options.entityType });
-    this._type = options.type;
+    super(options);
 
     this.parent$ = createValueState(
       options.parent,
