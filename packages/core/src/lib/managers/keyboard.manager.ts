@@ -7,17 +7,18 @@ import { NodeModel, PointModel, PortModel, LinkModel } from '../models';
 
 export class KeyboardManager {
   protected engine: DiagramEngineCore;
-  clipboard$ = new BehaviorSubject<(NodeModel | PointModel | PortModel | LinkModel)[]>([]);
+  clipboard$: BehaviorSubject<(NodeModel | PointModel | PortModel | LinkModel)[]>;
 
   constructor(_diagramEngine: DiagramEngineCore) {
     this.engine = _diagramEngine;
+    this.clipboard$ = new BehaviorSubject<(NodeModel | PointModel | PortModel | LinkModel)[]>([]);
   }
 
   onKeyDown(event: KeyboardEvent) {
-      const deleteKeyPressedAction = new DeleteKeyPressed(this.engine, event.keyCode);
-      this.engine.startFiringAction(deleteKeyPressedAction);
-      this.engine.fireAction();
-      this.engine.stopFiringAction();
+    const deleteKeyPressedAction = new DeleteKeyPressed(this.engine, event.keyCode);
+    this.engine.startFiringAction(deleteKeyPressedAction);
+    this.engine.fireAction();
+    this.engine.stopFiringAction();
   }
 
   onCopy() {

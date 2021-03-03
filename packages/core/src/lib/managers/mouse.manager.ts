@@ -426,7 +426,7 @@ export class MouseManager {
           ) {
             link.destroy();
             this.engine.startFiringAction(
-              new LooseLinkDestroyed(event.clientX, event.clientY, link)
+              new LooseLinkDestroyed(link)
             );
           }
         });

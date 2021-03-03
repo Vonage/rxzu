@@ -1,14 +1,14 @@
-import { BaseMouseAction } from './base-mouse.action';
 import { PortModel } from '../models/port.model';
 import { NodeModel } from '../models/node.model';
 import { LinkModel } from '../models';
+import { BaseAction } from './base.action';
 
-export class LooseLinkDestroyed extends BaseMouseAction {
+export class LooseLinkDestroyed extends BaseAction {
   sourcePort: PortModel | null;
   link: LinkModel;
 
-  constructor(mouseX: number, mouseY: number, link: LinkModel) {
-    super(mouseX, mouseY);
+  constructor(link: LinkModel) {
+    super();
     this.sourcePort = link.getSourcePort();
     this.link = link;
   }
