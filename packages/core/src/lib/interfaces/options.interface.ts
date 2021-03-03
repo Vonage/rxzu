@@ -54,7 +54,7 @@ export interface DiagramModelOptions extends BaseEntityOptions {
   inverseZoom?: boolean;
   allowLooseLinks?: boolean;
   portMagneticRadius?: number;
-  keyBindings: KeyBindigsOptions;
+  keyBindings?: KeyBindigsOptions;
 }
 
 export interface NodeModelOptions extends BaseModelOptions<DiagramModel> {
