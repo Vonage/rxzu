@@ -29,6 +29,19 @@ export interface BaseModelOptions<E> extends BaseEntityOptions {
   parent?: E;
 }
 
+export interface KeyBindigsOptions {
+  delete?: {
+    keyCodes?: number[];
+    modifiers?: {
+      ctrlKey?: boolean;
+      shiftKey?: boolean;
+      altKey?: boolean;
+      metaKey?: boolean;
+    };
+  }
+}
+
+
 export interface DiagramModelOptions extends BaseEntityOptions {
   offsetX?: number;
   offsetY?: number;
@@ -41,6 +54,7 @@ export interface DiagramModelOptions extends BaseEntityOptions {
   inverseZoom?: boolean;
   allowLooseLinks?: boolean;
   portMagneticRadius?: number;
+  keyBindings: KeyBindigsOptions;
 }
 
 export interface NodeModelOptions extends BaseModelOptions<DiagramModel> {

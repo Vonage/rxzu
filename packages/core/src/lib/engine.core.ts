@@ -437,6 +437,7 @@ export class DiagramEngineCore {
     allowCanvasZoom,
     allowCanvasTranslation,
     inverseZoom,
+    keyBindings
   }: EngineSetup) {
     const diagramModel = this.getDiagramModel();
     diagramModel.setAllowCanvasZoom(allowCanvasZoom ?? true);
@@ -446,6 +447,7 @@ export class DiagramEngineCore {
     diagramModel.setPortMagneticRadius(portMagneticRadius ?? 30);
     diagramModel.setMaxZoomIn(maxZoomIn ?? 0);
     diagramModel.setMaxZoomOut(maxZoomOut ?? 0);
+    diagramModel.setKeyBindings(keyBindings ?? {});
   }
 
   paintNodes(

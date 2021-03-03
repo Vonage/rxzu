@@ -15,7 +15,7 @@ export class KeyboardManager {
   }
 
   onKeyDown(event: KeyboardEvent) {
-    const deleteKeyPressedAction = new DeleteKeyPressed(this.engine, event.keyCode);
+    const deleteKeyPressedAction = new DeleteKeyPressed(this.engine, event);
     this.engine.startFiringAction(deleteKeyPressedAction);
     this.engine.fireAction();
     this.engine.stopFiringAction();

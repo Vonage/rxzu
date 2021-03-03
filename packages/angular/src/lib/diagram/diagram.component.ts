@@ -39,6 +39,7 @@ export class RxZuDiagramComponent
   @Input() maxZoomOut = 0;
   @Input() maxZoomIn = 0;
   @Input() portMagneticRadius = 30;
+  @Input() keyBindings = {};
 
   @ViewChild('nodesLayer', { read: ViewContainerRef })
   nodesLayer?: ViewContainerRef;
