@@ -25,7 +25,7 @@ export class CustomLabelDiagramComponent implements OnInit {
       coords: { x: 500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
-    const outPort = new PortModel({ name: 'default', name: 'outport' });
+    const outPort = new PortModel({ name: 'default', displayName: 'outport' });
     node1.addPort(outPort);
 
     const node2 = new NodeModel({
@@ -33,7 +33,7 @@ export class CustomLabelDiagramComponent implements OnInit {
       coords: { x: 1500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
-    const inPort = new PortModel({ name: 'default', name: 'inport' });
+    const inPort = new PortModel({ name: 'default', displayName: 'inport' });
     node2.addPort(inPort);
 
     const link = outPort.link(inPort);

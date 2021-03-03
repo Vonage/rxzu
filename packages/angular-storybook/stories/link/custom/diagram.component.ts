@@ -32,10 +32,10 @@ export class CustomLinkDiagramComponent implements OnInit {
     });
 
     const outport1 = new PortModel({
-      name: 'outport1',
+      name: 'default',
       linkName: 'custom-link',
       maximumLinks: 3,
-      name: 'default',
+      displayName: 'outport1'
     });
     node1.addPort(outport1);
 
@@ -45,7 +45,7 @@ export class CustomLinkDiagramComponent implements OnInit {
       dimensions: nodesDefaultDimensions,
     });
 
-    const inport = new PortModel({ name: 'default', name: 'inport2' });
+    const inport = new PortModel({ name: 'default', displayName: 'inport2' });
     node2.addPort(inport);
 
     const link = new LinkModel({ name: 'custom-link' });

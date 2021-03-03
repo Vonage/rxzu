@@ -9,11 +9,11 @@ import { DiagramModel, NodeModel, RxZuDiagramComponent } from '@rxzu/angular';
         *ngFor="let node of nodesLibrary"
         class="node-drag"
         draggable="true"
-        [attr.data-type]="node.type"
+        [attr.data-type]="node.name"
         (dragstart)="onBlockDrag($event)"
         [ngStyle]="{ 'background-color': node.color }"
       >
-        {{ node.type }}
+        {{ node.name }}
       </div>
       <div></div>
     </div>
@@ -33,9 +33,9 @@ export class DragAndDropExampleStoryComponent implements OnInit {
   diagramModel: DiagramModel;
   nodesDefaultDimensions = { height: 200, width: 200 };
   nodesLibrary = [
-    { color: '#AFF8D8', type: 'default' },
-    { color: '#FFB5E8', type: 'default' },
-    { color: '#85E3FF', type: 'default' },
+    { color: '#AFF8D8', name: 'default' },
+    { color: '#FFB5E8', name: 'default' },
+    { color: '#85E3FF', name: 'default' },
   ];
   @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
@@ -46,9 +46,9 @@ export class DragAndDropExampleStoryComponent implements OnInit {
   ngOnInit() {}
 
   createNode(type: string) {
-    const nodeData = this.nodesLibrary.find((nodeLib) => nodeLib.type === type);
+    const nodeData = this.nodesLibrary.find((nodeLib) => nodeLib.name === type);
     if (nodeData) {
-      const node = new NodeModel({ name: nodeData.type });
+      const node = new NodeModel({ name: nodeData.name });
       node.setExtras(nodeData);
       node.setDimensions(this.nodesDefaultDimensions);
 

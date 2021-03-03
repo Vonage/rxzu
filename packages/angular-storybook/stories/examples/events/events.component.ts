@@ -31,7 +31,7 @@ export class EventsExampleStoryComponent implements OnInit {
       name: 'default',
       dimensions: nodesDefaultDimensions,
     });
-    const outPort = new PortModel({ name: 'default', name: 'outport1' });
+    const outPort = new PortModel({ name: 'default', displayName: 'outport1' });
     node1.addPort(outPort);
 
     const node2 = new NodeModel({
@@ -41,7 +41,7 @@ export class EventsExampleStoryComponent implements OnInit {
     });
 
     node2.setDimensions(nodesDefaultDimensions);
-    const inPort = new PortModel({ name: 'default', name: 'inport2' });
+    const inPort = new PortModel({ name: 'default', displayName: 'inport2' });
     node2.addPort(inPort);
 
     for (let index = 0; index < 2; index++) {
@@ -52,7 +52,7 @@ export class EventsExampleStoryComponent implements OnInit {
       });
       const portLoop = new PortModel({
         name: 'default',
-        name: `inport${index + 3}`,
+        displayName: `inport${index + 3}`,
       });
       nodeLoop.addPort(portLoop);
 

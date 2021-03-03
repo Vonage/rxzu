@@ -81,10 +81,6 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
     return this.hovered$.select();
   }
 
-  getType(): string {
-    return this._type;
-  }
-
   getSelected(): boolean {
     return this.selected$.value;
   }

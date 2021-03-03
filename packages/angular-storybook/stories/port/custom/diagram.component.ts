@@ -25,7 +25,7 @@ export class CustomPortDiagramComponent implements OnInit {
       coords: { x: 500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
-    const port = new PortModel({ name: 'custom', name: 'inport' });
+    const port = new PortModel({ name: 'custom', displayName: 'inport' });
     node.addPort(port);
 
     this.diagramModel.addAll(node);

@@ -24,13 +24,13 @@ export class DefaultLinkStoryComponent implements OnInit {
     node1.setCoords({ x: 500, y: 300 });
     node1.setDimensions(nodesDefaultDimensions);
 
-    const outport1 = new PortModel({ name: 'default', name: 'outport' });
+    const outport1 = new PortModel({ name: 'default', displayName: 'outport' });
     node1.addPort(outport1);
 
     const node2 = new NodeModel({ name: 'default' });
     node2.setCoords({ x: 1000, y: 0 });
     node2.setDimensions(nodesDefaultDimensions);
-    const inport = new PortModel({ name: 'default', name: 'inport' });
+    const inport = new PortModel({ name: 'default', displayName: 'inport' });
     node2.addPort(inport);
 
     for (let index = 0; index < 2; index++) {

@@ -26,8 +26,8 @@ export class DefaultPortStoryComponent implements OnInit {
       coords: { x: 500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
-    const inPort = new PortModel({ name: 'default', name: 'inport' });
-    const outPort = new PortModel({ name: 'default', name: 'outport' });
+    const inPort = new PortModel({ name: 'default', displayName: 'inport' });
+    const outPort = new PortModel({ name: 'default', displayName: 'outport' });
     node.addPort(inPort);
     node.addPort(outPort);
     this.diagramModel.addAll(node);

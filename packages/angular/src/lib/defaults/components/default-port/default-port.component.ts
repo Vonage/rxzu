@@ -9,13 +9,12 @@ import { MODEL } from '../../../injection.tokens';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DefaultPortComponent {
-
   @HostBinding('attr.data-portid') get linkId(): ID | undefined {
     return this.model?.id;
   }
 
   @HostBinding('attr.data-name') get name(): string {
-    return this.model?.getName() ?? '';
+    return this.model?.name ?? '';
   }
 
   constructor(@Optional() @Host() @Inject(MODEL) public model: PortModel) {

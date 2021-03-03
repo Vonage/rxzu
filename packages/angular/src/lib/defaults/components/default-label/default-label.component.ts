@@ -19,6 +19,10 @@ export class DefaultLabelComponent implements OnInit {
     return this.model?.id;
   }
 
+  @HostBinding('attr.data-name') get name(): string {
+    return this.model?.name ?? '';
+  }
+
   constructor(
     private cdRef: ChangeDetectorRef,
     @Optional() @Host() @Inject(MODEL) public model: LabelModel

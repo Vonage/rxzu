@@ -23,7 +23,7 @@ export class PortModel extends BaseModel<NodeModel> {
   protected links$: EntityState<LinkModel>;
 
   constructor(options: PortModelOptions) {
-    super({ ...options, logPrefix: '[Port]', type: 'port' });
+    super({ ...options, logPrefix: '[Port]', name: 'port' });
 
     this.coords$ = createValueState(
       options.coords ?? { x: 0, y: 0 },
@@ -61,7 +61,7 @@ export class PortModel extends BaseModel<NodeModel> {
   // serialize(): IPortModel {
   //   return {
   //     ...super.serialize(),
-  //     name: this.getName(),
+  //     name: this.name,
   //     linkName: this.getLinkName(),
   //     maximumLinks: this.getMaximumLinks(),
   //     type: this.getType(),
@@ -86,10 +86,6 @@ export class PortModel extends BaseModel<NodeModel> {
 
   getNode() {
     return this.getParent();
-  }
-
-  getName() {
-    return this.name$.value;
   }
 
   getCanCreateLinks(): boolean {

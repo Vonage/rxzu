@@ -77,7 +77,7 @@ export class RxZuDiagramComponent
 
   ngAfterViewInit() {
     const mergedOptions = { ...this.defaultOptions, ...this.options };
-    this.model = this.model && this.diagramEngine.setModel(this.model) || this.diagramEngine.createModel({ name: this.type || 'default', ...mergedOptions });
+    this.model = this.model && this.diagramEngine.setModel(this.model) || this.diagramEngine.createModel({ name: this.name || 'default', ...mergedOptions });
 
     if (!this.canvas) {
       return;

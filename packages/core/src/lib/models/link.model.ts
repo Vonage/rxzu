@@ -17,7 +17,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
   protected points$: ValueState<PointModel[]>;
 
   constructor(options: LinkModelOptions) {
-    super({ ...options, logPrefix: '[Link]', type: 'link' });
+    super({ ...options, logPrefix: '[Link]', name: 'link' });
 
     this.sourcePort$ = createValueState<PortModel | null>(
       options.sourcePort ?? null,
@@ -66,14 +66,6 @@ export class LinkModel extends BaseModel<DiagramModel> {
   //     label,
   //   };
   // }
-
-  setName(name: string) {
-    this.name$.set(name).emit();
-  }
-
-  getName(): string | undefined {
-    return this.name$.value;
-  }
 
   setExtras<E>(extras: Partial<E>) {
     this.extras$.set(extras).emit();

@@ -21,7 +21,7 @@ module.exports = {
 		customScope: '⤴️  - Denote the SCOPE of this change, e.g. file name or module:',
 		footer: '📌  - List any ISSUES CLOSED by this change (optional). E.g.: #31, #34:\n',
 		subject: '✏️  - Write a SHORT, IMPERATIVE tense description of the change:\n',
-		type: "ℹ️  - Select the type of change that you're committing:"
+		name: "ℹ️  - Select the type of change that you're committing:"
 	},
 
 	allowBreakingChanges: ['feat', 'fix'],

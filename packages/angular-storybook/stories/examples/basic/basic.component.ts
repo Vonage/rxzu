@@ -26,7 +26,7 @@ export class BasicExampleStoryComponent implements OnInit {
     node1.setDimensions(nodesDefaultDimensions);
     const outport = new PortModel({
       name: 'default',
-      name: 'outport',
+      displayName: 'outport',
     });
     node1.addPort(outport);
 
@@ -35,7 +35,7 @@ export class BasicExampleStoryComponent implements OnInit {
     node2.setDimensions(nodesDefaultDimensions);
     const inport = new PortModel({
       name: 'default',
-      name: 'inport',
+      displayName: 'inport',
     });
     node2.addPort(inport);
 
@@ -45,7 +45,7 @@ export class BasicExampleStoryComponent implements OnInit {
       nodeLoop.setDimensions(nodesDefaultDimensions);
       const portLoop = new PortModel({
         name: 'default',
-        name: `inport${index + 3}`,
+        displayName: `inport${index + 3}`,
       });
       nodeLoop.addPort(portLoop);
 

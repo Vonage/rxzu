@@ -22,7 +22,6 @@ export class ZoomToNodeExampleStoryComponent implements OnInit {
   constructor(
     private diagramEngine: DiagramEngine
   ) {
-    this.diagramEngine.registerDefaultFactories();
     this.diagramModel = this.diagramEngine.createModel();
   }
 

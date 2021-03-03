@@ -25,12 +25,16 @@ export class BaseEntity {
 
   constructor(options: BaseEntityOptions) {
     this._id = options.id || UID();
-    this._type = options.type;
+    this._type = options.name;
     this._logPrefix = `${options.logPrefix ?? ''}`;
     this.destroyed$ = new Subject<void>();
     this.locked$ = createValueState<boolean>(!!options.locked, this.entityPipe('locked'));
     this.name$ = createValueState<string>(options.name ?? 'default', this.entityPipe('name'));
     this.displayName$ = createValueState<string>(options.displayName ?? '', this.entityPipe('displayName'));
+  }
+
+  get type(): BaseEntityType {
+    return this._type;
   }
 
   get id(): ID {
@@ -41,8 +45,12 @@ export class BaseEntity {
     this._id = id;
   }
 
-  get type(): BaseEntityType {
-    return this._type;
+  get name(): string {
+    return this.name$.value;
+  }
+
+  set name(value: string) {
+    this.name$.set(value).emit();
   }
 
   log(message: string, ...args: any): void {

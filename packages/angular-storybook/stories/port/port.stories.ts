@@ -17,7 +17,7 @@ export default {
     moduleMetadata({
       declarations: [CustomPortComponent, DefaultPortStoryComponent, CustomPortDiagramComponent],
       imports: [RxZuDefaultsModule],
-      providers: [RxZuModule.registerComponent({ type: 'port', name: 'custom', component: CustomPortComponent})],
+      providers: [RxZuModule.registerComponent({ name: 'port', name: 'custom', component: CustomPortComponent})],
       entryComponents: [CustomPortComponent],
     }),
   ],

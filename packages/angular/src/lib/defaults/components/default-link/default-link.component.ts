@@ -27,7 +27,7 @@ export class DefaultLinkComponent implements OnInit, AfterViewInit {
   }
 
   @HostBinding('attr.data-name') get name(): string {
-    return this.model?.getName() ?? '';
+    return this.model?.name ?? '';
   }
 
   constructor(

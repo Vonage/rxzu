@@ -32,17 +32,14 @@ export class DynamicPortsExampleStoryComponent implements OnInit {
     });
 
     const outPort1 = new PortModel({
-      name: 'outport1',
       id: 'outport1',
       name: 'default',
     });
     const outPort2 = new PortModel({
-      name: 'outport2',
       id: 'outport2',
       name: 'default',
     });
     const outPort3 = new PortModel({
-      name: 'outport3',
       id: 'outport3',
       name: 'default',
     });
@@ -57,7 +54,7 @@ export class DynamicPortsExampleStoryComponent implements OnInit {
       dimensions: nodesDefaultDimensions,
     });
 
-    const inPort = new PortModel({ name: 'default', name: 'inport2' });
+    const inPort = new PortModel({ name: 'default' });
     node2.addPort(inPort);
 
     for (let index = 0; index < 2; index++) {
@@ -69,7 +66,6 @@ export class DynamicPortsExampleStoryComponent implements OnInit {
 
       const loopPort = new PortModel({
         name: 'default',
-        name: `inport${index + 3}`,
       });
       nodeLoop.addPort(loopPort);
 
@@ -97,7 +93,7 @@ export class DynamicPortsExampleStoryComponent implements OnInit {
     const numOfPorts = node.getPorts().values.length;
     const newPort = new PortModel({
       name: 'default',
-      name: `inport${numOfPorts}`,
+      displayName: `inport${numOfPorts}`,
     });
     node.addPort(newPort);
   }

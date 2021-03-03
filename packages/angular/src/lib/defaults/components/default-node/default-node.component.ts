@@ -30,6 +30,10 @@ export class DefaultNodeComponent implements OnInit {
     return this.model?.id;
   }
 
+  @HostBinding('attr.data-name') get name(): string {
+    return this.model?.name ?? '';
+  }
+
   constructor(
     @Host() @Optional() @Inject(MODEL) public model: NodeModel,
     private factory: FactoryService,
