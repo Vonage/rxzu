@@ -25,7 +25,7 @@ export class BaseEntity {
 
   constructor(options: BaseEntityOptions) {
     this._id = options.id || UID();
-    this._type = options.name;
+    this._type = options.type;
     this._logPrefix = `${options.logPrefix ?? ''}`;
     this.destroyed$ = new Subject<void>();
     this.locked$ = createValueState<boolean>(!!options.locked, this.entityPipe('locked'));

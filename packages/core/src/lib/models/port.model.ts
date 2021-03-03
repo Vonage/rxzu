@@ -23,7 +23,7 @@ export class PortModel extends BaseModel<NodeModel> {
   protected links$: EntityState<LinkModel>;
 
   constructor(options: PortModelOptions) {
-    super({ ...options, logPrefix: '[Port]', name: 'port' });
+    super({ ...options, logPrefix: '[Port]', type: 'port' });
 
     this.coords$ = createValueState(
       options.coords ?? { x: 0, y: 0 },

@@ -30,8 +30,8 @@ import { DIAGRAM_DEFAULT_OPTIONS } from '../injection.tokens';
 })
 export class RxZuDiagramComponent
   implements AfterViewInit, OnDestroy, ZonedClass {
-  /** The type of the diagram, if not set will be `'default'` */
-  @Input() type?: string;
+  /** The name of the diagram, if not set will be `'default'` */
+  @Input() name?: string;
   @Input() model?: DiagramModel;
   @Input() options?: Partial<EngineSetup>;
   /** @deprecated use options instead, will be removed in v4.0.0 */

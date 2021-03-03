@@ -32,7 +32,7 @@ export abstract class AbstractFactory<CompType = any, WidgetType = any, Resolved
   }
 
   has<M extends BaseModel>(model: M): boolean {
-    return this._registry.has(toRegistryKey(model.name, model.name));
+    return this._registry.has(toRegistryKey(model.type, model.name));
   }
 
   generateWidget<M extends BaseModel>(options: WidgetOptions<M, any>): WidgetType | null {
@@ -48,6 +48,6 @@ export abstract class AbstractFactory<CompType = any, WidgetType = any, Resolved
   }
 
   protected get<M extends BaseModel>(model: M): CompType | undefined {
-    return this._registry.get(toRegistryKey(model.name, model.name));
+    return this._registry.get(toRegistryKey(model.type, model.name));
   }
 }
