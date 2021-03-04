@@ -3,31 +3,31 @@
     "interfaces": [
         {
             "name": "ComponentProviderOptions",
-            "id": "interface-ComponentProviderOptions-6ff8a432c3ac918402ac6f2386b6310c",
+            "id": "interface-ComponentProviderOptions-25c4b4c6de64c85a2478baa70369fc8b",
             "file": "packages/angular/src/lib/injection.tokens.ts",
             "type": "interface",
-            "sourceCode": "import { InjectionToken, Provider, Type } from '@angular/core';\nimport { BaseEntityType, BaseModel, toCompRegistryKey } from '@rxzu/core';\n\nexport const MODEL: InjectionToken<BaseModel> = new InjectionToken('MODEL');\n\nexport interface ComponentProviderOptions<T = any> {entityType: BaseEntityType, type: string, comp: Type<T>}\n\nexport const COMPONENT: InjectionToken<Omit<ComponentProviderOptions, 'entityType'>> = new InjectionToken('COMPONENT');\n\nexport function componentProviderOptionToProvider({ entityType, type, comp }: ComponentProviderOptions): Provider {\n  return {\n    provide: COMPONENT,\n    multi: true,\n    useValue: { type: toCompRegistryKey(entityType, type), comp }\n  }\n}\n",
+            "sourceCode": "import { InjectionToken, Type } from '@angular/core';\nimport { BaseEntityType, BaseModel, EngineSetup } from '@rxzu/core';\n\nexport const MODEL: InjectionToken<BaseModel> = new InjectionToken('MODEL');\n\nexport interface ComponentProviderOptions<T = any> {\n  type: BaseEntityType,\n  name: string,\n  component: Type<T>\n}\n\nexport const COMPONENT: InjectionToken<Omit<ComponentProviderOptions, 'type'>> = new InjectionToken('COMPONENT');\n\nexport const DIAGRAM_DEFAULT_OPTIONS: InjectionToken<EngineSetup> = new InjectionToken('DIAGRAM_DEFAULT_OPTIONS', {\n  providedIn: 'root',\n  factory: function() {\n    return {\n      allowCanvasZoom: true,\n      allowCanvasTranslation: true,\n      inverseZoom: true,\n      allowLooseLinks: true,\n      maxZoomOut: 0,\n      maxZoomIn: 0,\n      portMagneticRadius: 30\n    } as EngineSetup\n  }\n})\n",
             "properties": [
                 {
-                    "name": "comp",
+                    "name": "component",
                     "type": "Type<T>",
                     "optional": false,
                     "description": "",
-                    "line": 6
+                    "line": 9
                 },
                 {
-                    "name": "entityType",
-                    "type": "BaseEntityType",
-                    "optional": false,
-                    "description": "",
-                    "line": 6
-                },
-                {
-                    "name": "type",
+                    "name": "name",
                     "type": "string",
                     "optional": false,
                     "description": "",
-                    "line": 6
+                    "line": 8
+                },
+                {
+                    "name": "type",
+                    "type": "BaseEntityType",
+                    "optional": false,
+                    "description": "",
+                    "line": 7
                 }
             ],
             "indexSignatures": [],
@@ -371,12 +371,11 @@
     "components": [
         {
             "name": "DefaultLabelComponent",
-            "id": "component-DefaultLabelComponent-d8b4189bd4750534f48834505009d847",
+            "id": "component-DefaultLabelComponent-46fd59e3d53b51d2b2aac18cb936a36b",
             "file": "packages/angular/src/lib/defaults/components/default-label/default-label.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
             "entryComponents": [],
-            "host": {},
             "inputs": [],
             "outputs": [],
             "providers": [],
@@ -397,7 +396,7 @@
                     "type": "LabelModel",
                     "optional": false,
                     "description": "",
-                    "line": 23,
+                    "line": 28,
                     "decorators": [
                         {
                             "name": "Optional",
@@ -424,15 +423,26 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 28
+                    "line": 31
                 }
             ],
-            "hostBindings": [],
+            "hostBindings": [
+                {
+                    "name": "attr.data-labelid",
+                    "line": 18,
+                    "type": "ID | undefined"
+                },
+                {
+                    "name": "attr.data-name",
+                    "line": 22,
+                    "type": "string"
+                }
+            ],
             "hostListeners": [],
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component, Host,\n  Inject,\n  OnInit, Optional\n} from '@angular/core';\nimport { LabelModel } from '@rxzu/core';\nimport { MODEL } from '../../../injection.tokens';\n\n@Component({\n  selector: 'rxzu-default-label',\n  templateUrl: './default-label.component.html',\n  styleUrls: ['./default-label.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n  host: {\n    '[attr.data-labelid]': `model?.id`\n  }\n})\nexport class DefaultLabelComponent implements OnInit {\n  constructor(\n    private cdRef: ChangeDetectorRef,\n    @Optional() @Host() @Inject(MODEL) public model: LabelModel\n  ) {\n    console.log(model?.getType());\n  }\n\n  ngOnInit() {\n    this.model.selectCoords().subscribe(() => {\n      this.cdRef.detectChanges();\n    });\n\n    this.model.setPainted(true);\n  }\n}\n",
+            "sourceCode": "import {\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component, Host, HostBinding,\n  Inject,\n  OnInit, Optional\n} from '@angular/core';\nimport { ID, LabelModel } from '@rxzu/core';\nimport { MODEL } from '../../../injection.tokens';\n\n@Component({\n  selector: 'rxzu-default-label',\n  templateUrl: './default-label.component.html',\n  styleUrls: ['./default-label.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class DefaultLabelComponent implements OnInit {\n  @HostBinding('attr.data-labelid') get labelId(): ID | undefined {\n    return this.model?.id;\n  }\n\n  @HostBinding('attr.data-name') get name(): string {\n    return this.model?.name ?? '';\n  }\n\n  constructor(\n    private cdRef: ChangeDetectorRef,\n    @Optional() @Host() @Inject(MODEL) public model: LabelModel\n  ) {}\n\n  ngOnInit() {\n    this.model.selectCoords().subscribe(() => {\n      this.cdRef.detectChanges();\n    });\n\n    this.model.setPainted(true);\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -454,7 +464,7 @@
                         "type": "LabelModel"
                     }
                 ],
-                "line": 20,
+                "line": 24,
                 "jsdoctags": [
                     {
                         "name": "cdRef",
@@ -479,12 +489,11 @@
         },
         {
             "name": "DefaultLinkComponent",
-            "id": "component-DefaultLinkComponent-69c4fbe9d4061cad7f9e925be7acf2a2",
+            "id": "component-DefaultLinkComponent-9869359ed8105efc0add2cc4b39c0cf4",
             "file": "packages/angular/src/lib/defaults/components/default-link/default-link.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
             "entryComponents": [],
-            "host": {},
             "inputs": [],
             "outputs": [],
             "providers": [],
@@ -505,7 +514,7 @@
                     "type": "ViewContainerRef",
                     "optional": false,
                     "description": "",
-                    "line": 27,
+                    "line": 23,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -518,7 +527,7 @@
                     "type": "LinkModel",
                     "optional": false,
                     "description": "",
-                    "line": 30,
+                    "line": 34,
                     "decorators": [
                         {
                             "name": "Optional",
@@ -554,7 +563,7 @@
                     "optional": false,
                     "returnType": "Coords",
                     "typeParameters": [],
-                    "line": 105,
+                    "line": 107,
                     "jsdoctags": [
                         {
                             "name": "firstPoint",
@@ -587,7 +596,7 @@
                     "optional": false,
                     "returnType": "number",
                     "typeParameters": [],
-                    "line": 88,
+                    "line": 90,
                     "jsdoctags": [
                         {
                             "name": "firstPoint",
@@ -611,7 +620,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 48
+                    "line": 50
                 },
                 {
                     "name": "ngOnInit",
@@ -619,7 +628,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 36
+                    "line": 38
                 },
                 {
                     "name": "onHover",
@@ -627,7 +636,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 44
+                    "line": 46
                 },
                 {
                     "name": "trackByPoints",
@@ -644,7 +653,7 @@
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 40,
+                    "line": 42,
                     "jsdoctags": [
                         {
                             "name": "i",
@@ -663,12 +672,23 @@
                     ]
                 }
             ],
-            "hostBindings": [],
+            "hostBindings": [
+                {
+                    "name": "attr.data-linkid",
+                    "line": 25,
+                    "type": "ID | undefined"
+                },
+                {
+                    "name": "attr.data-name",
+                    "line": 29,
+                    "type": "string"
+                }
+            ],
             "hostListeners": [],
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component, Host,\n  Inject, OnInit, Optional,\n  ViewChild,\n  ViewContainerRef\n} from '@angular/core';\nimport { PointModel, generateCurvePath, Coords, LinkModel } from '@rxzu/core';\nimport { combineLatest } from 'rxjs';\nimport { takeUntil } from 'rxjs/operators';\nimport { MODEL } from '../../../injection.tokens';\n\n@Component({\n  selector: 'rxzu-default-link',\n  templateUrl: './default-link.component.html',\n  styleUrls: ['./default-link.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n  host: {\n    '[attr.data-linkid]': `model?.id`,\n    '[attr.data-name]': `model?.getName()`\n  }\n})\nexport class DefaultLinkComponent implements OnInit, AfterViewInit {\n  @ViewChild('labelLayer', { read: ViewContainerRef, static: true })\n  labelLayer!: ViewContainerRef;\n\n  constructor(\n    @Optional() @Host() @Inject(MODEL) public model: LinkModel,\n    private cdRef: ChangeDetectorRef\n  ) {\n    console.log(model?.getType());\n  }\n\n  ngOnInit() {\n    this.model.setPainted(true);\n  }\n\n  trackByPoints(i: number, point: PointModel) {\n    return point.id;\n  }\n\n  onHover() {\n    this.cdRef.detectChanges();\n  }\n\n  ngAfterViewInit() {\n    const firstPCoords$ = this.model.getFirstPoint().selectCoords();\n    const lastPCoords$ = this.model.getLastPoint().selectCoords();\n\n    // Observe link coords and update drawing accordingly\n    combineLatest([firstPCoords$, lastPCoords$])\n      .pipe(takeUntil(this.model.onEntityDestroy()))\n      .subscribe(([firstPCoords, lastPCoords]) => {\n        const points = [firstPCoords, lastPCoords];\n\n        // handle regular links\n        // draw the smoothing\n        // if the points are too close, just draw a straight line\n        const isHorizontal =\n          Math.abs(firstPCoords.x - lastPCoords.x) >\n          Math.abs(firstPCoords.y - lastPCoords.y);\n        const xOrY = isHorizontal ? 'x' : 'y';\n        let isStraight = false;\n        if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 50) {\n          isStraight = true;\n        }\n\n        const path = generateCurvePath(\n          firstPCoords,\n          lastPCoords,\n          isStraight ? 0 : 50\n        );\n        this.model.setPath(path);\n\n        const label = this.model.getLabel();\n\n        // update label position\n        if (label) {\n          label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));\n        }\n\n        this.cdRef.detectChanges();\n      });\n  }\n\n  calcLabelIncline(firstPoint: Coords, secondPoint: Coords): number {\n    const dy = secondPoint.y - firstPoint.y;\n    const dx = secondPoint.x - firstPoint.x;\n\n    if (dx === 0) {\n      return 0;\n    }\n\n    let inclineAngel = (Math.atan(dy / dx) * 180) / Math.PI;\n\n    if (inclineAngel < 0) {\n      inclineAngel += 180;\n    }\n\n    return inclineAngel;\n  }\n\n  calcCenterOfPath(firstPoint: Coords, secondPoint: Coords): Coords {\n    return {\n      x: (firstPoint.x + secondPoint.x) / 2 + 20,\n      y: (firstPoint.y + secondPoint.y) / 2 + 20,\n    };\n  }\n}\n",
+            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component, Host, HostBinding,\n  Inject, OnInit, Optional,\n  ViewChild,\n  ViewContainerRef\n} from '@angular/core';\nimport { PointModel, generateCurvePath, Coords, LinkModel, ID } from '@rxzu/core';\nimport { combineLatest } from 'rxjs';\nimport { takeUntil } from 'rxjs/operators';\nimport { MODEL } from '../../../injection.tokens';\n\n@Component({\n  selector: 'rxzu-default-link',\n  templateUrl: './default-link.component.html',\n  styleUrls: ['./default-link.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class DefaultLinkComponent implements OnInit, AfterViewInit {\n  @ViewChild('labelLayer', { read: ViewContainerRef, static: true })\n  labelLayer!: ViewContainerRef;\n\n  @HostBinding('attr.data-linkid') get linkId(): ID | undefined {\n    return this.model?.id;\n  }\n\n  @HostBinding('attr.data-name') get name(): string {\n    return this.model?.name ?? '';\n  }\n\n  constructor(\n    @Optional() @Host() @Inject(MODEL) public model: LinkModel,\n    private cdRef: ChangeDetectorRef\n  ) {}\n\n  ngOnInit() {\n    this.model.setPainted(true);\n  }\n\n  trackByPoints(i: number, point: PointModel) {\n    return point.id;\n  }\n\n  onHover() {\n    this.cdRef.detectChanges();\n  }\n\n  ngAfterViewInit() {\n    const firstPCoords$ = this.model.getFirstPoint().selectCoords();\n    const lastPCoords$ = this.model.getLastPoint().selectCoords();\n\n    // Observe link coords and update drawing accordingly\n    combineLatest([firstPCoords$, lastPCoords$])\n      .pipe(takeUntil(this.model.onEntityDestroy()))\n      .subscribe(([firstPCoords, lastPCoords]) => {\n        const points = [firstPCoords, lastPCoords];\n\n        // handle regular links\n        // draw the smoothing\n        // if the points are too close, just draw a straight line\n        const isHorizontal =\n          Math.abs(firstPCoords.x - lastPCoords.x) >\n          Math.abs(firstPCoords.y - lastPCoords.y);\n        const xOrY = isHorizontal ? 'x' : 'y';\n        let isStraight = false;\n        if (Math.abs(points[0][xOrY] - points[1][xOrY]) < 50) {\n          isStraight = true;\n        }\n\n        const path = generateCurvePath(\n          firstPCoords,\n          lastPCoords,\n          isStraight ? 0 : 50\n        );\n        this.model.setPath(path);\n\n        const label = this.model.getLabel();\n\n        // update label position\n        if (label) {\n          label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));\n        }\n\n        this.cdRef.detectChanges();\n      });\n  }\n\n  calcLabelIncline(firstPoint: Coords, secondPoint: Coords): number {\n    const dy = secondPoint.y - firstPoint.y;\n    const dx = secondPoint.x - firstPoint.x;\n\n    if (dx === 0) {\n      return 0;\n    }\n\n    let inclineAngel = (Math.atan(dy / dx) * 180) / Math.PI;\n\n    if (inclineAngel < 0) {\n      inclineAngel += 180;\n    }\n\n    return inclineAngel;\n  }\n\n  calcCenterOfPath(firstPoint: Coords, secondPoint: Coords): Coords {\n    return {\n      x: (firstPoint.x + secondPoint.x) / 2 + 20,\n      y: (firstPoint.y + secondPoint.y) / 2 + 20,\n    };\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -690,7 +710,7 @@
                         "type": "ChangeDetectorRef"
                     }
                 ],
-                "line": 27,
+                "line": 31,
                 "jsdoctags": [
                     {
                         "name": "model",
@@ -716,12 +736,11 @@
         },
         {
             "name": "DefaultNodeComponent",
-            "id": "component-DefaultNodeComponent-34cdcd125da3fb64bf4dd235e08e1060",
+            "id": "component-DefaultNodeComponent-4f52119600f736d653d254c43eac2d60",
             "file": "packages/angular/src/lib/defaults/components/default-node/default-node.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
             "entryComponents": [],
-            "host": {},
             "inputs": [],
             "outputs": [],
             "providers": [],
@@ -742,7 +761,7 @@
                     "type": "NodeModel",
                     "optional": false,
                     "description": "",
-                    "line": 33,
+                    "line": 38,
                     "decorators": [
                         {
                             "name": "Host",
@@ -766,7 +785,7 @@
                     "type": "IterableDiffer<PortModel>",
                     "optional": false,
                     "description": "",
-                    "line": 27,
+                    "line": 24,
                     "modifierKind": [
                         112
                     ]
@@ -776,7 +795,7 @@
                     "type": "ViewContainerRef",
                     "optional": false,
                     "description": "",
-                    "line": 29,
+                    "line": 26,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -789,7 +808,7 @@
                     "type": "HTMLElement",
                     "optional": false,
                     "description": "",
-                    "line": 30
+                    "line": 27
                 }
             ],
             "methodsClass": [
@@ -804,7 +823,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 88,
+                    "line": 89,
                     "modifierKind": [
                         112
                     ],
@@ -824,7 +843,7 @@
                     "optional": false,
                     "returnType": "any",
                     "typeParameters": [],
-                    "line": 51
+                    "line": 54
                 },
                 {
                     "name": "ngOnInit",
@@ -832,15 +851,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 45
-                },
-                {
-                    "name": "paintPorts",
-                    "args": [],
-                    "optional": false,
-                    "returnType": "Observable<boolean>",
-                    "typeParameters": [],
-                    "line": 63
+                    "line": 49
                 },
                 {
                     "name": "updateNodePosition",
@@ -848,15 +859,34 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 55
+                    "line": 58
+                },
+                {
+                    "name": "updatePorts",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 66
                 }
             ],
-            "hostBindings": [],
+            "hostBindings": [
+                {
+                    "name": "attr.data-name",
+                    "line": 33,
+                    "type": "string"
+                },
+                {
+                    "name": "attr.data-nodeid",
+                    "line": 29,
+                    "type": "ID | undefined"
+                }
+            ],
             "hostListeners": [],
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  ChangeDetectionStrategy,\n  Component,\n  ElementRef, Host,\n  Inject, IterableChanges, IterableDiffer, IterableDiffers, OnInit, Optional,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef\n} from '@angular/core';\nimport { NodeModel, PortModel } from '@rxzu/core';\nimport { MODEL } from '../../../injection.tokens';\nimport { filter, mapTo, pluck, switchMap, take, takeUntil } from 'rxjs/operators';\nimport { combineLatest, Observable } from 'rxjs';\nimport { RxZuDiagramComponent } from '../../../diagram/diagram.component';\nimport { FactoryService } from '../../../factory.service';\n\n@Component({\n  selector: 'rxzu-default-node',\n  templateUrl: './default-node.component.html',\n  styleUrls: ['./default-node.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n  host: {\n    '[attr.data-nodeid]': `model?.id`\n  }\n})\nexport class DefaultNodeComponent implements OnInit {\n  private portDiffers: IterableDiffer<PortModel>;\n  @ViewChild('portsLayer', { read: ViewContainerRef, static: true })\n  portsLayer!: ViewContainerRef;\n  rootNode: HTMLElement;\n\n  constructor(\n    @Host() @Optional() @Inject(MODEL) public model: NodeModel,\n    private factory: FactoryService,\n    private diagram: RxZuDiagramComponent,\n    private rootEl: ElementRef,\n    private renderer: Renderer2,\n    iterableDiffers: IterableDiffers\n  ) {\n    this.rootNode = this.rootEl.nativeElement;\n    console.log(model?.getType());\n    this.portDiffers = iterableDiffers.find([]).create<PortModel>((index, item) => item.id);\n  }\n\n  ngOnInit() {\n    this.updateNodePosition();\n    this.paintPorts();\n    this.model.setPainted(true);\n  }\n\n  getPortsHost() {\n    return this.portsLayer;\n  }\n\n  updateNodePosition() {\n    // subscribe to node coordinates\n    this.model.selectCoords().pipe(takeUntil(this.model.onEntityDestroy())).subscribe(({ x, y }) => {\n      this.renderer.setStyle(this.rootNode, 'left', `${x}px`);\n      this.renderer.setStyle(this.rootNode, 'top', `${y}px`);\n    });\n  }\n\n  paintPorts(): Observable<boolean> {\n    return this.model\n      .selectPorts()\n      .pipe(\n        takeUntil(this.model.onEntityDestroy()),\n        filter(\n          (\n            ports: PortModel[] | null | undefined\n          ): ports is PortModel[] =>\n            ports !== null && ports !== undefined\n        ),\n        switchMap(ports => {\n          const changes = this.portDiffers.diff(ports);\n          this.applyPortChanges(changes);\n          return combineLatest(ports.map((port) => port.paintChanges().pipe(\n            pluck('isPainted'),\n            filter<boolean>(Boolean),\n            take(1))\n          ));\n        }),\n        filter((val) => val !== null),\n        mapTo(true)\n      );\n  }\n\n  private applyPortChanges(changes: IterableChanges<PortModel> | null): void {\n    changes?.forEachAddedItem(({ item, currentIndex, previousIndex }) => {\n      if (!item.getPainted().isPainted) {\n        if (!this.factory.has(item)) {\n          return;\n        }\n\n        this.factory.generateWidget({\n          model: item,\n          host: this.getPortsHost(),\n          index: currentIndex ?? undefined\n        });\n        return;\n      }\n      // tslint:disable-next-line:no-unused-expression\n      currentIndex && console.log(this.getPortsHost().get(currentIndex));\n    });\n    changes?.forEachRemovedItem(record => {\n      record.item.destroy();\n    });\n    changes?.forEachMovedItem(({ previousIndex, currentIndex, item }) => {\n      if (typeof previousIndex === 'number' && typeof currentIndex === 'number' && previousIndex !== currentIndex) {\n        const view = this.getPortsHost().get(previousIndex);\n        if (view) {\n          this.getPortsHost().move(view, currentIndex);\n          this.model.updatePortCoords(item, this.diagram.diagramEngine);\n        }\n      }\n    });\n  }\n}\n",
+            "sourceCode": "import {\n  ChangeDetectionStrategy,\n  Component,\n  ElementRef, Host, HostBinding,\n  Inject, IterableChanges, IterableDiffer, IterableDiffers, OnInit, Optional,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef\n} from '@angular/core';\nimport { ID, NodeModel, PortModel } from '@rxzu/core';\nimport { MODEL } from '../../../injection.tokens';\nimport { filter, mapTo, pluck, switchMap, take, takeUntil, tap } from 'rxjs/operators';\nimport { combineLatest } from 'rxjs';\nimport { RxZuDiagramComponent } from '../../../diagram/diagram.component';\nimport { FactoryService } from '../../../factory.service';\n\n@Component({\n  selector: 'rxzu-default-node',\n  templateUrl: './default-node.component.html',\n  styleUrls: ['./default-node.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class DefaultNodeComponent implements OnInit {\n  private portDiffers: IterableDiffer<PortModel>;\n  @ViewChild('portsLayer', { read: ViewContainerRef, static: true })\n  portsLayer!: ViewContainerRef;\n  rootNode: HTMLElement;\n\n  @HostBinding('attr.data-nodeid') get linkId(): ID | undefined {\n    return this.model?.id;\n  }\n\n  @HostBinding('attr.data-name') get name(): string {\n    return this.model?.name ?? '';\n  }\n\n  constructor(\n    @Host() @Optional() @Inject(MODEL) public model: NodeModel,\n    private factory: FactoryService,\n    private diagram: RxZuDiagramComponent,\n    private rootEl: ElementRef,\n    private renderer: Renderer2,\n    private iterableDiffers: IterableDiffers\n  ) {\n    this.rootNode = this.rootEl.nativeElement;\n    this.portDiffers = this.iterableDiffers.find([]).create<PortModel>((index, item) => item.id);\n  }\n\n  ngOnInit() {\n    this.updateNodePosition();\n    this.updatePorts();\n  }\n\n  getPortsHost() {\n    return this.portsLayer;\n  }\n\n  updateNodePosition(): void {\n    // subscribe to node coordinates\n    this.model.selectCoords().pipe(takeUntil(this.model.onEntityDestroy())).subscribe(({ x, y }) => {\n      this.renderer.setStyle(this.rootNode, 'left', `${x}px`);\n      this.renderer.setStyle(this.rootNode, 'top', `${y}px`);\n    });\n  }\n\n  updatePorts(): void {\n    this.model\n      .selectPorts()\n      .pipe(\n        takeUntil(this.model.onEntityDestroy()),\n        filter(\n          (\n            ports: PortModel[] | null | undefined\n          ): ports is PortModel[] =>\n            ports !== null && ports !== undefined\n        ),\n        tap(ports => this.applyPortChanges(this.portDiffers.diff(ports))),\n        switchMap(ports => combineLatest(ports.map((port) => port.paintChanges().pipe(\n          pluck('isPainted'),\n          filter<boolean>(Boolean),\n          take(1))\n          ))\n        ),\n        filter((val) => val !== null),\n        mapTo(true)\n      ).subscribe(() => !this.model.getPainted().isPainted && this.model.setPainted(true));\n  }\n\n  private applyPortChanges(changes: IterableChanges<PortModel> | null): void {\n    if (changes) {\n      changes.forEachAddedItem(({ item, currentIndex }) => this.factory.generateWidget({\n        model: item,\n        host: this.getPortsHost(),\n        index: currentIndex ?? undefined\n      }));\n      changes.forEachMovedItem(({ previousIndex, currentIndex, item }) => {\n        if (previousIndex !== null && currentIndex !== null && previousIndex !== currentIndex) {\n          const view = this.getPortsHost().get(previousIndex);\n          if (view) {\n            this.getPortsHost().move(view, currentIndex);\n            this.model.updatePortCoords(item, this.diagram.diagramEngine);\n          }\n        }\n      });\n      changes.forEachRemovedItem(record => record.item.destroy());\n    }\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -894,7 +924,7 @@
                         "type": "IterableDiffers"
                     }
                 ],
-                "line": 30,
+                "line": 35,
                 "jsdoctags": [
                     {
                         "name": "model",
@@ -947,12 +977,11 @@
         },
         {
             "name": "DefaultPortComponent",
-            "id": "component-DefaultPortComponent-07bb7a315cf42122d702c092bec80510",
+            "id": "component-DefaultPortComponent-870bb3705c12b5b5b7b4419b39dc9ac8",
             "file": "packages/angular/src/lib/defaults/components/default-port/default-port.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
             "entryComponents": [],
-            "host": {},
             "inputs": [],
             "outputs": [],
             "providers": [],
@@ -973,7 +1002,7 @@
                     "type": "PortModel",
                     "optional": false,
                     "description": "",
-                    "line": 16,
+                    "line": 20,
                     "decorators": [
                         {
                             "name": "Optional",
@@ -994,12 +1023,23 @@
                 }
             ],
             "methodsClass": [],
-            "hostBindings": [],
+            "hostBindings": [
+                {
+                    "name": "attr.data-name",
+                    "line": 16,
+                    "type": "string"
+                },
+                {
+                    "name": "attr.data-portid",
+                    "line": 12,
+                    "type": "ID | undefined"
+                }
+            ],
             "hostListeners": [],
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import { ChangeDetectionStrategy, Component, Host, Inject, Optional } from '@angular/core';\nimport { PortModel } from '@rxzu/core';\nimport { MODEL } from '../../../injection.tokens';\n\n@Component({\n  selector: 'rxzu-default-port',\n  templateUrl: './default-port.component.html',\n  styleUrls: ['./default-port.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n  host: {\n    '[attr.data-portid]': `model?.id`,\n    '[attr.data-name]': `model?.getName()`\n  }\n})\nexport class DefaultPortComponent {\n  constructor(@Optional() @Host() @Inject(MODEL) public model: PortModel) {\n    this.model.setPainted(true);\n    console.log(model?.getType());\n  }\n}\n",
+            "sourceCode": "import { ChangeDetectionStrategy, Component, Host, HostBinding, Inject, Optional } from '@angular/core';\nimport { ID, PortModel } from '@rxzu/core';\nimport { MODEL } from '../../../injection.tokens';\n\n@Component({\n  selector: 'rxzu-default-port',\n  templateUrl: './default-port.component.html',\n  styleUrls: ['./default-port.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class DefaultPortComponent {\n  @HostBinding('attr.data-portid') get linkId(): ID | undefined {\n    return this.model?.id;\n  }\n\n  @HostBinding('attr.data-name') get name(): string {\n    return this.model?.name ?? '';\n  }\n\n  constructor(@Optional() @Host() @Inject(MODEL) public model: PortModel) {\n    this.model.setPainted(true);\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -1017,7 +1057,7 @@
                         "type": "PortModel"
                     }
                 ],
-                "line": 15,
+                "line": 18,
                 "jsdoctags": [
                     {
                         "name": "model",
@@ -1032,11 +1072,7 @@
         },
         {
             "name": "RxZuDiagramComponent",
-<<<<<<< HEAD
-            "id": "component-RxZuDiagramComponent-d90ef445e404b7c773b21fd14eb12998",
-=======
-            "id": "component-RxZuDiagramComponent-c3bfe2e16ad5c18e8c3ff0b2d7a6e0af",
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+            "id": "component-RxZuDiagramComponent-1c88f2a3e2278231c1eba48805bb6ff5",
             "file": "packages/angular/src/lib/diagram/diagram.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -1068,56 +1104,58 @@
                 {
                     "name": "allowCanvasTranslation",
                     "defaultValue": "true",
-                    "line": 35
+                    "line": 48
                 },
                 {
                     "name": "allowCanvasZoom",
                     "defaultValue": "true",
-                    "line": 34
+                    "line": 46
                 },
                 {
                     "name": "allowLooseLinks",
                     "defaultValue": "true",
-                    "line": 37
+                    "line": 52
                 },
                 {
                     "name": "inverseZoom",
                     "defaultValue": "true",
-                    "line": 36
-<<<<<<< HEAD
+                    "line": 50
                 },
                 {
                     "name": "keyBindings",
                     "defaultValue": "{}",
-                    "line": 41
-=======
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 59
                 },
                 {
                     "name": "maxZoomIn",
                     "defaultValue": "0",
-                    "line": 39
+                    "line": 56
                 },
                 {
                     "name": "maxZoomOut",
                     "defaultValue": "0",
-                    "line": 38
+                    "line": 54
                 },
                 {
                     "name": "model",
-                    "defaultValue": "null",
-                    "line": 33,
-                    "type": "DiagramModel | null"
+                    "line": 43,
+                    "type": "DiagramModel"
+                },
+                {
+                    "name": "name",
+                    "description": "<p>The name of the diagram, if not set will be <code>&#39;default&#39;</code> </p>\n",
+                    "line": 42,
+                    "type": "string"
                 },
                 {
                     "name": "options",
-                    "line": 33,
-                    "type": "DiagramModelOptions"
+                    "line": 44,
+                    "type": "Partial<EngineSetup>"
                 },
                 {
                     "name": "portMagneticRadius",
                     "defaultValue": "30",
-                    "line": 40
+                    "line": 58
                 }
             ],
             "outputsClass": [],
@@ -1127,11 +1165,7 @@
                     "type": "ElementRef",
                     "optional": true,
                     "description": "",
-<<<<<<< HEAD
-                    "line": 50,
-=======
-                    "line": 49,
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 68,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1145,40 +1179,32 @@
                     "type": "",
                     "optional": false,
                     "description": "",
-                    "line": 56
+                    "line": 73
                 },
                 {
                     "name": "diagramEngine",
                     "type": "EngineService",
                     "optional": false,
                     "description": "",
-<<<<<<< HEAD
-                    "line": 52
+                    "line": 80,
+                    "modifierKind": [
+                        114,
+                        132
+                    ]
                 },
                 {
                     "name": "keyboardManager",
                     "type": "KeyboardManager",
                     "optional": true,
                     "description": "",
-                    "line": 54
-=======
-                    "line": 60,
-                    "modifierKind": [
-                        114,
-                        132
-                    ]
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 71
                 },
                 {
                     "name": "linksLayer",
                     "type": "ViewContainerRef",
                     "optional": true,
                     "description": "",
-<<<<<<< HEAD
-                    "line": 47,
-=======
-                    "line": 46,
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 65,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1191,18 +1217,14 @@
                     "type": "MouseManager",
                     "optional": true,
                     "description": "",
-                    "line": 53
+                    "line": 70
                 },
                 {
                     "name": "ngZone",
                     "type": "NgZone",
                     "optional": false,
                     "description": "",
-<<<<<<< HEAD
-                    "line": 63,
-=======
-                    "line": 61,
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 81,
                     "modifierKind": [
                         114
                     ]
@@ -1212,11 +1234,7 @@
                     "type": "ViewContainerRef",
                     "optional": true,
                     "description": "",
-<<<<<<< HEAD
-                    "line": 44,
-=======
-                    "line": 43,
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 62,
                     "decorators": [
                         {
                             "name": "ViewChild",
@@ -1229,7 +1247,7 @@
                     "type": "Observable<SelectingAction | null>",
                     "optional": true,
                     "description": "",
-                    "line": 55
+                    "line": 72
                 }
             ],
             "methodsClass": [
@@ -1239,11 +1257,7 @@
                     "optional": false,
                     "returnType": "HTMLDivElement | null",
                     "typeParameters": [],
-<<<<<<< HEAD
-                    "line": 210,
-=======
-                    "line": 189,
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 239,
                     "modifierKind": [
                         113
                     ]
@@ -1254,11 +1268,7 @@
                     "optional": false,
                     "returnType": "HTMLDivElement | null",
                     "typeParameters": [],
-<<<<<<< HEAD
-                    "line": 202,
-=======
-                    "line": 181,
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 231,
                     "modifierKind": [
                         113
                     ]
@@ -1269,11 +1279,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-<<<<<<< HEAD
-                    "line": 113
-=======
-                    "line": 105
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 140
                 },
                 {
                     "name": "initSubs",
@@ -1281,11 +1287,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-<<<<<<< HEAD
-                    "line": 184,
-=======
-                    "line": 163,
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 213,
                     "modifierKind": [
                         113
                     ]
@@ -1296,11 +1298,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-<<<<<<< HEAD
-                    "line": 69
-=======
-                    "line": 67
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 88
                 },
                 {
                     "name": "ngOnDestroy",
@@ -1308,30 +1306,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-<<<<<<< HEAD
-                    "line": 104
-                },
-                {
-                    "name": "onCopy",
-                    "args": [
-                        {
-                            "name": "event",
-                            "type": "ClipboardEvent"
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "void",
-                    "typeParameters": [],
-                    "line": 146,
-                    "jsdoctags": [
-                        {
-                            "name": "event",
-                            "type": "ClipboardEvent",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ]
+                    "line": 131
                 },
                 {
                     "name": "onKeyUp",
@@ -1344,7 +1319,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 141,
+                    "line": 168,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1359,9 +1334,6 @@
                             }
                         }
                     ]
-=======
-                    "line": 100
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
                 },
                 {
                     "name": "onMouseDown",
@@ -1374,11 +1346,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-<<<<<<< HEAD
-                    "line": 163,
-=======
-                    "line": 138,
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 188,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1405,11 +1373,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-<<<<<<< HEAD
-                    "line": 158,
-=======
-                    "line": 133,
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 183,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1436,11 +1400,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-<<<<<<< HEAD
-                    "line": 136,
-=======
-                    "line": 128,
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 163,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1467,11 +1427,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-<<<<<<< HEAD
-                    "line": 168,
-=======
-                    "line": 143,
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 193,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1481,28 +1437,6 @@
                         {
                             "name": "event",
                             "type": "WheelEvent",
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "onPaste",
-                    "args": [
-                        {
-                            "name": "event",
-                            "type": "ClipboardEvent"
-                        }
-                    ],
-                    "optional": false,
-                    "returnType": "void",
-                    "typeParameters": [],
-                    "line": 152,
-                    "jsdoctags": [
-                        {
-                            "name": "event",
-                            "type": "ClipboardEvent",
                             "tagName": {
                                 "text": "param"
                             }
@@ -1528,11 +1462,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-<<<<<<< HEAD
-                    "line": 173,
-=======
-                    "line": 152,
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                    "line": 202,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1577,7 +1507,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 147,
+                    "line": 197,
                     "jsdoctags": [
                         {
                             "name": "additionalZoomFactor",
@@ -1591,19 +1521,42 @@
                 }
             ],
             "hostBindings": [],
-            "hostListeners": [],
+            "hostListeners": [
+                {
+                    "name": "window:copy",
+                    "args": [
+                        {
+                            "name": "event",
+                            "type": "ClipboardEvent"
+                        }
+                    ],
+                    "argsDecorator": [
+                        "$event"
+                    ],
+                    "line": 173
+                },
+                {
+                    "name": "window:paste",
+                    "args": [
+                        {
+                            "name": "event",
+                            "type": "ClipboardEvent"
+                        }
+                    ],
+                    "argsDecorator": [
+                        "$event"
+                    ],
+                    "line": 178
+                }
+            ],
             "description": "",
             "rawdescription": "",
             "type": "component",
-<<<<<<< HEAD
-            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  Input,\n  NgZone,\n  OnDestroy,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { combineLatest, noop, Observable, of, ReplaySubject } from 'rxjs';\nimport { map, switchMap, takeUntil, tap } from 'rxjs/operators';\nimport {\n  DiagramEngineCore,\n  SelectingAction,\n  MouseManager,\n  DiagramModel,\n  KeyboardManager\n} from '@rxzu/core';\nimport { ZonedClass, OutsideZone } from '../utils';\n\n@Component({\n  selector: 'rxzu-diagram',\n  templateUrl: 'diagram.component.html',\n  styleUrls: ['diagram.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class RxZuDiagramComponent\n  implements AfterViewInit, OnDestroy, ZonedClass {\n  @Input('model') diagramModel: DiagramModel | null = null;\n  @Input() allowCanvasZoom = true;\n  @Input() allowCanvasTranslation = true;\n  @Input() inverseZoom = true;\n  @Input() allowLooseLinks = true;\n  @Input() maxZoomOut = 0;\n  @Input() maxZoomIn = 0;\n  @Input() portMagneticRadius = 30;\n  @Input() keyBindings = {};\n\n  @ViewChild('nodesLayer', { read: ViewContainerRef })\n  nodesLayer?: ViewContainerRef;\n\n  @ViewChild('linksLayer', { read: ViewContainerRef })\n  linksLayer?: ViewContainerRef;\n\n  @ViewChild('canvas', { read: ElementRef })\n  canvas?: ElementRef;\n\n  diagramEngine?: DiagramEngineCore;\n  mouseManager?: MouseManager;\n  keyboardManager?: KeyboardManager;\n  selectionBox$?: Observable<SelectingAction | null>;\n  destroyed$ = new ReplaySubject<boolean>(1);\n\n  get host(): HTMLElement {\n    return this.elRef.nativeElement;\n  }\n\n  constructor(\n    public ngZone: NgZone,\n    protected renderer: Renderer2,\n    protected cdRef: ChangeDetectorRef,\n    protected elRef: ElementRef<HTMLElement>\n  ) {}\n\n  ngAfterViewInit() {\n    const model = this.diagramModel;\n    if (!model || !this.canvas) {\n      return;\n    }\n    this.diagramEngine = model.getDiagramEngine();\n    this.mouseManager = this.diagramEngine.getMouseManager();\n    this.keyboardManager = this.diagramEngine.getKeyboardManager();\n    \n\n    this.diagramEngine.setCanvas(this.canvas.nativeElement);\n\n    this.diagramEngine.setup({\n      ...this,\n    });\n\n    (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)\n      .pipe(\n        switchMap(() => {\n          if (!this.diagramEngine) {\n            return of(null);\n          }\n\n          return this.diagramEngine.paintLinks(this.linksLayer) as Observable<\n            void\n          >;\n        })\n      )\n      .subscribe(() => {\n        this.initSubs();\n        this.initSelectionBox();\n        this.cdRef.detectChanges();\n      });\n  }\n\n  ngOnDestroy() {\n    this.destroyed$.next(true);\n    this.destroyed$.complete();\n    \n    if (this.keyboardManager) {\n      this.keyboardManager.dispose();\n    }\n  }\n\n  initSelectionBox() {\n    if (!this.diagramEngine) {\n      return;\n    }\n\n    this.selectionBox$ = this.diagramEngine.selectAction().pipe(\n      map((a) => {\n        if (\n          a &&\n          a.action &&\n          a.action instanceof SelectingAction &&\n          a.state === 'firing'\n        ) {\n          return a.action as SelectingAction;\n        } else {\n          return null;\n        }\n      }),\n      tap(() => this.cdRef.detectChanges())\n    );\n  }\n\n  @OutsideZone\n  onMouseUp(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseUp(event) : noop();\n  }\n\n  @OutsideZone\n  onKeyUp(event: KeyboardEvent) {\n    this.keyboardManager ? this.keyboardManager.onKeyUp(event) : noop();\n  }\n\n\n  onCopy(event: ClipboardEvent) {\n    event.preventDefault();\n    this.keyboardManager ? this.keyboardManager.onCopy() : noop();\n  }\n\n\n  onPaste(event: ClipboardEvent) {\n    event.preventDefault();\n    this.keyboardManager ? this.keyboardManager.onPaste() : noop();\n  }\n\n  @OutsideZone\n  onMouseMove(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseMove(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseDown(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseDown(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseWheel(event: WheelEvent) {\n    this.mouseManager ? this.mouseManager.onMouseWheel(event) : noop();\n  }\n\n  @OutsideZone\n  protected setLayerStyles(x: number, y: number, zoom: number): void {\n    const nodesLayer = this.getNodesLayer();\n    const linksLayer = this.getLinksLayer();\n\n    const style = 'transform';\n    const value = `translate(${x}px, ${y}px) scale(${zoom / 100.0})`;\n\n    this.renderer.setStyle(nodesLayer, style, value);\n    this.renderer.setStyle(linksLayer, style, value);\n  }\n\n  protected initSubs() {\n    const diagramModel = this.diagramEngine?.getDiagramModel();\n    if (!diagramModel) {\n      return;\n    }\n\n    combineLatest([\n      diagramModel.selectOffsetX(),\n      diagramModel.selectOffsetY(),\n      diagramModel.selectZoomLevel(),\n    ])\n      .pipe(\n        tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),\n        takeUntil(this.destroyed$)\n      )\n      .subscribe();\n  }\n\n  protected getNodesLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-nodes-layer');\n  }\n\n  protected getLinksLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-links-layer');\n  }\n}\n",
-=======
-            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  Input,\n  NgZone,\n  OnDestroy,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { combineLatest, noop, Observable, of, ReplaySubject } from 'rxjs';\nimport { map, switchMap, takeUntil, tap } from 'rxjs/operators';\nimport { SelectingAction, MouseManager, DiagramModel, DiagramModelOptions } from '@rxzu/core';\nimport { ZonedClass, OutsideZone } from '../utils';\nimport { EngineService } from '../engine.service';\nimport { RegistryService } from '../registry.service';\nimport { FactoryService } from '../factory.service';\n\n@Component({\n  selector: 'rxzu-diagram',\n  exportAs: 'RxzuDiagram',\n  templateUrl: 'diagram.component.html',\n  styleUrls: ['diagram.component.scss'],\n  providers: [EngineService, RegistryService, FactoryService],\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class RxZuDiagramComponent\n  implements AfterViewInit, OnDestroy, ZonedClass {\n  @Input('model') diagramModel: DiagramModel | null = null;\n  @Input() options?: DiagramModelOptions;\n  @Input() allowCanvasZoom = true;\n  @Input() allowCanvasTranslation = true;\n  @Input() inverseZoom = true;\n  @Input() allowLooseLinks = true;\n  @Input() maxZoomOut = 0;\n  @Input() maxZoomIn = 0;\n  @Input() portMagneticRadius = 30;\n\n  @ViewChild('nodesLayer', { read: ViewContainerRef })\n  nodesLayer?: ViewContainerRef;\n\n  @ViewChild('linksLayer', { read: ViewContainerRef })\n  linksLayer?: ViewContainerRef;\n\n  @ViewChild('canvas', { read: ElementRef })\n  canvas?: ElementRef;\n\n  mouseManager?: MouseManager;\n  selectionBox$?: Observable<SelectingAction | null>;\n  destroyed$ = new ReplaySubject<boolean>(1);\n\n  get host(): HTMLElement {\n    return this.elRef.nativeElement;\n  }\n\n  constructor(\n    public readonly diagramEngine: EngineService,\n    public ngZone: NgZone,\n    protected renderer: Renderer2,\n    protected cdRef: ChangeDetectorRef,\n    protected elRef: ElementRef<HTMLElement>,\n  ) {}\n\n  ngAfterViewInit() {\n    this.diagramModel = this.diagramModel && this.diagramEngine.setModel(this.diagramModel) || this.diagramEngine.createModel(this.options);\n\n    if (!this.canvas) {\n      return;\n    }\n    this.mouseManager = this.diagramEngine.getMouseManager();\n\n    this.diagramEngine.setCanvas(this.canvas.nativeElement);\n\n    this.diagramEngine.setup({\n      ...this,\n    });\n\n    (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)\n      .pipe(\n        switchMap(() => {\n          if (!this.diagramEngine) {\n            return of(null);\n          }\n\n          return this.diagramEngine.paintLinks(this.linksLayer) as Observable<\n            void\n          >;\n        })\n      )\n      .subscribe(() => {\n        this.initSubs();\n        this.initSelectionBox();\n        this.cdRef.detectChanges();\n      });\n  }\n\n  ngOnDestroy() {\n    this.destroyed$.next(true);\n    this.destroyed$.complete();\n  }\n\n  initSelectionBox() {\n    if (!this.diagramEngine) {\n      return;\n    }\n\n    this.selectionBox$ = this.diagramEngine.selectAction().pipe(\n      map((a) => {\n        if (\n          a &&\n          a.action &&\n          a.action instanceof SelectingAction &&\n          a.state === 'firing'\n        ) {\n          return a.action as SelectingAction;\n        } else {\n          return null;\n        }\n      }),\n      tap(() => this.cdRef.detectChanges())\n    );\n  }\n\n  @OutsideZone\n  onMouseUp(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseUp(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseMove(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseMove(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseDown(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseDown(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseWheel(event: WheelEvent) {\n    this.mouseManager ? this.mouseManager.onMouseWheel(event) : noop();\n  }\n\n  zoomToFit(additionalZoomFactor?: number): void {\n    this.diagramEngine.zoomToFit(additionalZoomFactor);\n  }\n\n  @OutsideZone\n  protected setLayerStyles(x: number, y: number, zoom: number): void {\n    const nodesLayer = this.getNodesLayer();\n    const linksLayer = this.getLinksLayer();\n\n    const style = 'transform';\n    const value = `translate(${x}px, ${y}px) scale(${zoom / 100.0})`;\n\n    this.renderer.setStyle(nodesLayer, style, value);\n    this.renderer.setStyle(linksLayer, style, value);\n  }\n\n  protected initSubs() {\n    const diagramModel = this.diagramEngine?.getDiagramModel();\n    if (!diagramModel) {\n      return;\n    }\n\n    combineLatest([\n      diagramModel.selectOffsetX(),\n      diagramModel.selectOffsetY(),\n      diagramModel.selectZoomLevel(),\n    ])\n      .pipe(\n        tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),\n        takeUntil(this.destroyed$)\n      )\n      .subscribe();\n  }\n\n  protected getNodesLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-nodes-layer');\n  }\n\n  protected getLinksLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-links-layer');\n  }\n}\n",
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  Inject,\n  HostListener,\n  Input,\n  NgZone,\n  OnDestroy,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { combineLatest, noop, Observable, of, ReplaySubject } from 'rxjs';\nimport { map, switchMap, takeUntil, tap } from 'rxjs/operators';\nimport {\n  SelectingAction,\n  MouseManager,\n  DiagramModel,\n  EngineSetup,\n  KeyboardManager,\n} from '@rxzu/core';\nimport { ZonedClass, OutsideZone } from '../utils';\nimport { EngineService } from '../engine.service';\nimport { RegistryService } from '../registry.service';\nimport { FactoryService } from '../factory.service';\nimport { DIAGRAM_DEFAULT_OPTIONS } from '../injection.tokens';\n\n@Component({\n  selector: 'rxzu-diagram',\n  exportAs: 'RxzuDiagram',\n  templateUrl: 'diagram.component.html',\n  styleUrls: ['diagram.component.scss'],\n  providers: [EngineService, RegistryService, FactoryService],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class RxZuDiagramComponent\n  implements AfterViewInit, OnDestroy, ZonedClass {\n  /** The name of the diagram, if not set will be `'default'` */\n  @Input() name?: string;\n  @Input() model?: DiagramModel;\n  @Input() options?: Partial<EngineSetup>;\n  /** @deprecated use options instead, will be removed in v4.0.0 */\n  @Input() allowCanvasZoom = true;\n  /** @deprecated use options instead, will be removed in v4.0.0 */\n  @Input() allowCanvasTranslation = true;\n  /** @deprecated use options instead, will be removed in v4.0.0 */\n  @Input() inverseZoom = true;\n  /** @deprecated use options instead, will be removed in v4.0.0 */\n  @Input() allowLooseLinks = true;\n  /** @deprecated use options instead, will be removed in v4.0.0 */\n  @Input() maxZoomOut = 0;\n  /** @deprecated use options instead, will be removed in v4.0.0 */\n  @Input() maxZoomIn = 0;\n  /** @deprecated use options instead, will be removed in v4.0.0 */\n  @Input() portMagneticRadius = 30;\n  @Input() keyBindings = {};\n\n  @ViewChild('nodesLayer', { read: ViewContainerRef })\n  nodesLayer?: ViewContainerRef;\n\n  @ViewChild('linksLayer', { read: ViewContainerRef })\n  linksLayer?: ViewContainerRef;\n\n  @ViewChild('canvas', { read: ElementRef })\n  canvas?: ElementRef;\n\n  mouseManager?: MouseManager;\n  keyboardManager?: KeyboardManager;\n  selectionBox$?: Observable<SelectingAction | null>;\n  destroyed$ = new ReplaySubject<boolean>(1);\n\n  get host(): HTMLElement {\n    return this.elRef.nativeElement;\n  }\n\n  constructor(\n    public readonly diagramEngine: EngineService,\n    public ngZone: NgZone,\n    protected renderer: Renderer2,\n    protected cdRef: ChangeDetectorRef,\n    protected elRef: ElementRef<HTMLElement>,\n    @Inject(DIAGRAM_DEFAULT_OPTIONS) protected defaultOptions: EngineSetup\n  ) {}\n\n  ngAfterViewInit() {\n    const mergedOptions = { ...this.defaultOptions, ...this.options };\n    this.model =\n      (this.model && this.diagramEngine.setModel(this.model)) ||\n      this.diagramEngine.createModel({\n        name: this.name || 'default',\n        ...mergedOptions,\n      });\n\n    if (!this.canvas) {\n      return;\n    }\n\n    this.mouseManager = this.diagramEngine.getMouseManager();\n    this.keyboardManager = this.diagramEngine.getKeyboardManager();\n\n    this.diagramEngine.setCanvas(this.canvas.nativeElement);\n\n    this.diagramEngine.setup({\n      ...mergedOptions,\n      // TODO: remove after deprecated inputs removed\n      ...this,\n    } as EngineSetup);\n\n    (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)\n      .pipe(\n        switchMap(() => {\n          if (!this.diagramEngine) {\n            return of(null);\n          }\n\n          return this.diagramEngine.paintLinks(\n            this.linksLayer\n          ) as Observable<void>;\n        })\n      )\n      .subscribe(() => {\n        this.initSubs();\n        this.initSelectionBox();\n        this.cdRef.detectChanges();\n      });\n  }\n\n  ngOnDestroy() {\n    this.destroyed$.next(true);\n    this.destroyed$.complete();\n\n    if (this.keyboardManager) {\n      this.keyboardManager.dispose();\n    }\n  }\n\n  initSelectionBox() {\n    if (!this.diagramEngine) {\n      return;\n    }\n\n    this.selectionBox$ = this.diagramEngine.selectAction().pipe(\n      map((a) => {\n        if (\n          a &&\n          a.action &&\n          a.action instanceof SelectingAction &&\n          a.state === 'firing'\n        ) {\n          return a.action as SelectingAction;\n        } else {\n          return null;\n        }\n      }),\n      tap(() => this.cdRef.detectChanges())\n    );\n  }\n\n  @OutsideZone\n  onMouseUp(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseUp(event) : noop();\n  }\n\n  @OutsideZone\n  onKeyUp(event: KeyboardEvent) {\n    this.keyboardManager ? this.keyboardManager.onKeyUp(event) : noop();\n  }\n\n  @HostListener('window:copy', ['$event'])\n  onCopy(event: ClipboardEvent) {\n    this.keyboardManager ? this.keyboardManager.onCopy() : noop();\n  }\n\n  @HostListener('window:paste', ['$event'])\n  onPaste(event: ClipboardEvent) {\n    this.keyboardManager ? this.keyboardManager.onPaste() : noop();\n  }\n\n  @OutsideZone\n  onMouseMove(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseMove(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseDown(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseDown(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseWheel(event: WheelEvent) {\n    this.mouseManager ? this.mouseManager.onMouseWheel(event) : noop();\n  }\n\n  zoomToFit(additionalZoomFactor?: number): void {\n    this.diagramEngine.zoomToFit(additionalZoomFactor);\n  }\n\n  @OutsideZone\n  protected setLayerStyles(x: number, y: number, zoom: number): void {\n    const nodesLayer = this.getNodesLayer();\n    const linksLayer = this.getLinksLayer();\n\n    const style = 'transform';\n    const value = `translate(${x}px, ${y}px) scale(${zoom / 100.0})`;\n\n    this.renderer.setStyle(nodesLayer, style, value);\n    this.renderer.setStyle(linksLayer, style, value);\n  }\n\n  protected initSubs() {\n    const diagramModel = this.diagramEngine?.getDiagramModel();\n    if (!diagramModel) {\n      return;\n    }\n\n    combineLatest([\n      diagramModel.selectOffsetX(),\n      diagramModel.selectOffsetY(),\n      diagramModel.selectZoomLevel(),\n    ])\n      .pipe(\n        tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),\n        takeUntil(this.destroyed$)\n      )\n      .subscribe();\n  }\n\n  protected getNodesLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-nodes-layer');\n  }\n\n  protected getLinksLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-links-layer');\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
-                    "data": ".rxzu-diagram {\n  position: relative;\n  flex-grow: 1;\n  display: flex;\n  cursor: move;\n  overflow: hidden;\n\n  .selector {\n    position: absolute;\n    background-color: rgba(0, 192, 255, 0.2);\n    border: solid 2px rgb(0, 192, 255);\n  }\n\n  &:hover {\n    outline: none;\n  }\n\n  .rxzu-nodes-layer {\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    transform-origin: 0 0;\n    overflow: visible;\n    pointer-events: none;\n    z-index: 150;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    right: 0;\n  }\n\n  .rxzu-links-layer {\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    transform-origin: 0 0;\n    overflow: visible;\n    pointer-events: none;\n    z-index: 100;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    right: 0;\n  }\n}\n",
+                    "data": ".rxzu-diagram {\n  position: relative;\n  flex-grow: 1;\n  display: flex;\n  cursor: move;\n  overflow: hidden;\n\n  &:focus {\n    outline: none;\n  }\n\n  .selector {\n    position: absolute;\n    background-color: rgba(0, 192, 255, 0.2);\n    border: solid 2px rgb(0, 192, 255);\n  }\n\n  .rxzu-nodes-layer {\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    transform-origin: 0 0;\n    overflow: visible;\n    pointer-events: none;\n    z-index: 150;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    right: 0;\n  }\n\n  .rxzu-links-layer {\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    transform-origin: 0 0;\n    overflow: visible;\n    pointer-events: none;\n    z-index: 100;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    right: 0;\n  }\n}\n",
                     "styleUrl": "diagram.component.scss"
                 }
             ],
@@ -1631,9 +1584,13 @@
                     {
                         "name": "elRef",
                         "type": "ElementRef<HTMLElement>"
+                    },
+                    {
+                        "name": "defaultOptions",
+                        "type": "EngineSetup"
                     }
                 ],
-                "line": 60,
+                "line": 77,
                 "jsdoctags": [
                     {
                         "name": "diagramEngine",
@@ -1669,6 +1626,13 @@
                         "tagName": {
                             "text": "param"
                         }
+                    },
+                    {
+                        "name": "defaultOptions",
+                        "type": "EngineSetup",
+                        "tagName": {
+                            "text": "param"
+                        }
                     }
                 ]
             },
@@ -1684,11 +1648,11 @@
                         "name": "host",
                         "type": "",
                         "returnType": "HTMLElement",
-                        "line": 58
+                        "line": 75
                     }
                 }
             },
-            "templateData": "<div\n  class=\"rxzu-diagram\"\n  #canvas\n  (mousedown)=\"onMouseDown($event)\"\n  (wheel)=\"onMouseWheel($event)\"\n  (keyup)=\"onKeyUp($event)\"\n  (copy)=\"onCopy($event)\"\n  (paste)=\"onPaste($event)\"\n  tabindex=\"1\"\n>\n  <!-- Nodes Layer -->\n  <div class=\"rxzu-nodes-layer\">\n    <ng-template #nodesLayer></ng-template>\n  </div>\n\n  <!-- Links Layer -->\n  <div class=\"rxzu-links-layer\">\n    <ng-template #linksLayer></ng-template>\n  </div>\n\n  <!-- Selection Box -->\n  <div\n    *ngIf=\"selectionBox$ | async as selectionBox\"\n    class=\"selector\"\n    [ngStyle]=\"{\n      top: selectionBox?.dimensions.top + 'px',\n      left: selectionBox?.dimensions.left + 'px',\n      width: selectionBox?.dimensions.width + 'px',\n      height: selectionBox?.dimensions.height + 'px'\n    }\"\n  ></div>\n</div>\n"
+            "templateData": "<div\n  class=\"rxzu-diagram\"\n  #canvas\n  (mousedown)=\"onMouseDown($event)\"\n  (wheel)=\"onMouseWheel($event)\"\n  (keyup)=\"onKeyUp($event)\"\n  tabindex=\"1\"\n>\n  <!-- Nodes Layer -->\n  <div class=\"rxzu-nodes-layer\">\n    <ng-template #nodesLayer></ng-template>\n  </div>\n\n  <!-- Links Layer -->\n  <div class=\"rxzu-links-layer\">\n    <ng-template #linksLayer></ng-template>\n  </div>\n\n  <!-- Selection Box -->\n  <div\n    *ngIf=\"selectionBox$ | async as selectionBox\"\n    class=\"selector\"\n    [ngStyle]=\"{\n      top: selectionBox?.dimensions.top + 'px',\n      left: selectionBox?.dimensions.left + 'px',\n      width: selectionBox?.dimensions.width + 'px',\n      height: selectionBox?.dimensions.height + 'px'\n    }\"\n  ></div>\n</div>\n"
         }
     ],
     "modules": [
@@ -1738,6 +1702,9 @@
                         },
                         {
                             "name": "DefaultPortComponent"
+                        },
+                        {
+                            "name": "RxZuModule"
                         }
                     ]
                 },
@@ -1799,7 +1766,7 @@
                 "ctype": "miscellaneous",
                 "subtype": "variable",
                 "file": "packages/angular/src/lib/injection.tokens.ts",
-                "type": "InjectionToken<Omit<ComponentProviderOptions, entityType>>",
+                "type": "InjectionToken<Omit<ComponentProviderOptions, type>>",
                 "defaultValue": "new InjectionToken('COMPONENT')"
             },
             {
@@ -1816,7 +1783,15 @@
                 "subtype": "variable",
                 "file": "packages/angular/src/lib/defaults/defaults.module.ts",
                 "type": "ComponentProviderOptions[]",
-                "defaultValue": "[\n  {\n    entityType: 'node',\n    type: 'default',\n    comp: DefaultNodeComponent\n  },\n  {\n    entityType: 'port',\n    type: 'default',\n    comp: DefaultPortComponent\n  }, {\n    entityType: 'link',\n    type: 'default',\n    comp: DefaultLinkComponent\n  },\n  {\n    entityType: 'label',\n    type: 'default',\n    comp: DefaultLabelComponent\n  }\n]"
+                "defaultValue": "[\n  {\n    type: 'node',\n    name: 'default',\n    component: DefaultNodeComponent\n  },\n  {\n    type: 'port',\n    name: 'default',\n    component: DefaultPortComponent\n  }, {\n    type: 'link',\n    name: 'default',\n    component: DefaultLinkComponent\n  },\n  {\n    type: 'label',\n    name: 'default',\n    component: DefaultLabelComponent\n  }\n]"
+            },
+            {
+                "name": "DIAGRAM_DEFAULT_OPTIONS",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "packages/angular/src/lib/injection.tokens.ts",
+                "type": "InjectionToken<EngineSetup>",
+                "defaultValue": "new InjectionToken('DIAGRAM_DEFAULT_OPTIONS', {\n  providedIn: 'root',\n  factory: function() {\n    return {\n      allowCanvasZoom: true,\n      allowCanvasTranslation: true,\n      inverseZoom: true,\n      allowLooseLinks: true,\n      maxZoomOut: 0,\n      maxZoomIn: 0,\n      portMagneticRadius: 30\n    } as EngineSetup\n  }\n})"
             },
             {
                 "name": "MODEL",
@@ -1828,24 +1803,6 @@
             }
         ],
         "functions": [
-            {
-                "name": "componentProviderOptionToProvider",
-                "file": "packages/angular/src/lib/injection.tokens.ts",
-                "ctype": "miscellaneous",
-                "subtype": "function",
-                "description": "",
-                "args": [
-                    {}
-                ],
-                "returnType": "Provider",
-                "jsdoctags": [
-                    {
-                        "tagName": {
-                            "text": "param"
-                        }
-                    }
-                ]
-            },
             {
                 "name": "OutsideZone",
                 "file": "packages/angular/src/lib/utils/decorators.ts",
@@ -1896,8 +1853,16 @@
                     "ctype": "miscellaneous",
                     "subtype": "variable",
                     "file": "packages/angular/src/lib/injection.tokens.ts",
-                    "type": "InjectionToken<Omit<ComponentProviderOptions, entityType>>",
+                    "type": "InjectionToken<Omit<ComponentProviderOptions, type>>",
                     "defaultValue": "new InjectionToken('COMPONENT')"
+                },
+                {
+                    "name": "DIAGRAM_DEFAULT_OPTIONS",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "packages/angular/src/lib/injection.tokens.ts",
+                    "type": "InjectionToken<EngineSetup>",
+                    "defaultValue": "new InjectionToken('DIAGRAM_DEFAULT_OPTIONS', {\n  providedIn: 'root',\n  factory: function() {\n    return {\n      allowCanvasZoom: true,\n      allowCanvasTranslation: true,\n      inverseZoom: true,\n      allowLooseLinks: true,\n      maxZoomOut: 0,\n      maxZoomIn: 0,\n      portMagneticRadius: 30\n    } as EngineSetup\n  }\n})"
                 },
                 {
                     "name": "MODEL",
@@ -1923,31 +1888,11 @@
                     "subtype": "variable",
                     "file": "packages/angular/src/lib/defaults/defaults.module.ts",
                     "type": "ComponentProviderOptions[]",
-                    "defaultValue": "[\n  {\n    entityType: 'node',\n    type: 'default',\n    comp: DefaultNodeComponent\n  },\n  {\n    entityType: 'port',\n    type: 'default',\n    comp: DefaultPortComponent\n  }, {\n    entityType: 'link',\n    type: 'default',\n    comp: DefaultLinkComponent\n  },\n  {\n    entityType: 'label',\n    type: 'default',\n    comp: DefaultLabelComponent\n  }\n]"
+                    "defaultValue": "[\n  {\n    type: 'node',\n    name: 'default',\n    component: DefaultNodeComponent\n  },\n  {\n    type: 'port',\n    name: 'default',\n    component: DefaultPortComponent\n  }, {\n    type: 'link',\n    name: 'default',\n    component: DefaultLinkComponent\n  },\n  {\n    type: 'label',\n    name: 'default',\n    component: DefaultLabelComponent\n  }\n]"
                 }
             ]
         },
         "groupedFunctions": {
-            "packages/angular/src/lib/injection.tokens.ts": [
-                {
-                    "name": "componentProviderOptionToProvider",
-                    "file": "packages/angular/src/lib/injection.tokens.ts",
-                    "ctype": "miscellaneous",
-                    "subtype": "function",
-                    "description": "",
-                    "args": [
-                        {}
-                    ],
-                    "returnType": "Provider",
-                    "jsdoctags": [
-                        {
-                            "tagName": {
-                                "text": "param"
-                            }
-                        }
-                    ]
-                }
-            ],
             "packages/angular/src/lib/utils/decorators.ts": [
                 {
                     "name": "OutsideZone",
@@ -2005,7 +1950,7 @@
                 "linktype": "component",
                 "name": "DefaultLabelComponent",
                 "coveragePercent": 0,
-                "coverageCount": "0/4",
+                "coverageCount": "0/6",
                 "status": "low"
             },
             {
@@ -2014,7 +1959,7 @@
                 "linktype": "component",
                 "name": "DefaultLinkComponent",
                 "coveragePercent": 0,
-                "coverageCount": "0/10",
+                "coverageCount": "0/12",
                 "status": "low"
             },
             {
@@ -2023,7 +1968,7 @@
                 "linktype": "component",
                 "name": "DefaultNodeComponent",
                 "coveragePercent": 0,
-                "coverageCount": "0/11",
+                "coverageCount": "0/13",
                 "status": "low"
             },
             {
@@ -2032,7 +1977,7 @@
                 "linktype": "component",
                 "name": "DefaultPortComponent",
                 "coveragePercent": 0,
-                "coverageCount": "0/3",
+                "coverageCount": "0/5",
                 "status": "low"
             },
             {
@@ -2060,12 +2005,8 @@
                 "type": "component",
                 "linktype": "component",
                 "name": "RxZuDiagramComponent",
-                "coveragePercent": 0,
-<<<<<<< HEAD
-                "coverageCount": "0/34",
-=======
-                "coverageCount": "0/31",
->>>>>>> 55dd6f0ed7c65f1c873ccae2c9405672dc8c025e
+                "coveragePercent": 2,
+                "coverageCount": "1/37",
                 "status": "low"
             },
             {
@@ -2097,9 +2038,10 @@
             },
             {
                 "filePath": "packages/angular/src/lib/injection.tokens.ts",
-                "type": "function",
-                "linksubtype": "function",
-                "name": "componentProviderOptionToProvider",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "COMPONENT",
                 "coveragePercent": 0,
                 "coverageCount": "0/1",
                 "status": "low"
@@ -2109,7 +2051,7 @@
                 "type": "variable",
                 "linktype": "miscellaneous",
                 "linksubtype": "variable",
-                "name": "COMPONENT",
+                "name": "DIAGRAM_DEFAULT_OPTIONS",
                 "coveragePercent": 0,
                 "coverageCount": "0/1",
                 "status": "low"
