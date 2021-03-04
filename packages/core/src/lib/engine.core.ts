@@ -4,7 +4,7 @@ import { BaseEntity } from './base.entity';
 import { FactoriesManager } from './factories';
 import { DiagramModel, PortModel, NodeModel, LabelModel } from './models';
 import { createValueState, ValueState } from './state';
-import { BaseMouseAction, BaseActionState, SelectingAction } from './actions';
+import { BaseActionState, SelectingAction } from './actions';
 import { DiagramModelOptions, EngineSetup } from './interfaces';
 import { KeyboardManager, MouseManager } from './managers';
 import { BaseAction } from './actions/base.action';
@@ -646,7 +646,7 @@ export class DiagramEngineCore {
     return this.action$;
   }
 
-  setAction(action: BaseMouseAction) {
+  setAction(action: BaseAction) {
     this.action$.next({ action, state: 'firing' });
   }
 
