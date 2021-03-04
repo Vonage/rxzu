@@ -400,7 +400,7 @@ export class MouseManager {
             ) {
               // link is valid, fire the event
               this.engine.startFiringAction(
-                new LinkCreatedAction(event.clientX, event.clientY, link)
+                new LinkCreatedAction(link)
               );
             }
           }
@@ -426,7 +426,7 @@ export class MouseManager {
           ) {
             link.destroy();
             this.engine.startFiringAction(
-              new LooseLinkDestroyed(event.clientX, event.clientY, link)
+              new LooseLinkDestroyed(link)
             );
           }
         });
@@ -448,7 +448,7 @@ export class MouseManager {
             // link not allowed
             link?.destroy();
             this.engine.startFiringAction(
-              new InvalidLinkDestroyed(event.clientX, event.clientY, link)
+              new InvalidLinkDestroyed(link)
             );
           } else if (
             targetPort

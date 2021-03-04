@@ -2,10 +2,10 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import {
   DiagramModel,
   NodeModel,
-  BaseAction,
   PortModel,
   BaseModel,
   DiagramEngine,
+  BaseAction,
 } from '@rxzu/angular';
 import { filter } from 'rxjs/operators';
 

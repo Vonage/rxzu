@@ -14,7 +14,7 @@ import { LinkModel } from './link.model';
 import { NodeModel } from './node.model';
 import { PortModel } from './port.model';
 import { PointModel } from './point.model';
-import { DiagramModelOptions } from '../interfaces/options.interface';
+import { DiagramModelOptions, KeyBindigsOptions } from '../interfaces/options.interface';
 
 export class DiagramModel extends BaseEntity {
   protected nodes$: EntityState<NodeModel>;
@@ -30,6 +30,7 @@ export class DiagramModel extends BaseEntity {
   protected inverseZoom$: ValueState<boolean>;
   protected allowLooseLinks$: ValueState<boolean>;
   protected portMagneticRadius$: ValueState<number>;
+  protected keyBindings$: ValueState<KeyBindigsOptions>;
 
   constructor(
     protected diagramEngine: DiagramEngineCore,
@@ -79,6 +80,10 @@ export class DiagramModel extends BaseEntity {
     this.portMagneticRadius$ = createValueState(
       options.portMagneticRadius ?? 30,
       this.entityPipe('portMagneticRadius')
+    );
+    this.keyBindings$ = createValueState(
+      options.keyBindings ?? {},
+      this.entityPipe('keyBindings')
     );
   }
 
@@ -230,6 +235,18 @@ export class DiagramModel extends BaseEntity {
 
   selectInverseZoom() {
     return this.inverseZoom$.select();
+  }
+
+  setKeyBindings(keyBindings: KeyBindigsOptions) {
+    this.keyBindings$.set(keyBindings).emit();
+  }
+
+  getKeyBindings() {
+    return this.keyBindings$.value;
+  }
+
+  selectKeyBindings() {
+    return this.keyBindings$.select();
   }
 
   setAllowCanvasZoom(allowCanvasZoom: boolean) {

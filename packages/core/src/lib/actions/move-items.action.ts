@@ -1,4 +1,4 @@
-import { BaseAction } from './base.action';
+import { BaseMouseAction } from './base-mouse.action';
 import { PointModel } from '../models/point.model';
 import { NodeModel } from '../models/node.model';
 import { LinkModel } from '../models/link.model';
@@ -6,7 +6,7 @@ import { DiagramEngineCore } from '../engine.core';
 import { SelectionModel } from '../interfaces/move-selection.interface';
 import { PortModel } from '../models';
 
-export class MoveItemsAction extends BaseAction {
+export class MoveItemsAction extends BaseMouseAction {
   selectionModels: SelectionModel[];
   moved: boolean;
 
