@@ -14,7 +14,10 @@ import { LinkModel } from './link.model';
 import { NodeModel } from './node.model';
 import { PortModel } from './port.model';
 import { PointModel } from './point.model';
-import { DiagramModelOptions, KeyBindigsOptions } from '../interfaces/options.interface';
+import {
+  DiagramModelOptions,
+  KeyBindigsOptions,
+} from '../interfaces/options.interface';
 
 export class DiagramModel extends BaseEntity {
   private _diagramEngine?: DiagramEngine;
@@ -33,10 +36,7 @@ export class DiagramModel extends BaseEntity {
   protected portMagneticRadius$: ValueState<number>;
   protected keyBindings$: ValueState<KeyBindigsOptions>;
 
-  constructor(
-    options: DiagramModelOptions,
-    diagramEngine?: DiagramEngine
-  ) {
+  constructor(options: DiagramModelOptions, diagramEngine?: DiagramEngine) {
     super({ ...options, logPrefix: '[Diagram]', type: 'diagram' });
 
     if (diagramEngine) {

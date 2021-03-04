@@ -2,23 +2,30 @@ import { BehaviorSubject } from 'rxjs';
 import { CopyAction } from '../actions/copy.action';
 import { DeleteKeyPressedAction } from '../actions/delete-key-pressed.action';
 import { PasteAction } from '../actions/paste.action';
-import { DiagramEngineCore } from '../engine.core';
+import { DiagramEngine } from '../engine.core';
 import { NodeModel, PointModel, PortModel, LinkModel } from '../models';
 
 export class KeyboardManager {
-  protected engine: DiagramEngineCore;
-  protected clipboard$: BehaviorSubject<(NodeModel | PointModel | PortModel | LinkModel)[]>;
+  protected engine: DiagramEngine;
+  protected clipboard$: BehaviorSubject<
+    (NodeModel | PointModel | PortModel | LinkModel)[]
+  >;
 
-  constructor(_diagramEngine: DiagramEngineCore) {
+  constructor(_diagramEngine: DiagramEngine) {
     this.engine = _diagramEngine;
-    this.clipboard$ = new BehaviorSubject<(NodeModel | PointModel | PortModel | LinkModel)[]>([]);
+    this.clipboard$ = new BehaviorSubject<
+      (NodeModel | PointModel | PortModel | LinkModel)[]
+    >([]);
   }
 
   onKeyUp(event: KeyboardEvent) {
-      const deleteKeyPressedAction = new DeleteKeyPressedAction(this.engine, event);
-      this.engine.startFiringAction(deleteKeyPressedAction);
-      this.engine.fireAction();
-      this.engine.stopFiringAction();
+    const deleteKeyPressedAction = new DeleteKeyPressedAction(
+      this.engine,
+      event
+    );
+    this.engine.startFiringAction(deleteKeyPressedAction);
+    this.engine.fireAction();
+    this.engine.stopFiringAction();
   }
 
   onCopy() {
