@@ -136,9 +136,7 @@ export class RxZuDiagramComponent
 
   @OutsideZone
   onKeyUp(event: KeyboardEvent) {
-    if (this.diagramModel?.getKeyBindings()) {
-      this.keyboardManager ? this.keyboardManager.onKeyUp(event) : noop();
-    }
+    this.keyboardManager ? this.keyboardManager.onKeyUp(event) : noop();
   }
 
   @OutsideZone
