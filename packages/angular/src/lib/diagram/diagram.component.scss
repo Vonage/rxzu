@@ -5,6 +5,10 @@
   cursor: move;
   overflow: hidden;
 
+  &:focus {
+    outline: none;
+  }
+
   .selector {
     position: absolute;
     background-color: rgba(0, 192, 255, 0.2);
