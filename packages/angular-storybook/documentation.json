@@ -1201,7 +1201,7 @@
         },
         {
             "name": "RxZuDiagramComponent",
-            "id": "component-RxZuDiagramComponent-491220a560488452d27e622dd9a383ea",
+            "id": "component-RxZuDiagramComponent-d90ef445e404b7c773b21fd14eb12998",
             "file": "packages/angular/src/lib/diagram/diagram.component.ts",
             "changeDetection": "ChangeDetectionStrategy.OnPush",
             "encapsulation": [],
@@ -1222,43 +1222,48 @@
                 {
                     "name": "allowCanvasTranslation",
                     "defaultValue": "true",
-                    "line": 36
+                    "line": 35
                 },
                 {
                     "name": "allowCanvasZoom",
                     "defaultValue": "true",
-                    "line": 35
+                    "line": 34
                 },
                 {
                     "name": "allowLooseLinks",
                     "defaultValue": "true",
-                    "line": 38
+                    "line": 37
                 },
                 {
                     "name": "inverseZoom",
                     "defaultValue": "true",
-                    "line": 37
+                    "line": 36
+                },
+                {
+                    "name": "keyBindings",
+                    "defaultValue": "{}",
+                    "line": 41
                 },
                 {
                     "name": "maxZoomIn",
                     "defaultValue": "0",
-                    "line": 40
+                    "line": 39
                 },
                 {
                     "name": "maxZoomOut",
                     "defaultValue": "0",
-                    "line": 39
+                    "line": 38
                 },
                 {
                     "name": "model",
                     "defaultValue": "null",
-                    "line": 34,
+                    "line": 33,
                     "type": "DiagramModel | null"
                 },
                 {
                     "name": "portMagneticRadius",
                     "defaultValue": "30",
-                    "line": 41
+                    "line": 40
                 }
             ],
             "outputsClass": [],
@@ -1356,7 +1361,7 @@
                     "optional": false,
                     "returnType": "HTMLDivElement | null",
                     "typeParameters": [],
-                    "line": 204,
+                    "line": 210,
                     "modifierKind": [
                         113
                     ]
@@ -1367,7 +1372,7 @@
                     "optional": false,
                     "returnType": "HTMLDivElement | null",
                     "typeParameters": [],
-                    "line": 196,
+                    "line": 202,
                     "modifierKind": [
                         113
                     ]
@@ -1378,7 +1383,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 109
+                    "line": 113
                 },
                 {
                     "name": "initSubs",
@@ -1386,7 +1391,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 178,
+                    "line": 184,
                     "modifierKind": [
                         113
                     ]
@@ -1408,6 +1413,28 @@
                     "line": 104
                 },
                 {
+                    "name": "onCopy",
+                    "args": [
+                        {
+                            "name": "event",
+                            "type": "ClipboardEvent"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 146,
+                    "jsdoctags": [
+                        {
+                            "name": "event",
+                            "type": "ClipboardEvent",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
                     "name": "onKeyUp",
                     "args": [
                         {
@@ -1418,7 +1445,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 137,
+                    "line": 141,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1445,7 +1472,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 157,
+                    "line": 163,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1472,7 +1499,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 152,
+                    "line": 158,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1499,7 +1526,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 132,
+                    "line": 136,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1526,7 +1553,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 162,
+                    "line": 168,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1536,6 +1563,28 @@
                         {
                             "name": "event",
                             "type": "WheelEvent",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "onPaste",
+                    "args": [
+                        {
+                            "name": "event",
+                            "type": "ClipboardEvent"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 152,
+                    "jsdoctags": [
+                        {
+                            "name": "event",
+                            "type": "ClipboardEvent",
                             "tagName": {
                                 "text": "param"
                             }
@@ -1561,7 +1610,7 @@
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 167,
+                    "line": 173,
                     "decorators": [
                         {
                             "name": "OutsideZone"
@@ -1596,42 +1645,15 @@
                 }
             ],
             "hostBindings": [],
-            "hostListeners": [
-                {
-                    "name": "window:copy",
-                    "args": [
-                        {
-                            "name": "event",
-                            "type": "ClipboardEvent"
-                        }
-                    ],
-                    "argsDecorator": [
-                        "$event"
-                    ],
-                    "line": 142
-                },
-                {
-                    "name": "window:paste",
-                    "args": [
-                        {
-                            "name": "event",
-                            "type": "ClipboardEvent"
-                        }
-                    ],
-                    "argsDecorator": [
-                        "$event"
-                    ],
-                    "line": 147
-                }
-            ],
+            "hostListeners": [],
             "description": "",
             "rawdescription": "",
             "type": "component",
-            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  HostListener,\n  Input,\n  NgZone,\n  OnDestroy,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { combineLatest, noop, Observable, of, ReplaySubject } from 'rxjs';\nimport { map, switchMap, takeUntil, tap } from 'rxjs/operators';\nimport {\n  DiagramEngineCore,\n  SelectingAction,\n  MouseManager,\n  DiagramModel,\n  KeyboardManager\n} from '@rxzu/core';\nimport { ZonedClass, OutsideZone } from '../utils';\n\n@Component({\n  selector: 'rxzu-diagram',\n  templateUrl: 'diagram.component.html',\n  styleUrls: ['diagram.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class RxZuDiagramComponent\n  implements AfterViewInit, OnDestroy, ZonedClass {\n  @Input('model') diagramModel: DiagramModel | null = null;\n  @Input() allowCanvasZoom = true;\n  @Input() allowCanvasTranslation = true;\n  @Input() inverseZoom = true;\n  @Input() allowLooseLinks = true;\n  @Input() maxZoomOut = 0;\n  @Input() maxZoomIn = 0;\n  @Input() portMagneticRadius = 30;\n\n  @ViewChild('nodesLayer', { read: ViewContainerRef })\n  nodesLayer?: ViewContainerRef;\n\n  @ViewChild('linksLayer', { read: ViewContainerRef })\n  linksLayer?: ViewContainerRef;\n\n  @ViewChild('canvas', { read: ElementRef })\n  canvas?: ElementRef;\n\n  diagramEngine?: DiagramEngineCore;\n  mouseManager?: MouseManager;\n  keyboardManager?: KeyboardManager;\n  selectionBox$?: Observable<SelectingAction | null>;\n  destroyed$ = new ReplaySubject<boolean>(1);\n\n  get host(): HTMLElement {\n    return this.elRef.nativeElement;\n  }\n\n  constructor(\n    public ngZone: NgZone,\n    protected renderer: Renderer2,\n    protected cdRef: ChangeDetectorRef,\n    protected elRef: ElementRef<HTMLElement>\n  ) {}\n\n  ngAfterViewInit() {\n    const model = this.diagramModel;\n    if (!model || !this.canvas) {\n      return;\n    }\n    this.diagramEngine = model.getDiagramEngine();\n    this.mouseManager = this.diagramEngine.getMouseManager();\n    this.keyboardManager = this.diagramEngine.getKeyboardManager();\n    \n\n    this.diagramEngine.setCanvas(this.canvas.nativeElement);\n\n    this.diagramEngine.setup({\n      ...this,\n    });\n\n    (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)\n      .pipe(\n        switchMap(() => {\n          if (!this.diagramEngine) {\n            return of(null);\n          }\n\n          return this.diagramEngine.paintLinks(this.linksLayer) as Observable<\n            void\n          >;\n        })\n      )\n      .subscribe(() => {\n        this.initSubs();\n        this.initSelectionBox();\n        this.cdRef.detectChanges();\n      });\n  }\n\n  ngOnDestroy() {\n    this.destroyed$.next(true);\n    this.destroyed$.complete();\n  }\n\n  initSelectionBox() {\n    if (!this.diagramEngine) {\n      return;\n    }\n\n    this.selectionBox$ = this.diagramEngine.selectAction().pipe(\n      map((a) => {\n        if (\n          a &&\n          a.action &&\n          a.action instanceof SelectingAction &&\n          a.state === 'firing'\n        ) {\n          return a.action as SelectingAction;\n        } else {\n          return null;\n        }\n      }),\n      tap(() => this.cdRef.detectChanges())\n    );\n  }\n\n  @OutsideZone\n  onMouseUp(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseUp(event) : noop();\n  }\n\n  @OutsideZone\n  onKeyUp(event: KeyboardEvent) {\n   this.keyboardManager ? this.keyboardManager.onKeyDown(event) : noop();\n  }\n\n  @HostListener('window:copy', ['$event'])\n  copyEvent(event: ClipboardEvent) {\n   this.keyboardManager ? this.keyboardManager.onCopy() : noop();\n  }\n\n  @HostListener('window:paste', ['$event'])\n  pasteEvent(event: ClipboardEvent) {\n   this.keyboardManager ? this.keyboardManager.onPaste() : noop();\n  }\n\n  @OutsideZone\n  onMouseMove(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseMove(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseDown(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseDown(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseWheel(event: WheelEvent) {\n    this.mouseManager ? this.mouseManager.onMouseWheel(event) : noop();\n  }\n\n  @OutsideZone\n  protected setLayerStyles(x: number, y: number, zoom: number): void {\n    const nodesLayer = this.getNodesLayer();\n    const linksLayer = this.getLinksLayer();\n\n    const style = 'transform';\n    const value = `translate(${x}px, ${y}px) scale(${zoom / 100.0})`;\n\n    this.renderer.setStyle(nodesLayer, style, value);\n    this.renderer.setStyle(linksLayer, style, value);\n  }\n\n  protected initSubs() {\n    const diagramModel = this.diagramEngine?.getDiagramModel();\n    if (!diagramModel) {\n      return;\n    }\n\n    combineLatest([\n      diagramModel.selectOffsetX(),\n      diagramModel.selectOffsetY(),\n      diagramModel.selectZoomLevel(),\n    ])\n      .pipe(\n        tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),\n        takeUntil(this.destroyed$)\n      )\n      .subscribe();\n  }\n\n  protected getNodesLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-nodes-layer');\n  }\n\n  protected getLinksLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-links-layer');\n  }\n}\n",
+            "sourceCode": "import {\n  AfterViewInit,\n  ChangeDetectionStrategy,\n  ChangeDetectorRef,\n  Component,\n  ElementRef,\n  Input,\n  NgZone,\n  OnDestroy,\n  Renderer2,\n  ViewChild,\n  ViewContainerRef,\n} from '@angular/core';\nimport { combineLatest, noop, Observable, of, ReplaySubject } from 'rxjs';\nimport { map, switchMap, takeUntil, tap } from 'rxjs/operators';\nimport {\n  DiagramEngineCore,\n  SelectingAction,\n  MouseManager,\n  DiagramModel,\n  KeyboardManager\n} from '@rxzu/core';\nimport { ZonedClass, OutsideZone } from '../utils';\n\n@Component({\n  selector: 'rxzu-diagram',\n  templateUrl: 'diagram.component.html',\n  styleUrls: ['diagram.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class RxZuDiagramComponent\n  implements AfterViewInit, OnDestroy, ZonedClass {\n  @Input('model') diagramModel: DiagramModel | null = null;\n  @Input() allowCanvasZoom = true;\n  @Input() allowCanvasTranslation = true;\n  @Input() inverseZoom = true;\n  @Input() allowLooseLinks = true;\n  @Input() maxZoomOut = 0;\n  @Input() maxZoomIn = 0;\n  @Input() portMagneticRadius = 30;\n  @Input() keyBindings = {};\n\n  @ViewChild('nodesLayer', { read: ViewContainerRef })\n  nodesLayer?: ViewContainerRef;\n\n  @ViewChild('linksLayer', { read: ViewContainerRef })\n  linksLayer?: ViewContainerRef;\n\n  @ViewChild('canvas', { read: ElementRef })\n  canvas?: ElementRef;\n\n  diagramEngine?: DiagramEngineCore;\n  mouseManager?: MouseManager;\n  keyboardManager?: KeyboardManager;\n  selectionBox$?: Observable<SelectingAction | null>;\n  destroyed$ = new ReplaySubject<boolean>(1);\n\n  get host(): HTMLElement {\n    return this.elRef.nativeElement;\n  }\n\n  constructor(\n    public ngZone: NgZone,\n    protected renderer: Renderer2,\n    protected cdRef: ChangeDetectorRef,\n    protected elRef: ElementRef<HTMLElement>\n  ) {}\n\n  ngAfterViewInit() {\n    const model = this.diagramModel;\n    if (!model || !this.canvas) {\n      return;\n    }\n    this.diagramEngine = model.getDiagramEngine();\n    this.mouseManager = this.diagramEngine.getMouseManager();\n    this.keyboardManager = this.diagramEngine.getKeyboardManager();\n    \n\n    this.diagramEngine.setCanvas(this.canvas.nativeElement);\n\n    this.diagramEngine.setup({\n      ...this,\n    });\n\n    (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)\n      .pipe(\n        switchMap(() => {\n          if (!this.diagramEngine) {\n            return of(null);\n          }\n\n          return this.diagramEngine.paintLinks(this.linksLayer) as Observable<\n            void\n          >;\n        })\n      )\n      .subscribe(() => {\n        this.initSubs();\n        this.initSelectionBox();\n        this.cdRef.detectChanges();\n      });\n  }\n\n  ngOnDestroy() {\n    this.destroyed$.next(true);\n    this.destroyed$.complete();\n    \n    if (this.keyboardManager) {\n      this.keyboardManager.dispose();\n    }\n  }\n\n  initSelectionBox() {\n    if (!this.diagramEngine) {\n      return;\n    }\n\n    this.selectionBox$ = this.diagramEngine.selectAction().pipe(\n      map((a) => {\n        if (\n          a &&\n          a.action &&\n          a.action instanceof SelectingAction &&\n          a.state === 'firing'\n        ) {\n          return a.action as SelectingAction;\n        } else {\n          return null;\n        }\n      }),\n      tap(() => this.cdRef.detectChanges())\n    );\n  }\n\n  @OutsideZone\n  onMouseUp(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseUp(event) : noop();\n  }\n\n  @OutsideZone\n  onKeyUp(event: KeyboardEvent) {\n    this.keyboardManager ? this.keyboardManager.onKeyUp(event) : noop();\n  }\n\n\n  onCopy(event: ClipboardEvent) {\n    event.preventDefault();\n    this.keyboardManager ? this.keyboardManager.onCopy() : noop();\n  }\n\n\n  onPaste(event: ClipboardEvent) {\n    event.preventDefault();\n    this.keyboardManager ? this.keyboardManager.onPaste() : noop();\n  }\n\n  @OutsideZone\n  onMouseMove(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseMove(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseDown(event: MouseEvent) {\n    this.mouseManager ? this.mouseManager.onMouseDown(event) : noop();\n  }\n\n  @OutsideZone\n  onMouseWheel(event: WheelEvent) {\n    this.mouseManager ? this.mouseManager.onMouseWheel(event) : noop();\n  }\n\n  @OutsideZone\n  protected setLayerStyles(x: number, y: number, zoom: number): void {\n    const nodesLayer = this.getNodesLayer();\n    const linksLayer = this.getLinksLayer();\n\n    const style = 'transform';\n    const value = `translate(${x}px, ${y}px) scale(${zoom / 100.0})`;\n\n    this.renderer.setStyle(nodesLayer, style, value);\n    this.renderer.setStyle(linksLayer, style, value);\n  }\n\n  protected initSubs() {\n    const diagramModel = this.diagramEngine?.getDiagramModel();\n    if (!diagramModel) {\n      return;\n    }\n\n    combineLatest([\n      diagramModel.selectOffsetX(),\n      diagramModel.selectOffsetY(),\n      diagramModel.selectZoomLevel(),\n    ])\n      .pipe(\n        tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),\n        takeUntil(this.destroyed$)\n      )\n      .subscribe();\n  }\n\n  protected getNodesLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-nodes-layer');\n  }\n\n  protected getLinksLayer(): HTMLDivElement | null {\n    if (!this.host) {\n      return null;\n    }\n\n    return this.host.querySelector('.rxzu-links-layer');\n  }\n}\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
-                    "data": ".rxzu-diagram {\n  position: relative;\n  flex-grow: 1;\n  display: flex;\n  cursor: move;\n  overflow: hidden;\n\n  .selector {\n    position: absolute;\n    background-color: rgba(0, 192, 255, 0.2);\n    border: solid 2px rgb(0, 192, 255);\n  }\n\n  .rxzu-nodes-layer {\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    transform-origin: 0 0;\n    overflow: visible;\n    pointer-events: none;\n    z-index: 150;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    right: 0;\n  }\n\n  .rxzu-links-layer {\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    transform-origin: 0 0;\n    overflow: visible;\n    pointer-events: none;\n    z-index: 100;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    right: 0;\n  }\n}\n",
+                    "data": ".rxzu-diagram {\n  position: relative;\n  flex-grow: 1;\n  display: flex;\n  cursor: move;\n  overflow: hidden;\n\n  .selector {\n    position: absolute;\n    background-color: rgba(0, 192, 255, 0.2);\n    border: solid 2px rgb(0, 192, 255);\n  }\n\n  &:hover {\n    outline: none;\n  }\n\n  .rxzu-nodes-layer {\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    transform-origin: 0 0;\n    overflow: visible;\n    pointer-events: none;\n    z-index: 150;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    right: 0;\n  }\n\n  .rxzu-links-layer {\n    position: absolute;\n    height: 100%;\n    width: 100%;\n    transform-origin: 0 0;\n    overflow: visible;\n    pointer-events: none;\n    z-index: 100;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    right: 0;\n  }\n}\n",
                     "styleUrl": "diagram.component.scss"
                 }
             ],
@@ -1705,7 +1727,7 @@
                     }
                 }
             },
-            "templateData": "<div\n  class=\"rxzu-diagram\"\n  #canvas\n  (mousedown)=\"onMouseDown($event)\"\n  (wheel)=\"onMouseWheel($event)\"\n  (keyup)=\"onKeyUp($event)\"\n  tabindex=\"1\"\n>\n  <!-- Nodes Layer -->\n  <div class=\"rxzu-nodes-layer\">\n    <ng-template #nodesLayer></ng-template>\n  </div>\n\n  <!-- Links Layer -->\n  <div class=\"rxzu-links-layer\">\n    <ng-template #linksLayer></ng-template>\n  </div>\n\n  <!-- Selection Box -->\n  <div\n    *ngIf=\"selectionBox$ | async as selectionBox\"\n    class=\"selector\"\n    [ngStyle]=\"{\n      top: selectionBox?.dimensions.top + 'px',\n      left: selectionBox?.dimensions.left + 'px',\n      width: selectionBox?.dimensions.width + 'px',\n      height: selectionBox?.dimensions.height + 'px'\n    }\"\n  ></div>\n</div>\n"
+            "templateData": "<div\n  class=\"rxzu-diagram\"\n  #canvas\n  (mousedown)=\"onMouseDown($event)\"\n  (wheel)=\"onMouseWheel($event)\"\n  (keyup)=\"onKeyUp($event)\"\n  (copy)=\"onCopy($event)\"\n  (paste)=\"onPaste($event)\"\n  tabindex=\"1\"\n>\n  <!-- Nodes Layer -->\n  <div class=\"rxzu-nodes-layer\">\n    <ng-template #nodesLayer></ng-template>\n  </div>\n\n  <!-- Links Layer -->\n  <div class=\"rxzu-links-layer\">\n    <ng-template #linksLayer></ng-template>\n  </div>\n\n  <!-- Selection Box -->\n  <div\n    *ngIf=\"selectionBox$ | async as selectionBox\"\n    class=\"selector\"\n    [ngStyle]=\"{\n      top: selectionBox?.dimensions.top + 'px',\n      left: selectionBox?.dimensions.left + 'px',\n      width: selectionBox?.dimensions.width + 'px',\n      height: selectionBox?.dimensions.height + 'px'\n    }\"\n  ></div>\n</div>\n"
         }
     ],
     "modules": [
@@ -2168,7 +2190,7 @@
                 "linktype": "component",
                 "name": "RxZuDiagramComponent",
                 "coveragePercent": 0,
-                "coverageCount": "0/33",
+                "coverageCount": "0/34",
                 "status": "low"
             },
             {

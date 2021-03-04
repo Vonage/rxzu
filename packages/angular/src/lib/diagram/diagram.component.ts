@@ -4,6 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  HostListener,
   Input,
   NgZone,
   OnDestroy,
@@ -142,15 +143,13 @@ export class RxZuDiagramComponent
     this.keyboardManager ? this.keyboardManager.onKeyUp(event) : noop();
   }
 
-  @OutsideZone
+  @HostListener('window:copy', ['$event'])
   onCopy(event: ClipboardEvent) {
-    event.preventDefault();
     this.keyboardManager ? this.keyboardManager.onCopy() : noop();
   }
 
-  @OutsideZone
+  @HostListener('window:paste', ['$event'])
   onPaste(event: ClipboardEvent) {
-    event.preventDefault();
     this.keyboardManager ? this.keyboardManager.onPaste() : noop();
   }
 
