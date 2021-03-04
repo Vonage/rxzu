@@ -18,6 +18,7 @@ import {
   SelectingAction,
   MouseManager,
   DiagramModel,
+  KeyboardManager
 } from '@rxzu/core';
 import { ZonedClass, OutsideZone } from '../utils';
 
@@ -37,6 +38,7 @@ export class RxZuDiagramComponent
   @Input() maxZoomOut = 0;
   @Input() maxZoomIn = 0;
   @Input() portMagneticRadius = 30;
+  @Input() keyBindings = {};
 
   @ViewChild('nodesLayer', { read: ViewContainerRef })
   nodesLayer?: ViewContainerRef;
@@ -49,6 +51,7 @@ export class RxZuDiagramComponent
 
   diagramEngine?: DiagramEngineCore;
   mouseManager?: MouseManager;
+  keyboardManager?: KeyboardManager;
   selectionBox$?: Observable<SelectingAction | null>;
   destroyed$ = new ReplaySubject<boolean>(1);
 
@@ -70,6 +73,8 @@ export class RxZuDiagramComponent
     }
     this.diagramEngine = model.getDiagramEngine();
     this.mouseManager = this.diagramEngine.getMouseManager();
+    this.keyboardManager = this.diagramEngine.getKeyboardManager();
+    
 
     this.diagramEngine.setCanvas(this.canvas.nativeElement);
 
@@ -99,6 +104,10 @@ export class RxZuDiagramComponent
   ngOnDestroy() {
     this.destroyed$.next(true);
     this.destroyed$.complete();
+    
+    if (this.keyboardManager) {
+      this.keyboardManager.dispose();
+    }
   }
 
   initSelectionBox() {
@@ -126,6 +135,23 @@ export class RxZuDiagramComponent
   @OutsideZone
   onMouseUp(event: MouseEvent) {
     this.mouseManager ? this.mouseManager.onMouseUp(event) : noop();
+  }
+
+  @OutsideZone
+  onKeyUp(event: KeyboardEvent) {
+    this.keyboardManager ? this.keyboardManager.onKeyUp(event) : noop();
+  }
+
+  @OutsideZone
+  onCopy(event: ClipboardEvent) {
+    event.preventDefault();
+    this.keyboardManager ? this.keyboardManager.onCopy() : noop();
+  }
+
+  @OutsideZone
+  onPaste(event: ClipboardEvent) {
+    event.preventDefault();
+    this.keyboardManager ? this.keyboardManager.onPaste() : noop();
   }
 
   @OutsideZone
