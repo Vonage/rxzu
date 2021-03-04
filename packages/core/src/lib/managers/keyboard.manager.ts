@@ -1,6 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import { CopyAction } from '../actions/copy.action';
-import { DeleteKeyPressed } from '../actions/delete-key-pressed.action';
+import { DeleteKeyPressedAction } from '../actions/delete-key-pressed.action';
 import { PasteAction } from '../actions/paste.action';
 import { DiagramEngineCore } from '../engine.core';
 import { NodeModel, PointModel, PortModel, LinkModel } from '../models';
@@ -15,7 +15,7 @@ export class KeyboardManager {
   }
 
   onKeyUp(event: KeyboardEvent) {
-      const deleteKeyPressedAction = new DeleteKeyPressed(this.engine, event);
+      const deleteKeyPressedAction = new DeleteKeyPressedAction(this.engine, event);
       this.engine.startFiringAction(deleteKeyPressedAction);
       this.engine.fireAction();
       this.engine.stopFiringAction();

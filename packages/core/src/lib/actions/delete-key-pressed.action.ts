@@ -2,7 +2,7 @@ import { DiagramEngineCore } from '../engine.core';
 import { LinkModel, NodeModel, PointModel, PortModel } from '../models';
 import { BaseAction } from './base.action';
 
-export class DeleteKeyPressed extends BaseAction {
+export class DeleteKeyPressedAction extends BaseAction {
   deletedModels: (NodeModel | PointModel | PortModel | LinkModel)[];
 
   constructor(diagramEngine: DiagramEngineCore, event: KeyboardEvent) {
