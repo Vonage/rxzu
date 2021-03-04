@@ -2,13 +2,13 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component,
+  Component, Host,
   Inject,
   ViewChild,
-  ViewContainerRef,
+  ViewContainerRef
 } from '@angular/core';
 import {
-  LINK_MODEL,
+  MODEL,
   Coords,
   LinkModel,
   generateCurvePath,
@@ -29,7 +29,7 @@ export class CustomLinkComponent implements AfterViewInit {
   centerOfLink$: BehaviorSubject<Coords>;
 
   constructor(
-    @Inject(LINK_MODEL) public model: LinkModel,
+    @Inject(MODEL) @Host() public model: LinkModel,
     private cdRef: ChangeDetectorRef
   ) {
     this.centerOfLink$ = new BehaviorSubject(

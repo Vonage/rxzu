@@ -11,31 +11,23 @@ import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { NodeModel } from './node.model';
 import { Coords, Dimensions, PortModelOptions } from '../interfaces';
+import { DiagramEngine } from '../engine.core';
 
 export class PortModel extends BaseModel<NodeModel> {
   protected coords$: ValueState<Coords>;
-  protected name$: ValueState<string | null>;
   protected maximumLinks$: ValueState<number | null>;
-  protected linkType$: ValueState<string>;
+  protected linkName$: ValueState<string>;
   protected dimensions$: ValueState<Dimensions>;
   protected magnetic$: ValueState<boolean>;
-  protected canCreateLinks$ = createValueState(
-    true,
-    this.entityPipe('magnetic')
-  );
+  protected canCreateLinks$: ValueState<boolean>;
   protected links$: EntityState<LinkModel>;
 
   constructor(options: PortModelOptions) {
-    super({ linkType: 'default', logPrefix: '[Port]', ...options });
+    super({ ...options, logPrefix: '[Port]', type: 'port' });
 
     this.coords$ = createValueState(
       options.coords ?? { x: 0, y: 0 },
       this.entityPipe('coords')
-    );
-
-    this.name$ = createValueState(
-      options.name ?? null,
-      this.entityPipe('name')
     );
 
     this.maximumLinks$ = createValueState(
@@ -43,9 +35,9 @@ export class PortModel extends BaseModel<NodeModel> {
       this.entityPipe('maximumLinks')
     );
 
-    this.linkType$ = createValueState(
-      options.linkType ?? 'default',
-      this.entityPipe('linkType')
+    this.linkName$ = createValueState(
+      options.linkName ?? 'default',
+      this.entityPipe('linkName')
     );
 
     this.magnetic$ = createValueState<boolean>(
@@ -57,14 +49,20 @@ export class PortModel extends BaseModel<NodeModel> {
       options.dimensions ?? { width: 0, height: 0 },
       this.entityPipe('dimensions')
     );
+
+    this.canCreateLinks$ = createValueState(
+      !!options.canCreateLinks,
+      this.entityPipe('canCreateLinks')
+    );
+
     this.links$ = createEntityState([], this.entityPipe('links'));
   }
 
   // serialize(): IPortModel {
   //   return {
   //     ...super.serialize(),
-  //     name: this.getName(),
-  //     linkType: this.getLinkType(),
+  //     name: this.name,
+  //     linkName: this.getLinkName(),
   //     maximumLinks: this.getMaximumLinks(),
   //     type: this.getType(),
   //     magnetic: this.getMagnetic(),
@@ -77,7 +75,7 @@ export class PortModel extends BaseModel<NodeModel> {
 
   link(port: PortModel): LinkModel | null {
     if (this.getCanCreateLinks()) {
-      const link = new LinkModel({ type: this.getLinkType() });
+      const link = new LinkModel({ name: this.getLinkName() });
       link.setSourcePort(this);
       link.setTargetPort(port);
       return link;
@@ -88,10 +86,6 @@ export class PortModel extends BaseModel<NodeModel> {
 
   getNode() {
     return this.getParent();
-  }
-
-  getName() {
-    return this.name$.value;
   }
 
   getCanCreateLinks(): boolean {
@@ -154,12 +148,12 @@ export class PortModel extends BaseModel<NodeModel> {
     this.maximumLinks$.set(maximumLinks ?? null).emit();
   }
 
-  getLinkType() {
-    return this.linkType$.value;
+  getLinkName() {
+    return this.linkName$.value;
   }
 
-  setLinkType(type: string) {
-    this.linkType$.set(type).emit();
+  setLinkName(type: string) {
+    this.linkName$.set(type).emit();
   }
 
   removeLink(linkOrId?: ID | LinkModel | null) {
@@ -195,12 +189,9 @@ export class PortModel extends BaseModel<NodeModel> {
     y: number;
     width: number;
     height: number;
-  }) {
+  }, engine?: DiagramEngine) {
     this.coords$.set({ x, y }).emit();
     this.dimensions$.set({ width, height }).emit();
-
-    // TODO: add a cleaner way to get the engine without traveling through parents
-    const engine = this.getParent()?.getParent()?.getDiagramEngine();
 
     if (!engine) {
       this.log(`Couldn't find DiagramEngine when updating coords. skipping`);
@@ -226,7 +217,7 @@ export class PortModel extends BaseModel<NodeModel> {
     if (this.getCanCreateLinks()) {
       return new LinkModel({
         parent: this.getParent().getParent(),
-        type: this.getLinkType(),
+        name: this.getLinkName(),
       });
     }
     return undefined;

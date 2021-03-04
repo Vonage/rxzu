@@ -83,7 +83,7 @@ export class DagrePlugin {
               new PointModel({
                 parent: link,
                 coords: { x: edge.points[i].x, y: edge.points[i].y },
-                type: 'default',
+                name: 'default',
               })
             );
           }

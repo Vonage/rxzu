@@ -1,19 +1,5 @@
-import {
-  Component,
-  ComponentFactoryResolver,
-  OnInit,
-  Renderer2,
-} from '@angular/core';
-import {
-  DiagramEngine,
-  DiagramModel,
-  NodeModel,
-  LabelModel,
-  PortModel,
-  BaseModel,
-  AbstractAngularFactory,
-} from '@rxzu/angular';
-import { CustomLabelFactory } from './custom.factory';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { DiagramModel, NodeModel, LabelModel, PortModel, BaseModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
@@ -25,41 +11,29 @@ import { CustomLabelFactory } from './custom.factory';
 })
 export class CustomLabelDiagramComponent implements OnInit {
   diagramModel: DiagramModel;
+  @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
-  constructor(
-    private diagramEngine: DiagramEngine,
-    private resolver: ComponentFactoryResolver,
-    private renderer: Renderer2
-  ) {
-    this.diagramEngine.registerDefaultFactories();
-    this.diagramEngine.getFactoriesManager().registerFactory({
-      type: 'labelFactories',
-      factory: new CustomLabelFactory(
-        this.resolver,
-        this.renderer
-      ) as AbstractAngularFactory,
-    });
-
-    this.diagramModel = this.diagramEngine.createModel();
+  constructor() {
+    this.diagramModel = new DiagramModel({ name: 'default' });
   }
 
   ngOnInit() {
     const nodesDefaultDimensions = { height: 200, width: 200 };
 
     const node1 = new NodeModel({
-      type: 'default',
+      name: 'default',
       coords: { x: 500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
-    const outPort = new PortModel({ type: 'default', name: 'outport' });
+    const outPort = new PortModel({ name: 'default', displayName: 'outport' });
     node1.addPort(outPort);
 
     const node2 = new NodeModel({
-      type: 'default',
+      name: 'default',
       coords: { x: 1500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
-    const inPort = new PortModel({ type: 'default', name: 'inport' });
+    const inPort = new PortModel({ name: 'default', displayName: 'inport' });
     node2.addPort(inPort);
 
     const link = outPort.link(inPort);
@@ -67,7 +41,7 @@ export class CustomLabelDiagramComponent implements OnInit {
     if (link) {
       const label = new LabelModel({
         text: "I'm a custom label",
-        type: 'custom-label',
+        name: 'custom',
       });
       link.setLocked();
       link.setLabel(label);
@@ -76,6 +50,6 @@ export class CustomLabelDiagramComponent implements OnInit {
 
     this.diagramModel.addAll(...models);
 
-    this.diagramModel.getDiagramEngine().zoomToFit();
+    this.diagram?.zoomToFit();
   }
 }

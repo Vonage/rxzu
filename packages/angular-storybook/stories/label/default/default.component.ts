@@ -1,12 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import {
-  DiagramEngine,
-  DiagramModel,
-  NodeModel,
-  LabelModel,
-  PortModel,
-  BaseModel,
-} from '@rxzu/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { DiagramModel, NodeModel, LabelModel, PortModel, BaseModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
@@ -18,33 +11,33 @@ import {
 })
 export class DefaultLabelStoryComponent implements OnInit {
   diagramModel: DiagramModel;
+  @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
-  constructor(private diagramEngine: DiagramEngine) {
-    this.diagramEngine.registerDefaultFactories();
-    this.diagramModel = this.diagramEngine.createModel();
+  constructor() {
+    this.diagramModel = new DiagramModel({ name: 'default' });
   }
 
   ngOnInit() {
     const nodesDefaultDimensions = { height: 200, width: 200 };
 
     const node1 = new NodeModel({
-      type: 'default',
+      name: 'default',
       coords: { x: 500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
-    const outport = new PortModel({ type: 'default' });
+    const outport = new PortModel({ name: 'default' });
     node1.addPort(outport);
 
     const node2 = new NodeModel({
-      type: 'default',
+      name: 'default',
       coords: { x: 500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
 
-    const inport = new PortModel({ type: 'default' });
+    const inport = new PortModel({ name: 'default' });
     node2.addPort(inport);
 
-    const label = new LabelModel({ text: "I'm a label", type: 'default' });
+    const label = new LabelModel({ text: "I'm a label", name: 'default' });
     const link = outport.link(inport);
     const models: BaseModel[] = [node1, node2];
 
@@ -56,6 +49,6 @@ export class DefaultLabelStoryComponent implements OnInit {
 
     this.diagramModel.addAll(...models);
 
-    this.diagramModel.getDiagramEngine().zoomToFit();
+    this.diagram?.zoomToFit();
   }
 }

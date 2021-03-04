@@ -2,13 +2,9 @@ import { Meta, moduleMetadata } from '@storybook/angular';
 import { CommonModule } from '@angular/common';
 import { DefaultNodeTemplate, CustomNodeTemplate } from './node.template';
 import { CustomNodeComponent } from './custom/custom.component';
-import {
-  DefaultNodeComponent,
-  DefaultLinkComponent,
-  DefaultLabelComponent,
-  DefaultPortComponent,
-  RxZuDiagramsModule
-} from '@rxzu/angular';
+import { DefaultNodeComponent, RxZuDefaultsModule, RxZuModule } from '@rxzu/angular';
+import { DefaultNodeStoryComponent } from './default/default.component';
+import { CustomNodeDiagramComponent } from './custom/diagram.component';
 
 export default {
   title: 'Node',
@@ -16,21 +12,10 @@ export default {
   parameters: { docs: { iframeHeight: '400px' } },
   decorators: [
     moduleMetadata({
-      declarations: [
-        DefaultNodeComponent,
-        CustomNodeComponent,
-        DefaultLinkComponent,
-        DefaultLabelComponent,
-        DefaultPortComponent
-      ],
-      imports: [CommonModule, RxZuDiagramsModule],
-      entryComponents: [
-        DefaultNodeComponent,
-        DefaultLinkComponent,
-        CustomNodeComponent,
-        DefaultLabelComponent,
-        DefaultPortComponent
-      ]
+      declarations: [CustomNodeComponent, DefaultNodeStoryComponent, CustomNodeDiagramComponent],
+      imports: [CommonModule, RxZuDefaultsModule],
+      providers: [RxZuModule.registerComponent({ name: 'node', name: 'custom', component: CustomNodeComponent })],
+      entryComponents: [CustomNodeComponent]
     })
   ]
 } as Meta;

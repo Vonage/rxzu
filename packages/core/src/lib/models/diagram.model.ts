@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
-import { BaseEntity, BaseEntityType } from '../base.entity';
-import { DiagramEngineCore } from '../engine.core';
-import { SelectOptions, Coords } from '../interfaces';
+import { BaseEntity } from '../base.entity';
+import { DiagramEngine } from '../engine.core';
+import { SelectOptions, Coords, BaseEntityType } from '../interfaces';
 import {
   createEntityState,
   createValueState,
@@ -17,6 +17,7 @@ import { PointModel } from './point.model';
 import { DiagramModelOptions, KeyBindigsOptions } from '../interfaces/options.interface';
 
 export class DiagramModel extends BaseEntity {
+  private _diagramEngine?: DiagramEngine;
   protected nodes$: EntityState<NodeModel>;
   protected links$: EntityState<LinkModel>;
   protected offsetX$: ValueState<number>;
@@ -33,10 +34,14 @@ export class DiagramModel extends BaseEntity {
   protected keyBindings$: ValueState<KeyBindigsOptions>;
 
   constructor(
-    protected diagramEngine: DiagramEngineCore,
-    options: DiagramModelOptions
+    options: DiagramModelOptions,
+    diagramEngine?: DiagramEngine
   ) {
-    super({ logPrefix: '[Diagram]' });
+    super({ ...options, logPrefix: '[Diagram]', type: 'diagram' });
+
+    if (diagramEngine) {
+      this._diagramEngine = diagramEngine;
+    }
 
     this.nodes$ = createEntityState([], this.entityPipe('nodes'));
     this.links$ = createEntityState([], this.entityPipe('links'));
@@ -85,6 +90,14 @@ export class DiagramModel extends BaseEntity {
       options.keyBindings ?? {},
       this.entityPipe('keyBindings')
     );
+  }
+
+  set diagramEngine(value: DiagramEngine | undefined) {
+    this._diagramEngine = value;
+  }
+
+  get diagramEngine(): DiagramEngine | undefined {
+    return this._diagramEngine;
   }
 
   getNodes(): EntityMap<NodeModel> {
@@ -342,7 +355,7 @@ export class DiagramModel extends BaseEntity {
     return this.zoom$.value$;
   }
 
-  getDiagramEngine(): DiagramEngineCore {
+  getDiagramEngine(): DiagramEngine | undefined {
     return this.diagramEngine;
   }
 
@@ -368,7 +381,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   getSelectedItems(
-    ...filters: BaseEntityType[]
+    ...filters: Exclude<BaseEntityType, 'diagram' | 'label'>[]
   ): (NodeModel | PointModel | PortModel | LinkModel)[] {
     filters = coerceArray(filters);
 
@@ -404,7 +417,7 @@ export class DiagramModel extends BaseEntity {
       );
     } else {
       const byType: Record<
-        BaseEntityType,
+        Exclude<BaseEntityType, 'diagram' | 'label'>,
         () => (NodeModel | PointModel | PortModel | LinkModel)[]
       > = {
         node: selectedNodes,

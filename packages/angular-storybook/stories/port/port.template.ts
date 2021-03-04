@@ -1,15 +1,15 @@
 import { Story } from '@storybook/angular';
 import { CustomPortDiagramComponent } from './custom/diagram.component';
-import { DefaultPortComponent } from './default/default.component';
+import { DefaultPortStoryComponent } from './default/default.component';
 
-export const DefaultNodeTemplate: Story<DefaultPortComponent> = (
+export const DefaultPortTemplate: Story<DefaultPortStoryComponent> = (
   args: any
 ) => ({
-  component: DefaultPortComponent,
+  component: DefaultPortStoryComponent,
   props: args,
 });
 
-export const CustomNodeTemplate: Story<CustomPortDiagramComponent> = (
+export const CustomPortTemplate: Story<CustomPortDiagramComponent> = (
   args: any
 ) => ({
   component: CustomPortDiagramComponent,

@@ -22,33 +22,32 @@ export class ZoomToFitExampleStoryComponent implements OnInit {
   constructor(
     private diagramEngine: DiagramEngine
   ) {
-    this.diagramEngine.registerDefaultFactories();
     this.diagramModel = this.diagramEngine.createModel();
   }
 
   ngOnInit() {
     const nodesDefaultDimensions = { height: 200, width: 200 };
-    const node1 = new NodeModel({ type: 'default' });
+    const node1 = new NodeModel({ name: 'default' });
     node1.setCoords({ x: 500, y: 300 });
     node1.setDimensions(nodesDefaultDimensions);
-    const outport1 = new PortModel({ type: 'default' });
+    const outport1 = new PortModel({ name: 'default' });
     node1.addPort(outport1);
 
-    const node2 = new NodeModel({ type: 'default' });
+    const node2 = new NodeModel({ name: 'default' });
     node2.setCoords({ x: 100, y: 100 });
     node2.setDimensions(nodesDefaultDimensions);
-    const inport = new PortModel({ type: 'default' });
+    const inport = new PortModel({ name: 'default' });
     node2.addPort(inport);
 
 
     for (let index = 0; index < 2; index++) {
-      const nodeLoop = new NodeModel({ type: 'default' });
+      const nodeLoop = new NodeModel({ name: 'default' });
       nodeLoop.setCoords({
         x: 1000 * (Math.random() * 10),
         y: 300 + index * (Math.random() * 10) * 300,
       });
       nodeLoop.setDimensions(nodesDefaultDimensions);
-      const inportLoop = new PortModel({ type: 'default' });
+      const inportLoop = new PortModel({ name: 'default' });
       node2.addPort(inport);
       nodeLoop.addPort(inportLoop);
 

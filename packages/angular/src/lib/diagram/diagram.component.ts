@@ -4,6 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  Inject,
   HostListener,
   Input,
   NgZone,
@@ -15,29 +16,45 @@ import {
 import { combineLatest, noop, Observable, of, ReplaySubject } from 'rxjs';
 import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import {
-  DiagramEngineCore,
   SelectingAction,
   MouseManager,
   DiagramModel,
-  KeyboardManager
+  EngineSetup,
+  KeyboardManager,
 } from '@rxzu/core';
 import { ZonedClass, OutsideZone } from '../utils';
+import { EngineService } from '../engine.service';
+import { RegistryService } from '../registry.service';
+import { FactoryService } from '../factory.service';
+import { DIAGRAM_DEFAULT_OPTIONS } from '../injection.tokens';
 
 @Component({
   selector: 'rxzu-diagram',
+  exportAs: 'RxzuDiagram',
   templateUrl: 'diagram.component.html',
   styleUrls: ['diagram.component.scss'],
+  providers: [EngineService, RegistryService, FactoryService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RxZuDiagramComponent
   implements AfterViewInit, OnDestroy, ZonedClass {
-  @Input('model') diagramModel: DiagramModel | null = null;
+  /** The name of the diagram, if not set will be `'default'` */
+  @Input() name?: string;
+  @Input() model?: DiagramModel;
+  @Input() options?: Partial<EngineSetup>;
+  /** @deprecated use options instead, will be removed in v4.0.0 */
   @Input() allowCanvasZoom = true;
+  /** @deprecated use options instead, will be removed in v4.0.0 */
   @Input() allowCanvasTranslation = true;
+  /** @deprecated use options instead, will be removed in v4.0.0 */
   @Input() inverseZoom = true;
+  /** @deprecated use options instead, will be removed in v4.0.0 */
   @Input() allowLooseLinks = true;
+  /** @deprecated use options instead, will be removed in v4.0.0 */
   @Input() maxZoomOut = 0;
+  /** @deprecated use options instead, will be removed in v4.0.0 */
   @Input() maxZoomIn = 0;
+  /** @deprecated use options instead, will be removed in v4.0.0 */
   @Input() portMagneticRadius = 30;
   @Input() keyBindings = {};
 
@@ -50,7 +67,6 @@ export class RxZuDiagramComponent
   @ViewChild('canvas', { read: ElementRef })
   canvas?: ElementRef;
 
-  diagramEngine?: DiagramEngineCore;
   mouseManager?: MouseManager;
   keyboardManager?: KeyboardManager;
   selectionBox$?: Observable<SelectingAction | null>;
@@ -61,27 +77,37 @@ export class RxZuDiagramComponent
   }
 
   constructor(
+    public readonly diagramEngine: EngineService,
     public ngZone: NgZone,
     protected renderer: Renderer2,
     protected cdRef: ChangeDetectorRef,
-    protected elRef: ElementRef<HTMLElement>
+    protected elRef: ElementRef<HTMLElement>,
+    @Inject(DIAGRAM_DEFAULT_OPTIONS) protected defaultOptions: EngineSetup
   ) {}
 
   ngAfterViewInit() {
-    const model = this.diagramModel;
-    if (!model || !this.canvas) {
+    const mergedOptions = { ...this.defaultOptions, ...this.options };
+    this.model =
+      (this.model && this.diagramEngine.setModel(this.model)) ||
+      this.diagramEngine.createModel({
+        name: this.name || 'default',
+        ...mergedOptions,
+      });
+
+    if (!this.canvas) {
       return;
     }
-    this.diagramEngine = model.getDiagramEngine();
+
     this.mouseManager = this.diagramEngine.getMouseManager();
     this.keyboardManager = this.diagramEngine.getKeyboardManager();
-    
 
     this.diagramEngine.setCanvas(this.canvas.nativeElement);
 
     this.diagramEngine.setup({
+      ...mergedOptions,
+      // TODO: remove after deprecated inputs removed
       ...this,
-    });
+    } as EngineSetup);
 
     (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)
       .pipe(
@@ -90,9 +116,9 @@ export class RxZuDiagramComponent
             return of(null);
           }
 
-          return this.diagramEngine.paintLinks(this.linksLayer) as Observable<
-            void
-          >;
+          return this.diagramEngine.paintLinks(
+            this.linksLayer
+          ) as Observable<void>;
         })
       )
       .subscribe(() => {
@@ -105,7 +131,7 @@ export class RxZuDiagramComponent
   ngOnDestroy() {
     this.destroyed$.next(true);
     this.destroyed$.complete();
-    
+
     if (this.keyboardManager) {
       this.keyboardManager.dispose();
     }
@@ -166,6 +192,10 @@ export class RxZuDiagramComponent
   @OutsideZone
   onMouseWheel(event: WheelEvent) {
     this.mouseManager ? this.mouseManager.onMouseWheel(event) : noop();
+  }
+
+  zoomToFit(additionalZoomFactor?: number): void {
+    this.diagramEngine.zoomToFit(additionalZoomFactor);
   }
 
   @OutsideZone

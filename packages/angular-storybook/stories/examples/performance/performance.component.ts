@@ -1,11 +1,5 @@
-import { Component } from '@angular/core';
-import {
-  DiagramEngine,
-  DiagramModel,
-  NodeModel,
-  LabelModel,
-  PortModel,
-} from '@rxzu/angular';
+import { Component, ViewChild } from '@angular/core';
+import { DiagramModel, NodeModel, LabelModel, PortModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
@@ -26,16 +20,16 @@ export class PerformanceExampleStoryComponent {
   initialRenderTimer = 0;
   isResseted = false;
   numberOfNodes = 200;
+  @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
-  constructor(private diagramEngine: DiagramEngine) {
-    this.diagramEngine.registerDefaultFactories();
-    this.diagramModel = this.diagramEngine.createModel();
+  constructor() {
+    this.diagramModel = new DiagramModel({ name: 'default' });
     this.createDiagram();
   }
 
   createDiagram() {
     this.createNodes();
-    this.diagramEngine.zoomToFit();
+    this.diagram?.zoomToFit();
   }
 
   resetDiagram() {
@@ -49,13 +43,13 @@ export class PerformanceExampleStoryComponent {
     const nodesDefaultDimensions = { height: 200, width: 200 };
 
     for (let index = 0; index < this.numberOfNodes; index++) {
-      const nodeLoop = new NodeModel({ type: 'default', id: `${index}` });
+      const nodeLoop = new NodeModel({ name: 'default', id: `${index}` });
       const row = index % 10;
       const col = Math.floor(index / 10);
       nodeLoop.setCoords({ x: 1000 * row, y: 300 * col });
       nodeLoop.setDimensions(nodesDefaultDimensions);
-      const inPort = new PortModel({ type: 'default', id: `${index}` });
-      const outPort = new PortModel({ type: 'default' });
+      const inPort = new PortModel({ name: 'default', id: `${index}` });
+      const outPort = new PortModel({ name: 'default' });
       nodeLoop.addPort(inPort);
       const outport = nodeLoop.addPort(outPort);
 
@@ -67,7 +61,7 @@ export class PerformanceExampleStoryComponent {
         const link = outport.link(prevPort);
 
         if (link) {
-          const label = new LabelModel({ type: 'default', text: 'label' });
+          const label = new LabelModel({ name: 'default', text: 'label' });
           link.setLabel(label);
           this.diagramModel.addLink(link);
         }
