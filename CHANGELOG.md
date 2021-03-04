@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/Vonage/rxzu/compare/v2.2.0...v2.2.1) (2021-03-04)
+
+
+### Bug Fixes
+
+* **action:** add new actions to actions index ([29d51f0](https://github.com/Vonage/rxzu/commit/29d51f09ef4662f7499ddb778fcd0060488abe01))
+
 # [2.2.0](https://github.com/Vonage/rxzu/compare/v2.1.4...v2.2.0) (2021-03-04)
 
 
