@@ -1,3 +1,11 @@
+## [2.2.2](https://github.com/Vonage/rxzu/compare/v2.2.1...v2.2.2) (2021-03-04)
+
+
+### Bug Fixes
+
+* **events:** remove contenteditable ([5365877](https://github.com/Vonage/rxzu/commit/53658772ea5c84cea53654fba3562b800fb1a740))
+* **events:** remove contenteditable ([c94d1f9](https://github.com/Vonage/rxzu/commit/c94d1f9e2246591cc2f2f2a54e60559dd9a42903))
+
 ## [2.2.1](https://github.com/Vonage/rxzu/compare/v2.2.0...v2.2.1) (2021-03-04)
 
 
