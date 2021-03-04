@@ -14,7 +14,7 @@ export class KeyboardManager {
     this.clipboard$ = new BehaviorSubject<(NodeModel | PointModel | PortModel | LinkModel)[]>([]);
   }
 
-  onKeyDown(event: KeyboardEvent) {
+  onKeyUp(event: KeyboardEvent) {
     const deleteKeyPressedAction = new DeleteKeyPressed(this.engine, event);
     this.engine.startFiringAction(deleteKeyPressedAction);
     this.engine.fireAction();

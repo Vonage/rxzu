@@ -4,7 +4,10 @@
   (mousedown)="onMouseDown($event)"
   (wheel)="onMouseWheel($event)"
   (keyup)="onKeyUp($event)"
+  (copy)="onCopy($event)"
+  (paste)="onPaste($event)"
   tabindex="1"
+  contenteditable="true"
 >
   <!-- Nodes Layer -->
   <div class="rxzu-nodes-layer">

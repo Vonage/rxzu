@@ -136,17 +136,19 @@ export class RxZuDiagramComponent
 
   @OutsideZone
   onKeyUp(event: KeyboardEvent) {
-   this.keyboardManager ? this.keyboardManager.onKeyDown(event) : noop();
+   this.keyboardManager ? this.keyboardManager.onKeyUp(event) : noop();
   }
 
-  @HostListener('window:copy', ['$event'])
-  copyEvent(event: ClipboardEvent) {
-   this.keyboardManager ? this.keyboardManager.onCopy() : noop();
+  @OutsideZone
+  onCopy(event: ClipboardEvent) {
+    event.preventDefault();
+    this.keyboardManager ? this.keyboardManager.onCopy() : noop();
   }
 
-  @HostListener('window:paste', ['$event'])
-  pasteEvent(event: ClipboardEvent) {
-   this.keyboardManager ? this.keyboardManager.onPaste() : noop();
+  @OutsideZone
+  onPaste(event: ClipboardEvent) {
+    event.preventDefault();
+    this.keyboardManager ? this.keyboardManager.onPaste() : noop();
   }
 
   @OutsideZone
