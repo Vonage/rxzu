@@ -1,11 +1,17 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import {
   DiagramModel,
   NodeModel,
+  BaseAction,
   PortModel,
   BaseModel,
-  DiagramEngine,
-  BaseAction,
+  RxZuDiagramComponent,
 } from '@rxzu/angular';
 import { filter } from 'rxjs/operators';
 
@@ -19,15 +25,16 @@ import { filter } from 'rxjs/operators';
 })
 export class EventsExampleStoryComponent implements OnInit {
   diagramModel: DiagramModel;
+  @ViewChild(RxZuDiagramComponent, { static: true })
+  diagram?: RxZuDiagramComponent;
 
   @Output() events: EventEmitter<{
     action: BaseAction | null;
     state: string | null;
   }> = new EventEmitter();
 
-  constructor(private diagramEngine: DiagramEngine) {
-    this.diagramEngine.registerDefaultFactories();
-    this.diagramModel = this.diagramEngine.createModel();
+  constructor() {
+    this.diagramModel = new DiagramModel({ name: 'default' });
   }
 
   ngOnInit() {
@@ -35,31 +42,31 @@ export class EventsExampleStoryComponent implements OnInit {
 
     const node1 = new NodeModel({
       coords: { x: 500, y: 300 },
-      type: 'default',
+      name: 'default',
       dimensions: nodesDefaultDimensions,
     });
-    const outPort = new PortModel({ type: 'default', name: 'outport1' });
+    const outPort = new PortModel({ name: 'default', displayName: 'outport1' });
     node1.addPort(outPort);
 
     const node2 = new NodeModel({
       coords: { x: 1000, y: 0 },
-      type: 'default',
+      name: 'default',
       dimensions: nodesDefaultDimensions,
     });
 
     node2.setDimensions(nodesDefaultDimensions);
-    const inPort = new PortModel({ type: 'default', name: 'inport2' });
+    const inPort = new PortModel({ name: 'default', displayName: 'inport2' });
     node2.addPort(inPort);
 
     for (let index = 0; index < 2; index++) {
       const nodeLoop = new NodeModel({
         coords: { x: 1000, y: 300 + index * 300 },
-        type: 'default',
+        name: 'default',
         dimensions: nodesDefaultDimensions,
       });
       const portLoop = new PortModel({
-        type: 'default',
-        name: `inport${index + 3}`,
+        name: 'default',
+        displayName: `inport${index + 3}`,
       });
       nodeLoop.addPort(portLoop);
 
@@ -75,13 +82,13 @@ export class EventsExampleStoryComponent implements OnInit {
 
     this.diagramModel.addAll(...models);
 
-    this.diagramModel.getDiagramEngine().zoomToFit();
+    this.diagram?.zoomToFit();
 
     this.subscribeToDiagramEvents();
   }
 
   subscribeToDiagramEvents() {
-    this.diagramEngine
+    this.diagram?.diagramEngine
       .selectAction()
       .pipe(filter((e) => e !== null))
       .subscribe((e) => this.events.emit(e));

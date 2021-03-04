@@ -1,11 +1,11 @@
 import { Story } from '@storybook/angular';
 import { CustomNodeDiagramComponent } from './custom/diagram.component';
-import { DefaultNodeComponent } from './default/default.component';
+import { DefaultNodeStoryComponent } from './default/default.component';
 
-export const DefaultNodeTemplate: Story<DefaultNodeComponent> = (
+export const DefaultNodeTemplate: Story<DefaultNodeStoryComponent> = (
   args: any
 ) => ({
-  component: DefaultNodeComponent,
+  component: DefaultNodeStoryComponent,
   props: args,
 });
 

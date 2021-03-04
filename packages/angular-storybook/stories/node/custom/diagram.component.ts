@@ -1,19 +1,11 @@
 import {
   Component,
-  ComponentFactoryResolver,
   Input,
   OnChanges,
   OnInit,
-  Renderer2,
-  SimpleChanges,
+  SimpleChanges, ViewChild
 } from '@angular/core';
-import {
-  AbstractAngularFactory,
-  DiagramEngine,
-  DiagramModel,
-  NodeModel,
-} from '@rxzu/angular';
-import { CustomNodeFactory } from './custom.factory';
+import { DiagramModel, NodeModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
@@ -27,22 +19,10 @@ export class CustomNodeDiagramComponent implements OnInit, OnChanges {
   diagramModel: DiagramModel;
   @Input() nodeHeight = 200;
   @Input() nodeWidth = 200;
+  @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
-  constructor(
-    private diagramEngine: DiagramEngine,
-    private resolver: ComponentFactoryResolver,
-    private renderer: Renderer2
-  ) {
-    this.diagramEngine.registerDefaultFactories();
-    this.diagramEngine.getFactoriesManager().registerFactory({
-      type: 'nodeFactories',
-      factory: new CustomNodeFactory(
-        this.resolver,
-        this.renderer
-      ) as AbstractAngularFactory,
-    });
-
-    this.diagramModel = this.diagramEngine.createModel();
+  constructor() {
+    this.diagramModel = new DiagramModel({ name: 'default' });
   }
 
   ngOnInit() {
@@ -52,14 +32,13 @@ export class CustomNodeDiagramComponent implements OnInit, OnChanges {
     };
 
     const node1 = new NodeModel({
-      type: 'custom-node',
+      name: 'custom',
       coords: { x: 500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
 
     this.diagramModel.addAll(node1);
-
-    this.diagramModel.getDiagramEngine().zoomToFit();
+    this.diagram?.zoomToFit();
   }
 
   ngOnChanges(e: SimpleChanges) {

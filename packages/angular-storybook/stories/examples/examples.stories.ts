@@ -13,43 +13,25 @@ import {
 import { BasicExampleStoryComponent } from './basic/basic.component';
 import { AutoArrangeExampleStoryComponent } from './auto-arrange/auto-arrange.component';
 import { PerformanceExampleStoryComponent } from './performance/performance.component';
-import {
-  DefaultLinkComponent,
-  DefaultNodeComponent,
-  DefaultLabelComponent,
-  DefaultPortComponent,
-  RxZuDiagramsModule,
-  DagrePlugin,
-} from '@rxzu/angular';
+import { RxZuDefaultsModule, DagrePlugin, } from '@rxzu/angular';
 import { DragAndDropExampleStoryComponent } from './drag-and-drop/drag-and-drop.component';
 import { ZoomToFitExampleStoryComponent } from './zoom-to-fit/zoom-to-fit.component';
 import { ZoomToNodeExampleStoryComponent } from './zoom-to-node/zoom-to-node.component';
 export default {
   title: 'Examples',
-  component: DefaultLinkComponent,
   parameters: { docs: { iframeHeight: '400px' } },
   decorators: [
     moduleMetadata({
       declarations: [
-        DefaultNodeComponent,
         BasicExampleStoryComponent,
         AutoArrangeExampleStoryComponent,
         PerformanceExampleStoryComponent,
         DragAndDropExampleStoryComponent,
         ZoomToFitExampleStoryComponent,
-        ZoomToNodeExampleStoryComponent,
-        DefaultLinkComponent,
-        DefaultLabelComponent,
-        DefaultPortComponent,
+        ZoomToNodeExampleStoryComponent
       ],
       providers: [DagrePlugin],
-      imports: [CommonModule, RxZuDiagramsModule],
-      entryComponents: [
-        DefaultNodeComponent,
-        DefaultLinkComponent,
-        DefaultLabelComponent,
-        DefaultPortComponent,
-      ],
+      imports: [CommonModule, RxZuDefaultsModule],
     }),
   ],
 } as Meta;

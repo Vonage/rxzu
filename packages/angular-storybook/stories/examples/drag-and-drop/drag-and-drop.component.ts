@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { DiagramEngine, DiagramModel, NodeModel } from '@rxzu/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { DiagramModel, NodeModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
@@ -9,11 +9,11 @@ import { DiagramEngine, DiagramModel, NodeModel } from '@rxzu/angular';
         *ngFor="let node of nodesLibrary"
         class="node-drag"
         draggable="true"
-        [attr.data-type]="node.type"
+        [attr.data-type]="node.name"
         (dragstart)="onBlockDrag($event)"
         [ngStyle]="{ 'background-color': node.color }"
       >
-        {{ node.type }}
+        {{ node.name }}
       </div>
       <div></div>
     </div>
@@ -33,22 +33,22 @@ export class DragAndDropExampleStoryComponent implements OnInit {
   diagramModel: DiagramModel;
   nodesDefaultDimensions = { height: 200, width: 200 };
   nodesLibrary = [
-    { color: '#AFF8D8', type: 'default' },
-    { color: '#FFB5E8', type: 'default' },
-    { color: '#85E3FF', type: 'default' },
+    { color: '#AFF8D8', name: 'default' },
+    { color: '#FFB5E8', name: 'default' },
+    { color: '#85E3FF', name: 'default' },
   ];
+  @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
-  constructor(private diagramEngine: DiagramEngine) {
-    this.diagramEngine.registerDefaultFactories();
-    this.diagramModel = this.diagramEngine.createModel();
+  constructor() {
+    this.diagramModel = new DiagramModel({ name: 'default' });
   }
 
   ngOnInit() {}
 
   createNode(type: string) {
-    const nodeData = this.nodesLibrary.find((nodeLib) => nodeLib.type === type);
+    const nodeData = this.nodesLibrary.find((nodeLib) => nodeLib.name === type);
     if (nodeData) {
-      const node = new NodeModel({ type: nodeData.type });
+      const node = new NodeModel({ name: nodeData.name });
       node.setExtras(nodeData);
       node.setDimensions(this.nodesDefaultDimensions);
 
@@ -75,18 +75,19 @@ export class DragAndDropExampleStoryComponent implements OnInit {
     if (e.dataTransfer) {
       const nodeType = e.dataTransfer.getData('type');
       const node = this.createNode(nodeType);
-      const droppedPoint = this.diagramEngine
-        .getMouseManager()
-        .getRelativePoint(e);
+      const mouseManager = this.diagram?.diagramEngine.getMouseManager();
+      if (mouseManager) {
+        const droppedPoint = mouseManager.getRelativePoint(e);
 
-      const coords = {
-        x: droppedPoint.x - this.nodesDefaultDimensions.width / 2,
-        y: droppedPoint.y - this.nodesDefaultDimensions.height / 2,
-      };
+        const coords = {
+          x: droppedPoint.x - this.nodesDefaultDimensions.width / 2,
+          y: droppedPoint.y - this.nodesDefaultDimensions.height / 2,
+        };
 
-      if (node) {
-        node.setCoords(coords);
-        this.diagramModel.addNode(node);
+        if (node) {
+          node.setCoords(coords);
+          this.diagramModel.addNode(node);
+        }
       }
     }
   }

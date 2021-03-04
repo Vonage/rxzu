@@ -8,15 +8,15 @@ import {
   LooseLinkDestroyed,
   InvalidLinkDestroyed,
 } from '../actions';
-import { DiagramEngineCore } from '../engine.core';
+import { DiagramEngine } from '../engine.core';
 import { Coords } from '../interfaces';
 import { NodeModel, PointModel, PortModel, BaseModel } from '../models';
 import { isNil } from '../utils';
 
 export class MouseManager {
-  protected engine: DiagramEngineCore;
+  protected engine: DiagramEngine;
 
-  constructor(_diagramEngine: DiagramEngineCore) {
+  constructor(_diagramEngine: DiagramEngine) {
     this.engine = _diagramEngine;
   }
 
@@ -232,7 +232,7 @@ export class MouseManager {
                 return;
               }
 
-              port.updateCoords(portCoords);
+              port.updateCoords(portCoords, this.engine);
             });
           }
         } else if (selectionModel.model instanceof PointModel) {

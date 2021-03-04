@@ -1,10 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import {
-  DiagramEngine,
-  DiagramModel,
-  NodeModel,
-  PortModel,
-} from '@rxzu/angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { DiagramModel, NodeModel, PortModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
@@ -14,28 +9,29 @@ import {
   ></rxzu-diagram>`,
   styleUrls: ['../../demo-diagram.component.scss'],
 })
-export class DefaultPortComponent implements OnInit {
+export class DefaultPortStoryComponent implements OnInit {
   diagramModel: DiagramModel;
+  @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
-  constructor(private diagramEngine: DiagramEngine) {
-    this.diagramEngine.registerDefaultFactories();
-    this.diagramModel = this.diagramEngine.createModel();
+
+  constructor() {
+    this.diagramModel = new DiagramModel({ name: 'default' });
   }
 
   ngOnInit() {
     const nodesDefaultDimensions = { height: 200, width: 200 };
 
     const node = new NodeModel({
-      type: 'default',
+      name: 'default',
       coords: { x: 500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
-    const inPort = new PortModel({ type: 'default', name: 'inport' });
-    const outPort = new PortModel({ type: 'default', name: 'outport' });
+    const inPort = new PortModel({ name: 'default', displayName: 'inport' });
+    const outPort = new PortModel({ name: 'default', displayName: 'outport' });
     node.addPort(inPort);
     node.addPort(outPort);
     this.diagramModel.addAll(node);
 
-    this.diagramModel.getDiagramEngine().zoomToFit();
+    this.diagram?.zoomToFit();
   }
 }

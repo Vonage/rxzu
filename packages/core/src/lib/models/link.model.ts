@@ -9,7 +9,6 @@ import { PointModel } from './point.model';
 import { PortModel } from './port.model';
 
 export class LinkModel extends BaseModel<DiagramModel> {
-  protected name$: ValueState<string>;
   protected sourcePort$: ValueState<PortModel | null>;
   protected targetPort$: ValueState<PortModel | null>;
   protected extras$: ValueState<any>;
@@ -18,15 +17,11 @@ export class LinkModel extends BaseModel<DiagramModel> {
   protected points$: ValueState<PointModel[]>;
 
   constructor(options: LinkModelOptions) {
-    super({ logPrefix: '[Link]', ...options });
+    super({ ...options, logPrefix: '[Link]', type: 'link' });
 
-    this.name$ = createValueState<string>(
-      options.name ?? '',
-      this.entityPipe('targetPort')
-    );
     this.sourcePort$ = createValueState<PortModel | null>(
       options.sourcePort ?? null,
-      this.entityPipe('targetPort')
+      this.entityPipe('sourcePort')
     );
     this.targetPort$ = createValueState<PortModel | null>(
       options.targetPort ?? null,
@@ -46,8 +41,8 @@ export class LinkModel extends BaseModel<DiagramModel> {
     this.path$ = createValueState<string | null>(null, this.entityPipe('path'));
     this.points$ = createValueState(
       [
-        new PointModel({ parent: this, type: 'default' }),
-        new PointModel({ parent: this, type: 'default' }),
+        new PointModel({ parent: this, name: 'default' }),
+        new PointModel({ parent: this, name: 'default' }),
       ],
       this.entityPipe('points')
     );
@@ -71,14 +66,6 @@ export class LinkModel extends BaseModel<DiagramModel> {
   //     label,
   //   };
   // }
-
-  setName(name: string) {
-    this.name$.set(name).emit();
-  }
-
-  getName(): string | undefined {
-    return this.name$.value;
-  }
 
   setExtras<E>(extras: Partial<E>) {
     this.extras$.set(extras).emit();
@@ -284,7 +271,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
   }
 
   generatePoint({ x = 0, y = 0 }: Coords): PointModel {
-    return new PointModel({ parent: this, coords: { x, y }, type: 'default' });
+    return new PointModel({ parent: this, coords: { x, y }, name: 'default' });
   }
 
   setLocked(locked = true) {
