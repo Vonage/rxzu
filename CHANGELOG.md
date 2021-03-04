@@ -1,3 +1,22 @@
+# [2.2.0](https://github.com/Vonage/rxzu/compare/v2.1.4...v2.2.0) (2021-03-04)
+
+
+### Features
+
+* **general:** add keyboard manager ([382d0d4](https://github.com/Vonage/rxzu/commit/382d0d43bfaacafa39c35d0211c41b15f3f56d6c))
+* **keyboard:** add copy paste events ([400c429](https://github.com/Vonage/rxzu/commit/400c4290d12b5f1b19a14b36fd831edcb6d054cc))
+* **keyboard manager:** fix cr comments ([c54ed9b](https://github.com/Vonage/rxzu/commit/c54ed9bfc94ab434045ad7add87d427441a16a94))
+* **keyboard manager:** fix cr comments ([7fb1d24](https://github.com/Vonage/rxzu/commit/7fb1d246f581dae745ff788452b8f245c6b36756))
+* **keyboard manager:** fix cr comments ([ea18c52](https://github.com/Vonage/rxzu/commit/ea18c524c16b3523d50715ed1cf1ff3b2247ffb8))
+* **keyboard manager:** fix cr comments ([19d4973](https://github.com/Vonage/rxzu/commit/19d49737334b8d4dcce2b562f32f05ff322206df))
+* **keyboard manager:** fix cr comments ([92fa193](https://github.com/Vonage/rxzu/commit/92fa19391c27989d75abf4c88554bf4268efd7a0))
+* **keyboard manager:** fix cr comments ([0bc5259](https://github.com/Vonage/rxzu/commit/0bc5259575ecc47e7932a37fe8e4639b01691105))
+* **keyboard manager:** fix cr comments ([0de5fa0](https://github.com/Vonage/rxzu/commit/0de5fa0a85d56277ab3b6a6c3f0f1ed3be6b66c6))
+* **keyboard manager:** fix cr comments ([94d1455](https://github.com/Vonage/rxzu/commit/94d14554015b524ee5c7698301b9d33534c5b5f6))
+* **keyboard manager:** fix cr in progress ([dab3950](https://github.com/Vonage/rxzu/commit/dab39501c456b10c3be177f21932898c093b635e))
+* **keyboard manager:** fix cr in progress ([0d90e76](https://github.com/Vonage/rxzu/commit/0d90e76fecaf72b43d8ac6b215588b1f13e3b8c6))
+* **keyboard manager:** fix cr in progress ([1a862f7](https://github.com/Vonage/rxzu/commit/1a862f79cf88ec5254aadaf63df4c0d0be1a22cd))
+
 ## [2.1.4](https://github.com/Vonage/rxzu/compare/v2.1.3...v2.1.4) (2021-03-01)
 
 
