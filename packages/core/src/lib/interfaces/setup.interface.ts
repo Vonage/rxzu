@@ -1,4 +1,4 @@
-import { KeyBindigsOptions } from "./options.interface";
+import { KeyBindigsOptions } from './options.interface';
 
 export interface EngineSetup {
   maxZoomIn?: number;
@@ -8,5 +8,5 @@ export interface EngineSetup {
   allowCanvasZoom?: boolean;
   allowCanvasTranslation?: boolean;
   inverseZoom?: boolean;
-  keyBindings: KeyBindigsOptions;
+  keyBindings?: KeyBindigsOptions;
 }

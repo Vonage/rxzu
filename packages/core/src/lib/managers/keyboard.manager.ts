@@ -15,13 +15,10 @@ export class KeyboardManager {
   }
 
   onKeyUp(event: KeyboardEvent) {
-    // only if delete key bindings provided, set delete action
-    if (this.engine.getDiagramModel().getKeyBindings()?.delete) {
       const deleteKeyPressedAction = new DeleteKeyPressed(this.engine, event);
       this.engine.startFiringAction(deleteKeyPressedAction);
       this.engine.fireAction();
       this.engine.stopFiringAction();
-    }
   }
 
   onCopy() {
