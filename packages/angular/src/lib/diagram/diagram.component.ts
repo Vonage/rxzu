@@ -4,7 +4,6 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  HostListener,
   Input,
   NgZone,
   OnDestroy,
@@ -105,6 +104,10 @@ export class RxZuDiagramComponent
   ngOnDestroy() {
     this.destroyed$.next(true);
     this.destroyed$.complete();
+    
+    if (this.keyboardManager) {
+      this.keyboardManager.dispose();
+    }
   }
 
   initSelectionBox() {

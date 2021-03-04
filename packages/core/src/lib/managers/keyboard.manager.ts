@@ -35,4 +35,8 @@ export class KeyboardManager {
     this.engine.fireAction();
     this.engine.stopFiringAction();
   }
+
+  dispose() {
+    this.clipboard$.unsubscribe();
+  }
 }
