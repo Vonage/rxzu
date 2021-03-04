@@ -30,13 +30,13 @@ export class KeyboardManager {
   }
 
   onPaste() {
-    const pasteAction = new PasteAction(this.clipboard$.value);
+    const pasteAction = new PasteAction(this.clipboard$.getValue());
     this.engine.startFiringAction(pasteAction);
     this.engine.fireAction();
     this.engine.stopFiringAction();
   }
 
   dispose() {
-    this.clipboard$.unsubscribe();
+    this.clipboard$.complete();
   }
 }
