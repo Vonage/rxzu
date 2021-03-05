@@ -19,8 +19,8 @@ import {
   SelectingAction,
   MouseManager,
   DiagramModel,
-  EngineSetup,
   KeyboardManager,
+  EngineSetup,
 } from '@rxzu/core';
 import { ZonedClass, OutsideZone } from '../utils';
 import { EngineService } from '../engine.service';
@@ -109,6 +109,7 @@ export class RxZuDiagramComponent
       ...this,
     } as EngineSetup);
 
+    console.log(this.diagramEngine);
     (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)
       .pipe(
         switchMap(() => {

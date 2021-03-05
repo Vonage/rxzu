@@ -179,17 +179,20 @@ export class PortModel extends BaseModel<NodeModel> {
     return this.links$.value$;
   }
 
-  updateCoords({
-    x,
-    y,
-    width,
-    height,
-  }: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  }, engine?: DiagramEngine) {
+  updateCoords(
+    {
+      x,
+      y,
+      width,
+      height,
+    }: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    },
+    engine?: DiagramEngine
+  ) {
     this.coords$.set({ x, y }).emit();
     this.dimensions$.set({ width, height }).emit();
 

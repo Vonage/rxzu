@@ -1,14 +1,20 @@
-import { DiagramEngineCore } from '../engine.core';
-import { LinkModel, NodeModel, PointModel, PortModel } from '../models';
+import { DiagramEngine } from '../engine.core';
+import {
+  BaseModel,
+  LinkModel,
+  NodeModel,
+  PointModel,
+  PortModel,
+} from '../models';
 import { BaseAction } from './base.action';
 
 export class CopyAction extends BaseAction {
   copiedModels: (NodeModel | PointModel | PortModel | LinkModel)[];
 
-  constructor(diagramEngine: DiagramEngineCore) {
+  constructor(diagramEngine: DiagramEngine) {
     super();
     const isNotLocked = (
-      item: NodeModel | PointModel | PortModel | LinkModel
+      item: BaseModel
     ): item is NodeModel | PointModel | PortModel =>
       !diagramEngine.isModelLocked(item);
 
@@ -17,5 +23,4 @@ export class CopyAction extends BaseAction {
       .getSelectedItems()
       .filter(isNotLocked);
   }
-  
 }

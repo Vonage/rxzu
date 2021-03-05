@@ -467,6 +467,7 @@ export class DiagramEngine {
     nodesHost: any,
     promise = false
   ): Observable<boolean> | Promise<boolean> | void {
+    console.log('PAINT NODES');
     const diagramModel = this.getDiagramModel();
     const observable = diagramModel.selectNodes().pipe(
       takeUntil(diagramModel.onEntityDestroy()),

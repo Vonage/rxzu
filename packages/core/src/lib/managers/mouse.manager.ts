@@ -138,7 +138,7 @@ export class MouseManager {
 
           link.getPoints().forEach((point) => {
             const pointPort = point.getParent().getPortForPoint(point);
-            const pointCoords =  point.getCoords();
+            const pointCoords = point.getCoords();
             if (
               (action as SelectingAction).containsElement(
                 pointCoords,
@@ -232,7 +232,7 @@ export class MouseManager {
                 return;
               }
 
-              port.updateCoords(portCoords, this.engine);
+              port.updateCoords(portCoords);
             });
           }
         } else if (selectionModel.model instanceof PointModel) {
@@ -360,7 +360,7 @@ export class MouseManager {
           return;
         }
 
-        let el: BaseModel | PortModel | null = null;
+        let el: BaseModel | null = null;
         if (model.magnet) {
           el = model.magnet;
         } else if (element && element.model) {
@@ -399,9 +399,7 @@ export class MouseManager {
               srcPort?.canLinkToPort(targetPort)
             ) {
               // link is valid, fire the event
-              this.engine.startFiringAction(
-                new LinkCreatedAction(link)
-              );
+              this.engine.startFiringAction(new LinkCreatedAction(link));
             }
           }
         }
@@ -425,9 +423,7 @@ export class MouseManager {
             link?.getTargetPort() === null
           ) {
             link.destroy();
-            this.engine.startFiringAction(
-              new LooseLinkDestroyed(link)
-            );
+            this.engine.startFiringAction(new LooseLinkDestroyed(link));
           }
         });
       }
@@ -447,9 +443,7 @@ export class MouseManager {
           if (!sourcePort.canLinkToPort(targetPort)) {
             // link not allowed
             link?.destroy();
-            this.engine.startFiringAction(
-              new InvalidLinkDestroyed(link)
-            );
+            this.engine.startFiringAction(new InvalidLinkDestroyed(link));
           } else if (
             targetPort
               .getLinksArray()
@@ -465,7 +459,7 @@ export class MouseManager {
           }
         }
       });
-      
+
       this.engine.stopFiringAction();
     } else {
       this.engine.stopFiringAction();
