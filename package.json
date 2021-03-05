@@ -35,8 +35,6 @@
     "dep-graph": "nx dep-graph",
     "help": "nx help",
     "postinstall": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points",
-    "snyk-protect": "snyk protect",
-    "prepare": "npm run snyk-protect",
     "angular:storybook": "yarn docs:json && nx run angular-storybook:storybook",
     "docs:json": "compodoc -p ./packages/angular/tsconfig.lib.prod.json -e json -d ./packages/angular-storybook",
     "run-many": "yarn docs:json && npx nx run-many --target=build --configuration=production --all"
@@ -105,7 +103,6 @@
     "jest-preset-angular": "8.3.2",
     "ng-packagr": "^11.1.2",
     "prettier": "2.2.1",
-    "snyk": "1.440.1",
     "ts-jest": "26.5.0",
     "ts-node": "~9.1.1",
     "tslint": "~6.1.3",
@@ -115,6 +112,5 @@
     "commitizen": {
       "path": "node_modules/cz-customizable"
     }
-  },
-  "snyk": true
+  }
 }
