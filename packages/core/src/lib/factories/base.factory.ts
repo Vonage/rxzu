@@ -21,7 +21,7 @@ export abstract class AbstractFactory<CompType = any, WidgetType = any, Resolved
     this._afterGenerate$ = new Subject();
   }
 
-  abstract resolveComponent(options: WidgetOptions<any, any>): ResolvedType | null;
+  abstract resolveComponent(options: WidgetOptions<any, any>): ResolvedType;
 
   beforeGenerate(): Observable<void> {
     return this._beforeGenerate$.asObservable();
@@ -41,8 +41,6 @@ export abstract class AbstractFactory<CompType = any, WidgetType = any, Resolved
     this._beforeGenerate$.next();
     const widget = this.resolveComponent(options);
     this._afterGenerate$.next(widget);
-
-    if (!widget) return null;
 
     return widget as unknown as WidgetType;
   }

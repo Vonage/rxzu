@@ -10,21 +10,17 @@ import { DefaultPortComponent } from './components/default-port/default-port.com
 const DEFAULTS: ComponentProviderOptions[] = [
   {
     type: 'node',
-    name: 'default',
     component: DefaultNodeComponent
   },
   {
     type: 'port',
-    name: 'default',
     component: DefaultPortComponent
   }, {
     type: 'link',
-    name: 'default',
     component: DefaultLinkComponent
   },
   {
     type: 'label',
-    name: 'default',
     component: DefaultLabelComponent
   }
 ];

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { BaseModel, DiagramModel, NodeModel, PortModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
@@ -10,43 +10,34 @@ import { BaseModel, DiagramModel, NodeModel, PortModel, RxZuDiagramComponent } f
   ></rxzu-diagram>`,
   styleUrls: ['../../demo-diagram.component.scss'],
 })
-export class BasicExampleStoryComponent implements OnInit {
+export class BasicExampleStoryComponent implements OnInit, AfterViewInit {
   diagramModel: DiagramModel;
   @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
   constructor() {
-    this.diagramModel = new DiagramModel({ name: 'default' })
+    this.diagramModel = new DiagramModel()
   }
 
   ngOnInit() {
     const nodesDefaultDimensions = { height: 200, width: 200 };
 
-    const node1 = new NodeModel({ name: 'default' });
+    const node1 = new NodeModel();
     node1.setCoords({ x: 500, y: 300 });
     node1.setDimensions(nodesDefaultDimensions);
-    const outport = new PortModel({
-      name: 'default',
-      displayName: 'outport',
-    });
+    const outport = new PortModel({ displayName: 'outport' });
     node1.addPort(outport);
 
-    const node2 = new NodeModel({ name: 'default' });
+    const node2 = new NodeModel();
     node2.setCoords({ x: 1000, y: 0 });
     node2.setDimensions(nodesDefaultDimensions);
-    const inport = new PortModel({
-      name: 'default',
-      displayName: 'inport',
-    });
+    const inport = new PortModel({ displayName: 'inport' });
     node2.addPort(inport);
 
     for (let index = 0; index < 2; index++) {
-      const nodeLoop = new NodeModel({ name: 'default' });
+      const nodeLoop = new NodeModel();
       nodeLoop.setCoords({ x: 1000, y: 300 + index * 300 });
       nodeLoop.setDimensions(nodesDefaultDimensions);
-      const portLoop = new PortModel({
-        name: 'default',
-        displayName: `inport${index + 3}`,
-      });
+      const portLoop = new PortModel({ displayName: `inport${index + 3}` });
       nodeLoop.addPort(portLoop);
 
       this.diagramModel.addNode(nodeLoop);
@@ -59,7 +50,9 @@ export class BasicExampleStoryComponent implements OnInit {
     }
 
     this.diagramModel.addAll(...models);
+  }
 
+  ngAfterViewInit() {
     this.diagram?.zoomToFit();
   }
 }

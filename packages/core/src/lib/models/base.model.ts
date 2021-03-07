@@ -15,7 +15,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   protected painted$: ValueState<PaintedEvent>;
 
   constructor(options: BaseModelOptions<any>) {
-    super(options);
+    super({ name: 'default', ...options });
 
     this.parent$ = createValueState(
       options.parent,

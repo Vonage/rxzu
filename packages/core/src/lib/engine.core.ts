@@ -1,15 +1,16 @@
 import {
+  catchError,
   delay,
   filter,
   map,
   pluck,
   switchMap,
   take,
-  takeUntil,
+  takeUntil
 } from 'rxjs/operators';
-import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
+import { BehaviorSubject, combineLatest, EMPTY, Observable, of } from 'rxjs';
 import { BaseEntity } from './base.entity';
-import { DiagramModel, PortModel, NodeModel, LabelModel } from './models';
+import { DiagramModel, PortModel, NodeModel, LabelModel, BaseModel } from './models';
 import { createValueState, ValueState } from './state';
 import { BaseActionState, SelectingAction } from './actions';
 import { DiagramModelOptions, EngineSetup } from './interfaces';
@@ -77,7 +78,7 @@ export class DiagramEngine {
       );
     }
 
-    this.diagramModel = new DiagramModel(options ?? { name: 'default' }, this);
+    this.diagramModel = new DiagramModel(options, this);
 
     this.diagramModel.onEntityDestroy().subscribe(() => {
       this.diagramModel = undefined;
@@ -94,36 +95,17 @@ export class DiagramEngine {
     return this.keyboardManager;
   }
 
-  getNodeElement(node: NodeModel) {
+  getModelElement(model: BaseModel): HTMLElement {
     const canvas = this.getCanvas();
-    const selector = canvas.querySelector(`[data-nodeid="${node.id}"]`);
+    const selector = canvas.querySelector(`[data-type="${model.type}"][data-id="${model.id}"]`);
     if (selector === null) {
-      throw new Error(
-        'Cannot find Node element with node id: [' + node.id + ']'
-      );
-    }
-    return selector as HTMLElement;
-  }
-
-  getNodePortElement(port: PortModel) {
-    const canvas = this.getCanvas();
-    const selector = canvas.querySelector(
-      `[data-nodeid="${port.getParent().id}"] [data-portid="${port.id}"]`
-    );
-    if (selector === null) {
-      throw new Error(
-        'Cannot find Node Port element with node id: [' +
-          port.getParent().id +
-          '] and port id: [' +
-          port.id +
-          ']'
-      );
+      throw new Error(`Cannot find [${model.type}] element with id [${model.id}]`);
     }
     return selector as HTMLElement;
   }
 
   getPortCenter(port: PortModel) {
-    const sourceElement = this.getNodePortElement(port);
+    const sourceElement = this.getModelElement(port);
     const diagramModel = this.getDiagramModel();
     if (!sourceElement || !diagramModel) {
       return null;
@@ -152,7 +134,7 @@ export class DiagramEngine {
    * Calculate rectangular coordinates of the port passed in.
    */
   getPortCoords(port: PortModel) {
-    const sourceElement = this.getNodePortElement(port);
+    const sourceElement = this.getModelElement(port);
     const canvas = this.getCanvas();
     const diagramModel = this.getDiagramModel();
     if (!sourceElement || !canvas || !diagramModel) {
@@ -180,7 +162,7 @@ export class DiagramEngine {
    * Calculate rectangular coordinates of the node passed in.
    */
   getNodeCoords(node: NodeModel) {
-    const sourceElement = this.getNodeElement(node);
+    const sourceElement = this.getModelElement(node);
     const canvas = this.getCanvas();
     const diagramModel = this.getDiagramModel();
     if (!sourceElement || !canvas || !diagramModel) {
@@ -205,7 +187,7 @@ export class DiagramEngine {
   }
 
   getNodeCenter(node: NodeModel) {
-    const sourceElement = this.getNodeElement(node);
+    const sourceElement = this.getModelElement(node);
     const diagramModel = this.getDiagramModel();
     if (!sourceElement || !diagramModel) {
       return null;
@@ -235,7 +217,7 @@ export class DiagramEngine {
    * It currently assumes nodes have a rectangular shape, can be overriden for customised shapes.
    */
   getNodeDimensions(node: NodeModel) {
-    const nodeElement = this.getNodeElement(node);
+    const nodeElement = this.getModelElement(node);
     if (!nodeElement) {
       return null;
     }
@@ -341,7 +323,7 @@ export class DiagramEngine {
       const { x, y } = node.getCoords();
 
       // get client width and client height of current node
-      const nodeElement = this.getNodeElement(node);
+      const nodeElement = this.getModelElement(node);
       const { clientWidth, clientHeight } = nodeElement;
 
       // if this node located at the leftmost point
@@ -465,9 +447,15 @@ export class DiagramEngine {
 
   paintNodes(
     nodesHost: any,
+    promise: true
+  ): Promise<boolean>
+  paintNodes(
+    nodesHost: any
+  ): Observable<boolean>
+  paintNodes(
+    nodesHost: any,
     promise = false
-  ): Observable<boolean> | Promise<boolean> | void {
-    console.log('PAINT NODES');
+  ): Observable<boolean> | Promise<boolean> {
     const diagramModel = this.getDiagramModel();
     const observable = diagramModel.selectNodes().pipe(
       takeUntil(diagramModel.onEntityDestroy()),
@@ -475,34 +463,42 @@ export class DiagramEngine {
         const nodesPainted$ = [];
         for (const node of nodes.values()) {
           if (!node.getPainted().isPainted) {
-            if (!this.factory.has(node)) {
-              return of(null);
-            }
+            nodesPainted$.push(
+              node
+                .paintChanges()
+                .pipe(pluck('isPainted'), take(1))
+            );
+
+            node.setParent(diagramModel);
 
             this.factory.generateWidget({
               model: node,
               host: nodesHost,
+              diagramModel: this.diagramModel
             });
-
-            node.setParent(diagramModel);
-
-            nodesPainted$.push(
-              node
-                .paintChanges()
-                .pipe(pluck('isPainted'), filter<boolean>(Boolean), take(1))
-            );
           }
         }
 
         return combineLatest(nodesPainted$);
       }),
       filter((val) => val !== null),
-      map(() => true)
+      map(() => true),
+      catchError(err => {
+        console.error(err);
+        return of(true);
+      })
     );
 
     return promise ? observable.toPromise() : observable;
   }
 
+  paintLinks(
+    linksHost: any,
+    promise: true
+  ): Promise<void>
+  paintLinks(
+    linksHost: any
+  ): Observable<void>
   paintLinks(
     linksHost: any,
     promise = false
@@ -540,12 +536,7 @@ export class DiagramEngine {
                 [link.getPoints().length - 1].setCoords(portCenter);
             }
 
-            // Render link component
-            if (!this.factory.has(link)) {
-              return;
-            }
-
-            this.factory.generateWidget({ model: link, host: linksHost });
+            this.factory.generateWidget({ model: link, host: linksHost, diagramModel: this.diagramModel });
 
             // (canvas: HTMLElement | null | undefined): canvas is HTMLElement =>
             // Handle link label, if any
@@ -560,6 +551,10 @@ export class DiagramEngine {
               .subscribe((label) => this.paintLabel(label, linksHost));
           }
         }
+      }),
+      catchError(err => {
+        console.error(err);
+        return EMPTY;
       })
     );
 
@@ -567,13 +562,7 @@ export class DiagramEngine {
   }
 
   paintLabel(label: LabelModel, host: any) {
-    if (!label.getPainted().isPainted) {
-      if (!this.factory.has(label)) {
-        return;
-      }
-
-      this.factory.generateWidget({ model: label, host });
-    }
+    this.factory.generateWidget({ model: label, host, diagramModel: this.diagramModel });
   }
 
   /**

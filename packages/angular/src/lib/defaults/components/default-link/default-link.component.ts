@@ -2,12 +2,12 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component, Host, HostBinding,
-  Inject, OnInit, Optional,
+  Component, Host,
+  Inject, OnInit,
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
-import { PointModel, generateCurvePath, Coords, LinkModel, ID } from '@rxzu/core';
+import { PointModel, generateCurvePath, Coords, LinkModel } from '@rxzu/core';
 import { combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { MODEL } from '../../../injection.tokens';
@@ -22,16 +22,8 @@ export class DefaultLinkComponent implements OnInit, AfterViewInit {
   @ViewChild('labelLayer', { read: ViewContainerRef, static: true })
   labelLayer!: ViewContainerRef;
 
-  @HostBinding('attr.data-linkid') get linkId(): ID | undefined {
-    return this.model?.id;
-  }
-
-  @HostBinding('attr.data-name') get name(): string {
-    return this.model?.name ?? '';
-  }
-
   constructor(
-    @Optional() @Host() @Inject(MODEL) public model: LinkModel,
+    @Host() @Inject(MODEL) public model: LinkModel,
     private cdRef: ChangeDetectorRef
   ) {}
 

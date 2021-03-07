@@ -14,30 +14,28 @@ export class DefaultLabelStoryComponent implements OnInit {
   @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
   constructor() {
-    this.diagramModel = new DiagramModel({ name: 'default' });
+    this.diagramModel = new DiagramModel();
   }
 
   ngOnInit() {
     const nodesDefaultDimensions = { height: 200, width: 200 };
 
     const node1 = new NodeModel({
-      name: 'default',
       coords: { x: 500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
-    const outport = new PortModel({ name: 'default' });
+    const outport = new PortModel();
     node1.addPort(outport);
 
     const node2 = new NodeModel({
-      name: 'default',
       coords: { x: 500, y: 300 },
       dimensions: nodesDefaultDimensions,
     });
 
-    const inport = new PortModel({ name: 'default' });
+    const inport = new PortModel();
     node2.addPort(inport);
 
-    const label = new LabelModel({ text: "I'm a label", name: 'default' });
+    const label = new LabelModel({ text: "I'm a label" });
     const link = outport.link(inport);
     const models: BaseModel[] = [node1, node2];
 

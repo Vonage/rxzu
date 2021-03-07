@@ -1,9 +1,10 @@
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
   OnInit,
   Output,
-  ViewChild,
+  ViewChild
 } from '@angular/core';
 import {
   DiagramModel,
@@ -23,7 +24,7 @@ import { filter } from 'rxjs/operators';
   ></rxzu-diagram>`,
   styleUrls: ['../../demo-diagram.component.scss'],
 })
-export class EventsExampleStoryComponent implements OnInit {
+export class EventsExampleStoryComponent implements OnInit, AfterViewInit {
   diagramModel: DiagramModel;
   @ViewChild(RxZuDiagramComponent, { static: true })
   diagram?: RxZuDiagramComponent;
@@ -34,7 +35,7 @@ export class EventsExampleStoryComponent implements OnInit {
   }> = new EventEmitter();
 
   constructor() {
-    this.diagramModel = new DiagramModel({ name: 'default' });
+    this.diagramModel = new DiagramModel();
   }
 
   ngOnInit() {
@@ -42,32 +43,26 @@ export class EventsExampleStoryComponent implements OnInit {
 
     const node1 = new NodeModel({
       coords: { x: 500, y: 300 },
-      name: 'default',
       dimensions: nodesDefaultDimensions,
     });
-    const outPort = new PortModel({ name: 'default', displayName: 'outport1' });
+    const outPort = new PortModel({ displayName: 'outport1' });
     node1.addPort(outPort);
 
     const node2 = new NodeModel({
       coords: { x: 1000, y: 0 },
-      name: 'default',
       dimensions: nodesDefaultDimensions,
     });
 
     node2.setDimensions(nodesDefaultDimensions);
-    const inPort = new PortModel({ name: 'default', displayName: 'inport2' });
+    const inPort = new PortModel({ displayName: 'inport2' });
     node2.addPort(inPort);
 
     for (let index = 0; index < 2; index++) {
       const nodeLoop = new NodeModel({
         coords: { x: 1000, y: 300 + index * 300 },
-        name: 'default',
         dimensions: nodesDefaultDimensions,
       });
-      const portLoop = new PortModel({
-        name: 'default',
-        displayName: `inport${index + 3}`,
-      });
+      const portLoop = new PortModel({ displayName: `inport${index + 3}` });
       nodeLoop.addPort(portLoop);
 
       this.diagramModel.addNode(nodeLoop);
@@ -81,7 +76,9 @@ export class EventsExampleStoryComponent implements OnInit {
     }
 
     this.diagramModel.addAll(...models);
+  }
 
+  ngAfterViewInit() {
     this.diagram?.zoomToFit();
 
     this.subscribeToDiagramEvents();

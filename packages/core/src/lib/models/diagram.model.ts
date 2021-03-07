@@ -36,8 +36,8 @@ export class DiagramModel extends BaseEntity {
   protected portMagneticRadius$: ValueState<number>;
   protected keyBindings$: ValueState<KeyBindigsOptions>;
 
-  constructor(options: DiagramModelOptions, diagramEngine?: DiagramEngine) {
-    super({ ...options, logPrefix: '[Diagram]', type: 'diagram' });
+  constructor(options: DiagramModelOptions = {}, diagramEngine?: DiagramEngine) {
+    super({ type: 'diagram', logPrefix: '[Diagram]', ...options });
 
     if (diagramEngine) {
       this._diagramEngine = diagramEngine;

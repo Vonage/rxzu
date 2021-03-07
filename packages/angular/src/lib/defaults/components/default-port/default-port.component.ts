@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, Host, HostBinding, Inject, Optional } from '@angular/core';
-import { ID, PortModel } from '@rxzu/core';
+import { ChangeDetectionStrategy, Component, Host, Inject, OnInit } from '@angular/core';
+import { PortModel } from '@rxzu/core';
 import { MODEL } from '../../../injection.tokens';
 
 @Component({
@@ -8,16 +8,10 @@ import { MODEL } from '../../../injection.tokens';
   styleUrls: ['./default-port.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DefaultPortComponent {
-  @HostBinding('attr.data-portid') get linkId(): ID | undefined {
-    return this.model?.id;
-  }
+export class DefaultPortComponent implements OnInit {
+  constructor(@Host() @Inject(MODEL) public model: PortModel) {}
 
-  @HostBinding('attr.data-name') get name(): string {
-    return this.model?.name ?? '';
-  }
-
-  constructor(@Optional() @Host() @Inject(MODEL) public model: PortModel) {
+  ngOnInit() {
     this.model.setPainted(true);
   }
 }

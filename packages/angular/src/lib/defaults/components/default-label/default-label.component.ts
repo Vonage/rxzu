@@ -1,11 +1,11 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component, Host, HostBinding,
+  Component, Host,
   Inject,
-  OnInit, Optional
+  OnInit
 } from '@angular/core';
-import { ID, LabelModel } from '@rxzu/core';
+import { LabelModel } from '@rxzu/core';
 import { MODEL } from '../../../injection.tokens';
 
 @Component({
@@ -15,17 +15,9 @@ import { MODEL } from '../../../injection.tokens';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DefaultLabelComponent implements OnInit {
-  @HostBinding('attr.data-labelid') get labelId(): ID | undefined {
-    return this.model?.id;
-  }
-
-  @HostBinding('attr.data-name') get name(): string {
-    return this.model?.name ?? '';
-  }
-
   constructor(
-    private cdRef: ChangeDetectorRef,
-    @Optional() @Host() @Inject(MODEL) public model: LabelModel
+    @Host() @Inject(MODEL) public model: LabelModel,
+    private cdRef: ChangeDetectorRef
   ) {}
 
   ngOnInit() {

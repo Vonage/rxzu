@@ -12,12 +12,12 @@ import { toRegistryKey } from '@rxzu/core';
   exports: [RxZuDiagramComponent]
 })
 export class RxZuModule {
-  constructor(registry: RegistryService, @Inject(COMPONENT) @Optional() components: Omit<ComponentProviderOptions, 'type'>[]) {
-    components?.forEach(({ name, component }) => registry.set(name, component));
+  constructor(registry: RegistryService, @Inject(COMPONENT) @Optional() components: ComponentProviderOptions[]) {
+    components?.forEach(({ type, name, component }) => registry.set(toRegistryKey(type, name), component));
   }
 
   static registerComponent({ type, name, component }: ComponentProviderOptions): Provider {
-    return { provide: COMPONENT, multi: true, useValue: { name: toRegistryKey(type, name), component } }
+    return { provide: COMPONENT, multi: true, useValue: { type, name, component } };
   }
 
   static withComponents(components?: ComponentProviderOptions | ComponentProviderOptions[]): ModuleWithProviders<RxZuModule> {

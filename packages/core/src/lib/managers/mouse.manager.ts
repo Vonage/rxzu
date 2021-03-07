@@ -26,15 +26,15 @@ export class MouseManager {
     const target = event.target as Element;
 
     // is it a port?
-    let element = target.closest('[data-portid]');
-    const nodeEl = target.closest('[data-nodeid]');
+    let element = target.closest('[data-type="port"]');
+    const nodeEl = target.closest('[data-type="node"]');
     if (element && nodeEl) {
       // get the relevant node and return the port.
       return {
         model: this.engine
           .getDiagramModel()
-          ?.getNode(nodeEl.getAttribute('data-nodeid'))
-          ?.getPort(element.getAttribute('data-portid')) as
+          ?.getNode(nodeEl.getAttribute('data-id'))
+          ?.getPort(element.getAttribute('data-id')) as
           | BaseModel
           | undefined,
         element,
@@ -42,13 +42,13 @@ export class MouseManager {
     }
 
     // look for a point
-    element = target.closest('[data-pointid]');
+    element = target.closest('[data-type="point"]');
     if (element) {
       return {
         model: this.engine
           .getDiagramModel()
-          ?.getLink(element.getAttribute('data-linkid'))
-          ?.getPointModel(element.getAttribute('data-pointid')) as
+          ?.getLink(element.getAttribute('data-parentId'))
+          ?.getPointModel(element.getAttribute('data-id')) as
           | BaseModel
           | undefined,
         element,
@@ -56,12 +56,12 @@ export class MouseManager {
     }
 
     // look for a link
-    element = target.closest('[data-linkid]');
+    element = target.closest('[data-type="link"]');
     if (element) {
       return {
         model: this.engine
           .getDiagramModel()
-          ?.getLink(element.getAttribute('data-linkid')) as
+          ?.getLink(element.getAttribute('data-id')) as
           | BaseModel
           | undefined,
         element,
@@ -69,12 +69,12 @@ export class MouseManager {
     }
 
     // a node maybe
-    element = target.closest('[data-nodeid]');
+    element = target.closest('[data-type="node"]');
     if (element) {
       return {
         model: this.engine
           .getDiagramModel()
-          ?.getNode(element.getAttribute('data-nodeid')) as
+          ?.getNode(element.getAttribute('data-id')) as
           | BaseModel
           | undefined,
         element,

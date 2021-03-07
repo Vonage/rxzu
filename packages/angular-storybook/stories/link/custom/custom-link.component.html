@@ -40,7 +40,7 @@
       marker-end="url(#triangle)"
       (mouseleave)="model.setHovered(false)"
       (mouseenter)="model.setHovered()"
-      [attr.data-linkid]="model.id"
+      [attr.data-id]="model.id"
       [attr.stroke-opacity]="(model.selectHovered() | async) ? '0.1' : '0'"
       [attr.d]="model.selectPath() | async"
     ></path>
@@ -62,8 +62,8 @@
     <circle
       r="15"
       opacity="0"
-      [attr.data-pointid]="point.id"
-      [attr.data-linkid]="model.id"
+      [attr.data-id]="point.id"
+      [attr.data-parentId]="model.id"
       (mouseleave)="point.setHovered(false); model.setHovered(false)"
       (mouseenter)="point.setHovered(); model.setHovered()"
       [attr.cx]="point.selectX() | async"

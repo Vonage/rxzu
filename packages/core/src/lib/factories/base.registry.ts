@@ -6,23 +6,23 @@ export abstract class AbstractRegistry<C> {
     this._parent = parent;
   };
 
-  get(type: string): C | undefined {
-    return this._registry.get(type) || this._parent?.get(type);
+  get(key: string): C | undefined {
+    return this._registry.get(key) || this._parent?.get(key);
   }
 
-  has(type: string): boolean {
-    return this._registry.has(type) || !!this._parent?.has(type);
+  has(key: string): boolean {
+    return this._registry.has(key) || !!this._parent?.has(key);
   }
 
-  set(type: string, component: C) {
-    this._registry.set(type, component);
+  set(key: string, component: C) {
+    this._registry.set(key, component);
   }
 
   clear() {
     this._registry.clear()
   }
 
-  delete(type: string) {
-    this._registry.delete(type);
+  delete(key: string) {
+    this._registry.delete(key);
   }
 }

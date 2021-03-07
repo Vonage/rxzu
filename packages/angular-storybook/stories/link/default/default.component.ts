@@ -14,30 +14,30 @@ export class DefaultLinkStoryComponent implements OnInit {
   @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
   constructor() {
-    this.diagramModel = new DiagramModel({ name: 'default' });
+    this.diagramModel = new DiagramModel();
   }
 
   ngOnInit() {
     const nodesDefaultDimensions = { height: 200, width: 200 };
 
-    const node1 = new NodeModel({ name: 'default' });
+    const node1 = new NodeModel();
     node1.setCoords({ x: 500, y: 300 });
     node1.setDimensions(nodesDefaultDimensions);
 
-    const outport1 = new PortModel({ name: 'default', displayName: 'outport' });
+    const outport1 = new PortModel({ displayName: 'outport' });
     node1.addPort(outport1);
 
-    const node2 = new NodeModel({ name: 'default' });
+    const node2 = new NodeModel();
     node2.setCoords({ x: 1000, y: 0 });
     node2.setDimensions(nodesDefaultDimensions);
-    const inport = new PortModel({ name: 'default', displayName: 'inport' });
+    const inport = new PortModel({ displayName: 'inport' });
     node2.addPort(inport);
 
     for (let index = 0; index < 2; index++) {
-      const nodeLoop = new NodeModel({ name: 'default' });
+      const nodeLoop = new NodeModel();
       nodeLoop.setCoords({ x: 1000, y: 300 + index * 300 });
       nodeLoop.setDimensions(nodesDefaultDimensions);
-      const loopPort = new PortModel({ name: 'default' });
+      const loopPort = new PortModel();
       nodeLoop.addPort(loopPort);
       this.diagramModel.addNode(nodeLoop);
     }
