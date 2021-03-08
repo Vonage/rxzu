@@ -4,9 +4,9 @@ import { BaseEntityType, BaseModel, EngineSetup } from '@rxzu/core';
 export const MODEL: InjectionToken<BaseModel> = new InjectionToken('MODEL');
 
 export interface ComponentProviderOptions<T = any> {
-  type: BaseEntityType;
-  name: string;
   component: Type<T>;
+  type: BaseEntityType;
+  name?: string;
 }
 
 export const COMPONENT: InjectionToken<

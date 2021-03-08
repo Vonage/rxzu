@@ -8,8 +8,8 @@ export class LabelModel extends BaseModel<LinkModel> {
   protected rotation$: ValueState<number>;
   protected text$: ValueState<string | null>;
 
-  constructor(options: LabelModelOptions) {
-    super({ ...options, type: 'label' });
+  constructor(options: LabelModelOptions = {}) {
+    super({ type: 'label', ...options });
 
     this.coords$ = createValueState(
       options.coords ?? { x: 0, y: 0 },

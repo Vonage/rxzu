@@ -23,4 +23,5 @@ export class CopyAction extends BaseAction {
       .getSelectedItems()
       .filter(isNotLocked);
   }
+
 }

@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -11,16 +10,16 @@ import {
   OnDestroy,
   Renderer2,
   ViewChild,
-  ViewContainerRef,
+  ViewContainerRef, OnInit
 } from '@angular/core';
-import { combineLatest, noop, Observable, of, ReplaySubject } from 'rxjs';
+import { combineLatest, noop, Observable, of } from 'rxjs';
 import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import {
   SelectingAction,
   MouseManager,
   DiagramModel,
-  KeyboardManager,
   EngineSetup,
+  KeyboardManager, NodeModel
 } from '@rxzu/core';
 import { ZonedClass, OutsideZone } from '../utils';
 import { EngineService } from '../engine.service';
@@ -37,10 +36,10 @@ import { DIAGRAM_DEFAULT_OPTIONS } from '../injection.tokens';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RxZuDiagramComponent
-  implements AfterViewInit, OnDestroy, ZonedClass {
+  implements OnInit, OnDestroy, ZonedClass {
   /** The name of the diagram, if not set will be `'default'` */
   @Input() name?: string;
-  @Input() model?: DiagramModel;
+  @Input() model!: DiagramModel;
   @Input() options?: Partial<EngineSetup>;
   /** @deprecated use options instead, will be removed in v4.0.0 */
   @Input() allowCanvasZoom = true;
@@ -58,19 +57,18 @@ export class RxZuDiagramComponent
   @Input() portMagneticRadius = 30;
   @Input() keyBindings = {};
 
-  @ViewChild('nodesLayer', { read: ViewContainerRef })
+  @ViewChild('nodesLayer', { read: ViewContainerRef, static: true })
   nodesLayer?: ViewContainerRef;
 
-  @ViewChild('linksLayer', { read: ViewContainerRef })
+  @ViewChild('linksLayer', { read: ViewContainerRef, static: true })
   linksLayer?: ViewContainerRef;
 
-  @ViewChild('canvas', { read: ElementRef })
+  @ViewChild('canvas', { read: ElementRef, static: true })
   canvas?: ElementRef;
 
   mouseManager?: MouseManager;
   keyboardManager?: KeyboardManager;
   selectionBox$?: Observable<SelectingAction | null>;
-  destroyed$ = new ReplaySubject<boolean>(1);
 
   get host(): HTMLElement {
     return this.elRef.nativeElement;
@@ -83,59 +81,58 @@ export class RxZuDiagramComponent
     protected cdRef: ChangeDetectorRef,
     protected elRef: ElementRef<HTMLElement>,
     @Inject(DIAGRAM_DEFAULT_OPTIONS) protected defaultOptions: EngineSetup
-  ) {}
+  ) {
+    this.mouseManager = this.diagramEngine.getMouseManager();
+    this.keyboardManager = this.diagramEngine.getKeyboardManager();
+  }
 
-  ngAfterViewInit() {
-    const mergedOptions = { ...this.defaultOptions, ...this.options };
+  ngOnInit() {
+    this.options = { ...this.defaultOptions, ...this.options };
     this.model =
       (this.model && this.diagramEngine.setModel(this.model)) ||
       this.diagramEngine.createModel({
         name: this.name || 'default',
-        ...mergedOptions,
+        ...this.options,
       });
 
     if (!this.canvas) {
       return;
     }
 
-    this.mouseManager = this.diagramEngine.getMouseManager();
-    this.keyboardManager = this.diagramEngine.getKeyboardManager();
-
     this.diagramEngine.setCanvas(this.canvas.nativeElement);
 
     this.diagramEngine.setup({
-      ...mergedOptions,
+      ...this.options,
       // TODO: remove after deprecated inputs removed
       ...this,
     } as EngineSetup);
 
-    console.log(this.diagramEngine);
-    (this.diagramEngine.paintNodes(this.nodesLayer) as Observable<boolean>)
+    this.initNodes();
+    this.initSelectionBox();
+    this.initSubs();
+  }
+
+  ngOnDestroy() {
+    if (this.keyboardManager) {
+      this.keyboardManager.dispose();
+    }
+
+    this.model.destroy();
+  }
+
+  initNodes(): void {
+    this.diagramEngine.paintNodes(this.nodesLayer)
       .pipe(
+        takeUntil(this.model.onEntityDestroy()),
         switchMap(() => {
           if (!this.diagramEngine) {
             return of(null);
           }
 
-          return this.diagramEngine.paintLinks(
-            this.linksLayer
-          ) as Observable<void>;
+          return this.diagramEngine.paintLinks(this.linksLayer);
         })
       )
-      .subscribe(() => {
-        this.initSubs();
-        this.initSelectionBox();
-        this.cdRef.detectChanges();
-      });
-  }
-
-  ngOnDestroy() {
-    this.destroyed$.next(true);
-    this.destroyed$.complete();
-
-    if (this.keyboardManager) {
-      this.keyboardManager.dispose();
-    }
+      .subscribe();
   }
 
   initSelectionBox() {
@@ -199,6 +196,10 @@ export class RxZuDiagramComponent
     this.diagramEngine.zoomToFit(additionalZoomFactor);
   }
 
+  zoomToNodes(nodes: NodeModel[], margin = 100): void {
+    this.diagramEngine.zoomToNodes(nodes, margin);
+  }
+
   @OutsideZone
   protected setLayerStyles(x: number, y: number, zoom: number): void {
     const nodesLayer = this.getNodesLayer();
@@ -223,8 +224,8 @@ export class RxZuDiagramComponent
       diagramModel.selectZoomLevel(),
     ])
       .pipe(
-        tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom)),
-        takeUntil(this.destroyed$)
+        takeUntil(this.model.onEntityDestroy()),
+        tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom))
       )
       .subscribe();
   }
@@ -234,7 +235,7 @@ export class RxZuDiagramComponent
       return null;
     }
 
-    return this.host.querySelector('.rxzu-nodes-layer');
+    return this.nodesLayer?.element.nativeElement.parentElement;
   }
 
   protected getLinksLayer(): HTMLDivElement | null {
@@ -242,6 +243,6 @@ export class RxZuDiagramComponent
       return null;
     }
 
-    return this.host.querySelector('.rxzu-links-layer');
+    return this.linksLayer?.element.nativeElement.parentElement;
   }
 }

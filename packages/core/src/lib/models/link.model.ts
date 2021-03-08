@@ -16,8 +16,8 @@ export class LinkModel extends BaseModel<DiagramModel> {
   protected path$: ValueState<string | null>;
   protected points$: ValueState<PointModel[]>;
 
-  constructor(options: LinkModelOptions) {
-    super({ ...options, logPrefix: '[Link]', type: 'link' });
+  constructor(options: LinkModelOptions = {}) {
+    super({ type: 'link', logPrefix: '[Link]', ...options });
 
     this.sourcePort$ = createValueState<PortModel | null>(
       options.sourcePort ?? null,
@@ -271,7 +271,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
   }
 
   generatePoint({ x = 0, y = 0 }: Coords): PointModel {
-    return new PointModel({ parent: this, coords: { x, y }, name: 'default' });
+    return new PointModel({ parent: this, coords: { x, y } });
   }
 
   setLocked(locked = true) {

@@ -20,8 +20,8 @@ export class NodeModel extends BaseModel<DiagramModel> {
   protected coords$: ValueState<Coords>;
   protected dimensions$: ValueState<Dimensions>;
 
-  constructor(options: NodeModelOptions) {
-    super({ ...options, logPrefix: '[Node]', type: 'node' });
+  constructor(options: NodeModelOptions = {}) {
+    super({ type: 'node', logPrefix: '[Node]', ...options });
 
     this.ports$ = createEntityState([], this.entityPipe('ports'));
     this.extras$ = createValueState(
@@ -223,6 +223,6 @@ export class NodeModel extends BaseModel<DiagramModel> {
   }
 
   removeAllPorts(): void {
-    this.ports$.clear().emit();
+    this.ports$.destroy();
   }
 }

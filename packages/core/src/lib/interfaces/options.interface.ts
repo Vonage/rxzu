@@ -28,7 +28,7 @@ export type BaseEntityType =
 
 export interface BaseEntityOptions {
   type: BaseEntityType;
-  name: string;
+  name?: string;
   displayName?: string;
   locked?: boolean;
   id?: string;

@@ -1,10 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import {
-  DiagramEngine,
-  DiagramModel,
-  NodeModel,
-  PortModel,
-} from '@rxzu/angular';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { DiagramModel, NodeModel, PortModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
@@ -16,39 +11,38 @@ import {
   `,
   styleUrls: ['../../demo-diagram.component.scss'],
 })
-export class ZoomToNodeExampleStoryComponent implements OnInit {
+export class ZoomToNodeExampleStoryComponent implements OnInit, AfterViewInit {
   diagramModel: DiagramModel;
+  @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
-  constructor(
-    private diagramEngine: DiagramEngine
-  ) {
-    this.diagramModel = this.diagramEngine.createModel();
+  constructor() {
+    this.diagramModel = new DiagramModel();
   }
 
   ngOnInit() {
     const nodesDefaultDimensions = { height: 200, width: 200 };
-    const node1 = new NodeModel({ name: 'default' });
+    const node1 = new NodeModel();
     node1.setCoords({ x: 500, y: 300 });
     node1.setDimensions(nodesDefaultDimensions);
-    const outport1 = new PortModel({ name: 'default' });
+    const outport1 = new PortModel();
     node1.addPort(outport1);
 
-    const node2 = new NodeModel({ name: 'default' });
+    const node2 = new NodeModel();
     node2.setCoords({ x: 100, y: 100 });
     node2.setDimensions(nodesDefaultDimensions);
-    const inport = new PortModel({ name: 'default' });
+    const inport = new PortModel();
     node2.addPort(inport);
     node2.setSelected(true);
 
 
     for (let index = 0; index < 2; index++) {
-      const nodeLoop = new NodeModel({ name: 'default' });
+      const nodeLoop = new NodeModel();
       nodeLoop.setCoords({
         x: 1000 * (Math.random() * 10),
         y: 300 + index * (Math.random() * 10) * 300,
       });
       nodeLoop.setDimensions(nodesDefaultDimensions);
-      const inportLoop = new PortModel({ name: 'default' });
+      const inportLoop = new PortModel();
       node2.addPort(inport);
       nodeLoop.addPort(inportLoop);
 
@@ -61,13 +55,15 @@ export class ZoomToNodeExampleStoryComponent implements OnInit {
     }
 
     this.diagramModel.addAll(node1, node2);
+  }
 
-    this.diagramEngine.zoomToFit();
+  ngAfterViewInit() {
+    this.diagram?.zoomToFit();
   }
 
   zoomToNode() {
     const allNodes = this.diagramModel.getNodesArray();
     const nodeToZoomInto = allNodes[allNodes.length - 1];
-    this.diagramEngine.zoomToNodes([nodeToZoomInto], 100);
+    this.diagram?.zoomToNodes([nodeToZoomInto], 100);
   }
 }

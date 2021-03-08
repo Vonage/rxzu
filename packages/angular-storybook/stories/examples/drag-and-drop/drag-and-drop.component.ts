@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { DiagramModel, NodeModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
@@ -29,7 +29,7 @@ import { DiagramModel, NodeModel, RxZuDiagramComponent } from '@rxzu/angular';
     './drag-and-drop.component.scss',
   ],
 })
-export class DragAndDropExampleStoryComponent implements OnInit {
+export class DragAndDropExampleStoryComponent implements AfterViewInit {
   diagramModel: DiagramModel;
   nodesDefaultDimensions = { height: 200, width: 200 };
   nodesLibrary = [
@@ -40,10 +40,12 @@ export class DragAndDropExampleStoryComponent implements OnInit {
   @ViewChild(RxZuDiagramComponent, { static: true }) diagram?: RxZuDiagramComponent;
 
   constructor() {
-    this.diagramModel = new DiagramModel({ name: 'default' });
+    this.diagramModel = new DiagramModel();
   }
 
-  ngOnInit() {}
+  ngAfterViewInit() {
+    this.diagram?.zoomToFit();
+  }
 
   createNode(type: string) {
     const nodeData = this.nodesLibrary.find((nodeLib) => nodeLib.name === type);

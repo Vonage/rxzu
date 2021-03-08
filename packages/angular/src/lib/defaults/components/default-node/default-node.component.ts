@@ -1,13 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef, Host, HostBinding,
-  Inject, IterableChanges, IterableDiffer, IterableDiffers, OnInit, Optional,
+  ElementRef, Host,
+  Inject, IterableChanges, IterableDiffer, IterableDiffers, OnInit,
   Renderer2,
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
-import { ID, NodeModel, PortModel } from '@rxzu/core';
+import { NodeModel, PortModel } from '@rxzu/core';
 import { MODEL } from '../../../injection.tokens';
 import { filter, mapTo, pluck, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
@@ -24,25 +24,15 @@ export class DefaultNodeComponent implements OnInit {
   private portDiffers: IterableDiffer<PortModel>;
   @ViewChild('portsLayer', { read: ViewContainerRef, static: true })
   portsLayer!: ViewContainerRef;
-  rootNode: HTMLElement;
-
-  @HostBinding('attr.data-nodeid') get linkId(): ID | undefined {
-    return this.model?.id;
-  }
-
-  @HostBinding('attr.data-name') get name(): string {
-    return this.model?.name ?? '';
-  }
 
   constructor(
-    @Host() @Optional() @Inject(MODEL) public model: NodeModel,
+    @Host() @Inject(MODEL) public model: NodeModel,
     private factory: FactoryService,
     private diagram: RxZuDiagramComponent,
-    private rootEl: ElementRef,
+    private elRef: ElementRef,
     private renderer: Renderer2,
     private iterableDiffers: IterableDiffers
   ) {
-    this.rootNode = this.rootEl.nativeElement;
     this.portDiffers = this.iterableDiffers.find([]).create<PortModel>((index, item) => item.id);
   }
 
@@ -58,8 +48,8 @@ export class DefaultNodeComponent implements OnInit {
   updateNodePosition(): void {
     // subscribe to node coordinates
     this.model.selectCoords().pipe(takeUntil(this.model.onEntityDestroy())).subscribe(({ x, y }) => {
-      this.renderer.setStyle(this.rootNode, 'left', `${x}px`);
-      this.renderer.setStyle(this.rootNode, 'top', `${y}px`);
+      this.renderer.setStyle(this.elRef.nativeElement, 'left', `${x}px`);
+      this.renderer.setStyle(this.elRef.nativeElement, 'top', `${y}px`);
     });
   }
 
@@ -88,11 +78,16 @@ export class DefaultNodeComponent implements OnInit {
 
   private applyPortChanges(changes: IterableChanges<PortModel> | null): void {
     if (changes) {
-      changes.forEachAddedItem(({ item, currentIndex }) => this.factory.generateWidget({
-        model: item,
-        host: this.getPortsHost(),
-        index: currentIndex ?? undefined
-      }));
+      changes.forEachAddedItem(({ item, currentIndex }) => {
+        item.setParent(this.model);
+        this.factory.generateWidget({
+          model: item,
+          host: this.getPortsHost(),
+          index: currentIndex ?? undefined,
+          diagramModel: this.model.getParent()
+        });
+        this.model.updatePortCoords(item, this.diagram.diagramEngine);
+      });
       changes.forEachMovedItem(({ previousIndex, currentIndex, item }) => {
         if (previousIndex !== null && currentIndex !== null && previousIndex !== currentIndex) {
           const view = this.getPortsHost().get(previousIndex);

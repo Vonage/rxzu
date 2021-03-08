@@ -5,7 +5,7 @@ import {
   Type,
   ViewContainerRef
 } from '@angular/core';
-import { AbstractFactory, BaseModel, WidgetOptions } from '@rxzu/core';
+import { AbstractFactory, BaseModel, toRegistryKey, WidgetOptions } from '@rxzu/core';
 import { RegistryService } from './registry.service';
 import { MODEL } from './injection.tokens';
 
@@ -16,14 +16,21 @@ export class FactoryService extends AbstractFactory<Type<any>, ComponentRef<any>
     super(registry);
   }
 
-  resolveComponent<M extends BaseModel>({ model, host, index, diagramModel }: WidgetOptions<M, ViewContainerRef>): ComponentRef<any> | null {
+  resolveComponent<M extends BaseModel>({ model, host, index, diagramModel }: WidgetOptions<M, ViewContainerRef>): ComponentRef<any> {
     const cmp = this.get(model);
-    if (!cmp) return null;
+    if (!cmp) throw new Error(`[RxZu] Couldn't find component for ${toRegistryKey(model.type, model.name)}`);
 
     const injector = Injector.create({ providers: [{ provide: MODEL, useValue: model }], parent: host.injector });
     const ref = host.createComponent(this.cfr.resolveComponentFactory(cmp), index, injector);
 
+    this.renderer.setAttribute(ref.location.nativeElement, 'data-type', model.type);
     this.renderer.setAttribute(ref.location.nativeElement, 'data-id', model.id);
+    this.renderer.setAttribute(ref.location.nativeElement, 'data-parentId', model.getParent()?.id ?? diagramModel?.id);
+    this.renderer.setAttribute(ref.location.nativeElement, 'data-theme', model.name);
+
+    ref.changeDetectorRef.detectChanges();
+
+    model.onEntityDestroy().subscribe(() => ref.destroy());
 
     return ref;
   }

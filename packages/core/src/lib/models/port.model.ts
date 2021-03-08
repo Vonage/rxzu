@@ -22,8 +22,8 @@ export class PortModel extends BaseModel<NodeModel> {
   protected canCreateLinks$: ValueState<boolean>;
   protected links$: EntityState<LinkModel>;
 
-  constructor(options: PortModelOptions) {
-    super({ ...options, logPrefix: '[Port]', type: 'port' });
+  constructor(options: PortModelOptions = {}) {
+    super({ type: 'port', logPrefix: '[Port]', ...options });
 
     this.coords$ = createValueState(
       options.coords ?? { x: 0, y: 0 },
@@ -51,7 +51,7 @@ export class PortModel extends BaseModel<NodeModel> {
     );
 
     this.canCreateLinks$ = createValueState(
-      !!options.canCreateLinks,
+      options.canCreateLinks ?? true,
       this.entityPipe('canCreateLinks')
     );
 
