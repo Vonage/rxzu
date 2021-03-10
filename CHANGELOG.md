@@ -1,3 +1,10 @@
+## [2.2.3](https://github.com/Vonage/rxzu/compare/v2.2.2...v2.2.3) (2021-03-08)
+
+
+### Bug Fixes
+
+* **keyboard:** fire delete action only if pressed the delete key ([311989b](https://github.com/Vonage/rxzu/commit/311989bee7751bf29dea43d5a4a2718b51c2cf1d))
+
 ## [2.2.2](https://github.com/Vonage/rxzu/compare/v2.2.1...v2.2.2) (2021-03-04)
 
 
