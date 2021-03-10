@@ -9,6 +9,7 @@ export * from './lib/registry.service';
 export * from './lib/main.module';
 export * from './lib/defaults/index';
 export * from './lib/utils';
+export * from './lib/themes';
 
 // export all core
 export * from '@rxzu/core';

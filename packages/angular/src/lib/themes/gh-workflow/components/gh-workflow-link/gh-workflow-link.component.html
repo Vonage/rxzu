@@ -1,0 +1,56 @@
+<!-- Label Host -->
+<ng-template #labelLayer></ng-template>
+
+<svg class="link-container">
+  <!-- Link -->
+  <g [id]="model.id">
+    <path
+      class="default-link"
+      stroke-width="1"
+      stroke="white"
+      [attr.d]="model.selectPath() | async"
+      (mouseleave)="model.setHovered(false); onHover()"
+      (mouseenter)="model.setHovered(); onHover()"
+      [ngClass]="{ hovered: model.selectHovered() | async }"
+    ></path>
+    <path
+      class="default-link"
+      stroke="blue"
+      stroke-linecap="round"
+      (mouseleave)="model.setHovered(false); onHover()"
+      (mouseenter)="model.setHovered(); onHover()"
+      [attr.stroke-width]="20"
+      [attr.data-type]="model.type"
+      [attr.data-id]="model.id"
+      [attr.stroke-opacity]="(model.selectHovered() | async) ? '0.1' : '0'"
+      [attr.d]="model.selectPath() | async"
+    ></path>
+  </g>
+
+  <!-- Points -->
+  <g
+    *ngFor="let point of model.getPoints(); trackBy: trackByPoints"
+    [id]="point.id"
+  >
+    <circle
+      fill="currentColor"
+      [attr.cx]="point.selectX() | async"
+      [attr.cy]="point.selectY() | async"
+      r="5"
+      class="default-point"
+      [ngClass]="{ hovered: point.selectHovered() | async }"
+    />
+    <circle
+      [attr.data-type]="point.type"
+      [attr.data-id]="point.id"
+      [attr.data-parentId]="model.id"
+      (mouseleave)="point.setHovered(false); model.setHovered(false)"
+      (mouseenter)="point.setHovered(); model.setHovered()"
+      [attr.cx]="point.selectX() | async"
+      [attr.cy]="point.selectY() | async"
+      r="15"
+      [attr.opacity]="0"
+      [ngClass]="{ selected: point.selectSelected() | async }"
+    />
+  </g>
+</svg>

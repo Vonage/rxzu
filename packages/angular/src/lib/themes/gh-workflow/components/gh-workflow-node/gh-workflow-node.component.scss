@@ -1,0 +1,29 @@
+:host {
+  display: block;
+  position: absolute;
+  transition: background-color 0.12s ease-out, border-color 0.12s ease-out,
+    box-shadow 0.12s ease-out;
+}
+
+.default-node {
+  &.selected {
+    background-color: honeydew;
+  }
+
+  &.hovered {
+    background-color: gainsboro;
+  }
+
+  pointer-events: all;
+  width: 100%;
+  border-radius: 10px;
+  user-select: none;
+  cursor: auto;
+  background-color: white;
+}
+
+.ports {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}

@@ -10,25 +10,31 @@ import { DefaultPortComponent } from './components/default-port/default-port.com
 const DEFAULTS: ComponentProviderOptions[] = [
   {
     type: 'node',
-    component: DefaultNodeComponent
+    component: DefaultNodeComponent,
   },
   {
     type: 'port',
-    component: DefaultPortComponent
-  }, {
+    component: DefaultPortComponent,
+  },
+  {
     type: 'link',
-    component: DefaultLinkComponent
+    component: DefaultLinkComponent,
   },
   {
     type: 'label',
-    component: DefaultLabelComponent
-  }
+    component: DefaultLabelComponent,
+  },
 ];
-const COMPONENTS = [DefaultLinkComponent, DefaultLabelComponent, DefaultPortComponent, DefaultNodeComponent]
+const COMPONENTS = [
+  DefaultLinkComponent,
+  DefaultLabelComponent,
+  DefaultPortComponent,
+  DefaultNodeComponent,
+];
 @NgModule({
   declarations: [...COMPONENTS],
   imports: [CommonModule, RxZuModule.withComponents(DEFAULTS)],
   entryComponents: [...COMPONENTS],
-  exports: [...COMPONENTS, RxZuModule]
+  exports: [...COMPONENTS, RxZuModule],
 })
 export class RxZuDefaultsModule {}
