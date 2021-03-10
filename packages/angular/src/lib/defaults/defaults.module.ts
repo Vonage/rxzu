@@ -25,12 +25,14 @@ const DEFAULTS: ComponentProviderOptions[] = [
     component: DefaultLabelComponent,
   },
 ];
+
 const COMPONENTS = [
   DefaultLinkComponent,
   DefaultLabelComponent,
   DefaultPortComponent,
   DefaultNodeComponent,
 ];
+
 @NgModule({
   declarations: [...COMPONENTS],
   imports: [CommonModule, RxZuModule.withComponents(DEFAULTS)],

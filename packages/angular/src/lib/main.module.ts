@@ -22,20 +22,20 @@ export class RxZuModule {
     registry: RegistryService,
     @Inject(COMPONENT) @Optional() components: ComponentProviderOptions[]
   ) {
-    components?.forEach(({ type, name, component }) =>
+    components?.forEach(({ type, namespace: name, component }) =>
       registry.set(toRegistryKey(type, name), component)
     );
   }
 
   static registerComponent({
     type,
-    name,
+    namespace,
     component,
   }: ComponentProviderOptions): Provider {
     return {
       provide: COMPONENT,
       multi: true,
-      useValue: { type, name, component },
+      useValue: { type, namespace, component },
     };
   }
 

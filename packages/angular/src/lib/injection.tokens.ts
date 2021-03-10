@@ -6,7 +6,7 @@ export const MODEL: InjectionToken<BaseModel> = new InjectionToken('MODEL');
 export interface ComponentProviderOptions<T = any> {
   component: Type<T>;
   type: BaseEntityType;
-  name?: string;
+  namespace?: string;
 }
 
 export const COMPONENT: InjectionToken<

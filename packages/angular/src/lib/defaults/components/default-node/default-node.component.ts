@@ -1,15 +1,28 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef, Host,
-  Inject, IterableChanges, IterableDiffer, IterableDiffers, OnInit,
+  ElementRef,
+  Host,
+  Inject,
+  IterableChanges,
+  IterableDiffer,
+  IterableDiffers,
+  OnInit,
   Renderer2,
   ViewChild,
-  ViewContainerRef
+  ViewContainerRef,
 } from '@angular/core';
 import { NodeModel, PortModel } from '@rxzu/core';
 import { MODEL } from '../../../injection.tokens';
-import { filter, mapTo, pluck, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import {
+  filter,
+  mapTo,
+  pluck,
+  switchMap,
+  take,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
 import { RxZuDiagramComponent } from '../../../diagram/diagram.component';
 import { FactoryService } from '../../../factory.service';
@@ -18,7 +31,7 @@ import { FactoryService } from '../../../factory.service';
   selector: 'rxzu-default-node',
   templateUrl: './default-node.component.html',
   styleUrls: ['./default-node.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DefaultNodeComponent implements OnInit {
   private portDiffers: IterableDiffer<PortModel>;
@@ -33,7 +46,9 @@ export class DefaultNodeComponent implements OnInit {
     private renderer: Renderer2,
     private iterableDiffers: IterableDiffers
   ) {
-    this.portDiffers = this.iterableDiffers.find([]).create<PortModel>((index, item) => item.id);
+    this.portDiffers = this.iterableDiffers
+      .find([])
+      .create<PortModel>((index, item) => item.id);
   }
 
   ngOnInit() {
@@ -47,10 +62,13 @@ export class DefaultNodeComponent implements OnInit {
 
   updateNodePosition(): void {
     // subscribe to node coordinates
-    this.model.selectCoords().pipe(takeUntil(this.model.onEntityDestroy())).subscribe(({ x, y }) => {
-      this.renderer.setStyle(this.elRef.nativeElement, 'left', `${x}px`);
-      this.renderer.setStyle(this.elRef.nativeElement, 'top', `${y}px`);
-    });
+    this.model
+      .selectCoords()
+      .pipe(takeUntil(this.model.onEntityDestroy()))
+      .subscribe(({ x, y }) => {
+        this.renderer.setStyle(this.elRef.nativeElement, 'left', `${x}px`);
+        this.renderer.setStyle(this.elRef.nativeElement, 'top', `${y}px`);
+      });
   }
 
   updatePorts(): void {
@@ -59,21 +77,25 @@ export class DefaultNodeComponent implements OnInit {
       .pipe(
         takeUntil(this.model.onEntityDestroy()),
         filter(
-          (
-            ports: PortModel[] | null | undefined
-          ): ports is PortModel[] =>
+          (ports: PortModel[] | null | undefined): ports is PortModel[] =>
             ports !== null && ports !== undefined
         ),
-        tap(ports => this.applyPortChanges(this.portDiffers.diff(ports))),
-        switchMap(ports => combineLatest(ports.map((port) => port.paintChanges().pipe(
-          pluck('isPainted'),
-          filter<boolean>(Boolean),
-          take(1))
-          ))
+        tap((ports) => this.applyPortChanges(this.portDiffers.diff(ports))),
+        switchMap((ports) =>
+          combineLatest(
+            ports.map((port) =>
+              port
+                .paintChanges()
+                .pipe(pluck('isPainted'), filter<boolean>(Boolean), take(1))
+            )
+          )
         ),
         filter((val) => val !== null),
         mapTo(true)
-      ).subscribe(() => !this.model.getPainted().isPainted && this.model.setPainted(true));
+      )
+      .subscribe(
+        () => !this.model.getPainted().isPainted && this.model.setPainted(true)
+      );
   }
 
   private applyPortChanges(changes: IterableChanges<PortModel> | null): void {
@@ -84,12 +106,16 @@ export class DefaultNodeComponent implements OnInit {
           model: item,
           host: this.getPortsHost(),
           index: currentIndex ?? undefined,
-          diagramModel: this.model.getParent()
+          diagramModel: this.model.getParent(),
         });
         this.model.updatePortCoords(item, this.diagram.diagramEngine);
       });
       changes.forEachMovedItem(({ previousIndex, currentIndex, item }) => {
-        if (previousIndex !== null && currentIndex !== null && previousIndex !== currentIndex) {
+        if (
+          previousIndex !== null &&
+          currentIndex !== null &&
+          previousIndex !== currentIndex
+        ) {
           const view = this.getPortsHost().get(previousIndex);
           if (view) {
             this.getPortsHost().move(view, currentIndex);
@@ -97,7 +123,7 @@ export class DefaultNodeComponent implements OnInit {
           }
         }
       });
-      changes.forEachRemovedItem(record => record.item.destroy());
+      changes.forEachRemovedItem((record) => record.item.destroy());
     }
   }
 }

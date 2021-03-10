@@ -41,31 +41,12 @@ export class LinkModel extends BaseModel<DiagramModel> {
     this.path$ = createValueState<string | null>(null, this.entityPipe('path'));
     this.points$ = createValueState(
       [
-        new PointModel({ parent: this, name: 'default' }),
-        new PointModel({ parent: this, name: 'default' }),
+        new PointModel({ parent: this, namespace: 'default' }),
+        new PointModel({ parent: this, namespace: 'default' }),
       ],
       this.entityPipe('points')
     );
   }
-
-  // serialize(): ILinkModel & {
-  //   sourcePortId: string | null;
-  //   targetPortId: string | null;
-  // } {
-  //   const serializedPoints = this.points$.value.map((point) =>
-  //     point.serialize()
-  //   );
-  //   const label = this.getLabel()?.serialize();
-  //   return {
-  //     ...super.serialize(),
-  //     name: this.getName(),
-  //     sourcePortId: this.getSourcePort()?.id ?? null,
-  //     targetPortId: this.getTargetPort()?.id ?? null,
-  //     extras: this.getExtras(),
-  //     points: serializedPoints,
-  //     label,
-  //   };
-  // }
 
   setExtras<E>(extras: Partial<E>) {
     this.extras$.set(extras).emit();

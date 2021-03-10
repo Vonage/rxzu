@@ -1,9 +1,28 @@
 :host {
-  position: relative;
-  width: 10px;
-  height: 10px;
-  border-radius: 60px;
-  border: 1px solid gray;
-  background-color: lightgray;
-  margin: 10px 0;
+  position: absolute;
+  top: 35%;
+  border-radius: 50%;
+  background-color: white;
+  width: 14px;
+  height: 14px;
+
+  &.in {
+    left: -8px;
+  }
+
+  &.out {
+    right: -8px;
+  }
+
+  .inner-circle {
+    position: relative;
+    top: 3px;
+    left: 3px;
+    width: 8px;
+    height: 8px;
+    content: '';
+    background-color: #484f58;
+    border-radius: 50%;
+    transition: background-color ease-out 0.12s;
+  }
 }

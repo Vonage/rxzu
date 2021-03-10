@@ -17,8 +17,7 @@ export class BaseEntity {
   protected _id: ID;
   protected destroyed$: Subject<void>;
   protected locked$: ValueState<boolean>;
-  protected name$: ValueState<string>;
-  protected displayName$: ValueState<string>;
+  protected namespace$: ValueState<string>;
 
   protected readonly _type: BaseEntityType;
   protected readonly _logPrefix: string;
@@ -28,9 +27,14 @@ export class BaseEntity {
     this._type = options.type;
     this._logPrefix = `${options.logPrefix ?? ''}`;
     this.destroyed$ = new Subject<void>();
-    this.locked$ = createValueState<boolean>(!!options.locked, this.entityPipe('locked'));
-    this.name$ = createValueState<string>(options.name ?? 'default', this.entityPipe('name'));
-    this.displayName$ = createValueState<string>(options.displayName ?? '', this.entityPipe('displayName'));
+    this.locked$ = createValueState<boolean>(
+      !!options.locked,
+      this.entityPipe('locked')
+    );
+    this.namespace$ = createValueState<string>(
+      options.namespace ?? 'default',
+      this.entityPipe('name')
+    );
   }
 
   get type(): BaseEntityType {
@@ -45,12 +49,12 @@ export class BaseEntity {
     this._id = id;
   }
 
-  get name(): string {
-    return this.name$.value;
+  get namespace(): string {
+    return this.namespace$.value;
   }
 
-  set name(value: string) {
-    this.name$.set(value).emit();
+  set namespace(value: string) {
+    this.namespace$.set(value).emit();
   }
 
   log(message: string, ...args: any): void {
@@ -95,13 +99,6 @@ export class BaseEntity {
     this.doClone(lookupTable, clone);
     return clone;
   }
-
-  // serialize(): BaseModelOptions {
-  //   return {
-  //     id: this.id,
-  //     locked: this.getLocked(),
-  //   };
-  // }
 
   lockChanges(): Observable<LockEvent> {
     return this.locked$.select((locked) => new LockEvent(this, locked));

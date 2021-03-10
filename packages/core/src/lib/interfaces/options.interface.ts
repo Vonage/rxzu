@@ -16,20 +16,9 @@ export type BaseEntityType =
   | 'label'
   | 'diagram';
 
-// export type Serializable =
-//   | string
-//   | number
-//   | boolean
-//   | Array<any>
-//   | Record<string, any>
-//   | undefined;
-
-// export type SerializedModel = Record<string, Serializable>;
-
 export interface BaseEntityOptions {
   type: BaseEntityType;
-  name?: string;
-  displayName?: string;
+  namespace?: string;
   locked?: boolean;
   id?: string;
   logPrefix?: string;
@@ -86,7 +75,7 @@ export interface LinkModelOptions
 export interface PortModelOptions
   extends Omit<BaseModelOptions<NodeModel>, 'type'> {
   coords?: Coords;
-  linkName?: string;
+  linkNamespace?: string;
   maximumLinks?: number;
   magnetic?: boolean;
   dimensions?: Dimensions;
