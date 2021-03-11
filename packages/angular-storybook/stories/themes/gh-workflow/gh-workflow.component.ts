@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import {
   DiagramModel,
-  NodeModel,
-  PortModel,
   BaseModel,
   RxZuDiagramComponent,
+  GHPortModel,
+  GHNodeModel,
 } from '@rxzu/angular';
 
 @Component({
@@ -25,44 +25,62 @@ export class GHWorkfflowExampleStoryComponent implements OnInit {
   }
 
   ngOnInit() {
-    const nodesDefaultDimensions = { height: 200, width: 200 };
-
-    const node1 = new NodeModel({
+    const node1 = new GHNodeModel({
       coords: { x: 500, y: 300 },
-      dimensions: nodesDefaultDimensions,
-      namespace: 'gh',
+      extras: [
+        {
+          id: '4',
+          displayName: 'START',
+          status: 'success',
+          executionTime: 2622,
+        },
+      ],
     });
-    const outPort = new PortModel({
+
+    const outPort = new GHPortModel({
       id: 'outport1',
-      namespace: 'gh',
-      linkNamespace: 'gh',
+      direction: 'out',
     });
     node1.addPort(outPort);
 
-    const node2 = new NodeModel({
+    const node2 = new GHNodeModel({
       coords: { x: 1000, y: 0 },
-      dimensions: nodesDefaultDimensions,
-      namespace: 'gh',
+      extras: [
+        {
+          id: '3',
+          displayName: 'Security Pipeline',
+          status: 'fail',
+          executionTime: 231,
+        },
+      ],
     });
 
-    node2.setDimensions(nodesDefaultDimensions);
-    const inPort = new PortModel({
+    const inPort = new GHPortModel({
       id: 'inport2',
-      namespace: 'gh',
-      linkNamespace: 'gh',
     });
+
     node2.addPort(inPort);
 
     for (let index = 0; index < 2; index++) {
-      const nodeLoop = new NodeModel({
+      const nodeLoop = new GHNodeModel({
         coords: { x: 1000, y: 300 + index * 300 },
-        dimensions: nodesDefaultDimensions,
-        namespace: 'gh',
+        extras: [
+          {
+            id: '2',
+            displayName: `Extra success ${index}`,
+            status: 'success',
+            executionTime: 2622,
+          },
+          {
+            id: '1',
+            displayName: `Extra fail ${index}`,
+            status: 'fail',
+            executionTime: 2622,
+          },
+        ],
       });
-      const portLoop = new PortModel({
+      const portLoop = new GHPortModel({
         id: `inport${index + 3}`,
-        namespace: 'gh',
-        linkNamespace: 'gh',
       });
       nodeLoop.addPort(portLoop);
 

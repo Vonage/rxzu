@@ -1,1 +1,4 @@
-<div draggable="false"></div>
+<div
+  class="inner-circle"
+  [ngClass]="(model.selectHovered() | async) ? 'hovered' : ''"
+></div>

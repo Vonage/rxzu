@@ -1,25 +1,73 @@
 :host {
   display: block;
   position: absolute;
-  transition: background-color 0.12s ease-out, border-color 0.12s ease-out,
-    box-shadow 0.12s ease-out;
 }
 
-.default-node {
-  &.selected {
-    background-color: honeydew;
-  }
-
-  &.hovered {
-    background-color: gainsboro;
-  }
-
+.gh-workflow-node {
+  border: 1px solid #30363d;
+  display: flex;
   pointer-events: all;
   width: 100%;
   border-radius: 10px;
   user-select: none;
   cursor: auto;
-  background-color: white;
+  background-color: #21262d;
+  transition: background-color 0.12s ease-out, border-color 0.12s ease-out,
+    box-shadow 0.12s ease-out;
+}
+.pipes {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  &.multiple {
+    padding: 16px;
+  }
+
+  .content {
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.12s ease-out, background-color 0.12s ease-out;
+    cursor: pointer;
+    padding: 12px;
+    height: 100%;
+
+    &:hover:not(:only-child) {
+      background-color: #0d1117;
+    }
+
+    .status {
+      flex: 0;
+      display: flex;
+
+      &.success {
+        color: #2ea043;
+      }
+
+      &.fail {
+        color: #f85149;
+      }
+    }
+
+    .name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 500;
+      padding-left: 8px;
+      color: #c9d1d9;
+    }
+
+    .time {
+      flex: 0;
+      padding-left: 4px;
+      font-size: 12px;
+      color: #8b949e;
+      flex-shrink: 0;
+    }
+  }
 }
 
 .ports {

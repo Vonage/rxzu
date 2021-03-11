@@ -5,25 +5,11 @@
   <!-- Link -->
   <g [id]="model.id">
     <path
-      class="default-link"
-      stroke-width="1"
-      stroke="white"
+      class="gh-workflow-link"
+      stroke-width="2"
+      stroke="#484f58"
       [attr.d]="model.selectPath() | async"
-      (mouseleave)="model.setHovered(false); onHover()"
-      (mouseenter)="model.setHovered(); onHover()"
       [ngClass]="{ hovered: model.selectHovered() | async }"
-    ></path>
-    <path
-      class="default-link"
-      stroke="blue"
-      stroke-linecap="round"
-      (mouseleave)="model.setHovered(false); onHover()"
-      (mouseenter)="model.setHovered(); onHover()"
-      [attr.stroke-width]="20"
-      [attr.data-type]="model.type"
-      [attr.data-id]="model.id"
-      [attr.stroke-opacity]="(model.selectHovered() | async) ? '0.1' : '0'"
-      [attr.d]="model.selectPath() | async"
     ></path>
   </g>
 
@@ -37,7 +23,7 @@
       [attr.cx]="point.selectX() | async"
       [attr.cy]="point.selectY() | async"
       r="5"
-      class="default-point"
+      class="gh-workflow-point"
       [ngClass]="{ hovered: point.selectHovered() | async }"
     />
     <circle
