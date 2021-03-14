@@ -10,7 +10,8 @@ import {
   OnDestroy,
   Renderer2,
   ViewChild,
-  ViewContainerRef, OnInit
+  ViewContainerRef,
+  OnInit,
 } from '@angular/core';
 import { combineLatest, noop, Observable, of } from 'rxjs';
 import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
@@ -19,7 +20,8 @@ import {
   MouseManager,
   DiagramModel,
   EngineSetup,
-  KeyboardManager, NodeModel
+  KeyboardManager,
+  NodeModel,
 } from '@rxzu/core';
 import { ZonedClass, OutsideZone } from '../utils';
 import { EngineService } from '../engine.service';
@@ -35,8 +37,7 @@ import { DIAGRAM_DEFAULT_OPTIONS } from '../injection.tokens';
   providers: [EngineService, RegistryService, FactoryService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RxZuDiagramComponent
-  implements OnInit, OnDestroy, ZonedClass {
+export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
   /** The name of the diagram, if not set will be `'default'` */
   @Input() name?: string;
   @Input() model!: DiagramModel;
@@ -91,7 +92,7 @@ export class RxZuDiagramComponent
     this.model =
       (this.model && this.diagramEngine.setModel(this.model)) ||
       this.diagramEngine.createModel({
-        name: this.name || 'default',
+        namespace: this.name || 'default',
         ...this.options,
       });
 
@@ -121,7 +122,8 @@ export class RxZuDiagramComponent
   }
 
   initNodes(): void {
-    this.diagramEngine.paintNodes(this.nodesLayer)
+    this.diagramEngine
+      .paintNodes(this.nodesLayer)
       .pipe(
         takeUntil(this.model.onEntityDestroy()),
         switchMap(() => {

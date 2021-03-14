@@ -16,7 +16,7 @@ import { DiagramEngine } from '../engine.core';
 export class PortModel extends BaseModel<NodeModel> {
   protected coords$: ValueState<Coords>;
   protected maximumLinks$: ValueState<number | null>;
-  protected linkName$: ValueState<string>;
+  protected linkNamespace$: ValueState<string>;
   protected dimensions$: ValueState<Dimensions>;
   protected magnetic$: ValueState<boolean>;
   protected canCreateLinks$: ValueState<boolean>;
@@ -35,8 +35,8 @@ export class PortModel extends BaseModel<NodeModel> {
       this.entityPipe('maximumLinks')
     );
 
-    this.linkName$ = createValueState(
-      options.linkName ?? 'default',
+    this.linkNamespace$ = createValueState(
+      options.linkNamespace ?? 'default',
       this.entityPipe('linkName')
     );
 
@@ -58,24 +58,9 @@ export class PortModel extends BaseModel<NodeModel> {
     this.links$ = createEntityState([], this.entityPipe('links'));
   }
 
-  // serialize(): IPortModel {
-  //   return {
-  //     ...super.serialize(),
-  //     name: this.name,
-  //     linkName: this.getLinkName(),
-  //     maximumLinks: this.getMaximumLinks(),
-  //     type: this.getType(),
-  //     magnetic: this.getMagnetic(),
-  //     height: this.getHeight(),
-  //     width: this.getWidth(),
-  //     canCreateLinks: this.getCanCreateLinks(),
-  //     ...this.getCoords(),
-  //   };
-  // }
-
   link(port: PortModel): LinkModel | null {
     if (this.getCanCreateLinks()) {
-      const link = new LinkModel({ name: this.getLinkName() });
+      const link = new LinkModel({ namespace: this.getLinkNamespace() });
       link.setSourcePort(this);
       link.setTargetPort(port);
       return link;
@@ -148,12 +133,12 @@ export class PortModel extends BaseModel<NodeModel> {
     this.maximumLinks$.set(maximumLinks ?? null).emit();
   }
 
-  getLinkName() {
-    return this.linkName$.value;
+  getLinkNamespace() {
+    return this.linkNamespace$.value;
   }
 
-  setLinkName(type: string) {
-    this.linkName$.set(type).emit();
+  setLinkNamespace(type: string) {
+    this.linkNamespace$.set(type).emit();
   }
 
   removeLink(linkOrId?: ID | LinkModel | null) {
@@ -220,7 +205,7 @@ export class PortModel extends BaseModel<NodeModel> {
     if (this.getCanCreateLinks()) {
       return new LinkModel({
         parent: this.getParent().getParent(),
-        name: this.getLinkName(),
+        namespace: this.getLinkNamespace(),
       });
     }
     return undefined;

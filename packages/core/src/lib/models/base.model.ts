@@ -15,7 +15,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   protected painted$: ValueState<PaintedEvent>;
 
   constructor(options: BaseModelOptions<any>) {
-    super({ name: 'default', ...options });
+    super({ namespace: 'default', ...options });
 
     this.parent$ = createValueState(
       options.parent,
@@ -37,13 +37,6 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
       this.entityPipe('PaintedChange')
     );
   }
-
-  // serialize(): IBaseModel {
-  //   return {
-  //     ...super.serialize(),
-  //     type: this.getType(),
-  //   };
-  // }
 
   getParent(): E {
     return this.parent$.value;

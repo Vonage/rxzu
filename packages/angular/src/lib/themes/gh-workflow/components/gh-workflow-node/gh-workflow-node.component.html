@@ -1,0 +1,58 @@
+<div
+  class="gh-workflow-node"
+  [ngStyle]="{
+    'min-height.px': model.selectHeight() | async,
+    'min-width.px': model.selectWidth() | async
+  }"
+  (mouseover)="model.setHovered()"
+  (mouseout)="model.setHovered(false)"
+>
+  <div
+    class="pipes"
+    [ngClass]="{ multiple: (model.selectExtras() | async).length > 1 }"
+  >
+    <div
+      *ngFor="
+        let pipe of model.selectExtras() | async;
+        let l = count;
+        let i = index
+      "
+      class="content"
+    >
+      <div class="status" [ngClass]="pipe.status">
+        <!-- {{ pipe.status }} -->
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          version="1.1"
+          aria-hidden="true"
+          fill="currentColor"
+        >
+          <ng-container *ngIf="pipe.status === 'success'">
+            <path
+              fill-rule="evenodd"
+              d="M8 16A8 8 0 108 0a8 8 0 000 16zm3.78-9.72a.75.75 0 00-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 00-1.06 1.06l2 2a.75.75 0 001.06 0l4.5-4.5z"
+            ></path>
+          </ng-container>
+          <ng-container *ngIf="pipe.status === 'fail'">
+            <path
+              fill-rule="evenodd"
+              d="M2.343 13.657A8 8 0 1113.657 2.343 8 8 0 012.343 13.657zM6.03 4.97a.75.75 0 00-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 101.06 1.06L8 9.06l1.97 1.97a.75.75 0 101.06-1.06L9.06 8l1.97-1.97a.75.75 0 10-1.06-1.06L8 6.94 6.03 4.97z"
+            ></path>
+          </ng-container>
+        </svg>
+      </div>
+      <div class="name">
+        {{ pipe.displayName }}
+      </div>
+      <div class="time">
+        {{ pipe.executionTime / 60 | number: '1.0':'en-US' }}s
+      </div>
+    </div>
+  </div>
+
+  <div class="ports">
+    <ng-template #portsLayer></ng-template>
+  </div>
+</div>
