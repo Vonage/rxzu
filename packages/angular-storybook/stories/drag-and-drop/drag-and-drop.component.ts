@@ -78,9 +78,9 @@ export class DragAndDropExampleStoryComponent implements AfterViewInit {
     if (e.dataTransfer) {
       const nodeType = e.dataTransfer.getData('type');
       const node = this.createNode(nodeType);
-      const mouseManager = this.diagram?.diagramEngine.getMouseManager();
-      if (mouseManager) {
-        const droppedPoint = mouseManager.getRelativePoint(e);
+      const canvasManager = this.diagram?.diagramEngine.getCanvasManager();
+      if (canvasManager) {
+        const droppedPoint = canvasManager.getZoomAwareRelativePoint(e);
 
         const coords = {
           x: droppedPoint.x - this.nodesDefaultDimensions.width / 2,

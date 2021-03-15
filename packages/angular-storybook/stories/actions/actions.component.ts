@@ -9,12 +9,11 @@ import {
 import {
   DiagramModel,
   NodeModel,
-  BaseAction,
   PortModel,
   BaseModel,
   RxZuDiagramComponent,
+  DispatchedAction,
 } from '@rxzu/angular';
-import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -24,15 +23,12 @@ import { filter } from 'rxjs/operators';
   ></rxzu-diagram>`,
   styleUrls: ['../demo-diagram.component.scss'],
 })
-export class EventsExampleStoryComponent implements OnInit, AfterViewInit {
+export class ActionsExampleStoryComponent implements OnInit, AfterViewInit {
   diagramModel: DiagramModel;
   @ViewChild(RxZuDiagramComponent, { static: true })
   diagram?: RxZuDiagramComponent;
 
-  @Output() events: EventEmitter<{
-    action: BaseAction | null;
-    state: string | null;
-  }> = new EventEmitter();
+  @Output() events: EventEmitter<DispatchedAction> = new EventEmitter();
 
   constructor() {
     this.diagramModel = new DiagramModel();
@@ -86,8 +82,12 @@ export class EventsExampleStoryComponent implements OnInit, AfterViewInit {
 
   subscribeToDiagramEvents() {
     this.diagram?.diagramEngine
-      .selectAction()
-      .pipe(filter((e) => e !== null))
-      .subscribe((e) => this.events.emit(e));
+      .getActionsManager()
+      .observeActions()
+      .subscribe((e) => {
+        if (e !== null && e !== undefined) {
+          this.events.emit(e);
+        }
+      });
   }
 }
