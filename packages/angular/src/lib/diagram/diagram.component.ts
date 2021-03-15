@@ -22,6 +22,8 @@ import {
   EngineSetup,
   KeyboardManager,
   NodeModel,
+  CanvasManager,
+  ActionsManager,
 } from '@rxzu/core';
 import { ZonedClass, OutsideZone } from '../utils';
 import { EngineService } from '../engine.service';
@@ -42,21 +44,6 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
   @Input() name?: string;
   @Input() model!: DiagramModel;
   @Input() options?: Partial<EngineSetup>;
-  /** @deprecated use options instead, will be removed in v4.0.0 */
-  @Input() allowCanvasZoom = true;
-  /** @deprecated use options instead, will be removed in v4.0.0 */
-  @Input() allowCanvasTranslation = true;
-  /** @deprecated use options instead, will be removed in v4.0.0 */
-  @Input() inverseZoom = true;
-  /** @deprecated use options instead, will be removed in v4.0.0 */
-  @Input() allowLooseLinks = true;
-  /** @deprecated use options instead, will be removed in v4.0.0 */
-  @Input() maxZoomOut = 0;
-  /** @deprecated use options instead, will be removed in v4.0.0 */
-  @Input() maxZoomIn = 0;
-  /** @deprecated use options instead, will be removed in v4.0.0 */
-  @Input() portMagneticRadius = 30;
-  @Input() keyBindings = {};
 
   @ViewChild('nodesLayer', { read: ViewContainerRef, static: true })
   nodesLayer?: ViewContainerRef;
@@ -66,10 +53,12 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
 
   @ViewChild('canvas', { read: ElementRef, static: true })
   canvas?: ElementRef;
-
-  mouseManager?: MouseManager;
-  keyboardManager?: KeyboardManager;
   selectionBox$?: Observable<SelectingAction | null>;
+
+  mouseManager: MouseManager;
+  keyboardManager: KeyboardManager;
+  canvasManager: CanvasManager;
+  actionsManager: ActionsManager;
 
   get host(): HTMLElement {
     return this.elRef.nativeElement;
@@ -85,6 +74,8 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
   ) {
     this.mouseManager = this.diagramEngine.getMouseManager();
     this.keyboardManager = this.diagramEngine.getKeyboardManager();
+    this.canvasManager = this.diagramEngine.getCanvasManager();
+    this.actionsManager = this.diagramEngine.getActionsManager();
   }
 
   ngOnInit() {
@@ -100,12 +91,10 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
       return;
     }
 
-    this.diagramEngine.setCanvas(this.canvas.nativeElement);
+    this.canvasManager.setCanvas(this.canvas.nativeElement);
 
     this.diagramEngine.setup({
       ...this.options,
-      // TODO: remove after deprecated inputs removed
-      ...this,
     } as EngineSetup);
 
     this.initNodes();
@@ -122,7 +111,7 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
   }
 
   initNodes(): void {
-    this.diagramEngine
+    this.canvasManager
       .paintNodes(this.nodesLayer)
       .pipe(
         takeUntil(this.model.onEntityDestroy()),
@@ -131,7 +120,7 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
             return of(null);
           }
 
-          return this.diagramEngine.paintLinks(this.linksLayer);
+          return this.canvasManager.paintLinks(this.linksLayer);
         })
       )
       .subscribe();
@@ -142,7 +131,7 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
       return;
     }
 
-    this.selectionBox$ = this.diagramEngine.selectAction().pipe(
+    this.selectionBox$ = this.actionsManager.observeActions().pipe(
       map((a) => {
         if (
           a &&

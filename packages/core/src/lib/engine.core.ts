@@ -1,38 +1,53 @@
-import {
-  catchError,
-  delay,
-  filter,
-  map,
-  pluck,
-  switchMap,
-  take,
-  takeUntil
-} from 'rxjs/operators';
-import { BehaviorSubject, combineLatest, EMPTY, Observable, of } from 'rxjs';
+import { delay, filter, take } from 'rxjs/operators';
 import { BaseEntity } from './base.entity';
-import { DiagramModel, PortModel, NodeModel, LabelModel, BaseModel } from './models';
-import { createValueState, ValueState } from './state';
-import { BaseActionState, SelectingAction } from './actions';
+import { DiagramModel, NodeModel } from './models';
 import { DiagramModelOptions, EngineSetup } from './interfaces';
 import { KeyboardManager, MouseManager } from './managers';
-import { BaseAction } from './actions/base.action';
 import { AbstractFactory } from './factories';
+import { ActionsManager } from './managers/actions.manager';
+import { CanvasManager } from './managers/canvas.manager';
 
 export class DiagramEngine {
-  protected canvas$: ValueState<HTMLElement | null>;
-  protected action$ = new BehaviorSubject<{
-    action: BaseAction | null;
-    state: BaseActionState | null;
-  }>({ action: null, state: null });
-
+  protected actionsManager: ActionsManager;
   protected mouseManager: MouseManager;
   protected keyboardManager: KeyboardManager;
+  protected canvasManager: CanvasManager;
+
   protected diagramModel: DiagramModel | undefined;
 
-  constructor(protected factory: AbstractFactory) {
-    this.mouseManager = this.createMouseManager();
-    this.keyboardManager = this.createKeyboardManager();
-    this.canvas$ = createValueState<HTMLElement | null>(null);
+  constructor(
+    protected factory: AbstractFactory,
+    protected _canvas?: HTMLElement,
+    protected _mouseManager?: MouseManager,
+    protected _keyboardManager?: KeyboardManager,
+    protected _actionsManager?: ActionsManager,
+    protected _canvasManager?: CanvasManager
+  ) {
+    this.actionsManager = _actionsManager || this.createActionsManager();
+    this.mouseManager = _mouseManager || this.createMouseManager();
+    this.keyboardManager = _keyboardManager || this.createKeyboardManager();
+    this.canvasManager = _canvasManager || this.createCanvasManager(_canvas);
+  }
+
+  setup({
+    maxZoomIn,
+    maxZoomOut,
+    portMagneticRadius,
+    allowLooseLinks,
+    allowCanvasZoom,
+    allowCanvasTranslation,
+    inverseZoom,
+    keyBindings,
+  }: EngineSetup) {
+    const diagramModel = this.getDiagramModel();
+    diagramModel.setAllowCanvasZoom(allowCanvasZoom ?? true);
+    diagramModel.setAllowCanvasTranslation(allowCanvasTranslation ?? true);
+    diagramModel.setInverseZoom(inverseZoom ?? false);
+    diagramModel.setAllowLooseLinks(allowLooseLinks ?? true);
+    diagramModel.setPortMagneticRadius(portMagneticRadius ?? 30);
+    diagramModel.setMaxZoomIn(maxZoomIn ?? 0);
+    diagramModel.setMaxZoomOut(maxZoomOut ?? 0);
+    diagramModel.setKeyBindings(keyBindings ?? {});
   }
 
   createMouseManager(): MouseManager {
@@ -42,6 +57,24 @@ export class DiagramEngine {
     }
 
     return new MouseManager(this);
+  }
+
+  createCanvasManager(canvas?: HTMLElement): CanvasManager {
+    if (this.canvasManager) {
+      console.warn('[RxZu] Mouse Manager already initialized, bailing out.');
+      return this.canvasManager;
+    }
+
+    return new CanvasManager(this, canvas);
+  }
+
+  createActionsManager(): ActionsManager {
+    if (this.actionsManager) {
+      console.warn('[RxZu] Actions Manager already initialized, bailing out.');
+      return this.actionsManager;
+    }
+
+    return new ActionsManager();
   }
 
   createKeyboardManager() {
@@ -91,166 +124,16 @@ export class DiagramEngine {
     return this.mouseManager;
   }
 
+  getActionsManager() {
+    return this.actionsManager;
+  }
+
   getKeyboardManager() {
     return this.keyboardManager;
   }
 
-  getModelElement(model: BaseModel): HTMLElement {
-    const canvas = this.getCanvas();
-    const selector = canvas.querySelector(`[data-type="${model.type}"][data-id="${model.id}"]`);
-    if (selector === null) {
-      throw new Error(`Cannot find [${model.type}] element with id [${model.id}]`);
-    }
-    return selector as HTMLElement;
-  }
-
-  getPortCenter(port: PortModel) {
-    const sourceElement = this.getModelElement(port);
-    const diagramModel = this.getDiagramModel();
-    if (!sourceElement || !diagramModel) {
-      return null;
-    }
-
-    const sourceRect = sourceElement.getBoundingClientRect();
-    const rel = this.getRelativePoint(sourceRect.left, sourceRect.top);
-
-    if (!rel) {
-      return null;
-    }
-
-    return {
-      x:
-        sourceElement.offsetWidth / 2 +
-        (rel.x - diagramModel.getOffsetX()) /
-          (diagramModel.getZoomLevel() / 100.0),
-      y:
-        sourceElement.offsetHeight / 2 +
-        (rel.y - diagramModel.getOffsetY()) /
-          (diagramModel.getZoomLevel() / 100.0),
-    };
-  }
-
-  /**
-   * Calculate rectangular coordinates of the port passed in.
-   */
-  getPortCoords(port: PortModel) {
-    const sourceElement = this.getModelElement(port);
-    const canvas = this.getCanvas();
-    const diagramModel = this.getDiagramModel();
-    if (!sourceElement || !canvas || !diagramModel) {
-      return null;
-    }
-
-    const sourceRect = sourceElement.getBoundingClientRect() as DOMRect;
-    const canvasRect = canvas.getBoundingClientRect() as ClientRect;
-
-    return {
-      x:
-        (sourceRect.x - diagramModel.getOffsetX()) /
-          (diagramModel.getZoomLevel() / 100.0) -
-        canvasRect.left,
-      y:
-        (sourceRect.y - diagramModel.getOffsetY()) /
-          (diagramModel.getZoomLevel() / 100.0) -
-        canvasRect.top,
-      width: sourceRect.width,
-      height: sourceRect.height,
-    };
-  }
-
-  /**
-   * Calculate rectangular coordinates of the node passed in.
-   */
-  getNodeCoords(node: NodeModel) {
-    const sourceElement = this.getModelElement(node);
-    const canvas = this.getCanvas();
-    const diagramModel = this.getDiagramModel();
-    if (!sourceElement || !canvas || !diagramModel) {
-      return null;
-    }
-
-    const sourceRect = sourceElement.getBoundingClientRect() as DOMRect;
-    const canvasRect = canvas.getBoundingClientRect() as ClientRect;
-
-    return {
-      x:
-        (sourceRect.x - diagramModel.getOffsetX()) /
-          (diagramModel.getZoomLevel() / 100.0) -
-        canvasRect.left,
-      y:
-        (sourceRect.y - diagramModel.getOffsetY()) /
-          (diagramModel.getZoomLevel() / 100.0) -
-        canvasRect.top,
-      width: sourceRect.width,
-      height: sourceRect.height,
-    };
-  }
-
-  getNodeCenter(node: NodeModel) {
-    const sourceElement = this.getModelElement(node);
-    const diagramModel = this.getDiagramModel();
-    if (!sourceElement || !diagramModel) {
-      return null;
-    }
-
-    const sourceRect = sourceElement.getBoundingClientRect();
-    const rel = this.getRelativePoint(sourceRect.left, sourceRect.top);
-
-    if (!rel) {
-      return null;
-    }
-
-    return {
-      x:
-        sourceElement.offsetWidth / 2 +
-        (rel.x - diagramModel.getOffsetX()) /
-          (diagramModel.getZoomLevel() / 100.0),
-      y:
-        sourceElement.offsetHeight / 2 +
-        (rel.y - diagramModel.getOffsetY()) /
-          (diagramModel.getZoomLevel() / 100.0),
-    };
-  }
-
-  /**
-   * Determine the width and height of the node passed in.
-   * It currently assumes nodes have a rectangular shape, can be overriden for customised shapes.
-   */
-  getNodeDimensions(node: NodeModel) {
-    const nodeElement = this.getModelElement(node);
-    if (!nodeElement) {
-      return null;
-    }
-    const nodeRect = nodeElement.getBoundingClientRect();
-
-    return {
-      width: nodeRect.width,
-      height: nodeRect.height,
-    };
-  }
-
-  setCanvas(canvas: HTMLElement) {
-    this.canvas$.set(canvas).emit();
-  }
-
-  getCanvas() {
-    if (!this.canvas$.value) {
-      throw new Error(
-        '[RxZu] No canvas found, please use `setCanvas` to assign one.'
-      );
-    }
-
-    return this.canvas$.value;
-  }
-
-  selectCanvas() {
-    return this.canvas$.select();
-  }
-
-  getRelativePoint(x: number, y: number) {
-    const canvas = this.getCanvas();
-    const canvasRect = canvas.getBoundingClientRect();
-    return { x: x - canvasRect.left, y: y - canvasRect.top };
+  getCanvasManager() {
+    return this.canvasManager;
   }
 
   getDiagramModel() {
@@ -262,6 +145,10 @@ export class DiagramEngine {
     return this.diagramModel;
   }
 
+  getFactory() {
+    return this.factory;
+  }
+
   isModelLocked(model: BaseEntity) {
     const diagramModel = this.getDiagramModel();
     if (diagramModel.getLocked()) {
@@ -269,88 +156,6 @@ export class DiagramEngine {
     }
 
     return model.getLocked();
-  }
-
-  /**
-   * @description get node rectangle points (top left, top right, bottom left, bottom right)
-   */
-  getNodeRectPoints(node: NodeModel) {
-    if (!node) {
-      console.warn('[RxZu] No input node were found');
-      return;
-    }
-
-    const width = node.getWidth();
-    const height = node.getHeight();
-
-    // get top left point of node
-    const { x, y } = node.getCoords();
-
-    return {
-      topLeft: { x, y },
-      topRight: { x: x + width, y },
-      bottomLeft: { x: x, y: y + height },
-      bottomRight: { x: x + width, y: y + height },
-    };
-  }
-
-  /**
-   * @description get the bounding rectangle of the input group of nodes
-   * @param nodes the group of nodes to calculate the retcangle
-   * @param margin the desired margin to include when calc the rect (in px)
-   * @returns the total width and height of the nodes, most top and most left points of the nodes group
-   */
-  getNodeLayersRect(nodes: NodeModel[], margin = 0) {
-    if (!nodes || nodes.length === 0) {
-      console.warn('[RxZu] No input nodes were found');
-      return { width: 0, height: 0, top: 0, left: 0 };
-    }
-
-    const firstNode = nodes[0];
-    const { x: firstNodeXCoords, y: firstNodeYCoords } = firstNode.getCoords();
-
-    let rightNodeWidth = firstNode.getWidth();
-    let bottomNodeHeight = firstNode.getHeight();
-
-    let minX = firstNodeXCoords;
-    let maxX = firstNodeXCoords;
-    let minY = firstNodeYCoords;
-    let maxY = firstNodeYCoords;
-
-    // go over all nodes and calc the min, max points of all of them
-    nodes.forEach((node) => {
-      // get coords of current node
-      const { x, y } = node.getCoords();
-
-      // get client width and client height of current node
-      const nodeElement = this.getModelElement(node);
-      const { clientWidth, clientHeight } = nodeElement;
-
-      // if this node located at the leftmost point
-      if (x < minX) minX = x;
-
-      // if this node located at the topmost point
-      if (y < minY) minY = y;
-
-      // if this node located at the rightmost point including the width
-      if (x + clientWidth > maxX + rightNodeWidth) {
-        maxX = x;
-        rightNodeWidth = clientWidth;
-      }
-      // if this node located at the bottommost point including the height
-      if (y + clientHeight > maxY + bottomNodeHeight) {
-        maxY = y;
-        bottomNodeHeight = clientHeight;
-      }
-    });
-
-    // calc the rect, adding the desired margin.
-    return {
-      width: maxX - minX + rightNodeWidth + 2 * margin,
-      height: maxY - minY + bottomNodeHeight + 2 * margin,
-      top: minY - margin,
-      left: minX - margin,
-    };
   }
 
   /**
@@ -380,7 +185,8 @@ export class DiagramEngine {
     const diagramModel = this.getDiagramModel();
 
     if (diagramModel) {
-      this.canvas$.value$
+      this.canvasManager
+        .selectCanvas()
         .pipe(
           filter(
             (canvas: HTMLElement | null | undefined): canvas is HTMLElement =>
@@ -391,7 +197,10 @@ export class DiagramEngine {
         )
         .subscribe((canvas) => {
           // get nodes layers bounding rect with the desired margin
-          const nodesLayersRect = this.getNodeLayersRect(nodes, margin);
+          const nodesLayersRect = this.canvasManager.getNodeLayersRect(
+            nodes,
+            margin
+          );
 
           // calculate the zoom factor and set the new zoom
           const xFactor = canvas.clientWidth / nodesLayersRect?.width;
@@ -422,196 +231,5 @@ export class DiagramEngine {
           );
         });
     }
-  }
-
-  setup({
-    maxZoomIn,
-    maxZoomOut,
-    portMagneticRadius,
-    allowLooseLinks,
-    allowCanvasZoom,
-    allowCanvasTranslation,
-    inverseZoom,
-    keyBindings,
-  }: EngineSetup) {
-    const diagramModel = this.getDiagramModel();
-    diagramModel.setAllowCanvasZoom(allowCanvasZoom ?? true);
-    diagramModel.setAllowCanvasTranslation(allowCanvasTranslation ?? true);
-    diagramModel.setInverseZoom(inverseZoom ?? false);
-    diagramModel.setAllowLooseLinks(allowLooseLinks ?? true);
-    diagramModel.setPortMagneticRadius(portMagneticRadius ?? 30);
-    diagramModel.setMaxZoomIn(maxZoomIn ?? 0);
-    diagramModel.setMaxZoomOut(maxZoomOut ?? 0);
-    diagramModel.setKeyBindings(keyBindings ?? {});
-  }
-
-  paintNodes(
-    nodesHost: any,
-    promise: true
-  ): Promise<boolean>
-  paintNodes(
-    nodesHost: any
-  ): Observable<boolean>
-  paintNodes(
-    nodesHost: any,
-    promise = false
-  ): Observable<boolean> | Promise<boolean> {
-    const diagramModel = this.getDiagramModel();
-    const observable = diagramModel.selectNodes().pipe(
-      takeUntil(diagramModel.onEntityDestroy()),
-      switchMap((nodes) => {
-        const nodesPainted$ = [];
-        for (const node of nodes.values()) {
-          if (!node.getPainted().isPainted) {
-            nodesPainted$.push(
-              node
-                .paintChanges()
-                .pipe(pluck('isPainted'), take(1))
-            );
-
-            node.setParent(diagramModel);
-
-            this.factory.generateWidget({
-              model: node,
-              host: nodesHost,
-              diagramModel: this.diagramModel
-            });
-          }
-        }
-
-        return combineLatest(nodesPainted$);
-      }),
-      filter((val) => val !== null),
-      map(() => true),
-      catchError(err => {
-        console.error(err);
-        return of(true);
-      })
-    );
-
-    return promise ? observable.toPromise() : observable;
-  }
-
-  paintLinks(
-    linksHost: any,
-    promise: true
-  ): Promise<void>
-  paintLinks(
-    linksHost: any
-  ): Observable<void>
-  paintLinks(
-    linksHost: any,
-    promise = false
-  ): Observable<void> | Promise<void> {
-    const diagramModel = this.getDiagramModel();
-    const observable = diagramModel.selectLinks().pipe(
-      takeUntil(diagramModel.onEntityDestroy()),
-      map((links) => {
-        for (const link of links.values()) {
-          if (!link.getPainted().isPainted) {
-            const srcPort = link.getSourcePort();
-            const targetPort = link.getTargetPort();
-
-            if (!srcPort) {
-              return;
-            }
-
-            // Attach link first point to source port
-            const portCenter = this.getPortCenter(srcPort);
-
-            if (!portCenter) {
-              return;
-            }
-
-            link.getPoints()[0].setCoords(portCenter);
-
-            // Attach link last point to target port, will occour only for complete links
-            if (targetPort) {
-              const portCenter = this.getPortCenter(targetPort);
-              if (!portCenter) {
-                return;
-              }
-              link
-                .getPoints()
-                [link.getPoints().length - 1].setCoords(portCenter);
-            }
-
-            this.factory.generateWidget({ model: link, host: linksHost, diagramModel: this.diagramModel });
-
-            // (canvas: HTMLElement | null | undefined): canvas is HTMLElement =>
-            // Handle link label, if any
-            link
-              .selectLabel()
-              .pipe(
-                filter(
-                  (label: LabelModel | null | undefined): label is LabelModel =>
-                    label !== null && label !== undefined
-                )
-              )
-              .subscribe((label) => this.paintLabel(label, linksHost));
-          }
-        }
-      }),
-      catchError(err => {
-        console.error(err);
-        return EMPTY;
-      })
-    );
-
-    return promise ? observable.toPromise() : observable;
-  }
-
-  paintLabel(label: LabelModel, host: any) {
-    this.factory.generateWidget({ model: label, host, diagramModel: this.diagramModel });
-  }
-
-  /**
-   * fire the action registered and notify subscribers
-   */
-  fireAction() {
-    const action = this.action$.getValue()?.action;
-    if (action) {
-      this.action$.next({ action, state: 'firing' });
-      return action;
-    }
-
-    return;
-  }
-
-  /**
-   * Unregister the action, post firing and notify subscribers
-   */
-  stopFiringAction() {
-    const stoppedAction = this.action$.getValue()?.action;
-    if (stoppedAction) {
-      this.action$.next({ action: stoppedAction, state: 'stopped' });
-      return stoppedAction;
-    }
-
-    return;
-  }
-
-  /**
-   * Register the new action, pre firing and notify subscribers
-   */
-  startFiringAction(action: BaseAction) {
-    this.action$.next({ action, state: 'started' });
-    return action;
-  }
-
-  selectAction() {
-    return this.action$;
-  }
-
-  setAction(action: BaseAction) {
-    this.action$.next({ action, state: 'firing' });
-  }
-
-  shouldDrawSelectionBox() {
-    const action = this.action$.getValue();
-    if (action instanceof SelectingAction) {
-      return action.getBoxDimensions();
-    }
-    return false;
   }
 }

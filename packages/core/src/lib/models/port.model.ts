@@ -187,7 +187,7 @@ export class PortModel extends BaseModel<NodeModel> {
     }
 
     this.getLinksArray().forEach((link) => {
-      const relCoords = engine.getPortCenter(this);
+      const relCoords = engine.getCanvasManager().getPortCenter(this);
       const point = link.getPointForPort(this);
       point && point.setCoords({ ...relCoords });
     });

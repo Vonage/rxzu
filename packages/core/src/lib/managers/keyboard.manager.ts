@@ -18,29 +18,33 @@ export class KeyboardManager {
     >([]);
   }
 
+  get actionsManager() {
+    return this.engine.getActionsManager();
+  }
+
   onKeyUp(event: KeyboardEvent) {
     const deleteKeyPressedAction = new DeleteKeyPressedAction(
       this.engine,
       event
     );
-    this.engine.startFiringAction(deleteKeyPressedAction);
-    this.engine.fireAction();
-    this.engine.stopFiringAction();
+    this.actionsManager.startFiringAction(deleteKeyPressedAction);
+    this.actionsManager.fireAction();
+    this.actionsManager.stopFiringAction();
   }
 
   onCopy() {
     const copyAction = new CopyAction(this.engine);
     this.clipboard$.next(copyAction.copiedModels);
-    this.engine.startFiringAction(copyAction);
-    this.engine.fireAction();
-    this.engine.stopFiringAction();
+    this.actionsManager.startFiringAction(copyAction);
+    this.actionsManager.fireAction();
+    this.actionsManager.stopFiringAction();
   }
 
   onPaste() {
     const pasteAction = new PasteAction(this.clipboard$.getValue());
-    this.engine.startFiringAction(pasteAction);
-    this.engine.fireAction();
-    this.engine.stopFiringAction();
+    this.actionsManager.startFiringAction(pasteAction);
+    this.actionsManager.fireAction();
+    this.actionsManager.stopFiringAction();
   }
 
   dispose() {

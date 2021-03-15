@@ -40,25 +40,27 @@ export class SelectingAction extends BaseMouseAction {
     return this.dimensions;
   }
 
-
-  containsElement(topLeftPoint: { x: number, y: number }, bottomRightPoint: { x: number, y: number }, diagramModel: DiagramModel): boolean {
+  containsElement(
+    topLeftPoint: { x: number; y: number },
+    bottomRightPoint: { x: number; y: number },
+    diagramModel: DiagramModel
+  ): boolean {
     const z = diagramModel.getZoomLevel() / 100.0;
     const dimensions = this.getBoxDimensions();
 
     // check if box contain top left point
-    const isContainsTopLeftPoint = (
+    const isContainsTopLeftPoint =
       topLeftPoint.x * z + diagramModel.getOffsetX() > dimensions.left &&
       topLeftPoint.x * z + diagramModel.getOffsetX() < dimensions.right &&
       topLeftPoint.y * z + diagramModel.getOffsetY() > dimensions.top &&
-      topLeftPoint.y * z + diagramModel.getOffsetY() < dimensions.bottom);
+      topLeftPoint.y * z + diagramModel.getOffsetY() < dimensions.bottom;
 
     // check if box contain bottom right point
-    const isContainBottomRightPoint = (
+    const isContainBottomRightPoint =
       bottomRightPoint.x * z + diagramModel.getOffsetX() > dimensions.left &&
       bottomRightPoint.x * z + diagramModel.getOffsetX() < dimensions.right &&
       bottomRightPoint.y * z + diagramModel.getOffsetY() > dimensions.top &&
-      bottomRightPoint.y * z + diagramModel.getOffsetY() < dimensions.bottom
-    );
+      bottomRightPoint.y * z + diagramModel.getOffsetY() < dimensions.bottom;
 
     // only if box contains both top left and bottom right points, the element is contains in the box
     return isContainsTopLeftPoint && isContainBottomRightPoint;

@@ -40,16 +40,19 @@ export class NodeModel extends BaseModel<DiagramModel> {
 
   updatePortCoords(port: PortModel, engine: DiagramEngine) {
     if (port.getPainted().isPainted && this.getParent()) {
-      const portSize = engine.getPortCoords(port);
-      const portCenter = engine.getPortCenter(port);
-      port.updateCoords({
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-        ...portSize,
-        ...portCenter
-      }, engine);
+      const portSize = engine.getCanvasManager().getPortCoords(port);
+      const portCenter = engine.getCanvasManager().getPortCenter(port);
+      port.updateCoords(
+        {
+          x: 0,
+          y: 0,
+          width: 0,
+          height: 0,
+          ...portSize,
+          ...portCenter,
+        },
+        engine
+      );
     }
   }
 
