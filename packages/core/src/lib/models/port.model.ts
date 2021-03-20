@@ -117,6 +117,12 @@ export class PortModel extends BaseModel<NodeModel> {
     return this.coords$.value;
   }
 
+  /**
+   *
+   * @param dimensions
+   * @description Use this method to set the model dimensions, this will not be reflected in the diagram
+   * unless subscribed and bound to the template of the widget itself
+   */
   setDimensions(dimensions: Dimensions) {
     return this.dimensions$.set(dimensions);
   }

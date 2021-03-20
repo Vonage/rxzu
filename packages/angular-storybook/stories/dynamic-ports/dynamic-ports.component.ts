@@ -13,7 +13,6 @@ import {
     <div class="action-bar">
       <button (click)="addPort()">Add Last Port</button>
       <button (click)="removePort()">Remove First Port</button>
-      <button (click)="enlargeNode()">Enlarge Node</button>
     </div>
     <rxzu-diagram class="demo-diagram" [model]="diagramModel"></rxzu-diagram>
   `,
@@ -99,17 +98,5 @@ export class DynamicPortsExampleStoryComponent
 
     const firstPort = node.getPortsArray()[0];
     node.removePort(firstPort);
-  }
-
-  enlargeNode() {
-    const node = this.diagramModel.getNode('1');
-    if (!node) {
-      return;
-    }
-
-    const nodeCurrentDimensions = node.getDimensions();
-    node.setDimensions({
-      height: nodeCurrentDimensions.height + 50,
-    });
   }
 }
