@@ -36,7 +36,7 @@ export class PointModel extends BaseModel<LinkModel> {
   }
 
   setCoords(newCoords: Partial<Coords>) {
-    this.coords$.set({ ...this.getCoords(), ...newCoords }).emit();
+    this.coords$.set({ ...this.getCoords(), ...newCoords });
   }
 
   selectCoords(): Observable<Coords> {

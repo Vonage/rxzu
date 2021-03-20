@@ -6,7 +6,6 @@ import { ValueState } from './value.state';
 export class EntityState<T extends BaseEntity> extends ValueState<
   EntityMap<T>
 > {
-
   constructor(
     value: EntityMap<T>,
     entityPipe?: MonoTypeOperatorFunction<EntityMap<T>>
@@ -18,11 +17,8 @@ export class EntityState<T extends BaseEntity> extends ValueState<
     this.clear();
   }
 
-  clear(destroy = true) {
-    if (destroy) {
-      this.forEach((entity) => entity.destroy());
-    }
-
+  clear() {
+    this.forEach((entity) => entity.destroy());
     this.value.clear();
     return this;
   }

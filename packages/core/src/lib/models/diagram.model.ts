@@ -36,7 +36,10 @@ export class DiagramModel extends BaseEntity {
   protected portMagneticRadius$: ValueState<number>;
   protected keyBindings$: ValueState<KeyBindigsOptions>;
 
-  constructor(options: DiagramModelOptions = {}, diagramEngine?: DiagramEngine) {
+  constructor(
+    options: DiagramModelOptions = {},
+    diagramEngine?: DiagramEngine
+  ) {
     super({ type: 'diagram', logPrefix: '[Diagram]', ...options });
 
     if (diagramEngine) {
@@ -199,23 +202,8 @@ export class DiagramModel extends BaseEntity {
     return this.links$.value$;
   }
 
-  // /**
-  //  * Serialize the diagram model to JSON
-  //  * @returns diagram model as a string
-  //  */
-  // serialize(): IDiagramModel {
-  //   const serializedNodes = this.nodes$.map((node) => node.serialize());
-  //   const serializedLinks = this.links$.map((link) => link.serialize());
-
-  //   return {
-  //     ...super.serialize(),
-  //     nodes: serializedNodes,
-  //     links: serializedLinks,
-  //   };
-  // }
-
   setPortMagneticRadius(portMagneticRadius: number) {
-    this.portMagneticRadius$.set(portMagneticRadius).emit();
+    this.portMagneticRadius$.set(portMagneticRadius);
   }
 
   getPortMagneticRadius() {
@@ -227,7 +215,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   setAllowLooseLinks(allowLooseLinks: boolean) {
-    this.allowLooseLinks$.set(allowLooseLinks).emit();
+    this.allowLooseLinks$.set(allowLooseLinks);
   }
 
   getAllowLooseLinks() {
@@ -239,7 +227,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   setInverseZoom(inverseZoom: boolean) {
-    this.inverseZoom$.set(inverseZoom).emit();
+    this.inverseZoom$.set(inverseZoom);
   }
 
   getInverseZoom() {
@@ -251,7 +239,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   setKeyBindings(keyBindings: KeyBindigsOptions) {
-    this.keyBindings$.set(keyBindings).emit();
+    this.keyBindings$.set(keyBindings);
   }
 
   getKeyBindings() {
@@ -263,7 +251,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   setAllowCanvasZoom(allowCanvasZoom: boolean) {
-    this.allowCanvasZoom$.set(allowCanvasZoom).emit();
+    this.allowCanvasZoom$.set(allowCanvasZoom);
   }
 
   getAllowCanvasZoom() {
@@ -275,7 +263,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   setAllowCanvasTranslation(allowCanvasTranslation: boolean) {
-    this.allowCanvasTranslation$.set(allowCanvasTranslation).emit();
+    this.allowCanvasTranslation$.set(allowCanvasTranslation);
   }
 
   getAllowCanvasTranslation() {
@@ -287,7 +275,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   setMaxZoomOut(maxZoomOut: number) {
-    this.maxZoomOut$.set(maxZoomOut).emit();
+    this.maxZoomOut$.set(maxZoomOut);
   }
 
   getMaxZoomOut() {
@@ -299,7 +287,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   setMaxZoomIn(maxZoomIn: number) {
-    this.maxZoomIn$.set(maxZoomIn).emit();
+    this.maxZoomIn$.set(maxZoomIn);
   }
 
   getMaxZoomIn() {
@@ -307,12 +295,12 @@ export class DiagramModel extends BaseEntity {
   }
 
   setOffset(x: number, y: number) {
-    this.offsetX$.set(x).emit();
-    this.offsetY$.set(y).emit();
+    this.offsetX$.set(x);
+    this.offsetY$.set(y);
   }
 
   setOffsetX(x: number) {
-    this.offsetX$.set(x).emit();
+    this.offsetX$.set(x);
   }
 
   getOffsetX(): number {
@@ -324,7 +312,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   setOffsetY(y: number) {
-    this.offsetY$.set(y).emit();
+    this.offsetY$.set(y);
   }
 
   getOffsetY(): number {
@@ -344,7 +332,7 @@ export class DiagramModel extends BaseEntity {
       return;
     }
 
-    this.zoom$.set(z).emit();
+    this.zoom$.set(z);
   }
 
   getZoomLevel(): number {

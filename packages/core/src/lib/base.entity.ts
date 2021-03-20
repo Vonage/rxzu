@@ -54,7 +54,7 @@ export class BaseEntity {
   }
 
   set namespace(value: string) {
-    this.namespace$.set(value).emit();
+    this.namespace$.set(value);
   }
 
   log(message: string, ...args: any): void {
@@ -78,7 +78,7 @@ export class BaseEntity {
   }
 
   setLocked(locked = true) {
-    this.locked$.set(locked).emit();
+    this.locked$.set(locked);
   }
 
   // eslint-disable-next-line

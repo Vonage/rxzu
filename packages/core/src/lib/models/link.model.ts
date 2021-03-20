@@ -49,7 +49,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
   }
 
   setExtras<E>(extras: Partial<E>) {
-    this.extras$.set(extras).emit();
+    this.extras$.set(extras);
   }
 
   getExtras() {
@@ -63,7 +63,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
   }
 
   setPath(path: string) {
-    this.path$.set(path).emit();
+    this.path$.set(path);
   }
 
   getPath() {
@@ -165,7 +165,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
     this.getSourcePort()?.removeLink(this);
 
-    this.sourcePort$.set(port).emit();
+    this.sourcePort$.set(port);
   }
 
   getSourcePort(): PortModel | null {
@@ -183,7 +183,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
     this.getTargetPort()?.removeLink(this);
 
-    this.targetPort$.set(port).emit();
+    this.targetPort$.set(port);
   }
 
   point({ x, y }: Coords): PointModel {
@@ -202,12 +202,12 @@ export class LinkModel extends BaseModel<DiagramModel> {
     points.forEach((point) => {
       point.setParent(this);
     });
-    this.points$.set(points).emit();
+    this.points$.set(points);
   }
 
   setLabel(label: LabelModel) {
     label.setParent(this);
-    this.label$.set(label).emit();
+    this.label$.set(label);
   }
 
   selectLabel(): Observable<LabelModel | null> {

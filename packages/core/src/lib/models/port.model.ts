@@ -94,7 +94,7 @@ export class PortModel extends BaseModel<NodeModel> {
   }
 
   setCanCreateLinks(value: boolean) {
-    this.canCreateLinks$.set(value).emit();
+    this.canCreateLinks$.set(value);
   }
 
   getMagnetic(): boolean {
@@ -106,7 +106,7 @@ export class PortModel extends BaseModel<NodeModel> {
   }
 
   setMagnetic(magnetic: boolean) {
-    this.magnetic$.set(magnetic).emit();
+    this.magnetic$.set(magnetic);
   }
 
   selectCoords(): Observable<Coords> {
@@ -140,7 +140,7 @@ export class PortModel extends BaseModel<NodeModel> {
   }
 
   setMaximumLinks(maximumLinks?: number) {
-    this.maximumLinks$.set(maximumLinks ?? null).emit();
+    this.maximumLinks$.set(maximumLinks ?? null);
   }
 
   getLinkNamespace() {
@@ -148,7 +148,7 @@ export class PortModel extends BaseModel<NodeModel> {
   }
 
   setLinkNamespace(type: string) {
-    this.linkNamespace$.set(type).emit();
+    this.linkNamespace$.set(type);
   }
 
   removeLink(linkOrId?: ID | LinkModel | null) {
@@ -188,8 +188,8 @@ export class PortModel extends BaseModel<NodeModel> {
     },
     engine?: DiagramEngine
   ) {
-    this.coords$.set({ x, y }).emit();
-    this.dimensions$.set({ width, height }).emit();
+    this.coords$.set({ x, y });
+    this.dimensions$.set({ width, height });
 
     if (!engine) {
       this.log(`Couldn't find DiagramEngine when updating coords. skipping`);

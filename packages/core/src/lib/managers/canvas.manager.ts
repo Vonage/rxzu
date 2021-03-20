@@ -106,7 +106,7 @@ export class CanvasManager {
   }
 
   setCanvas(canvas: HTMLElement) {
-    this.canvas$.set(canvas).emit();
+    this.canvas$.set(canvas);
   }
 
   getCanvas() {

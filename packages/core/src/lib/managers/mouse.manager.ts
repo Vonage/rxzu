@@ -215,7 +215,7 @@ export class MouseManager {
                 return;
               }
 
-              port.updateCoords(portCoords);
+              port.updateCoords(portCoords, this.engine);
             });
           }
         } else if (selectionModel.model instanceof PointModel) {

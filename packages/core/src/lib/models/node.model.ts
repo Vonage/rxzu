@@ -72,7 +72,7 @@ export class NodeModel extends BaseModel<DiagramModel> {
       });
     });
 
-    this.coords$.set({ x, y }).emit();
+    this.coords$.set({ x, y });
   }
 
   // serialize(): INodeModel {
@@ -172,7 +172,7 @@ export class NodeModel extends BaseModel<DiagramModel> {
    * unless subscribed and bound to the template of the widget itself
    */
   setDimensions(dimensions: Partial<Dimensions>) {
-    this.dimensions$.set({ ...this.getDimensions(), ...dimensions }).emit();
+    this.dimensions$.set({ ...this.getDimensions(), ...dimensions });
   }
 
   getDimensions(): Dimensions {
@@ -213,7 +213,7 @@ export class NodeModel extends BaseModel<DiagramModel> {
   }
 
   setExtras<E>(extras: Partial<E>) {
-    this.extras$.set(extras).emit();
+    this.extras$.set(extras);
   }
 
   getExtras() {

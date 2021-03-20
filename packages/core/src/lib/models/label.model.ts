@@ -40,7 +40,7 @@ export class LabelModel extends BaseModel<LinkModel> {
   }
 
   setRotation(angle: number) {
-    this.rotation$.set(angle).emit();
+    this.rotation$.set(angle);
   }
 
   selectRotation() {
@@ -48,7 +48,7 @@ export class LabelModel extends BaseModel<LinkModel> {
   }
 
   setCoords(newCoords: Partial<Coords>) {
-    this.coords$.set({ ...this.coords$.value, ...newCoords }).emit();
+    this.coords$.set({ ...this.coords$.value, ...newCoords });
   }
 
   selectCoords() {
@@ -56,7 +56,7 @@ export class LabelModel extends BaseModel<LinkModel> {
   }
 
   setText(text: string) {
-    this.text$.set(text).emit();
+    this.text$.set(text);
   }
 
   getText() {
