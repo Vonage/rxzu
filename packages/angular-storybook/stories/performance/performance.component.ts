@@ -24,7 +24,7 @@ import { bufferTime, map } from 'rxjs/operators';
       </button>
       <button (click)="createDiagram()" *ngIf="isResseted">Recreate</button>
       FPS: {{ fps$ | async }} Rendered {{ numberOfNodes }} nodes and links in
-      {{ initialRenderTimer }} ms
+      {{ initialRenderTimer | number: '1.0-0' }} ms
     </div>
     <rxzu-diagram class="demo-diagram" [model]="diagramModel"></rxzu-diagram>
   `,
@@ -37,6 +37,7 @@ export class PerformanceExampleStoryComponent implements OnInit, AfterViewInit {
     bufferTime(1000),
     map((value) => value.length)
   );
+
   initialRenderTimer = 0;
   isResseted = false;
   numberOfNodes = 200;

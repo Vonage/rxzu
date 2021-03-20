@@ -43,7 +43,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   }
 
   setParent(parent: E): void {
-    this.parent$.set(parent).emit();
+    this.parent$.set(parent);
   }
 
   parentChanges(): Observable<ParentChangeEvent<E>> {
@@ -55,7 +55,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   }
 
   setPainted(painted = true): void {
-    this.painted$.set(new PaintedEvent(this, painted)).emit();
+    this.painted$.set(new PaintedEvent(this, painted));
   }
 
   paintChanges(): Observable<PaintedEvent> {
@@ -67,7 +67,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   }
 
   setHovered(hovered = true): void {
-    this.hovered$.set(hovered).emit();
+    this.hovered$.set(hovered);
   }
 
   selectHovered(): Observable<boolean> {
@@ -83,7 +83,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   }
 
   setSelected(selected = true): void {
-    this.selected$.set(selected).emit();
+    this.selected$.set(selected);
   }
 
   selectionChanges(): Observable<SelectionEvent> {
