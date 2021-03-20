@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RxZuModule } from '../../main.module';
-import { ComponentProviderOptions } from '../../injection.tokens';
+import { ComponentProviderOptions, RxZuModule } from '@rxzu/angular';
 import {
   GHWorkflowNodeComponent,
   GHWorkflowPortComponent,

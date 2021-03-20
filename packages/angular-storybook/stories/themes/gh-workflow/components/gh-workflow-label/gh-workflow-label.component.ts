@@ -6,8 +6,7 @@ import {
   Inject,
   OnInit,
 } from '@angular/core';
-import { LabelModel } from '@rxzu/core';
-import { MODEL } from '../../../../injection.tokens';
+import { MODEL, LabelModel } from '@rxzu/angular';
 
 @Component({
   selector: 'rxzu-gh-workflow-label',

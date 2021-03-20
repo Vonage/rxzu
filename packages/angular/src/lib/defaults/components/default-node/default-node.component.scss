@@ -1,5 +1,4 @@
 :host {
-  display: block;
   position: absolute;
 }
 
@@ -12,8 +11,10 @@
     background-color: gainsboro;
   }
 
+  display: block;
+  width: 200px;
+  height: 200px;
   pointer-events: all;
-  width: 100%;
   border-radius: 10px;
   user-select: none;
   cursor: auto;

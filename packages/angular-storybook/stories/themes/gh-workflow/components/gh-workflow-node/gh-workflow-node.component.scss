@@ -4,6 +4,8 @@
 }
 
 .gh-workflow-node {
+  min-height: 50px;
+  min-width: 260px;
   border: 1px solid #30363d;
   display: flex;
   pointer-events: all;

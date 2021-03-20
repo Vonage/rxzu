@@ -1,9 +1,5 @@
 <div
   class="gh-workflow-node"
-  [ngStyle]="{
-    'min-height.px': model.selectHeight() | async,
-    'min-width.px': model.selectWidth() | async
-  }"
   (mouseover)="model.setHovered()"
   (mouseout)="model.setHovered(false)"
 >

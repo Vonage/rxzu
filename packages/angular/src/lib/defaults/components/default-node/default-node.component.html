@@ -4,10 +4,6 @@
     selected: model.selectSelected() | async,
     hovered: model.selectHovered() | async
   }"
-  [ngStyle]="{
-    'height.px': model.selectHeight() | async,
-    'width.px': model.selectWidth() | async
-  }"
   (mouseover)="model.setHovered()"
   (mouseout)="model.setHovered(false)"
 >
