@@ -401,7 +401,7 @@ export class MouseManager {
             link?.getSourcePort() === null ||
             link?.getTargetPort() === null
           ) {
-            link.destroy();
+            this.diagramModel.deleteLink(link);
             this.actionsManager.startFiringAction(new LooseLinkDestroyed(link));
           }
         });
@@ -421,7 +421,7 @@ export class MouseManager {
         if (link && sourcePort && targetPort) {
           if (!sourcePort.canLinkToPort(targetPort)) {
             // link not allowed
-            link?.destroy();
+            if (link) this.diagramModel.deleteLink(link);
             this.actionsManager.startFiringAction(
               new InvalidLinkDestroyed(link)
             );
@@ -436,7 +436,7 @@ export class MouseManager {
               )
           ) {
             // link is a duplicate
-            link.destroy();
+            this.diagramModel.deleteLink(link);
           }
         }
       });

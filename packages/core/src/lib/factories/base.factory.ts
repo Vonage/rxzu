@@ -27,6 +27,10 @@ export abstract class AbstractFactory<
 
   abstract resolveComponent(options: WidgetOptions<any, any>): ResolvedType;
 
+  abstract getHTMLElement(widget: ResolvedType): HTMLElement
+
+  abstract destroyWidget(widget: ResolvedType): void
+
   beforeGenerate(): Observable<void> {
     return this._beforeGenerate$.asObservable();
   }

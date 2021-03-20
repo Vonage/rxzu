@@ -10,8 +10,6 @@ import {
 import {
   AbstractFactory,
   BaseModel,
-  NodeModel,
-  PortModel,
   toRegistryKey,
   WidgetOptions,
 } from '@rxzu/core';
@@ -29,6 +27,14 @@ export class FactoryService extends AbstractFactory<
     private renderer: Renderer2
   ) {
     super(registry);
+  }
+
+  getHTMLElement(widget: ComponentRef<any>): HTMLElement {
+    return widget.location.nativeElement;
+  }
+
+  destroyWidget(widget: ComponentRef<any>) {
+    widget.destroy();
   }
 
   resolveComponent<M extends BaseModel>({
@@ -75,29 +81,7 @@ export class FactoryService extends AbstractFactory<
       model.namespace
     );
 
-    const resizeObserver = new ResizeObserver((entries) => {
-      if (entries?.length > 0) {
-        // get the new width and height of the node
-        const { width, height } = entries[0].contentRect;
-        if (
-          width &&
-          height &&
-          (model instanceof NodeModel || model instanceof PortModel)
-        ) {
-          // update the new width and height of the node in the model
-          model.setDimensions({ width, height });
-        }
-      }
-    });
-
-    resizeObserver.observe(ref.location.nativeElement);
-
     ref.changeDetectorRef.detectChanges();
-
-    model.onEntityDestroy().subscribe(() => {
-      ref.destroy();
-      resizeObserver.disconnect();
-    });
 
     return ref;
   }
