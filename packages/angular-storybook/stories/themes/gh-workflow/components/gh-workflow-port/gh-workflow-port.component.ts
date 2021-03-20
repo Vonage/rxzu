@@ -7,9 +7,8 @@ import {
   OnInit,
   Renderer2,
 } from '@angular/core';
-import { DefaultPortComponent } from '../../../../defaults';
-import { MODEL } from '../../../../injection.tokens';
-import { GHPortModel } from '../../models/gh-workflow-port.model';
+import { DefaultPortComponent, MODEL } from '@rxzu/angular';
+import { GHPortModel } from '../../models';
 
 @Component({
   selector: 'rxzu-gh-workflow-port',

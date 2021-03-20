@@ -10,10 +10,12 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { MODEL } from '../../../../injection.tokens';
-import { RxZuDiagramComponent } from '../../../../diagram/diagram.component';
-import { FactoryService } from '../../../../factory.service';
-import { DefaultNodeComponent } from 'packages/angular/src/lib/defaults';
+import {
+  DefaultNodeComponent,
+  MODEL,
+  FactoryService,
+  RxZuDiagramComponent,
+} from '@rxzu/angular';
 import { GHNodeModel } from '../../models';
 
 @Component({

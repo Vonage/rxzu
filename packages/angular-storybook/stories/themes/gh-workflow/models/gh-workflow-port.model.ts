@@ -1,4 +1,4 @@
-import { PortModel, ValueState, PortModelOptions } from '@rxzu/core';
+import { PortModel, ValueState, PortModelOptions } from '@rxzu/angular';
 
 export class GHPortModel extends PortModel {
   direction$: ValueState<'in' | 'out'>;

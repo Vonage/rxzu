@@ -53,7 +53,6 @@ export class DragAndDropExampleStoryComponent implements AfterViewInit {
     if (nodeData) {
       const node = new NodeModel({ namespace: nodeData.name });
       node.setExtras(nodeData);
-      node.setDimensions(this.nodesDefaultDimensions);
 
       return node;
     }

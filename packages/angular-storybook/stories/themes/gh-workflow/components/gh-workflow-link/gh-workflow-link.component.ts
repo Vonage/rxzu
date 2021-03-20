@@ -7,9 +7,7 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { LinkModel } from '@rxzu/core';
-import { DefaultLinkComponent } from 'packages/angular/src/lib/defaults';
-import { MODEL } from '../../../../injection.tokens';
+import { MODEL, LinkModel, DefaultLinkComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'rxzu-gh-workflow-link',

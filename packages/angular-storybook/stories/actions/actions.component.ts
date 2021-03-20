@@ -35,28 +35,22 @@ export class ActionsExampleStoryComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    const nodesDefaultDimensions = { height: 200, width: 200 };
-
     const node1 = new NodeModel({
       coords: { x: 500, y: 300 },
-      dimensions: nodesDefaultDimensions,
     });
     const outPort = new PortModel({ id: 'outport1' });
     node1.addPort(outPort);
 
     const node2 = new NodeModel({
       coords: { x: 1000, y: 0 },
-      dimensions: nodesDefaultDimensions,
     });
 
-    node2.setDimensions(nodesDefaultDimensions);
     const inPort = new PortModel({ id: 'inport2' });
     node2.addPort(inPort);
 
     for (let index = 0; index < 2; index++) {
       const nodeLoop = new NodeModel({
         coords: { x: 1000, y: 300 + index * 300 },
-        dimensions: nodesDefaultDimensions,
       });
       const portLoop = new PortModel({ id: `inport${index + 3}` });
       nodeLoop.addPort(portLoop);

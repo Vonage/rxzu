@@ -117,6 +117,10 @@ export class PortModel extends BaseModel<NodeModel> {
     return this.coords$.value;
   }
 
+  setDimensions(dimensions: Dimensions) {
+    return this.dimensions$.set(dimensions);
+  }
+
   getDimensions() {
     return this.dimensions$.value;
   }

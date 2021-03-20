@@ -1,11 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import {
-  DiagramModel,
-  BaseModel,
-  RxZuDiagramComponent,
-  GHPortModel,
-  GHNodeModel,
-} from '@rxzu/angular';
+import { DiagramModel, BaseModel, RxZuDiagramComponent } from '@rxzu/angular';
+import { GHNodeModel, GHPortModel } from './models';
 
 @Component({
   selector: 'app-root',

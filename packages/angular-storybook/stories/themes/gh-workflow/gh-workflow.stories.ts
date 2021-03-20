@@ -1,7 +1,7 @@
 import { Meta, moduleMetadata, Story } from '@storybook/angular';
 import { CommonModule } from '@angular/common';
 import { GHWorkfflowExampleStoryComponent } from './gh-workflow.component';
-import { RxZuGHWorkflowTheme } from '@rxzu/angular';
+import { RxZuGHWorkflowTheme } from './gh-workflow.module';
 
 export default {
   title: 'Themes/Github Workflow',
