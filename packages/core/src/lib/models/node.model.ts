@@ -40,8 +40,9 @@ export class NodeModel extends BaseModel<DiagramModel> {
 
   updatePortCoords(port: PortModel, engine: DiagramEngine) {
     if (port.getPainted().isPainted && this.getParent()) {
-      const portSize = engine.getCanvasManager().getPortCoords(port);
-      const portCenter = engine.getCanvasManager().getPortCenter(port);
+      const canvasManager = engine.getCanvasManager();
+      const portSize = canvasManager.getPortCoords(port);
+      const portCenter = canvasManager.getPortCenter(port);
       port.updateCoords(
         {
           x: 0,
@@ -74,23 +75,6 @@ export class NodeModel extends BaseModel<DiagramModel> {
 
     this.coords$.set({ x, y });
   }
-
-  // serialize(): INodeModel {
-  //   const serializedPorts = this.getPortsArray().map((port) =>
-  //     port.serialize()
-  //   );
-
-  //   return {
-  //     ...super.serialize(),
-  //     nodeType: this.getType(),
-  //     type: this.getType(),
-  //     extras: this.getExtras(),
-  //     width: this.getWidth(),
-  //     height: this.getHeight(),
-  //     ...this.getCoords(),
-  //     ports: serializedPorts,
-  //   };
-  // }
 
   getSelectedEntities(): any {
     let entities: (

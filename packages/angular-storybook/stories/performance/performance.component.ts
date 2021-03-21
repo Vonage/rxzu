@@ -40,7 +40,7 @@ export class PerformanceExampleStoryComponent implements OnInit, AfterViewInit {
 
   initialRenderTimer = 0;
   isResseted = false;
-  numberOfNodes = 200;
+  numberOfNodes = 500;
   @ViewChild(RxZuDiagramComponent, { static: true })
   diagram?: RxZuDiagramComponent;
 

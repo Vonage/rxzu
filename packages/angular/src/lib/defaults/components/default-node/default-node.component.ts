@@ -1,14 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   Host,
   Inject,
   IterableChanges,
   IterableDiffer,
   IterableDiffers,
   OnInit,
-  Renderer2,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
@@ -25,7 +23,7 @@ import {
 } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
 import { RxZuDiagramComponent } from '../../../diagram/diagram.component';
-import { FactoryService } from '../../../factory.service';
+import { EngineService } from '../../../engine.service';
 
 @Component({
   selector: 'rxzu-default-node',
@@ -40,10 +38,8 @@ export class DefaultNodeComponent implements OnInit {
 
   constructor(
     @Host() @Inject(MODEL) public model: NodeModel,
-    private factory: FactoryService,
+    private engine: EngineService,
     private diagram: RxZuDiagramComponent,
-    private elRef: ElementRef,
-    private renderer: Renderer2,
     private iterableDiffers: IterableDiffers
   ) {
     this.portDiffers = this.iterableDiffers
@@ -52,23 +48,11 @@ export class DefaultNodeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.updateNodePosition();
     this.updatePorts();
   }
 
   getPortsHost() {
     return this.portsLayer;
-  }
-
-  updateNodePosition(): void {
-    // subscribe to node coordinates
-    this.model
-      .selectCoords()
-      .pipe(takeUntil(this.model.onEntityDestroy()))
-      .subscribe(({ x, y }) => {
-        this.renderer.setStyle(this.elRef.nativeElement, 'left', `${x}px`);
-        this.renderer.setStyle(this.elRef.nativeElement, 'top', `${y}px`);
-      });
   }
 
   updatePorts(): void {
@@ -100,14 +84,10 @@ export class DefaultNodeComponent implements OnInit {
 
   private applyPortChanges(changes: IterableChanges<PortModel> | null): void {
     if (changes) {
+      const canvasManager = this.engine.getCanvasManager();
       changes.forEachAddedItem(({ item, currentIndex }) => {
         item.setParent(this.model);
-        this.factory.generateWidget({
-          model: item,
-          host: this.getPortsHost(),
-          index: currentIndex ?? undefined,
-          diagramModel: this.model.getParent(),
-        });
+        canvasManager.paintModel(item, this.getPortsHost());
         this.model.updatePortCoords(item, this.diagram.diagramEngine);
       });
       changes.forEachMovedItem(({ previousIndex, currentIndex, item }) => {
@@ -123,7 +103,11 @@ export class DefaultNodeComponent implements OnInit {
           }
         }
       });
-      changes.forEachRemovedItem((record) => record.previousIndex !== null && this.getPortsHost().remove(record.previousIndex));
+      changes.forEachRemovedItem(
+        (record) =>
+          record.previousIndex !== null &&
+          this.getPortsHost().remove(record.previousIndex)
+      );
     }
   }
 }

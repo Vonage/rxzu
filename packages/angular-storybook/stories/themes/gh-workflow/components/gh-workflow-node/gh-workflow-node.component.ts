@@ -13,8 +13,8 @@ import {
 import {
   DefaultNodeComponent,
   MODEL,
-  FactoryService,
   RxZuDiagramComponent,
+  EngineService,
 } from '@rxzu/angular';
 import { GHNodeModel } from '../../models';
 
@@ -32,12 +32,10 @@ export class GHWorkflowNodeComponent
 
   constructor(
     @Host() @Inject(MODEL) public model: GHNodeModel,
-    factory: FactoryService,
+    engine: EngineService,
     diagram: RxZuDiagramComponent,
-    elRef: ElementRef,
-    renderer: Renderer2,
     iterableDiffers: IterableDiffers
   ) {
-    super(model, factory, diagram, elRef, renderer, iterableDiffers);
+    super(model, engine, diagram, iterableDiffers);
   }
 }

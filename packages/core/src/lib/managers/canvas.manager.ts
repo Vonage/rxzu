@@ -127,6 +127,7 @@ export class CanvasManager {
   setObservers<T extends BaseModel>(widget: any, model: T): ResizeObserver[] {
     const observers: ResizeObserver[] = [];
 
+    const element = this.engine.getFactory().getHTMLElement(widget);
     if (model instanceof NodeModel || model instanceof PortModel) {
       const resizeObserver = new ResizeObserver((entries) => {
         if (entries?.length > 0) {
@@ -135,11 +136,17 @@ export class CanvasManager {
           if (width && height) {
             // update the new width and height of the node in the model
             model.setDimensions({ width, height });
+            if (model instanceof PortModel) {
+              const coords = this.getPortCoords(model);
+              if (coords) {
+                model.updateCoords(coords);
+              }
+            }
           }
         }
       });
 
-      resizeObserver.observe(this.engine.getFactory().getHTMLElement(widget));
+      resizeObserver.observe(element);
 
       observers.push(resizeObserver);
     }
@@ -263,15 +270,19 @@ export class CanvasManager {
     const toPromise = (obs: Observable<boolean>) => {
       return promise ? obs.toPromise() : obs;
     };
-
-    const widget = this.engine.getFactory().generateWidget({
+    const factory = this.engine.getFactory();
+    const diagramModel = this.engine.getDiagramModel();
+    const widget = factory.generateWidget({
       model,
       host,
-      diagramModel: this.engine.getDiagramModel(),
+      diagramModel,
     });
 
     if (!widget) return toPromise(of(true));
 
+    const element = factory.getHTMLElement(widget);
+    this.setBaseAttributes(element, model);
+    this.subscribeToModelChanges(element, model);
     const observers = this.setObservers(widget, model);
 
     model.onEntityDestroy().subscribe(() => {
@@ -280,6 +291,26 @@ export class CanvasManager {
     });
 
     return toPromise(model.paintChanges().pipe(pluck('isPainted'), take(1)));
+  }
+
+  subscribeToModelChanges<T extends BaseModel>(element: HTMLElement, model: T) {
+    if (model instanceof NodeModel) {
+      // subscribe to node coordinates
+      model
+        .selectCoords()
+        .pipe(takeUntil(model.onEntityDestroy()))
+        .subscribe(({ x, y }) => {
+          element.style.setProperty('left', `${x}px`);
+          element.style.setProperty('top', `${y}px`);
+        });
+    }
+  }
+
+  setBaseAttributes<T extends BaseModel>(element: HTMLElement, model: T) {
+    element.setAttribute('data-type', model.type);
+    element.setAttribute('data-id', model.id);
+    element.setAttribute('data-parent-id', model.getParent()?.id);
+    element.setAttribute('data-namespace', model.namespace);
   }
 
   shouldDrawSelectionBox() {

@@ -1,6 +1,6 @@
 import { BaseModel, DiagramModel } from '../models';
 import { AbstractRegistry } from './base.registry';
-import { Observable, Subject } from 'rxjs';
+import { noop, Observable, Subject } from 'rxjs';
 import { toRegistryKey } from '../utils';
 
 export interface WidgetOptions<M, H> {
@@ -31,7 +31,9 @@ export abstract class AbstractFactory<
 
   abstract destroyWidget(widget: ResolvedType): void;
 
-  abstract detectChanges(widget: ResolvedType): void;
+  detectChanges(widget: ResolvedType): void {
+    noop();
+  }
 
   beforeGenerate(): Observable<void> {
     return this._beforeGenerate$.asObservable();
@@ -53,12 +55,6 @@ export abstract class AbstractFactory<
     if (options.model.getPainted().isPainted) return null;
     this._beforeGenerate$.next();
     const widget = this.resolveComponent(options);
-    const element = this.getHTMLElement(widget);
-
-    element.setAttribute('data-type', options.model.type);
-    element.setAttribute('data-id', options.model.id);
-    element.setAttribute('data-parent-id', options.model.getParent()?.id);
-    element.setAttribute('data-namespace', options.model.namespace);
 
     this._afterGenerate$.next(widget);
 
