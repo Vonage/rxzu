@@ -3,7 +3,6 @@ import {
   ComponentRef,
   Injectable,
   Injector,
-  Renderer2,
   Type,
   ViewContainerRef,
 } from '@angular/core';
@@ -23,8 +22,7 @@ export class FactoryService extends AbstractFactory<
 > {
   constructor(
     registry: RegistryService,
-    private cfr: ComponentFactoryResolver,
-    private renderer: Renderer2
+    private cfr: ComponentFactoryResolver
   ) {
     super(registry);
   }
@@ -35,6 +33,10 @@ export class FactoryService extends AbstractFactory<
 
   destroyWidget(widget: ComponentRef<any>) {
     widget.destroy();
+  }
+
+  detectChanges(widget: ComponentRef<any>) {
+    widget.changeDetectorRef.detectChanges();
   }
 
   resolveComponent<M extends BaseModel>({
@@ -56,32 +58,12 @@ export class FactoryService extends AbstractFactory<
       providers: [{ provide: MODEL, useValue: model }],
       parent: host.injector,
     });
+
     const ref = host.createComponent(
       this.cfr.resolveComponentFactory(cmp),
       index,
       injector
     );
-
-    this.renderer.setAttribute(
-      ref.location.nativeElement,
-      'data-type',
-      model.type
-    );
-
-    this.renderer.setAttribute(ref.location.nativeElement, 'data-id', model.id);
-    this.renderer.setAttribute(
-      ref.location.nativeElement,
-      'data-parentId',
-      model.getParent()?.id ?? diagramModel?.id
-    );
-
-    this.renderer.setAttribute(
-      ref.location.nativeElement,
-      'data-namespace',
-      model.namespace
-    );
-
-    ref.changeDetectorRef.detectChanges();
 
     return ref;
   }

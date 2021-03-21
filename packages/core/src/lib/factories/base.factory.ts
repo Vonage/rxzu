@@ -27,9 +27,11 @@ export abstract class AbstractFactory<
 
   abstract resolveComponent(options: WidgetOptions<any, any>): ResolvedType;
 
-  abstract getHTMLElement(widget: ResolvedType): HTMLElement
+  abstract getHTMLElement(widget: ResolvedType): HTMLElement;
 
-  abstract destroyWidget(widget: ResolvedType): void
+  abstract destroyWidget(widget: ResolvedType): void;
+
+  abstract detectChanges(widget: ResolvedType): void;
 
   beforeGenerate(): Observable<void> {
     return this._beforeGenerate$.asObservable();
@@ -51,7 +53,16 @@ export abstract class AbstractFactory<
     if (options.model.getPainted().isPainted) return null;
     this._beforeGenerate$.next();
     const widget = this.resolveComponent(options);
+    const element = this.getHTMLElement(widget);
+
+    element.setAttribute('data-type', options.model.type);
+    element.setAttribute('data-id', options.model.id);
+    element.setAttribute('data-parent-id', options.model.getParent()?.id);
+    element.setAttribute('data-namespace', options.model.namespace);
+
     this._afterGenerate$.next(widget);
+
+    this.detectChanges(widget);
 
     return (widget as unknown) as WidgetType;
   }

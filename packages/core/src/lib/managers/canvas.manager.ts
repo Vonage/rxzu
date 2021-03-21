@@ -5,7 +5,7 @@ import {
   NodeModel,
   PortModel,
   SelectingAction,
-  ValueState
+  ValueState,
 } from '@rxzu/core';
 import { Observable, combineLatest, of } from 'rxjs';
 import {
@@ -15,7 +15,8 @@ import {
   take,
   filter,
   map,
-  catchError, switchMapTo
+  catchError,
+  switchMapTo,
 } from 'rxjs/operators';
 import { createValueState } from '../state';
 
@@ -123,8 +124,8 @@ export class CanvasManager {
     return this.canvas$.select();
   }
 
-  setObservers<T extends BaseModel>(widget: any, model: T): MutationObserver[] {
-    const observers: MutationObserver[] = [];
+  setObservers<T extends BaseModel>(widget: any, model: T): ResizeObserver[] {
+    const observers: ResizeObserver[] = [];
 
     if (model instanceof NodeModel || model instanceof PortModel) {
       const resizeObserver = new ResizeObserver((entries) => {
@@ -208,18 +209,28 @@ export class CanvasManager {
           if (targetPort) {
             const portCenter = this.getPortCenter(targetPort);
             if (portCenter) {
-              link.getPoints()[link.getPoints().length - 1].setCoords(portCenter);
+              link
+                .getPoints()
+                [link.getPoints().length - 1].setCoords(portCenter);
             }
           }
 
           linksPainted$.push(
             this.paintModel(link, linksHost).pipe(
-              switchMapTo(link.selectLabel().pipe(
-                filter((label: LabelModel | null | undefined): label is LabelModel =>
-                  label !== null && label !== undefined
-                ),
-                switchMap((label: LabelModel) => this.paintLabel(label, linksHost))
-              )))
+              switchMapTo(
+                link.selectLabel().pipe(
+                  filter(
+                    (
+                      label: LabelModel | null | undefined
+                    ): label is LabelModel =>
+                      label !== null && label !== undefined
+                  ),
+                  switchMap((label: LabelModel) =>
+                    this.paintLabel(label, linksHost)
+                  )
+                )
+              )
+            )
           );
         }
 
@@ -238,14 +249,17 @@ export class CanvasManager {
     return this.paintModel(label, host);
   }
 
-  paintModel<T extends BaseModel>(model: T, host: any, promise: true): Promise<boolean>;
+  paintModel<T extends BaseModel>(
+    model: T,
+    host: any,
+    promise: true
+  ): Promise<boolean>;
   paintModel<T extends BaseModel>(model: T, host: any): Observable<boolean>;
   paintModel<T extends BaseModel>(
     model: T,
     host: any,
     promise = false
   ): Observable<boolean> | Promise<boolean> {
-
     const toPromise = (obs: Observable<boolean>) => {
       return promise ? obs.toPromise() : obs;
     };
@@ -253,7 +267,7 @@ export class CanvasManager {
     const widget = this.engine.getFactory().generateWidget({
       model,
       host,
-      diagramModel: this.engine.getDiagramModel()
+      diagramModel: this.engine.getDiagramModel(),
     });
 
     if (!widget) return toPromise(of(true));
@@ -262,7 +276,7 @@ export class CanvasManager {
 
     model.onEntityDestroy().subscribe(() => {
       this.engine.getFactory().destroyWidget(widget);
-      observers.forEach(observer => observer.disconnect());
+      observers.forEach((observer) => observer.disconnect());
     });
 
     return toPromise(model.paintChanges().pipe(pluck('isPainted'), take(1)));

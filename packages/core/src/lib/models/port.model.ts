@@ -154,12 +154,12 @@ export class PortModel extends BaseModel<NodeModel> {
   removeLink(linkOrId?: ID | LinkModel | null) {
     if (linkOrId) {
       const linkId = isString(linkOrId) ? linkOrId : linkOrId?.id;
-      this.links$.remove(linkId, false).emit();
+      this.links$.remove(linkId, false);
     }
   }
 
   addLink(link: LinkModel) {
-    this.links$.add(link).emit();
+    this.links$.add(link);
   }
 
   getLinks(): EntityMap<LinkModel> {
@@ -223,6 +223,6 @@ export class PortModel extends BaseModel<NodeModel> {
 
   destroy() {
     super.destroy();
-    this.links$.clear().emit();
+    this.links$.clear();
   }
 }

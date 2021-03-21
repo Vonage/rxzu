@@ -137,13 +137,13 @@ export class NodeModel extends BaseModel<DiagramModel> {
    */
   addPort(port: PortModel): PortModel {
     port.setParent(this);
-    this.ports$.add(port).emit();
+    this.ports$.add(port);
     return port;
   }
 
   removePort(portOrId: ID | PortModel): string {
     const portId = typeof portOrId === 'string' ? portOrId : portOrId.id;
-    this.ports$.remove(portId).emit();
+    this.ports$.remove(portId);
     return portId;
   }
 

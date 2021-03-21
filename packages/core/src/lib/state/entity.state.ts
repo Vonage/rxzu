@@ -20,6 +20,7 @@ export class EntityState<T extends BaseEntity> extends ValueState<
   clear() {
     this.forEach((entity) => entity.destroy());
     this.value.clear();
+    this.stream$.next(this.value);
     return this;
   }
 
@@ -33,6 +34,7 @@ export class EntityState<T extends BaseEntity> extends ValueState<
 
   add(entity: T): EntityState<T> {
     this.value.set(entity.id, entity);
+    this.stream$.next(this.value);
     return this;
   }
 
@@ -40,6 +42,7 @@ export class EntityState<T extends BaseEntity> extends ValueState<
     for (const entity of entities) {
       this.add(entity);
     }
+    this.stream$.next(this.value);
     return this;
   }
 
@@ -49,6 +52,7 @@ export class EntityState<T extends BaseEntity> extends ValueState<
     }
 
     this.value.delete(id);
+    this.stream$.next(this.value);
     return this;
   }
 

@@ -55,7 +55,7 @@ export class MouseManager {
     if (element) {
       return {
         model: this.diagramModel
-          ?.getLink(element.getAttribute('data-parentId'))
+          ?.getLink(element.getAttribute('data-parent-id'))
           ?.getPointModel(element.getAttribute('data-id')) as
           | BaseModel
           | undefined,

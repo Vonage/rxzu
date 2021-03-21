@@ -145,7 +145,7 @@ export class DiagramModel extends BaseEntity {
    * @returns Inserted Node
    */
   addNode(node: NodeModel): NodeModel {
-    this.nodes$.add(node).emit();
+    this.nodes$.add(node);
     return node;
   }
 
@@ -163,7 +163,7 @@ export class DiagramModel extends BaseEntity {
       }
     }
 
-    this.nodes$.remove(nodeId).emit();
+    this.nodes$.remove(nodeId);
   }
 
   /**
@@ -178,7 +178,7 @@ export class DiagramModel extends BaseEntity {
    * @returns Newly created link
    */
   addLink(link: LinkModel): LinkModel {
-    this.links$.add(link).emit();
+    this.links$.add(link);
     return link;
   }
 
@@ -187,12 +187,12 @@ export class DiagramModel extends BaseEntity {
    */
   deleteLink(linkOrId: LinkModel | string) {
     const linkId: ID = typeof linkOrId === 'string' ? linkOrId : linkOrId.id;
-    this.links$.remove(linkId).emit();
+    this.links$.remove(linkId);
   }
 
   reset() {
-    this.nodes$.clear().emit();
-    this.links$.clear().emit();
+    this.nodes$.clear();
+    this.links$.clear();
   }
 
   /**
@@ -441,11 +441,11 @@ export class DiagramModel extends BaseEntity {
   }
 
   addLinks(links: LinkModel[]) {
-    this.links$.addMany(links).emit();
+    this.links$.addMany(links);
   }
 
   addNodes(nodes: NodeModel[]) {
-    this.nodes$.addMany(nodes).emit();
+    this.nodes$.addMany(nodes);
   }
 
   destroy() {
