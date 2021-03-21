@@ -5,9 +5,9 @@ import {
   NodeModel,
   PortModel,
   SelectingAction,
-  ValueState,
+  ValueState
 } from '@rxzu/core';
-import { Observable, combineLatest, of, EMPTY } from 'rxjs';
+import { Observable, combineLatest, of } from 'rxjs';
 import {
   takeUntil,
   switchMap,
@@ -15,7 +15,7 @@ import {
   take,
   filter,
   map,
-  catchError,
+  catchError, switchMapTo
 } from 'rxjs/operators';
 import { createValueState } from '../state';
 
@@ -123,6 +123,29 @@ export class CanvasManager {
     return this.canvas$.select();
   }
 
+  setObservers<T extends BaseModel>(widget: any, model: T): MutationObserver[] {
+    const observers: MutationObserver[] = [];
+
+    if (model instanceof NodeModel || model instanceof PortModel) {
+      const resizeObserver = new ResizeObserver((entries) => {
+        if (entries?.length > 0) {
+          // get the new width and height of the node
+          const { width, height } = entries[0].contentRect;
+          if (width && height) {
+            // update the new width and height of the node in the model
+            model.setDimensions({ width, height });
+          }
+        }
+      });
+
+      resizeObserver.observe(this.engine.getFactory().getHTMLElement(widget));
+
+      observers.push(resizeObserver);
+    }
+
+    return observers;
+  }
+
   paintNodes(nodesHost: any, promise: true): Promise<boolean>;
   paintNodes(nodesHost: any): Observable<boolean>;
   paintNodes(
@@ -134,20 +157,13 @@ export class CanvasManager {
       takeUntil(diagramModel.onEntityDestroy()),
       switchMap((nodes) => {
         const nodesPainted$ = [];
+
         for (const node of nodes.values()) {
-          if (!node.getPainted().isPainted) {
-            nodesPainted$.push(
-              node.paintChanges().pipe(pluck('isPainted'), take(1))
-            );
+          if (node.getPainted().isPainted) continue;
 
-            node.setParent(diagramModel);
+          node.setParent(diagramModel);
 
-            this.engine.getFactory().generateWidget({
-              model: node,
-              host: nodesHost,
-              diagramModel,
-            });
-          }
+          nodesPainted$.push(this.paintModel(node, nodesHost));
         }
 
         return combineLatest(nodesPainted$);
@@ -172,71 +188,84 @@ export class CanvasManager {
     const diagramModel = this.engine.getDiagramModel();
     const observable = diagramModel.selectLinks().pipe(
       takeUntil(diagramModel.onEntityDestroy()),
-      map((links) => {
-        for (const link of links.values()) {
-          if (!link.getPainted().isPainted) {
-            const srcPort = link.getSourcePort();
-            const targetPort = link.getTargetPort();
+      switchMap((links) => {
+        const linksPainted$ = [];
+        for (const link of Array.from(links.values())) {
+          if (link.getPainted().isPainted) continue;
 
-            if (!srcPort) {
-              return;
-            }
+          const srcPort = link.getSourcePort();
+          const targetPort = link.getTargetPort();
 
+          if (srcPort) {
             // Attach link first point to source port
             const portCenter = this.getPortCenter(srcPort);
-
-            if (!portCenter) {
-              return;
+            if (portCenter) {
+              link.getPoints()[0].setCoords(portCenter);
             }
-
-            link.getPoints()[0].setCoords(portCenter);
-
-            // Attach link last point to target port, will occour only for complete links
-            if (targetPort) {
-              const portCenter = this.getPortCenter(targetPort);
-              if (!portCenter) {
-                return;
-              }
-              link
-                .getPoints()
-                [link.getPoints().length - 1].setCoords(portCenter);
-            }
-
-            this.engine.getFactory().generateWidget({
-              model: link,
-              host: linksHost,
-              diagramModel,
-            });
-
-            // (canvas: HTMLElement | null | undefined): canvas is HTMLElement =>
-            // Handle link label, if any
-            link
-              .selectLabel()
-              .pipe(
-                filter(
-                  (label: LabelModel | null | undefined): label is LabelModel =>
-                    label !== null && label !== undefined
-                )
-              )
-              .subscribe((label) => this.paintLabel(label, linksHost));
           }
+
+          // Attach link last point to target port, will occur only for complete links
+          if (targetPort) {
+            const portCenter = this.getPortCenter(targetPort);
+            if (portCenter) {
+              link.getPoints()[link.getPoints().length - 1].setCoords(portCenter);
+            }
+          }
+
+          linksPainted$.push(
+            this.paintModel(link, linksHost).pipe(
+              switchMapTo(link.selectLabel().pipe(
+                filter((label: LabelModel | null | undefined): label is LabelModel =>
+                  label !== null && label !== undefined
+                ),
+                switchMap((label: LabelModel) => this.paintLabel(label, linksHost))
+              )))
+          );
         }
+
+        return combineLatest(linksPainted$).pipe(switchMapTo(of()));
       }),
       catchError((err) => {
         console.error(err);
-        return EMPTY;
+        return of() as Observable<void>;
       })
     );
 
     return promise ? observable.toPromise() : observable;
   }
 
-  paintLabel(label: LabelModel, host: any) {
-    this.engine.getFactory().generateWidget({
-      model: label,
+  paintLabel(label: LabelModel, host: any): Observable<boolean> {
+    return this.paintModel(label, host);
+  }
+
+  paintModel<T extends BaseModel>(model: T, host: any, promise: true): Promise<boolean>;
+  paintModel<T extends BaseModel>(model: T, host: any): Observable<boolean>;
+  paintModel<T extends BaseModel>(
+    model: T,
+    host: any,
+    promise = false
+  ): Observable<boolean> | Promise<boolean> {
+
+    const toPromise = (obs: Observable<boolean>) => {
+      return promise ? obs.toPromise() : obs;
+    };
+
+    const widget = this.engine.getFactory().generateWidget({
+      model,
       host,
-      diagramModel: this.engine.getDiagramModel(),
+      diagramModel: this.engine.getDiagramModel()
     });
+
+    if (!widget) return toPromise(of(true));
+
+    const observers = this.setObservers(widget, model);
+
+    model.onEntityDestroy().subscribe(() => {
+      this.engine.getFactory().destroyWidget(widget);
+      observers.forEach(observer => observer.disconnect());
+    });
+
+    return toPromise(model.paintChanges().pipe(pluck('isPainted'), take(1)));
   }
 
   shouldDrawSelectionBox() {

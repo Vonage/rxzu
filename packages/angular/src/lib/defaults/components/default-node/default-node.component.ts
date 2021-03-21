@@ -123,7 +123,7 @@ export class DefaultNodeComponent implements OnInit {
           }
         }
       });
-      changes.forEachRemovedItem((record) => record.item.destroy());
+      changes.forEachRemovedItem((record) => record.previousIndex !== null && this.getPortsHost().remove(record.previousIndex));
     }
   }
 }
