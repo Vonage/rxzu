@@ -12,7 +12,7 @@ import {
   template: `
     <div class="action-bar">
       <button (click)="addPort()">Add Last Port</button>
-      <button (click)="removePort()">Remove Random Port</button>
+      <button (click)="removePort()">Remove First Port</button>
     </div>
     <rxzu-diagram class="demo-diagram" [model]="diagramModel"></rxzu-diagram>
   `,
@@ -86,7 +86,8 @@ export class DynamicPortsExampleStoryComponent
     }
 
     const numOfPorts = node.getPortsArray().length;
-    const newPort = new PortModel({ id: `inport${numOfPorts}` });
+    console.log(numOfPorts);
+    const newPort = new PortModel({ id: `outport${numOfPorts + 1}` });
     node.addPort(newPort);
   }
 
@@ -96,14 +97,9 @@ export class DynamicPortsExampleStoryComponent
       return;
     }
 
-    const portsArray = node.getPortsArray();
-    const max = Math.floor(portsArray.length - 1);
-
-    const randIndex = Math.floor(Math.random() * (max + 1));
-    const randomPort = portsArray[randIndex];
-
-    if (randomPort) {
-      node.removePort(randomPort);
+    const firstPort = node.getPortsArray()[0];
+    if (firstPort) {
+      node.removePort(firstPort);
     }
   }
 }

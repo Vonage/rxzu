@@ -78,7 +78,6 @@ export class LinkModel extends BaseModel<DiagramModel> {
     this.resetLabel();
     this.sourcePort$.value?.removeLink(this);
     this.targetPort$.value?.removeLink(this);
-
     super.destroy();
   }
 

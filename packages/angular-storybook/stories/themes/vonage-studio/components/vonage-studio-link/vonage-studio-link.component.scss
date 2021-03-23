@@ -1,0 +1,20 @@
+:host {
+  position: absolute;
+}
+
+.link-container {
+  position: relative;
+  fill: none;
+  overflow: visible;
+  pointer-events: all;
+  position: relative;
+
+  .vonage-studio-link {
+    transition: stroke 300ms ease-in-out;
+  }
+}
+.vonage-studio-point {
+  color: lightgray;
+  overflow: visible;
+  pointer-events: all;
+}

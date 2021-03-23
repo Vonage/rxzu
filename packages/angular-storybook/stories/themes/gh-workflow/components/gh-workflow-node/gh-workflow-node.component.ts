@@ -1,12 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   Host,
   Inject,
   IterableDiffers,
   OnInit,
-  Renderer2,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
