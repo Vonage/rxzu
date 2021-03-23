@@ -110,7 +110,24 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
     this.model.destroy();
   }
 
-  initNodes(): void {
+  /**
+   * zoom the canvas to fit all nodes inside the view.
+   * @param additionalZoomFactor additional margins to the zooming factor
+   */
+  zoomToFit(additionalZoomFactor?: number): void {
+    this.diagramEngine.zoomToFit(additionalZoomFactor);
+  }
+
+  /**
+   *
+   * @param nodes zoom the canvas to the selected nodes
+   * @param margin additional margins to the zooming factor
+   */
+  zoomToNodes(nodes: NodeModel[], margin = 100): void {
+    this.diagramEngine.zoomToNodes(nodes, margin);
+  }
+
+  protected initNodes(): void {
     this.canvasManager
       .paintNodes(this.nodesLayer)
       .pipe(
@@ -126,7 +143,7 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
       .subscribe();
   }
 
-  initSelectionBox() {
+  protected initSelectionBox() {
     if (!this.diagramEngine) {
       return;
     }
@@ -149,46 +166,38 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
   }
 
   @OutsideZone
-  onMouseUp(event: MouseEvent) {
+  protected onMouseUp(event: MouseEvent) {
     this.mouseManager ? this.mouseManager.onMouseUp(event) : noop();
   }
 
   @OutsideZone
-  onKeyUp(event: KeyboardEvent) {
+  protected onKeyUp(event: KeyboardEvent) {
     this.keyboardManager ? this.keyboardManager.onKeyUp(event) : noop();
   }
 
   @HostListener('window:copy', ['$event'])
-  onCopy(event: ClipboardEvent) {
+  protected onCopy(event: ClipboardEvent) {
     this.keyboardManager ? this.keyboardManager.onCopy() : noop();
   }
 
   @HostListener('window:paste', ['$event'])
-  onPaste(event: ClipboardEvent) {
+  protected onPaste(event: ClipboardEvent) {
     this.keyboardManager ? this.keyboardManager.onPaste() : noop();
   }
 
   @OutsideZone
-  onMouseMove(event: MouseEvent) {
+  protected onMouseMove(event: MouseEvent) {
     this.mouseManager ? this.mouseManager.onMouseMove(event) : noop();
   }
 
   @OutsideZone
-  onMouseDown(event: MouseEvent) {
+  protected onMouseDown(event: MouseEvent) {
     this.mouseManager ? this.mouseManager.onMouseDown(event) : noop();
   }
 
   @OutsideZone
-  onMouseWheel(event: WheelEvent) {
+  protected onMouseWheel(event: WheelEvent) {
     this.mouseManager ? this.mouseManager.onMouseWheel(event) : noop();
-  }
-
-  zoomToFit(additionalZoomFactor?: number): void {
-    this.diagramEngine.zoomToFit(additionalZoomFactor);
-  }
-
-  zoomToNodes(nodes: NodeModel[], margin = 100): void {
-    this.diagramEngine.zoomToNodes(nodes, margin);
   }
 
   @OutsideZone

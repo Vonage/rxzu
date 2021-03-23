@@ -86,7 +86,6 @@ export class DynamicPortsExampleStoryComponent
     }
 
     const numOfPorts = node.getPortsArray().length;
-    console.log(numOfPorts);
     const newPort = new PortModel({ id: `outport${numOfPorts + 1}` });
     node.addPort(newPort);
   }
