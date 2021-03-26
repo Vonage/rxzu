@@ -37,9 +37,9 @@ export class DynamicPortsExampleStoryComponent
       id: '1',
     });
 
-    const outPort1 = new PortModel({ id: 'outport1' });
-    const outPort2 = new PortModel({ id: 'outport2' });
-    const outPort3 = new PortModel({ id: 'outport3' });
+    const outPort1 = new PortModel({ id: '1' });
+    const outPort2 = new PortModel({ id: '2' });
+    const outPort3 = new PortModel({ id: '3' });
 
     node1.addPort(outPort1);
     node1.addPort(outPort2);
@@ -84,9 +84,16 @@ export class DynamicPortsExampleStoryComponent
     if (!node) {
       return;
     }
+    const portsArray = node.getPortsArray();
+    const lastPort = portsArray[portsArray.length - 1];
+    let newId: string;
+    if (!lastPort) {
+      newId = '0';
+    } else {
+      newId = (+lastPort.id + 1).toString();
+    }
 
-    const numOfPorts = node.getPortsArray().length;
-    const newPort = new PortModel({ id: `outport${numOfPorts + 1}` });
+    const newPort = new PortModel({ id: newId });
     node.addPort(newPort);
   }
 

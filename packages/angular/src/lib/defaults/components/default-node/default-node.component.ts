@@ -85,29 +85,15 @@ export class DefaultNodeComponent implements OnInit {
   private applyPortChanges(changes: IterableChanges<PortModel> | null): void {
     if (changes) {
       const canvasManager = this.engine.getCanvasManager();
-      changes.forEachAddedItem(({ item, currentIndex }) => {
-        item.setParent(this.model);
+      changes.forEachAddedItem(({ item }) => {
         canvasManager.paintModel(item, this.getPortsHost());
+        item.setParent(this.model);
         this.model.updatePortCoords(item, this.diagram.diagramEngine);
       });
-      changes.forEachMovedItem(({ previousIndex, currentIndex, item }) => {
-        if (
-          previousIndex !== null &&
-          currentIndex !== null &&
-          previousIndex !== currentIndex
-        ) {
-          const view = this.getPortsHost().get(previousIndex);
-          if (view) {
-            this.getPortsHost().move(view, currentIndex);
-            this.model.updatePortCoords(item, this.diagram.diagramEngine);
-          }
-        }
+
+      changes.forEachMovedItem(({ item }) => {
+        this.model.updatePortCoords(item, this.diagram.diagramEngine);
       });
-      changes.forEachRemovedItem(
-        (record) =>
-          record.previousIndex !== null &&
-          this.getPortsHost().remove(record.previousIndex)
-      );
     }
   }
 }
