@@ -1,4 +1,3 @@
-/// <reference types="resize-observer-browser" />
 import {
   BaseModel,
   DiagramEngine,
@@ -130,22 +129,24 @@ export class CanvasManager {
 
     const element = this.engine.getFactory().getHTMLElement(widget);
     if (model instanceof NodeModel || model instanceof PortModel) {
-      const resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
-        if (entries?.length > 0) {
-          // get the new width and height of the node
-          const { width, height } = entries[0].contentRect;
-          if (width && height) {
-            // update the new width and height of the node in the model
-            model.setDimensions({ width, height });
-            if (model instanceof PortModel) {
-              const coords = this.getPortCoords(model);
-              if (coords) {
-                model.updateCoords(coords);
+      const resizeObserver = new ResizeObserver(
+        (entries: ResizeObserverEntry[]) => {
+          if (entries?.length > 0) {
+            // get the new width and height of the node
+            const { width, height } = entries[0].contentRect;
+            if (width && height) {
+              // update the new width and height of the node in the model
+              model.setDimensions({ width, height });
+              if (model instanceof PortModel) {
+                const coords = this.getPortCoords(model);
+                if (coords) {
+                  model.updateCoords(coords);
+                }
               }
             }
           }
         }
-      });
+      );
 
       resizeObserver.observe(element);
 
