@@ -1,0 +1,31 @@
+:host {
+  position: absolute;
+}
+
+.link-container {
+  position: relative;
+  fill: none;
+  overflow: visible;
+  pointer-events: all;
+}
+
+.gh-workflow-link {
+  transition: background-color 0.12s ease-out;
+  fill: none;
+  overflow: visible;
+
+  &.hovered {
+    stroke: #1f6ff1;
+  }
+}
+
+.gh-workflow-point {
+  transition: background-color 0.12s ease-out;
+  color: lightgray;
+  overflow: visible;
+  pointer-events: all;
+
+  &.hovered {
+    color: #1f6ff1;
+  }
+}

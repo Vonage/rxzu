@@ -9,16 +9,13 @@ import { BaseModelOptions } from '../interfaces/options.interface';
 import { createValueState, ValueState } from '../state';
 
 export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
-  protected readonly _type: string;
-
   protected parent$: ValueState<any>;
   protected selected$: ValueState<boolean>;
   protected hovered$: ValueState<boolean>;
   protected painted$: ValueState<PaintedEvent>;
 
   constructor(options: BaseModelOptions<any>) {
-    super({ id: options.id, logPrefix: options.logPrefix });
-    this._type = options.type;
+    super({ namespace: 'default', ...options });
 
     this.parent$ = createValueState(
       options.parent,
@@ -41,19 +38,12 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
     );
   }
 
-  // serialize(): IBaseModel {
-  //   return {
-  //     ...super.serialize(),
-  //     type: this.getType(),
-  //   };
-  // }
-
   getParent(): E {
     return this.parent$.value;
   }
 
   setParent(parent: E): void {
-    this.parent$.set(parent).emit();
+    this.parent$.set(parent);
   }
 
   parentChanges(): Observable<ParentChangeEvent<E>> {
@@ -65,7 +55,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   }
 
   setPainted(painted = true): void {
-    this.painted$.set(new PaintedEvent(this, painted)).emit();
+    this.painted$.set(new PaintedEvent(this, painted));
   }
 
   paintChanges(): Observable<PaintedEvent> {
@@ -77,15 +67,11 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   }
 
   setHovered(hovered = true): void {
-    this.hovered$.set(hovered).emit();
+    this.hovered$.set(hovered);
   }
 
   selectHovered(): Observable<boolean> {
     return this.hovered$.select();
-  }
-
-  getType(): string {
-    return this._type;
   }
 
   getSelected(): boolean {
@@ -97,7 +83,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   }
 
   setSelected(selected = true): void {
-    this.selected$.set(selected).emit();
+    this.selected$.set(selected);
   }
 
   selectionChanges(): Observable<SelectionEvent> {

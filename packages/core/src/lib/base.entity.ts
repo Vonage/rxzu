@@ -11,20 +11,34 @@ import {
   withLog as _withLog,
 } from './utils/tool-kit.util';
 import { HashMap } from './utils/types';
-
-export type BaseEntityType = 'node' | 'link' | 'port' | 'point';
+import { BaseEntityOptions, BaseEntityType } from './interfaces';
 
 export class BaseEntity {
   protected _id: ID;
   protected destroyed$: Subject<void>;
   protected locked$: ValueState<boolean>;
+  protected namespace$: ValueState<string>;
+
+  protected readonly _type: BaseEntityType;
   protected readonly _logPrefix: string;
 
-  constructor(options: { id?: ID; logPrefix?: string }) {
+  constructor(options: BaseEntityOptions) {
     this._id = options.id || UID();
+    this._type = options.type;
     this._logPrefix = `${options.logPrefix ?? ''}`;
     this.destroyed$ = new Subject<void>();
-    this.locked$ = createValueState<boolean>(false, this.entityPipe('locked'));
+    this.locked$ = createValueState<boolean>(
+      !!options.locked,
+      this.entityPipe('locked')
+    );
+    this.namespace$ = createValueState<string>(
+      options.namespace ?? 'default',
+      this.entityPipe('name')
+    );
+  }
+
+  get type(): BaseEntityType {
+    return this._type;
   }
 
   get id(): ID {
@@ -33,6 +47,14 @@ export class BaseEntity {
 
   set id(id: ID) {
     this._id = id;
+  }
+
+  get namespace(): string {
+    return this.namespace$.value;
+  }
+
+  set namespace(value: string) {
+    this.namespace$.set(value);
   }
 
   log(message: string, ...args: any): void {
@@ -56,7 +78,7 @@ export class BaseEntity {
   }
 
   setLocked(locked = true) {
-    this.locked$.set(locked).emit();
+    this.locked$.set(locked);
   }
 
   // eslint-disable-next-line
@@ -77,13 +99,6 @@ export class BaseEntity {
     this.doClone(lookupTable, clone);
     return clone;
   }
-
-  // serialize(): BaseModelOptions {
-  //   return {
-  //     id: this.id,
-  //     locked: this.getLocked(),
-  //   };
-  // }
 
   lockChanges(): Observable<LockEvent> {
     return this.locked$.select((locked) => new LockEvent(this, locked));

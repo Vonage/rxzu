@@ -22,10 +22,6 @@ export class ValueState<T> {
     return this;
   }
 
-  emit(): void {
-    this.stream$.next(this.value);
-  }
-
   select(): Observable<T>;
   select(project?: (value: T) => T): Observable<T>;
   select<R>(project?: (value: T) => R): Observable<R>;

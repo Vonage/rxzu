@@ -1,0 +1,23 @@
+<div class="vstudio-node" [ngStyle]="{ 'box-shadow': boxShadow$ | async }">
+  <ng-container *ngIf="model.selectExtras() | async as extras">
+    <div class="content" [ngStyle]="{ background: nodeGradient }">
+      <div class="header">
+        <div class="title">
+          {{ extras.title }}
+        </div>
+        <div class="icon">
+          {{ extras.icon }}
+        </div>
+      </div>
+      <div class="info">
+        <div class="input" *ngFor="let input of extras.inputs">
+          {{ input.content }}
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="ports">
+    <ng-template #portsLayer></ng-template>
+  </div>
+</div>

@@ -1,5 +1,4 @@
 import { Observable } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
 import { Coords, NodeModelOptions, Dimensions } from '../interfaces';
 import {
   createValueState,
@@ -13,6 +12,7 @@ import { BaseModel } from './base.model';
 import { DiagramModel } from './diagram.model';
 import { PortModel } from './port.model';
 import { PointModel } from './point.model';
+import { DiagramEngine } from '../engine.core';
 
 export class NodeModel extends BaseModel<DiagramModel> {
   protected extras$: ValueState<any>;
@@ -20,8 +20,8 @@ export class NodeModel extends BaseModel<DiagramModel> {
   protected coords$: ValueState<Coords>;
   protected dimensions$: ValueState<Dimensions>;
 
-  constructor(options: NodeModelOptions) {
-    super({ logPrefix: '[Node]', ...options });
+  constructor(options: NodeModelOptions = {}) {
+    super({ type: 'node', logPrefix: '[Node]', ...options });
 
     this.ports$ = createEntityState([], this.entityPipe('ports'));
     this.extras$ = createValueState(
@@ -36,33 +36,25 @@ export class NodeModel extends BaseModel<DiagramModel> {
       options.dimensions ?? { width: 0, height: 0 },
       this.entityPipe('dimensions')
     );
+  }
 
-    // once node finish painting itself, subscribe to ports change and update their coords
-    this.paintChanges()
-      .pipe(filter((paintE) => paintE.isPainted))
-      .subscribe(() => {
-        this.selectPorts()
-          .pipe(takeUntil(this.destroyed$))
-          .subscribe((ports) => {
-            ports.forEach((port) => {
-              if (port.getPainted().isPainted && this.getParent()) {
-                const diagramEngine = this.getParent()?.getDiagramEngine();
-                if (diagramEngine) {
-                  const portSize = diagramEngine.getPortCoords(port);
-                  const portCenter = diagramEngine.getPortCenter(port);
-                  port.updateCoords({
-                    x: 0,
-                    y: 0,
-                    width: 0,
-                    height: 0,
-                    ...portSize,
-                    ...portCenter,
-                  });
-                }
-              }
-            });
-          });
-      });
+  updatePortCoords(port: PortModel, engine: DiagramEngine) {
+    if (port.getPainted().isPainted && this.getParent()) {
+      const canvasManager = engine.getCanvasManager();
+      const portSize = canvasManager.getPortCoords(port);
+      const portCenter = canvasManager.getPortCenter(port);
+      port.updateCoords(
+        {
+          x: 0,
+          y: 0,
+          width: 0,
+          height: 0,
+          ...portSize,
+          ...portCenter,
+        },
+        engine
+      );
+    }
   }
 
   getCoords(): Coords {
@@ -81,25 +73,8 @@ export class NodeModel extends BaseModel<DiagramModel> {
       });
     });
 
-    this.coords$.set({ x, y }).emit();
+    this.coords$.set({ x, y });
   }
-
-  // serialize(): INodeModel {
-  //   const serializedPorts = this.getPortsArray().map((port) =>
-  //     port.serialize()
-  //   );
-
-  //   return {
-  //     ...super.serialize(),
-  //     nodeType: this.getType(),
-  //     type: this.getType(),
-  //     extras: this.getExtras(),
-  //     width: this.getWidth(),
-  //     height: this.getHeight(),
-  //     ...this.getCoords(),
-  //     ports: serializedPorts,
-  //   };
-  // }
 
   getSelectedEntities(): any {
     let entities: (
@@ -146,13 +121,13 @@ export class NodeModel extends BaseModel<DiagramModel> {
    */
   addPort(port: PortModel): PortModel {
     port.setParent(this);
-    this.ports$.add(port).emit();
+    this.ports$.add(port);
     return port;
   }
 
   removePort(portOrId: ID | PortModel): string {
     const portId = typeof portOrId === 'string' ? portOrId : portOrId.id;
-    this.ports$.remove(portId).emit();
+    this.ports$.remove(portId);
     return portId;
   }
 
@@ -174,8 +149,14 @@ export class NodeModel extends BaseModel<DiagramModel> {
     return this.ports$.array();
   }
 
+  /**
+   *
+   * @param dimensions
+   * @description Use this method to set the model dimensions, this will not be reflected in the diagram
+   * unless subscribed and bound to the template of the widget itself
+   */
   setDimensions(dimensions: Partial<Dimensions>) {
-    this.dimensions$.set({ ...this.getDimensions(), ...dimensions }).emit();
+    this.dimensions$.set({ ...this.getDimensions(), ...dimensions });
   }
 
   getDimensions(): Dimensions {
@@ -216,7 +197,7 @@ export class NodeModel extends BaseModel<DiagramModel> {
   }
 
   setExtras<E>(extras: Partial<E>) {
-    this.extras$.set(extras).emit();
+    this.extras$.set(extras);
   }
 
   getExtras() {
@@ -235,6 +216,6 @@ export class NodeModel extends BaseModel<DiagramModel> {
   }
 
   removeAllPorts(): void {
-    this.ports$.clear().emit();
+    this.ports$.destroy();
   }
 }

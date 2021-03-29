@@ -1,23 +1,23 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component,
+  Component, Host,
   Inject,
-  OnInit,
+  OnInit
 } from '@angular/core';
 import { LabelModel } from '@rxzu/core';
-import { LABEL_MODEL } from '../../../injection.tokens';
+import { MODEL } from '../../../injection.tokens';
 
 @Component({
   selector: 'rxzu-default-label',
   templateUrl: './default-label.component.html',
   styleUrls: ['./default-label.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DefaultLabelComponent implements OnInit {
   constructor(
-    private cdRef: ChangeDetectorRef,
-    @Inject(LABEL_MODEL) public model: LabelModel
+    @Host() @Inject(MODEL) public model: LabelModel,
+    private cdRef: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
