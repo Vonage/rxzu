@@ -5,5 +5,5 @@
     "entryFile": "src/index.ts",
     "umdModuleIds": { "@rxzu/core": "@rxzu/core" }
   },
-  "whitelistedNonPeerDependencies": ["tslib", "rxzu"]
+  "allowedNonPeerDependencies": ["tslib", "@rxzu/core"]
 }
