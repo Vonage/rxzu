@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/Vonage/rxzu/compare/v3.0.0...v3.0.1) (2021-03-29)
+
+
+### Bug Fixes
+
+* **typings:** added resize-observer-browser typing to core ([18ddd83](https://github.com/Vonage/rxzu/commit/18ddd8393030174fa551fd2af4c758a77a13c006))
+
 # [3.0.0](https://github.com/Vonage/rxzu/compare/v2.2.3...v3.0.0) (2021-03-29)
 
 
