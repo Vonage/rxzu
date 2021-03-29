@@ -71,6 +71,7 @@
     "@nrwl/workspace": "11.4.0",
     "@nrwl/storybook": "^11.4.0",
     "@nrwl/cypress": "^11.4.0",
+    "@types/resize-observer-browser": "^0.1.5",
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/commit-analyzer": "^8.0.1",
     "@semantic-release/exec": "^5.0.0",
