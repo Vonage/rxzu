@@ -41,18 +41,18 @@ export interface KeyBindigsOptions {
 }
 
 export interface DiagramModelOptions extends Omit<BaseEntityOptions, 'type'> {
-  offsetX?: number;
-  offsetY?: number;
-  zoom?: number;
-  maxZoomOut?: number;
-  maxZoomIn?: number;
-  gridSize?: number;
-  allowCanvasZoom?: boolean;
-  allowCanvasTranslation?: boolean;
-  inverseZoom?: boolean;
-  allowLooseLinks?: boolean;
-  portMagneticRadius?: number;
-  keyBindings?: KeyBindigsOptions;
+  offsetX: number;
+  offsetY: number;
+  zoom: number;
+  maxZoomOut: number;
+  maxZoomIn: number;
+  gridSize: number;
+  allowCanvasZoom: boolean;
+  allowCanvasTranslation: boolean;
+  inverseZoom: boolean;
+  allowLooseLinks: boolean;
+  portMagneticRadius: number;
+  keyBindings: KeyBindigsOptions;
 }
 
 export interface NodeModelOptions

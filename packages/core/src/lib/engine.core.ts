@@ -2,10 +2,22 @@ import { delay, filter, take } from 'rxjs/operators';
 import { BaseEntity } from './base.entity';
 import { DiagramModel, NodeModel } from './models';
 import { DiagramModelOptions, EngineSetup } from './interfaces';
-import { KeyboardManager, MouseManager } from './managers';
+import {
+  ActionsManager,
+  CanvasManager,
+  DiagramManager,
+  KeyboardManager,
+  LabelsManager,
+  LinksManager,
+  MouseManager,
+  NodesManager,
+  PointsManager,
+  PortsManager,
+} from './managers';
 import { AbstractFactory } from './factories';
-import { ActionsManager } from './managers/actions.manager';
-import { CanvasManager } from './managers/canvas.manager';
+
+import { isDev } from './utils';
+import { akitaDevtools } from '@datorama/akita';
 
 export class DiagramEngine {
   protected actionsManager: ActionsManager;
@@ -23,10 +35,20 @@ export class DiagramEngine {
     protected _actionsManager?: ActionsManager,
     protected _canvasManager?: CanvasManager
   ) {
+    new DiagramManager(this);
+    new NodesManager(this);
+    new PointsManager(this);
+    new LinksManager(this);
+    new LabelsManager(this);
+    new PortsManager(this);
     this.actionsManager = _actionsManager || this.createActionsManager();
     this.mouseManager = _mouseManager || this.createMouseManager();
     this.keyboardManager = _keyboardManager || this.createKeyboardManager();
     this.canvasManager = _canvasManager || this.createCanvasManager(_canvas);
+
+    if (isDev()) {
+      akitaDevtools({ name: 'rxzu-diagram' });
+    }
   }
 
   setup({
