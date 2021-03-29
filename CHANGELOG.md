@@ -1,3 +1,30 @@
+# [3.0.0](https://github.com/Vonage/rxzu/compare/v2.2.3...v3.0.0) (2021-03-29)
+
+
+### Bug Fixes
+
+* generate links & dynamic ports ([9343733](https://github.com/Vonage/rxzu/commit/9343733e38c9bc83af5fb4474e33b22b457e4a4c))
+* **state:** removed un neccesery emits ([f9be243](https://github.com/Vonage/rxzu/commit/f9be2437253dfef0369bab52528d0e1b1bba6561))
+* factories reimplementation ([24eb729](https://github.com/Vonage/rxzu/commit/24eb729496e34d87b5929f1fbe7eec89cd9f74f0))
+
+
+### Features
+
+* **auto dimensions:** resize observer to resolve node and port dimensions automatically ([d97e372](https://github.com/Vonage/rxzu/commit/d97e372e560b00a3406e840d530443a849b90180))
+* **core:** change factory implementation ([5ad231d](https://github.com/Vonage/rxzu/commit/5ad231df2f1303f6ae238089ec65f2c2122b942c))
+* **themes:** gh theme finished ([0f45722](https://github.com/Vonage/rxzu/commit/0f45722e45ee5dfce3ffa9fe044df056e649723f))
+* **themes:** styling ([1807d0f](https://github.com/Vonage/rxzu/commit/1807d0fcb20a1d5c65ef7a031787423fe80efd57))
+* **v3:** initial work ([09c534d](https://github.com/Vonage/rxzu/commit/09c534d88766414a20b2038ccde8b4c012210b91))
+
+
+### BREAKING CHANGES
+
+* **core:** rename diagramEngineCore to diagramEngine
+delete FactoriesManager
+add entityType to base.entity
+delete default angular factories
+rename angular's DiagramEngine to EngineService
+
 ## [2.2.3](https://github.com/Vonage/rxzu/compare/v2.2.2...v2.2.3) (2021-03-08)
 
 
