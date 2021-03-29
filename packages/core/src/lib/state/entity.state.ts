@@ -6,7 +6,6 @@ import { ValueState } from './value.state';
 export class EntityState<T extends BaseEntity> extends ValueState<
   EntityMap<T>
 > {
-
   constructor(
     value: EntityMap<T>,
     entityPipe?: MonoTypeOperatorFunction<EntityMap<T>>
@@ -18,12 +17,10 @@ export class EntityState<T extends BaseEntity> extends ValueState<
     this.clear();
   }
 
-  clear(destroy = true) {
-    if (destroy) {
-      this.forEach((entity) => entity.destroy());
-    }
-
+  clear() {
+    this.forEach((entity) => entity.destroy());
     this.value.clear();
+    this.stream$.next(this.value);
     return this;
   }
 
@@ -37,6 +34,7 @@ export class EntityState<T extends BaseEntity> extends ValueState<
 
   add(entity: T): EntityState<T> {
     this.value.set(entity.id, entity);
+    this.stream$.next(this.value);
     return this;
   }
 
@@ -44,6 +42,7 @@ export class EntityState<T extends BaseEntity> extends ValueState<
     for (const entity of entities) {
       this.add(entity);
     }
+    this.stream$.next(this.value);
     return this;
   }
 
@@ -53,6 +52,7 @@ export class EntityState<T extends BaseEntity> extends ValueState<
     }
 
     this.value.delete(id);
+    this.stream$.next(this.value);
     return this;
   }
 

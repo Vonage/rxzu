@@ -1,2 +1,2 @@
-export * from './factory.manager';
+export * from './base.registry';
 export * from './base.factory';

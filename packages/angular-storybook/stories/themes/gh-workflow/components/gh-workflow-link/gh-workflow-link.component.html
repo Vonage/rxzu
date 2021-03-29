@@ -1,0 +1,42 @@
+<!-- Label Host -->
+<ng-template #labelLayer></ng-template>
+
+<svg class="link-container">
+  <!-- Link -->
+  <g [id]="model.id">
+    <path
+      class="gh-workflow-link"
+      stroke-width="2"
+      stroke="#484f58"
+      [attr.d]="model.selectPath() | async"
+      [ngClass]="{ hovered: model.selectHovered() | async }"
+    ></path>
+  </g>
+
+  <!-- Points -->
+  <g
+    *ngFor="let point of model.getPoints(); trackBy: trackByPoints"
+    [id]="point.id"
+  >
+    <circle
+      fill="currentColor"
+      [attr.cx]="point.selectX() | async"
+      [attr.cy]="point.selectY() | async"
+      r="5"
+      class="gh-workflow-point"
+      [ngClass]="{ hovered: point.selectHovered() | async }"
+    />
+    <circle
+      [attr.data-type]="point.type"
+      [attr.data-id]="point.id"
+      [attr.data-parent-id]="model.id"
+      (mouseleave)="point.setHovered(false); model.setHovered(false)"
+      (mouseenter)="point.setHovered(); model.setHovered()"
+      [attr.cx]="point.selectX() | async"
+      [attr.cy]="point.selectY() | async"
+      r="15"
+      [attr.opacity]="0"
+      [ngClass]="{ selected: point.selectSelected() | async }"
+    />
+  </g>
+</svg>

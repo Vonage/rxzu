@@ -9,7 +9,6 @@ import { PointModel } from './point.model';
 import { PortModel } from './port.model';
 
 export class LinkModel extends BaseModel<DiagramModel> {
-  protected name$: ValueState<string>;
   protected sourcePort$: ValueState<PortModel | null>;
   protected targetPort$: ValueState<PortModel | null>;
   protected extras$: ValueState<any>;
@@ -17,16 +16,12 @@ export class LinkModel extends BaseModel<DiagramModel> {
   protected path$: ValueState<string | null>;
   protected points$: ValueState<PointModel[]>;
 
-  constructor(options: LinkModelOptions) {
-    super({ logPrefix: '[Link]', ...options });
+  constructor(options: LinkModelOptions = {}) {
+    super({ type: 'link', logPrefix: '[Link]', ...options });
 
-    this.name$ = createValueState<string>(
-      options.name ?? '',
-      this.entityPipe('targetPort')
-    );
     this.sourcePort$ = createValueState<PortModel | null>(
       options.sourcePort ?? null,
-      this.entityPipe('targetPort')
+      this.entityPipe('sourcePort')
     );
     this.targetPort$ = createValueState<PortModel | null>(
       options.targetPort ?? null,
@@ -46,42 +41,15 @@ export class LinkModel extends BaseModel<DiagramModel> {
     this.path$ = createValueState<string | null>(null, this.entityPipe('path'));
     this.points$ = createValueState(
       [
-        new PointModel({ parent: this, type: 'default' }),
-        new PointModel({ parent: this, type: 'default' }),
+        new PointModel({ parent: this, namespace: 'default' }),
+        new PointModel({ parent: this, namespace: 'default' }),
       ],
       this.entityPipe('points')
     );
   }
 
-  // serialize(): ILinkModel & {
-  //   sourcePortId: string | null;
-  //   targetPortId: string | null;
-  // } {
-  //   const serializedPoints = this.points$.value.map((point) =>
-  //     point.serialize()
-  //   );
-  //   const label = this.getLabel()?.serialize();
-  //   return {
-  //     ...super.serialize(),
-  //     name: this.getName(),
-  //     sourcePortId: this.getSourcePort()?.id ?? null,
-  //     targetPortId: this.getTargetPort()?.id ?? null,
-  //     extras: this.getExtras(),
-  //     points: serializedPoints,
-  //     label,
-  //   };
-  // }
-
-  setName(name: string) {
-    this.name$.set(name).emit();
-  }
-
-  getName(): string | undefined {
-    return this.name$.value;
-  }
-
   setExtras<E>(extras: Partial<E>) {
-    this.extras$.set(extras).emit();
+    this.extras$.set(extras);
   }
 
   getExtras() {
@@ -95,7 +63,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
   }
 
   setPath(path: string) {
-    this.path$.set(path).emit();
+    this.path$.set(path);
   }
 
   getPath() {
@@ -110,7 +78,6 @@ export class LinkModel extends BaseModel<DiagramModel> {
     this.resetLabel();
     this.sourcePort$.value?.removeLink(this);
     this.targetPort$.value?.removeLink(this);
-
     super.destroy();
   }
 
@@ -197,7 +164,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
     this.getSourcePort()?.removeLink(this);
 
-    this.sourcePort$.set(port).emit();
+    this.sourcePort$.set(port);
   }
 
   getSourcePort(): PortModel | null {
@@ -215,7 +182,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
 
     this.getTargetPort()?.removeLink(this);
 
-    this.targetPort$.set(port).emit();
+    this.targetPort$.set(port);
   }
 
   point({ x, y }: Coords): PointModel {
@@ -234,12 +201,12 @@ export class LinkModel extends BaseModel<DiagramModel> {
     points.forEach((point) => {
       point.setParent(this);
     });
-    this.points$.set(points).emit();
+    this.points$.set(points);
   }
 
   setLabel(label: LabelModel) {
     label.setParent(this);
-    this.label$.set(label).emit();
+    this.label$.set(label);
   }
 
   selectLabel(): Observable<LabelModel | null> {
@@ -284,7 +251,7 @@ export class LinkModel extends BaseModel<DiagramModel> {
   }
 
   generatePoint({ x = 0, y = 0 }: Coords): PointModel {
-    return new PointModel({ parent: this, coords: { x, y }, type: 'default' });
+    return new PointModel({ parent: this, coords: { x, y } });
   }
 
   setLocked(locked = true) {

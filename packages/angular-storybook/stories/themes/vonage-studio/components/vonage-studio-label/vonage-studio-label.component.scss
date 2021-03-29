@@ -1,0 +1,26 @@
+:host {
+  position: absolute;
+}
+
+.vonage-studio-label {
+  width: 26px;
+  height: 26px;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: all;
+  user-select: none;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 300ms ease-in-out;
+
+  .delete-link-icon {
+    display: flex;
+  }
+
+  &.show {
+    opacity: 1;
+  }
+}

@@ -3,7 +3,7 @@
 >
 
 ![Quality Check](https://github.com/Vonage/rxzu/workflows/Quality%20Check/badge.svg)
-[![Known Vulnerabilities](https://snyk.io/test/github/Vonage/rxzu/badge.svg)](https://snyk.io/test/github/DanielNetzer/rxzu) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END --> 
 [![PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Vonage/rxzu)

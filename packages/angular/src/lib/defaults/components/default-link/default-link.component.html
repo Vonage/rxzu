@@ -20,7 +20,8 @@
       (mouseleave)="model.setHovered(false); onHover()"
       (mouseenter)="model.setHovered(); onHover()"
       [attr.stroke-width]="20"
-      [attr.data-linkid]="model.id"
+      [attr.data-type]="model.type"
+      [attr.data-id]="model.id"
       [attr.stroke-opacity]="(model.selectHovered() | async) ? '0.1' : '0'"
       [attr.d]="model.selectPath() | async"
     ></path>
@@ -40,8 +41,9 @@
       [ngClass]="{ hovered: point.selectHovered() | async }"
     />
     <circle
-      [attr.data-pointid]="point.id"
-      [attr.data-linkid]="model.id"
+      [attr.data-type]="point.type"
+      [attr.data-id]="point.id"
+      [attr.data-parent-id]="model.id"
       (mouseleave)="point.setHovered(false); model.setHovered(false)"
       (mouseenter)="point.setHovered(); model.setHovered()"
       [attr.cx]="point.selectX() | async"

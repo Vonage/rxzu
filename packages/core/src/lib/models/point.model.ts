@@ -7,8 +7,8 @@ import { LinkModel } from './link.model';
 export class PointModel extends BaseModel<LinkModel> {
   protected coords$: ValueState<Coords>;
 
-  constructor(options: PointModelOptions) {
-    super({ logPrefix: '[Point]', ...options });
+  constructor(options: PointModelOptions = {}) {
+    super({ type: 'point', logPrefix: '[Point]', ...options });
     this.coords$ = createValueState(
       options.coords ?? { x: 0, y: 0 },
       this.entityPipe('coords')
@@ -36,7 +36,7 @@ export class PointModel extends BaseModel<LinkModel> {
   }
 
   setCoords(newCoords: Partial<Coords>) {
-    this.coords$.set({ ...this.getCoords(), ...newCoords }).emit();
+    this.coords$.set({ ...this.getCoords(), ...newCoords });
   }
 
   selectCoords(): Observable<Coords> {
