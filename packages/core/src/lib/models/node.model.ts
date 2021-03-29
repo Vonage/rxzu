@@ -136,8 +136,6 @@ export class NodeModel extends BaseModel<DiagramModel> {
   }
 
   selectPorts(selector?: () => boolean | ID | ID[]): Observable<PortModel[]> {
-    // TODO: implement selector
-    // TODO: create coerce func
     return this.ports$.array$().pipe(this.withLog('selectPorts'));
   }
 
@@ -163,7 +161,6 @@ export class NodeModel extends BaseModel<DiagramModel> {
     return this.dimensions$.value;
   }
 
-  // TODO: return BaseEvent extension
   dimensionChanges(): Observable<Dimensions> {
     return this.dimensions$.select();
   }

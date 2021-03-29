@@ -3,7 +3,6 @@ import { NodeModel } from '../models/node.model';
 import { LinkModel } from '../models';
 import { BaseAction } from './base.action';
 
-// TODO: refactor into entity-created.action, and fire every time a new entity is created!
 export class LinkCreatedAction extends BaseAction {
   sourcePort?: PortModel | null;
   targetPort?: PortModel | null;
