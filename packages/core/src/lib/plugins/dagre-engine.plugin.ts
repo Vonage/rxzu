@@ -1,4 +1,3 @@
-import { Injectable } from '@angular/core';
 import { DiagramModel, PointModel } from '@rxzu/core';
 import { EdgeConfig, GraphLabel, NodeConfig, graphlib, layout } from 'dagre';
 
@@ -11,7 +10,6 @@ export interface DagreEngineOptions {
   includeLinks?: boolean;
 }
 
-@Injectable()
 export class DagrePlugin {
   g!: graphlib.Graph;
 
@@ -27,7 +25,6 @@ export class DagrePlugin {
 
   redistribute(model: DiagramModel, options: DagreEngineOptions = {}): void {
     this.instantiate();
-
     this.g.setGraph(options.graph || {});
 
     this.g.setDefaultEdgeLabel(() => {

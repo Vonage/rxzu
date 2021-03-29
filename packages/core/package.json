@@ -7,6 +7,9 @@
     "url": "https://github.com/Vonage/rxzu",
     "directory": "packages/core"
   },
+  "dependencies": {
+    "@types/resize-observer-browser": "^0.1.5"
+  },
   "publishConfig": {
     "access": "public"
   },
