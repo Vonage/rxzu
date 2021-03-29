@@ -79,8 +79,8 @@ PERFORMANCE OF THIS SOFTWARE.
  */
 
 /**
- * @license Angular v11.1.1
- * (c) 2010-2020 Google LLC. https://angular.io/
+ * @license Angular v11.2.7
+ * (c) 2010-2021 Google LLC. https://angular.io/
  * License: MIT
  */
 
