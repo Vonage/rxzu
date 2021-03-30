@@ -1,9 +1,11 @@
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component, Host,
+  Component,
+  Host,
   Inject,
-  OnInit
+  OnInit,
+  Optional,
 } from '@angular/core';
 import { LabelModel } from '@rxzu/core';
 import { MODEL } from '../../../injection.tokens';
@@ -12,11 +14,11 @@ import { MODEL } from '../../../injection.tokens';
   selector: 'rxzu-default-label',
   templateUrl: './default-label.component.html',
   styleUrls: ['./default-label.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DefaultLabelComponent implements OnInit {
   constructor(
-    @Host() @Inject(MODEL) public model: LabelModel,
+    @Optional() @Host() @Inject(MODEL) public model: LabelModel,
     private cdRef: ChangeDetectorRef
   ) {}
 

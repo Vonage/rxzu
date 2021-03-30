@@ -5,6 +5,7 @@ import {
   Inject,
   IterableDiffers,
   OnInit,
+  Optional,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
@@ -34,7 +35,7 @@ export class VStudioNodeComponent
   boxShadow$: BehaviorSubject<string>;
 
   constructor(
-    @Host() @Inject(MODEL) public model: VStudioNodeModel,
+    @Optional() @Host() @Inject(MODEL) public model: VStudioNodeModel,
     engine: EngineService,
     diagram: RxZuDiagramComponent,
     iterableDiffers: IterableDiffers

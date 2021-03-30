@@ -171,7 +171,7 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
   }
 
   @OutsideZone
-  protected onKeyUp(event: KeyboardEvent) {
+  onKeyUp(event: KeyboardEvent) {
     this.keyboardManager ? this.keyboardManager.onKeyUp(event) : noop();
   }
 
@@ -191,12 +191,12 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
   }
 
   @OutsideZone
-  protected onMouseDown(event: MouseEvent) {
+  onMouseDown(event: MouseEvent) {
     this.mouseManager ? this.mouseManager.onMouseDown(event) : noop();
   }
 
   @OutsideZone
-  protected onMouseWheel(event: WheelEvent) {
+  onMouseWheel(event: WheelEvent) {
     this.mouseManager ? this.mouseManager.onMouseWheel(event) : noop();
   }
 

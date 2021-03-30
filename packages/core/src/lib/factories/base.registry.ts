@@ -4,7 +4,7 @@ export abstract class AbstractRegistry<C> {
 
   constructor(parent: AbstractRegistry<C> | null) {
     this._parent = parent;
-  };
+  }
 
   get(key: string): C | undefined {
     return this._registry.get(key) || this._parent?.get(key);

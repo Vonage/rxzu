@@ -7,6 +7,7 @@ import {
   IterableDiffer,
   IterableDiffers,
   OnInit,
+  Optional,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
@@ -37,7 +38,7 @@ export class DefaultNodeComponent implements OnInit {
   portsLayer!: ViewContainerRef;
 
   constructor(
-    @Host() @Inject(MODEL) public model: NodeModel,
+    @Optional() @Host() @Inject(MODEL) public model: NodeModel,
     private engine: EngineService,
     private diagram: RxZuDiagramComponent,
     private iterableDiffers: IterableDiffers

@@ -21,10 +21,10 @@
     *ngIf="selectionBox$ | async as selectionBox"
     class="selector"
     [ngStyle]="{
-      top: selectionBox?.dimensions.top + 'px',
-      left: selectionBox?.dimensions.left + 'px',
-      width: selectionBox?.dimensions.width + 'px',
-      height: selectionBox?.dimensions.height + 'px'
+      top: selectionBox?.dimensions?.top + 'px',
+      left: selectionBox?.dimensions?.left + 'px',
+      width: selectionBox?.dimensions?.width + 'px',
+      height: selectionBox?.dimensions?.height + 'px'
     }"
   ></div>
 </div>
