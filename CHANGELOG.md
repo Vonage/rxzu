@@ -1,3 +1,10 @@
+## [3.0.2](https://github.com/Vonage/rxzu/compare/v3.0.1...v3.0.2) (2021-03-29)
+
+
+### Bug Fixes
+
+* **deps:** removed unnecessary dependencies ([e8956a2](https://github.com/Vonage/rxzu/commit/e8956a25b09ce9589f5bc0b31a77a62c217c2a98))
+
 ## [3.0.1](https://github.com/Vonage/rxzu/compare/v3.0.0...v3.0.1) (2021-03-29)
 
 
