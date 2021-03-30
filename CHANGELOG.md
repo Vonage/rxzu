@@ -1,3 +1,15 @@
+## [3.0.3](https://github.com/Vonage/rxzu/compare/v3.0.2...v3.0.3) (2021-03-30)
+
+
+### Bug Fixes
+
+* **optional models:** added optional to all models ([1780c6d](https://github.com/Vonage/rxzu/commit/1780c6d97e718920d7bdcbc2c24f2d5f9f317126))
+
+
+### Performance Improvements
+
+* **deps:** updated all deps to latest ([485d681](https://github.com/Vonage/rxzu/commit/485d6817d0550b6dfd1ecf9354585de203588285))
+
 ## [3.0.2](https://github.com/Vonage/rxzu/compare/v3.0.1...v3.0.2) (2021-03-29)
 
 
