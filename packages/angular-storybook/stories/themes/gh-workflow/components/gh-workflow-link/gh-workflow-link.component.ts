@@ -4,6 +4,7 @@ import {
   Component,
   Host,
   Inject,
+  Optional,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
@@ -20,7 +21,7 @@ export class GHWorkflowLinkComponent extends DefaultLinkComponent {
   labelLayer!: ViewContainerRef;
 
   constructor(
-    @Host() @Inject(MODEL) public model: LinkModel,
+    @Optional() @Host() @Inject(MODEL) public model: LinkModel,
     cdRef: ChangeDetectorRef
   ) {
     super(model, cdRef);

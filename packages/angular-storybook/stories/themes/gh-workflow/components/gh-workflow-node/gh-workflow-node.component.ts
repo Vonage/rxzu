@@ -5,6 +5,7 @@ import {
   Inject,
   IterableDiffers,
   OnInit,
+  Optional,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
@@ -29,7 +30,7 @@ export class GHWorkflowNodeComponent
   portsLayer!: ViewContainerRef;
 
   constructor(
-    @Host() @Inject(MODEL) public model: GHNodeModel,
+    @Optional() @Host() @Inject(MODEL) public model: GHNodeModel,
     engine: EngineService,
     diagram: RxZuDiagramComponent,
     iterableDiffers: IterableDiffers
