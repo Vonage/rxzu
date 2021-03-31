@@ -43,7 +43,6 @@ export class FactoryService extends AbstractFactory<
     model,
     host,
     index,
-    diagramModel,
   }: WidgetOptions<M, ViewContainerRef>): ComponentRef<any> {
     const cmp = this.get(model);
     if (!cmp)

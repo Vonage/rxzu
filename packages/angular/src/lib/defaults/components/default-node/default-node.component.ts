@@ -1,13 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Host,
   Inject,
   IterableChanges,
   IterableDiffer,
   IterableDiffers,
   OnInit,
-  Optional,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
@@ -38,7 +36,7 @@ export class DefaultNodeComponent implements OnInit {
   portsLayer!: ViewContainerRef;
 
   constructor(
-    @Optional() @Host() @Inject(MODEL) public model: NodeModel,
+    @Inject(MODEL) public model: NodeModel,
     private engine: EngineService,
     private diagram: RxZuDiagramComponent,
     private iterableDiffers: IterableDiffers

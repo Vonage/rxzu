@@ -2,10 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  Host,
   Inject,
   OnInit,
-  Optional,
   Renderer2,
 } from '@angular/core';
 import { DefaultPortComponent, MODEL } from '@rxzu/angular';
@@ -21,7 +19,7 @@ export class GHWorkflowPortComponent
   extends DefaultPortComponent
   implements OnInit {
   constructor(
-    @Optional() @Host() @Inject(MODEL) public model: GHPortModel,
+    @Inject(MODEL) public model: GHPortModel,
     private elRef: ElementRef,
     private renderer: Renderer2
   ) {

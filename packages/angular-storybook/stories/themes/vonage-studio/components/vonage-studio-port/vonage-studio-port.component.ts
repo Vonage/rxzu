@@ -2,10 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  Host,
   Inject,
   OnInit,
-  Optional,
   Renderer2,
 } from '@angular/core';
 import { DefaultPortComponent, MODEL } from '@rxzu/angular';
@@ -21,7 +19,7 @@ export class VStudioPortComponent
   extends DefaultPortComponent
   implements OnInit {
   constructor(
-    @Optional() @Host() @Inject(MODEL) public model: VStudioPortModel,
+    @Inject(MODEL) public model: VStudioPortModel,
     private elRef: ElementRef,
     private renderer: Renderer2
   ) {

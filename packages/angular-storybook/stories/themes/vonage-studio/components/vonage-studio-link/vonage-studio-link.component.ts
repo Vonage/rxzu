@@ -2,9 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  Host,
   Inject,
-  Optional,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
@@ -26,7 +24,7 @@ export class VStudioLinkComponent extends DefaultLinkComponent {
   labelLayer!: ViewContainerRef;
 
   constructor(
-    @Optional() @Host() @Inject(MODEL) public model: LinkModel,
+    @Inject(MODEL) public model: LinkModel,
     cdRef: ChangeDetectorRef
   ) {
     super(model, cdRef);
