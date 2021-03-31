@@ -30,6 +30,7 @@
       "tags": [],
       "implicitDependencies": ["core"]
     },
+    "angular-demo": { "tags": [] },
     "angular-storybook": {
       "tags": []
     },
