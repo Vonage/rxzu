@@ -1,11 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Host,
   Inject,
   IterableDiffers,
   OnInit,
-  Optional,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
@@ -35,7 +33,7 @@ export class VStudioNodeComponent
   boxShadow$: BehaviorSubject<string>;
 
   constructor(
-    @Optional() @Host() @Inject(MODEL) public model: VStudioNodeModel,
+    @Inject(MODEL) public model: VStudioNodeModel,
     engine: EngineService,
     diagram: RxZuDiagramComponent,
     iterableDiffers: IterableDiffers

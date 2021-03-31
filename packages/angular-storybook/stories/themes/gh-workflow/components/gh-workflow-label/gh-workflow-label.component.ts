@@ -2,10 +2,8 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  Host,
   Inject,
   OnInit,
-  Optional,
 } from '@angular/core';
 import { MODEL, LabelModel } from '@rxzu/angular';
 
@@ -17,7 +15,7 @@ import { MODEL, LabelModel } from '@rxzu/angular';
 })
 export class GHWorkflowLabelComponent implements OnInit {
   constructor(
-    @Optional() @Host() @Inject(MODEL) public model: LabelModel,
+    @Inject(MODEL) public model: LabelModel,
     private cdRef: ChangeDetectorRef
   ) {}
 

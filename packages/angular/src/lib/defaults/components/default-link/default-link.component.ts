@@ -3,10 +3,8 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  Host,
   Inject,
   OnInit,
-  Optional,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
@@ -26,7 +24,7 @@ export class DefaultLinkComponent implements OnInit, AfterViewInit {
   labelLayer!: ViewContainerRef;
 
   constructor(
-    @Optional() @Host() @Inject(MODEL) public model: LinkModel,
+    @Inject(MODEL) public model: LinkModel,
     private cdRef: ChangeDetectorRef
   ) {}
 

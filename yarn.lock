@@ -2756,7 +2756,7 @@
     core-js "^3.8.2"
     ts-dedent "^2.0.0"
 
-"@storybook/addon-docs@6.2.1", "@storybook/addon-docs@^6.1.21":
+"@storybook/addon-docs@6.2.1", "@storybook/addon-docs@^6.2.1":
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/@storybook/addon-docs/-/addon-docs-6.2.1.tgz#fcfdfd56256f01d8d54710a09d1130292a3f8385"
   integrity sha512-UIeUDEUDKRmAZW0ZlLMzp9f4iVP76QQOccDGHo7CoZEkj69nuR2g2kdoo0myOSzswq6f4yMgu6Hj4f+v+QCUEg==
@@ -2804,7 +2804,7 @@
     ts-dedent "^2.0.0"
     util-deprecate "^1.0.2"
 
-"@storybook/addon-essentials@^6.1.21":
+"@storybook/addon-essentials@^6.2.1":
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/@storybook/addon-essentials/-/addon-essentials-6.2.1.tgz#6b8f5e7f10da431ef287e64df9e47ce6eb2fff78"
   integrity sha512-jgz37V+FCIk3GKsVdvBf5Toz+yz/FPB1B85wFrkxNpJljdHC1XN5xd41AVFlkEsqzeaTLiHPpthHaPtjaQpbOw==
@@ -2822,7 +2822,7 @@
     regenerator-runtime "^0.13.7"
     ts-dedent "^2.0.0"
 
-"@storybook/addon-links@^6.1.21":
+"@storybook/addon-links@^6.2.1":
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/@storybook/addon-links/-/addon-links-6.2.1.tgz#64a9978b9eaec8a85de8b965d823cf5786c1a6ba"
   integrity sha512-ZVAaNEVdQaL8+OLu6A7yfake0w8cn9YOZAnUcrIPalIVZ7MESy/vfxAE7lzYk17ngC9G+w5ELtzoD4WThTcCNg==
@@ -2883,7 +2883,7 @@
     global "^4.4.0"
     regenerator-runtime "^0.13.7"
 
-"@storybook/angular@^6.1.21":
+"@storybook/angular@^6.2.1":
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/@storybook/angular/-/angular-6.2.1.tgz#98bf0caa827d2bff384b31ce287b6581405c0564"
   integrity sha512-Y7H56voR94cY+94wLvn8zOvSsavZ77bc4SATdKVmjiWMWTMRRawb5hcvdZu/T3K6BU8tISQYnEqsm2UZ3XKQiw==

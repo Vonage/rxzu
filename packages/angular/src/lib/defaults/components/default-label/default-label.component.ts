@@ -2,10 +2,8 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  Host,
   Inject,
   OnInit,
-  Optional,
 } from '@angular/core';
 import { LabelModel } from '@rxzu/core';
 import { MODEL } from '../../../injection.tokens';
@@ -18,7 +16,7 @@ import { MODEL } from '../../../injection.tokens';
 })
 export class DefaultLabelComponent implements OnInit {
   constructor(
-    @Optional() @Host() @Inject(MODEL) public model: LabelModel,
+    @Inject(MODEL) public model: LabelModel,
     private cdRef: ChangeDetectorRef
   ) {}
 

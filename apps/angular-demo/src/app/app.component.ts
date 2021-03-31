@@ -3,27 +3,7 @@ import { DiagramModel, NodeModel, RxZuDiagramComponent } from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
-  template: `
-    <div class="action-bar">
-      <div
-        *ngFor="let node of nodesLibrary"
-        class="node-drag"
-        draggable="true"
-        [attr.data-type]="node.name"
-        (dragstart)="onBlockDrag($event)"
-        [ngStyle]="{ 'background-color': node.color }"
-      >
-        {{ node.name }}
-      </div>
-      <div></div>
-    </div>
-    <rxzu-diagram
-      class="demo-diagram"
-      [model]="diagramModel"
-      (drop)="onBlockDropped($event)"
-      (dragover)="$event.preventDefault()"
-    ></rxzu-diagram>
-  `,
+  templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements AfterViewInit {
