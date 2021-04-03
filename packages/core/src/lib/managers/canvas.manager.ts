@@ -1,12 +1,3 @@
-import {
-  BaseModel,
-  DiagramEngine,
-  LabelModel,
-  NodeModel,
-  PortModel,
-  SelectingAction,
-  ValueState,
-} from '@rxzu/core';
 import { Observable, combineLatest, of } from 'rxjs';
 import {
   takeUntil,
@@ -18,7 +9,10 @@ import {
   catchError,
   switchMapTo,
 } from 'rxjs/operators';
-import { createValueState } from '../state';
+import { SelectingAction } from '../actions';
+import { DiagramEngine } from '../engine.core';
+import { BaseModel, LabelModel, NodeModel, PortModel } from '../models';
+import { createValueState, ValueState } from '../state';
 
 export class CanvasManager {
   protected canvas$: ValueState<HTMLElement | null>;

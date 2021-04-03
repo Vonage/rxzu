@@ -1,5 +1,5 @@
-import { DiagramModel, PointModel } from '@rxzu/core';
 import { EdgeConfig, GraphLabel, NodeConfig, graphlib, layout } from 'dagre';
+import { DiagramModel, PointModel } from '../models';
 
 export interface DagreEngineOptions {
   graph?: GraphLabel;
