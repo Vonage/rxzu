@@ -1,3 +1,17 @@
+## [3.0.5](https://github.com/Vonage/rxzu/compare/v3.0.4...v3.0.5) (2021-04-03)
+
+
+### Bug Fixes
+
+* **cyclic:** updated imports to remove cyclic dependencies ([b576592](https://github.com/Vonage/rxzu/commit/b5765920f55015b00245cac662939bdac1f1efab))
+
+## [3.0.4](https://github.com/Vonage/rxzu/compare/v3.0.3...v3.0.4) (2021-03-31)
+
+
+### Bug Fixes
+
+* **host:** models are no longer bound to host view ([a0d9937](https://github.com/Vonage/rxzu/commit/a0d993789dcf04585a08839f3af3637718b3afcb))
+
 ## [3.0.3](https://github.com/Vonage/rxzu/compare/v3.0.2...v3.0.3) (2021-03-30)
 
 
