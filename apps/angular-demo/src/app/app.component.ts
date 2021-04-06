@@ -1,5 +1,10 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
-import { DiagramModel, NodeModel, RxZuDiagramComponent } from '@rxzu/angular';
+import {
+  DiagramModel,
+  NodeModel,
+  PortModel,
+  RxZuDiagramComponent,
+} from '@rxzu/angular';
 
 @Component({
   selector: 'app-root',
@@ -8,7 +13,6 @@ import { DiagramModel, NodeModel, RxZuDiagramComponent } from '@rxzu/angular';
 })
 export class AppComponent implements AfterViewInit {
   diagramModel: DiagramModel;
-  nodesDefaultDimensions = { height: 200, width: 200 };
   nodesLibrary = [
     { color: '#AFF8D8', name: 'default' },
     { color: '#FFB5E8', name: 'default' },
@@ -28,7 +32,9 @@ export class AppComponent implements AfterViewInit {
   createNode(type: string) {
     const nodeData = this.nodesLibrary.find((nodeLib) => nodeLib.name === type);
     if (nodeData) {
-      const node = new NodeModel({ namespace: nodeData.name });
+      const node = new NodeModel();
+      const port = new PortModel();
+      node.addPort(port);
       node.setExtras(nodeData);
 
       return node;
@@ -57,10 +63,11 @@ export class AppComponent implements AfterViewInit {
       const canvasManager = this.diagram?.diagramEngine.getCanvasManager();
       if (canvasManager) {
         const droppedPoint = canvasManager.getZoomAwareRelativePoint(e);
-
+        const width = node?.getWidth() ?? 1;
+        const height = node?.getHeight() ?? 1;
         const coords = {
-          x: droppedPoint.x - this.nodesDefaultDimensions.width / 2,
-          y: droppedPoint.y - this.nodesDefaultDimensions.height / 2,
+          x: droppedPoint.x - width / 2,
+          y: droppedPoint.y - height / 2,
         };
 
         if (node) {
