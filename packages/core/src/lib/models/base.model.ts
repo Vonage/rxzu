@@ -5,38 +5,37 @@ import {
   ParentChangeEvent,
   SelectionEvent,
 } from '../interfaces/event.interface';
-import { createValueState } from '../state';
+import { BaseModelOptions } from '../interfaces/options.interface';
+import { createValueState, ValueState } from '../state';
 
 export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
-  protected readonly _type: string;
+  protected parent$: ValueState<any>;
+  protected selected$: ValueState<boolean>;
+  protected hovered$: ValueState<boolean>;
+  protected painted$: ValueState<PaintedEvent>;
 
-  protected parent$ = createValueState<E>(
-    null,
-    this.entityPipe('ParentsChange')
-  );
-  protected selected$ = createValueState<boolean>(
-    false,
-    this.entityPipe('SelectedChange')
-  );
-  protected hovered$ = createValueState<boolean>(
-    false,
-    this.entityPipe('HoveredChange')
-  );
-  protected painted$ = createValueState<PaintedEvent>(
-    new PaintedEvent(this, false),
-    this.entityPipe('PaintedChange')
-  );
+  constructor(options: BaseModelOptions<any>) {
+    super({ namespace: 'default', ...options });
 
-  constructor(type?: string, id?: string, logPrefix = '[Base]') {
-    super(id, logPrefix);
-    this._type = type;
-  }
+    this.parent$ = createValueState(
+      options.parent,
+      this.entityPipe('ParentsChange')
+    );
 
-  serialize() {
-    return {
-      ...super.serialize(),
-      type: this.getType(),
-    };
+    this.selected$ = createValueState<boolean>(
+      false,
+      this.entityPipe('SelectedChange')
+    );
+
+    this.hovered$ = createValueState<boolean>(
+      false,
+      this.entityPipe('HoveredChange')
+    );
+
+    this.painted$ = createValueState<PaintedEvent>(
+      new PaintedEvent(this, false),
+      this.entityPipe('PaintedChange')
+    );
   }
 
   getParent(): E {
@@ -44,7 +43,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   }
 
   setParent(parent: E): void {
-    this.parent$.set(parent).emit();
+    this.parent$.set(parent);
   }
 
   parentChanges(): Observable<ParentChangeEvent<E>> {
@@ -56,7 +55,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   }
 
   setPainted(painted = true): void {
-    this.painted$.set(new PaintedEvent(this, painted)).emit();
+    this.painted$.set(new PaintedEvent(this, painted));
   }
 
   paintChanges(): Observable<PaintedEvent> {
@@ -68,15 +67,11 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   }
 
   setHovered(hovered = true): void {
-    this.hovered$.set(hovered).emit();
+    this.hovered$.set(hovered);
   }
 
   selectHovered(): Observable<boolean> {
     return this.hovered$.select();
-  }
-
-  getType(): string {
-    return this._type;
   }
 
   getSelected(): boolean {
@@ -88,7 +83,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
   }
 
   setSelected(selected = true): void {
-    this.selected$.set(selected).emit();
+    this.selected$.set(selected);
   }
 
   selectionChanges(): Observable<SelectionEvent> {
@@ -97,7 +92,7 @@ export class BaseModel<E extends BaseEntity = BaseEntity> extends BaseEntity {
     );
   }
 
-  getSelectedEntities(): BaseModel[] {
+  getSelectedEntities(): BaseModel<E>[] {
     return this.getSelected() ? [this] : [];
   }
 }

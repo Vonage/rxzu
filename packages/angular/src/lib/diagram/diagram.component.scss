@@ -1,9 +1,13 @@
-.ngdx-diagram {
+.rxzu-diagram {
   position: relative;
   flex-grow: 1;
   display: flex;
   cursor: move;
   overflow: hidden;
+
+  &:focus {
+    outline: none;
+  }
 
   .selector {
     position: absolute;
@@ -11,12 +15,12 @@
     border: solid 2px rgb(0, 192, 255);
   }
 
-  .ngdx-nodes-layer {
+  .rxzu-nodes-layer {
     position: absolute;
     height: 100%;
     width: 100%;
     transform-origin: 0 0;
-    overflow: visible !important;
+    overflow: visible;
     pointer-events: none;
     z-index: 150;
     top: 0;
@@ -25,12 +29,12 @@
     right: 0;
   }
 
-  .ngdx-links-layer {
+  .rxzu-links-layer {
     position: absolute;
     height: 100%;
     width: 100%;
     transform-origin: 0 0;
-    overflow: visible !important;
+    overflow: visible;
     pointer-events: none;
     z-index: 100;
     top: 0;

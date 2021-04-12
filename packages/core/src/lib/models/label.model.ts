@@ -1,25 +1,30 @@
-import { Observable } from 'rxjs';
-import { Coords } from '../interfaces/coords.interface';
-import { SerializedLabelModel } from '../interfaces/serialization.interface';
-import { createValueState } from '../state';
+import { Coords, LabelModelOptions } from '../interfaces';
+import { createValueState, ValueState } from '../state';
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 
 export class LabelModel extends BaseModel<LinkModel> {
-  protected coords$ = createValueState<Coords>({ x: 0, y: 0 }, this.entityPipe('coords'));
-  protected rotation$ = createValueState<number>(0, this.entityPipe('rotation'));
+  protected coords$: ValueState<Coords>;
+  protected rotation$: ValueState<number>;
+  protected text$: ValueState<string | null>;
 
-  constructor(type?: string, id?: string, logPrefix = '[Label]') {
-    super(type, id, logPrefix);
-  }
+  constructor(options: LabelModelOptions = {}) {
+    super({ type: 'label', ...options });
 
-  serialize(): SerializedLabelModel {
-    return {
-      ...super.serialize(),
-      type: this.getType(),
-      rotation: this.getRotation(),
-      coords: this.getCoords()
-    };
+    this.coords$ = createValueState(
+      options.coords ?? { x: 0, y: 0 },
+      this.entityPipe('coords')
+    );
+
+    this.rotation$ = createValueState(
+      options.rotation ?? 0,
+      this.entityPipe('rotation')
+    );
+
+    this.text$ = createValueState(
+      options.text ?? null,
+      this.entityPipe('text')
+    );
   }
 
   getRotation() {
@@ -35,18 +40,30 @@ export class LabelModel extends BaseModel<LinkModel> {
   }
 
   setRotation(angle: number) {
-    this.rotation$.set(angle).emit();
+    this.rotation$.set(angle);
   }
 
-  selectRotation(): Observable<number> {
+  selectRotation() {
     return this.rotation$.value$;
   }
 
   setCoords(newCoords: Partial<Coords>) {
-    this.coords$.set({ ...this.coords$.value, ...newCoords }).emit();
+    this.coords$.set({ ...this.coords$.value, ...newCoords });
   }
 
-  selectCoords(): Observable<Coords> {
+  selectCoords() {
     return this.coords$.value$;
+  }
+
+  setText(text: string) {
+    this.text$.set(text);
+  }
+
+  getText() {
+    return this.text$.value;
+  }
+
+  selectText() {
+    return this.text$.value$;
   }
 }

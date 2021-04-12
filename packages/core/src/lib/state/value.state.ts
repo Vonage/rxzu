@@ -2,11 +2,11 @@ import { BehaviorSubject, Observable, OperatorFunction } from 'rxjs';
 import { map, distinctUntilChanged } from 'rxjs/operators';
 
 export class ValueState<T> {
-  protected readonly stream$: BehaviorSubject<T>;
+  protected stream$: BehaviorSubject<T>;
 
-  readonly value$: Observable<T>;
+  value$: Observable<T>;
 
-  constructor(value?: T, operator?: OperatorFunction<any, T>) {
+  constructor(value: T, operator?: OperatorFunction<any, T>) {
     this.stream$ = new BehaviorSubject(value);
     this.value$ = operator
       ? this.stream$.pipe(operator)
@@ -22,13 +22,9 @@ export class ValueState<T> {
     return this;
   }
 
-  emit(): void {
-    this.stream$.next(this.value);
-  }
-
   select(): Observable<T>;
-  select(project: (value: T) => T): Observable<T>;
-  select<R>(project: (value: T) => R): Observable<R>;
+  select(project?: (value: T) => T): Observable<T>;
+  select<R>(project?: (value: T) => R): Observable<R>;
   select<R>(
     project?: ((value: T) => T) | ((value: T) => R)
   ): Observable<T | R> {

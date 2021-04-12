@@ -30,10 +30,11 @@
       "tags": [],
       "implicitDependencies": ["core"]
     },
-    "shared-storybook": {
+    "angular-demo": { "tags": [] },
+    "angular-storybook": {
       "tags": []
     },
-    "rxzu-angular-e2e": {
+    "angular-e2e": {
       "tags": [],
       "implicitDependencies": ["core", "angular"]
     }

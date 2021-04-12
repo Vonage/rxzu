@@ -1,271 +1,32 @@
-import { delay, filter, map, switchMap, take, takeUntil } from 'rxjs/operators';
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { delay, filter, take } from 'rxjs/operators';
 import { BaseEntity } from './base.entity';
-import { AbstractFactory, FactoriesManager } from './factories';
-import {
-  DiagramModel,
-  PortModel,
-  NodeModel,
-  LinkModel,
-  BaseModel,
-  LabelModel,
-} from './models';
-import { createValueState } from './state';
-import { BaseAction, BaseActionState, SelectingAction } from './actions';
-import { EntityMap } from './utils';
-import { EngineSetup } from './interfaces/setup.interface';
-import { MouseManager } from './managers/mouse.manager';
+import { DiagramModel, NodeModel } from './models';
+import { DiagramModelOptions, EngineSetup } from './interfaces';
+import { KeyboardManager, MouseManager } from './managers';
+import { AbstractFactory } from './factories';
+import { ActionsManager } from './managers/actions.manager';
+import { CanvasManager } from './managers/canvas.manager';
 
-export class DiagramEngineCore {
-  protected canvas$ = createValueState<Element>(null);
-  protected factoriesManager: FactoriesManager<
-    AbstractFactory<BaseModel, unknown, unknown>
-  >;
+export class DiagramEngine {
+  protected actionsManager: ActionsManager;
   protected mouseManager: MouseManager;
-  diagramModel: DiagramModel;
+  protected keyboardManager: KeyboardManager;
+  protected canvasManager: CanvasManager;
 
-  protected nodes$: Observable<EntityMap<NodeModel>>;
-  protected links$: Observable<EntityMap<LinkModel>>;
-  protected action$ = new BehaviorSubject<{
-    action: BaseAction;
-    state: BaseActionState;
-  }>(null);
+  protected diagramModel: DiagramModel | undefined;
 
-  constructor() {
-    this.createFactoriesManager();
-    this.createMouseManager();
-  }
-
-  createMouseManager() {
-    if (this.mouseManager) {
-      console.warn('[RxZu] Mouse Manager already initialized, bailing out.');
-      return;
-    }
-
-    this.mouseManager = new MouseManager(this);
-  }
-
-  createFactoriesManager() {
-    if (this.factoriesManager) {
-      this.factoriesManager.dispose();
-    }
-
-    this.factoriesManager = new FactoriesManager();
-  }
-
-  createModel() {
-    if (this.diagramModel) {
-      throw new Error(
-        'diagram model already exists, please reset model prior to creating new diagram'
-      );
-    }
-
-    this.diagramModel = new DiagramModel(this);
-
-    this.diagramModel.onEntityDestroy().subscribe(() => {
-      this.diagramModel = undefined;
-    });
-
-    return this.diagramModel;
-  }
-
-  getFactoriesManager() {
-    return this.factoriesManager;
-  }
-
-  getMouseManager() {
-    return this.mouseManager;
-  }
-
-  getNodeElement(node: NodeModel): HTMLElement {
-    const selector = this.canvas$.value.querySelector(
-      `[data-nodeid="${node.id}"]`
-    );
-    if (selector === null) {
-      throw new Error(
-        'Cannot find Node element with node id: [' + node.id + ']'
-      );
-    }
-    return selector as HTMLElement;
-  }
-
-  getNodePortElement(port: PortModel): HTMLElement {
-    const selector = this.canvas$.value.querySelector(
-      `[data-nodeid="${port.getParent().id}"] [data-portid="${port.id}"]`
-    );
-    if (selector === null) {
-      throw new Error(
-        'Cannot find Node Port element with node id: [' +
-          port.getParent().id +
-          '] and port id: [' +
-          port.id +
-          ']'
-      );
-    }
-    return selector as HTMLElement;
-  }
-
-  getPortCenter(port: PortModel) {
-    const sourceElement = this.getNodePortElement(port);
-    const sourceRect = sourceElement.getBoundingClientRect();
-    const rel = this.getRelativePoint(sourceRect.left, sourceRect.top);
-
-    return {
-      x:
-        sourceElement.offsetWidth / 2 +
-        (rel.x - this.diagramModel.getOffsetX()) /
-          (this.diagramModel.getZoomLevel() / 100.0),
-      y:
-        sourceElement.offsetHeight / 2 +
-        (rel.y - this.diagramModel.getOffsetY()) /
-          (this.diagramModel.getZoomLevel() / 100.0),
-    };
-  }
-
-  /**
-   * Calculate rectangular coordinates of the port passed in.
-   */
-  getPortCoords(
-    port: PortModel
-  ): {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  } {
-    const sourceElement = this.getNodePortElement(port);
-    const sourceRect = sourceElement.getBoundingClientRect() as DOMRect;
-    const canvasRect = this.canvas$.value.getBoundingClientRect() as ClientRect;
-
-    return {
-      x:
-        (sourceRect.x - this.diagramModel.getOffsetX()) /
-          (this.diagramModel.getZoomLevel() / 100.0) -
-        canvasRect.left,
-      y:
-        (sourceRect.y - this.diagramModel.getOffsetY()) /
-          (this.diagramModel.getZoomLevel() / 100.0) -
-        canvasRect.top,
-      width: sourceRect.width,
-      height: sourceRect.height,
-    };
-  }
-
-  /**
-   * Calculate rectangular coordinates of the node passed in.
-   */
-  getNodeCoords(node: NodeModel) {
-    const sourceElement = this.getNodeElement(node);
-    const sourceRect = sourceElement.getBoundingClientRect() as DOMRect;
-    const canvasRect = this.canvas$.value.getBoundingClientRect() as ClientRect;
-
-    return {
-      x:
-        (sourceRect.x - this.diagramModel.getOffsetX()) /
-          (this.diagramModel.getZoomLevel() / 100.0) -
-        canvasRect.left,
-      y:
-        (sourceRect.y - this.diagramModel.getOffsetY()) /
-          (this.diagramModel.getZoomLevel() / 100.0) -
-        canvasRect.top,
-      width: sourceRect.width,
-      height: sourceRect.height,
-    };
-  }
-
-  getNodeCenter(node: NodeModel) {
-    const sourceElement = this.getNodeElement(node);
-    const sourceRect = sourceElement.getBoundingClientRect();
-    const rel = this.getRelativePoint(sourceRect.left, sourceRect.top);
-
-    return {
-      x:
-        sourceElement.offsetWidth / 2 +
-        (rel.x - this.diagramModel.getOffsetX()) /
-          (this.diagramModel.getZoomLevel() / 100.0),
-      y:
-        sourceElement.offsetHeight / 2 +
-        (rel.y - this.diagramModel.getOffsetY()) /
-          (this.diagramModel.getZoomLevel() / 100.0),
-    };
-  }
-
-  /**
-   * Determine the width and height of the node passed in.
-   * It currently assumes nodes have a rectangular shape, can be overriden for customised shapes.
-   */
-  getNodeDimensions(node: NodeModel): { width: number; height: number } {
-    if (!this.canvas$.value) {
-      return {
-        width: 0,
-        height: 0,
-      };
-    }
-
-    const nodeElement = this.getNodeElement(node);
-    const nodeRect = nodeElement.getBoundingClientRect();
-
-    return {
-      width: nodeRect.width,
-      height: nodeRect.height,
-    };
-  }
-
-  setCanvas(canvas: Element) {
-    this.canvas$.set(canvas).emit();
-  }
-
-  getCanvas() {
-    return this.canvas$.value;
-  }
-
-  selectCanvas() {
-    return this.canvas$.select();
-  }
-
-  getRelativePoint(x: number, y: number) {
-    const canvasRect = this.canvas$.value.getBoundingClientRect();
-    return { x: x - canvasRect.left, y: y - canvasRect.top };
-  }
-
-  getDiagramModel() {
-    return this.diagramModel;
-  }
-
-  isModelLocked(model: BaseEntity) {
-    if (this.diagramModel.getLocked()) {
-      return true;
-    }
-
-    return model.getLocked();
-  }
-
-  /**
-   * fit the canvas zoom levels to the elements contained.
-   * @param additionalZoomFactor allow for further zooming out to make sure edges doesn't cut
-   */
-  zoomToFit(additionalZoomFactor = 0.005) {
-    this.canvas$.value$
-      .pipe(filter(Boolean), take(1), delay(0))
-      .subscribe((canvas: HTMLElement) => {
-        const xFactor = canvas.clientWidth / canvas.scrollWidth;
-        const yFactor = canvas.clientHeight / canvas.scrollHeight;
-        const zoomFactor = xFactor < yFactor ? xFactor : yFactor;
-
-        let newZoomLvl =
-          this.diagramModel.getZoomLevel() *
-          (zoomFactor - additionalZoomFactor);
-        const maxZoomOut = this.diagramModel.getMaxZoomOut();
-
-        if (maxZoomOut && newZoomLvl < maxZoomOut) {
-          newZoomLvl = maxZoomOut;
-        }
-
-        this.diagramModel.setZoomLevel(newZoomLvl);
-
-        // TODO: either block the canvas movement on 0,0 or detect the top left furthest element and set the offest to its edges
-        this.diagramModel.setOffset(0, 0);
-      });
+  constructor(
+    protected factory: AbstractFactory,
+    protected _canvas?: HTMLElement,
+    protected _mouseManager?: MouseManager,
+    protected _keyboardManager?: KeyboardManager,
+    protected _actionsManager?: ActionsManager,
+    protected _canvasManager?: CanvasManager
+  ) {
+    this.actionsManager = _actionsManager || this.createActionsManager();
+    this.mouseManager = _mouseManager || this.createMouseManager();
+    this.keyboardManager = _keyboardManager || this.createKeyboardManager();
+    this.canvasManager = _canvasManager || this.createCanvasManager(_canvas);
   }
 
   setup({
@@ -276,169 +37,199 @@ export class DiagramEngineCore {
     allowCanvasZoom,
     allowCanvasTranslation,
     inverseZoom,
+    keyBindings,
   }: EngineSetup) {
-    this.diagramModel.setAllowCanvasZoom(allowCanvasZoom);
-    this.diagramModel.setAllowCanvasTranslation(allowCanvasTranslation);
-    this.diagramModel.setInverseZoom(inverseZoom);
-    this.diagramModel.setAllowLooseLinks(allowLooseLinks);
-    this.diagramModel.setPortMagneticRadius(portMagneticRadius);
-    this.diagramModel.setMaxZoomIn(maxZoomIn);
-    this.diagramModel.setMaxZoomOut(maxZoomOut);
+    const diagramModel = this.getDiagramModel();
+    diagramModel.setAllowCanvasZoom(allowCanvasZoom ?? true);
+    diagramModel.setAllowCanvasTranslation(allowCanvasTranslation ?? true);
+    diagramModel.setInverseZoom(inverseZoom ?? false);
+    diagramModel.setAllowLooseLinks(allowLooseLinks ?? true);
+    diagramModel.setPortMagneticRadius(portMagneticRadius ?? 30);
+    diagramModel.setMaxZoomIn(maxZoomIn ?? 0);
+    diagramModel.setMaxZoomOut(maxZoomOut ?? 0);
+    diagramModel.setKeyBindings(keyBindings ?? {});
   }
 
-  paintNodes(
-    nodesHost,
-    promise = false
-  ): Observable<boolean> | Promise<boolean> {
-    const observable = this.diagramModel.selectNodes().pipe(
-      takeUntil(this.diagramModel.onEntityDestroy()),
-      switchMap((nodes) => {
-        const nodesPainted$ = [];
-        for (const node of nodes.values()) {
-          if (!node.getPainted().isPainted) {
-            const portsHost = this.getFactoriesManager()
-              .getFactory({
-                factoryType: 'nodeFactories',
-                modelType: node.getType(),
-              })
-              .generateWidget({
-                model: node,
-                host: nodesHost,
-                diagramModel: this.diagramModel,
-              });
+  createMouseManager(): MouseManager {
+    if (this.mouseManager) {
+      console.warn('[RxZu] Mouse Manager already initialized, bailing out.');
+      return this.mouseManager;
+    }
 
-            node
-              .selectPorts()
-              .pipe(filter(Boolean))
-              .subscribe((ports: PortModel[]) => {
-                ports.forEach((port) => {
-                  if (!port.getPainted().isPainted) {
-                    this.factoriesManager
-                      .getFactory({
-                        factoryType: 'portFactories',
-                        modelType: port.getType(),
-                      })
-                      .generateWidget({ model: port, host: portsHost });
-                  }
-                });
-              });
-
-            nodesPainted$.push(
-              node.paintChanges().pipe(
-                filter((paintE) => paintE.isPainted),
-                take(1)
-              )
-            );
-          }
-        }
-
-        return combineLatest(nodesPainted$);
-      }),
-      map(() => true)
-    );
-
-    return promise ? observable.toPromise() : observable;
+    return new MouseManager(this);
   }
 
-  paintLinks(linksHost, promise = false): Observable<void> | Promise<void> {
-    const observable = this.diagramModel.selectLinks().pipe(
-      takeUntil(this.diagramModel.onEntityDestroy()),
-      map((links) => {
-        for (const link of links.values()) {
-          if (!link.getPainted().isPainted) {
-            const srcPort = link.getSourcePort();
-            const targetPort = link.getTargetPort();
+  createCanvasManager(canvas?: HTMLElement): CanvasManager {
+    if (this.canvasManager) {
+      console.warn('[RxZu] Mouse Manager already initialized, bailing out.');
+      return this.canvasManager;
+    }
 
-            // Attach link first point to source port
-            const portCenter = this.getPortCenter(srcPort);
-            link.getPoints()[0].setCoords(portCenter);
-
-            // Attach link last point to target port, will occour only for complete links
-            if (targetPort) {
-              const portCenter = this.getPortCenter(targetPort);
-              link
-                .getPoints()
-                [link.getPoints().length - 1].setCoords(portCenter);
-            }
-
-            // Render link component
-            this.getFactoriesManager()
-              .getFactory({
-                factoryType: 'linkFactories',
-                modelType: link.getType(),
-              })
-              .generateWidget({ model: link, host: linksHost });
-
-            // Handle link label, if any
-            link
-              .selectLabel()
-              .pipe(filter(Boolean))
-              .subscribe((label: LabelModel) =>
-                this.paintLabel(label, linksHost)
-              );
-          }
-        }
-      })
-    );
-
-    return promise ? observable.toPromise() : observable;
+    return new CanvasManager(this, canvas);
   }
 
-  paintLabel(label: LabelModel, host) {
-    if (!label.getPainted().isPainted) {
-      this.getFactoriesManager()
-        .getFactory({
-          factoryType: 'labelFactories',
-          modelType: label.getType(),
-        })
-        .generateWidget({ model: label, host });
+  createActionsManager(): ActionsManager {
+    if (this.actionsManager) {
+      console.warn('[RxZu] Actions Manager already initialized, bailing out.');
+      return this.actionsManager;
+    }
+
+    return new ActionsManager();
+  }
+
+  createKeyboardManager() {
+    if (this.keyboardManager) {
+      console.warn('[RxZu] Keyboard Manager already initialized, bailing out.');
+      return this.keyboardManager;
+    }
+
+    return new KeyboardManager(this);
+  }
+
+  setModel(model: DiagramModel): DiagramModel {
+    if (this.diagramModel) {
+      throw new Error(
+        'diagram model already exists, please reset model prior to creating new diagram'
+      );
+    }
+
+    this.diagramModel = model;
+
+    this.diagramModel.diagramEngine = this;
+
+    this.diagramModel.onEntityDestroy().subscribe(() => {
+      this.diagramModel = undefined;
+    });
+
+    return model;
+  }
+
+  createModel(options?: DiagramModelOptions): DiagramModel {
+    if (this.diagramModel) {
+      throw new Error(
+        'diagram model already exists, please reset model prior to creating new diagram'
+      );
+    }
+
+    this.diagramModel = new DiagramModel(options, this);
+
+    this.diagramModel.onEntityDestroy().subscribe(() => {
+      this.diagramModel = undefined;
+    });
+
+    return this.diagramModel;
+  }
+
+  getMouseManager() {
+    return this.mouseManager;
+  }
+
+  getActionsManager() {
+    return this.actionsManager;
+  }
+
+  getKeyboardManager() {
+    return this.keyboardManager;
+  }
+
+  getCanvasManager() {
+    return this.canvasManager;
+  }
+
+  getDiagramModel() {
+    if (!this.diagramModel) {
+      throw new Error(
+        '[RxZu] No model found, please create one and assign it to the engine.'
+      );
+    }
+    return this.diagramModel;
+  }
+
+  getFactory() {
+    return this.factory;
+  }
+
+  isModelLocked(model: BaseEntity) {
+    const diagramModel = this.getDiagramModel();
+    if (diagramModel.getLocked()) {
+      return true;
+    }
+
+    return model.getLocked();
+  }
+
+  /**
+   * @description get the bounding rectangle of the input group of nodes
+   * @param margin allow for further zooming out to make sure edges doesn't cut (in px)
+   */
+  zoomToFit(margin = 100) {
+    const diagramModel = this.getDiagramModel();
+    if (diagramModel) {
+      const allNodes = diagramModel.getNodesArray();
+      if (allNodes?.length > 0) {
+        this.zoomToNodes(allNodes, margin);
+      }
     }
   }
 
   /**
-   * fire the action registered and notify subscribers
+   * @description fit the canvas zoom levels and offset to the nodes contained.
+   * @param nodes set zoom and offset so that all those node will be seen at view
+   * @param margin allow for further zooming out to make sure edges doesn't cut (in px)
    */
-  fireAction() {
-    const action = this.action$.getValue()?.action;
-    if (action) {
-      this.action$.next({ action, state: 'firing' });
-      return action;
+  zoomToNodes(nodes: NodeModel[], margin = 100) {
+    if (!nodes || nodes.length === 0) {
+      console.warn('[RxZu] No input nodes were found');
+      return;
     }
-  }
+    const diagramModel = this.getDiagramModel();
 
-  /**
-   * Unregister the action, post firing and notify subscribers
-   */
-  stopFiringAction() {
-    const stoppedAction = this.action$.getValue()?.action;
-    if (stoppedAction) {
-      this.action$.next({ action: stoppedAction, state: 'stopped' });
-      this.action$.next(null);
-      return stoppedAction;
+    if (diagramModel) {
+      this.canvasManager
+        .selectCanvas()
+        .pipe(
+          filter(
+            (canvas: HTMLElement | null | undefined): canvas is HTMLElement =>
+              canvas !== null && canvas !== undefined
+          ),
+          take(1),
+          delay(0)
+        )
+        .subscribe((canvas) => {
+          // get nodes layers bounding rect with the desired margin
+          const nodesLayersRect = this.canvasManager.getNodeLayersRect(
+            nodes,
+            margin
+          );
+
+          // calculate the zoom factor and set the new zoom
+          const xFactor = canvas.clientWidth / nodesLayersRect?.width;
+          const yFactor = canvas.clientHeight / nodesLayersRect.height;
+          const zoomFactor = Math.min(xFactor, yFactor);
+          diagramModel.setZoomLevel(zoomFactor * 100);
+
+          // get canvas top and left values including the offset
+          const canvasRect = canvas.getBoundingClientRect();
+          const canvasRelativeTopLeftPoint = {
+            top: diagramModel.getOffsetY() + canvasRect.top,
+            left: diagramModel.getOffsetX() + canvasRect.left,
+          };
+
+          // calc nodes rect top left values
+          const nodesRectTopLeftPoint = {
+            top:
+              canvasRelativeTopLeftPoint.top + nodesLayersRect.top * zoomFactor,
+            left:
+              canvasRelativeTopLeftPoint.left +
+              nodesLayersRect.left * zoomFactor,
+          };
+
+          // set the new offset to the diagram
+          diagramModel.setOffset(
+            canvasRelativeTopLeftPoint.left - nodesRectTopLeftPoint.left,
+            canvasRelativeTopLeftPoint.top - nodesRectTopLeftPoint.top
+          );
+        });
     }
-  }
-
-  /**
-   * Register the new action, pre firing and notify subscribers
-   */
-  startFiringAction(action: BaseAction) {
-    this.action$.next({ action, state: 'started' });
-    return action;
-  }
-
-  selectAction() {
-    return this.action$;
-  }
-
-  setAction(action: BaseAction) {
-    this.action$.next({ action, state: 'firing' });
-  }
-
-  shouldDrawSelectionBox() {
-    const action = this.action$.getValue();
-    if (action instanceof SelectingAction) {
-      return action.getBoxDimensions();
-    }
-    return false;
   }
 }

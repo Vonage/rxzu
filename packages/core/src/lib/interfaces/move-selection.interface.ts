@@ -1,7 +1,7 @@
-import { BaseModel, PortModel } from '../models';
+import { NodeModel, PointModel, PortModel } from '../models';
 
 export interface SelectionModel {
-  model: BaseModel;
+  model: NodeModel | PortModel | PointModel;
   initialX: number;
   initialY: number;
   magnet?: PortModel;

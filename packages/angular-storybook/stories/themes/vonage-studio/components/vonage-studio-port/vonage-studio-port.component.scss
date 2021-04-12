@@ -1,0 +1,18 @@
+:host {
+  position: absolute;
+  top: 35%;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  background-color: #ffffff;
+  border: 1px solid #b3b3b3;
+
+  &.in {
+    left: -5px;
+    top: 45%;
+  }
+
+  &.out {
+    right: -5px;
+  }
+}

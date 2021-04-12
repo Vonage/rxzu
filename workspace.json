@@ -28,7 +28,8 @@
             "tsConfig": "packages/core/tsconfig.lib.json",
             "packageJson": "packages/core/package.json",
             "main": "packages/core/src/index.ts",
-            "assets": ["packages/core/*.md"]
+            "assets": ["packages/core/*.md"],
+            "allowedCommonJsDependencies": ["dagre"]
           }
         }
       }
@@ -71,11 +72,100 @@
         }
       }
     },
-    "shared-storybook": {
+    "angular-demo": {
+      "projectType": "application",
+      "root": "apps/angular-demo",
+      "sourceRoot": "apps/angular-demo/src",
+      "prefix": "app",
+      "targets": {
+        "build": {
+          "executor": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/apps/angular-demo",
+            "index": "apps/angular-demo/src/index.html",
+            "main": "apps/angular-demo/src/main.ts",
+            "polyfills": "apps/angular-demo/src/polyfills.ts",
+            "tsConfig": "apps/angular-demo/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "apps/angular-demo/src/favicon.ico",
+              "apps/angular-demo/src/assets"
+            ],
+            "styles": ["apps/angular-demo/src/styles.scss"],
+            "scripts": [],
+            "allowedCommonJsDependencies": ["dagre"]
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/angular-demo/src/environments/environment.ts",
+                  "with": "apps/angular-demo/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "angular-demo:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "angular-demo:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "executor": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "angular-demo:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/angular-demo/src/**/*.ts",
+              "apps/angular-demo/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/angular-demo"],
+          "options": {
+            "jestConfig": "apps/angular-demo/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "angular-storybook": {
       "projectType": "library",
-      "root": "packages/storybook",
-      "sourceRoot": "packages/storybook",
-      "prefix": "sharedstorybook",
+      "root": "packages/angular-storybook",
+      "sourceRoot": "packages/angular-storybook",
+      "prefix": "angularstorybook",
       "architect": {
         "storybook": {
           "builder": "@nrwl/storybook:storybook",
@@ -83,7 +173,7 @@
             "uiFramework": "@storybook/angular",
             "port": 4400,
             "config": {
-              "configFolder": "packages/storybook/.storybook"
+              "configFolder": "packages/angular-storybook/.storybook"
             }
           },
           "configurations": {
@@ -96,9 +186,9 @@
           "builder": "@nrwl/storybook:build",
           "options": {
             "uiFramework": "@storybook/angular",
-            "outputPath": "dist/storybook/shared-storybook",
+            "outputPath": "dist/storybook/angular-storybook",
             "config": {
-              "configFolder": "packages/storybook/.storybook"
+              "configFolder": "packages/angular-storybook/.storybook"
             }
           },
           "configurations": {
@@ -114,29 +204,29 @@
         }
       }
     },
-    "rxzu-angular-e2e": {
-      "root": "apps/rxzu-angular-e2e",
-      "sourceRoot": "apps/rxzu-angular-e2e/src",
+    "angular-e2e": {
+      "root": "apps/angular-e2e",
+      "sourceRoot": "apps/angular-e2e/src",
       "projectType": "application",
       "architect": {
         "e2e": {
           "builder": "@nrwl/cypress:cypress",
           "options": {
-            "cypressConfig": "apps/rxzu-angular-e2e/cypress.json",
-            "tsConfig": "apps/rxzu-angular-e2e/tsconfig.e2e.json",
-            "devServerTarget": "shared-storybook:storybook"
+            "cypressConfig": "apps/angular-e2e/cypress.json",
+            "tsConfig": "apps/angular-e2e/tsconfig.e2e.json",
+            "devServerTarget": "angular-storybook:storybook"
           },
           "configurations": {
             "ci": {
-              "devServerTarget": "shared-storybook:storybook:ci"
+              "devServerTarget": "angular-storybook:storybook:ci"
             }
           }
         },
         "lint": {
           "builder": "@nrwl/linter:lint",
           "options": {
-            "tsConfig": ["apps/rxzu-angular-e2e/tsconfig.e2e.json"],
-            "exclude": ["**/node_modules/**", "!apps/rxzu-angular-e2e/**"]
+            "tsConfig": ["apps/angular-e2e/tsconfig.e2e.json"],
+            "exclude": ["**/node_modules/**", "!apps/angular-e2e/**"]
           }
         }
       }

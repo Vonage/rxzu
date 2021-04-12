@@ -1,2 +1,2 @@
-export * from './components/index';
-export * from './factories';
+export * from './components';
+export * from './defaults.module';

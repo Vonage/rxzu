@@ -1,5 +1,5 @@
-import { fromEvent, merge } from 'rxjs';
-import { tap, take, takeUntil } from 'rxjs/operators';
+import { fromEvent, merge, race } from 'rxjs';
+import { tap, take, takeUntil, share } from 'rxjs/operators';
 import {
   SelectingAction,
   MoveItemsAction,
@@ -8,71 +8,79 @@ import {
   LooseLinkDestroyed,
   InvalidLinkDestroyed,
 } from '../actions';
-import { DiagramEngineCore } from '../engine.core';
+import { DiagramEngine } from '../engine.core';
 import { Coords } from '../interfaces';
-import {
-  NodeModel,
-  PointModel,
-  PortModel,
-  BaseModel,
-  LinkModel,
-} from '../models';
+import { NodeModel, PointModel, PortModel, BaseModel } from '../models';
 import { isNil } from '../utils';
 
 export class MouseManager {
-  protected engine: DiagramEngineCore;
+  protected engine: DiagramEngine;
 
-  constructor(_diagramEngine: DiagramEngineCore) {
+  constructor(protected _diagramEngine: DiagramEngine) {
     this.engine = _diagramEngine;
   }
 
-  getElement(event: MouseEvent): { model: BaseModel; element: Element } {
+  get diagramModel() {
+    return this.engine.getDiagramModel();
+  }
+
+  get canvasManager() {
+    return this.engine.getCanvasManager();
+  }
+
+  get actionsManager() {
+    return this.engine.getActionsManager();
+  }
+
+  getElement(
+    event: MouseEvent
+  ): { model: BaseModel | undefined; element: Element } | null {
     const target = event.target as Element;
 
     // is it a port?
-    let element = target.closest('[data-portid]');
-    if (element) {
+    let element = target.closest('[data-type="port"]');
+    const nodeEl = target.closest('[data-type="node"]');
+    if (element && nodeEl) {
       // get the relevant node and return the port.
-      const nodeEl = target.closest('[data-nodeid]');
       return {
-        model: this.engine
-          .getDiagramModel()
-          .getNode(nodeEl.getAttribute('data-nodeid'))
-          .getPort(element.getAttribute('data-portid')),
+        model: this.diagramModel
+          ?.getNode(nodeEl.getAttribute('data-id'))
+          ?.getPort(element.getAttribute('data-id')) as BaseModel | undefined,
         element,
       };
     }
 
     // look for a point
-    element = target.closest('[data-pointid]');
+    element = target.closest('[data-type="point"]');
     if (element) {
       return {
-        model: this.engine
-          .getDiagramModel()
-          .getLink(element.getAttribute('data-linkid'))
-          .getPointModel(element.getAttribute('data-pointid')),
+        model: this.diagramModel
+          ?.getLink(element.getAttribute('data-parent-id'))
+          ?.getPointModel(element.getAttribute('data-id')) as
+          | BaseModel
+          | undefined,
         element,
       };
     }
 
     // look for a link
-    element = target.closest('[data-linkid]');
+    element = target.closest('[data-type="link"]');
     if (element) {
       return {
-        model: this.engine
-          .getDiagramModel()
-          .getLink(element.getAttribute('data-linkid')),
+        model: this.diagramModel?.getLink(element.getAttribute('data-id')) as
+          | BaseModel
+          | undefined,
         element,
       };
     }
 
     // a node maybe
-    element = target.closest('[data-nodeid]');
+    element = target.closest('[data-type="node"]');
     if (element) {
       return {
-        model: this.engine
-          .getDiagramModel()
-          .getNode(element.getAttribute('data-nodeid')),
+        model: this.diagramModel?.getNode(element.getAttribute('data-id')) as
+          | BaseModel
+          | undefined,
         element,
       };
     }
@@ -81,83 +89,73 @@ export class MouseManager {
     return null;
   }
 
-  getRelativePoint(event: MouseEvent): { x: number; y: number } {
-    const point = this.engine.getRelativePoint(event.clientX, event.clientY);
-    return {
-      x:
-        (point.x - this.engine.getDiagramModel().getOffsetX()) /
-        (this.engine.getDiagramModel().getZoomLevel() / 100.0),
-      y:
-        (point.y - this.engine.getDiagramModel().getOffsetY()) /
-        (this.engine.getDiagramModel().getZoomLevel() / 100.0),
-    };
-  }
-
   onMouseMove(event: MouseEvent) {
-    const action = this.engine.selectAction().getValue()?.action;
+    const action = this.actionsManager.getCurrentAction()?.action;
 
     if (action === null || action === undefined) {
       return;
     }
 
     if (action instanceof SelectingAction) {
-      const relative = this.engine.getRelativePoint(
+      const relative = this.canvasManager.getRelativePoint(
         event.clientX,
         event.clientY
       );
 
-      this.engine
-        .getDiagramModel()
-        .getNodes()
-        .forEach((node) => {
+      this.diagramModel.getNodes().forEach((node) => {
+        const nodeRectPoints = this.canvasManager.getNodeRectPoints(node);
+        if (nodeRectPoints) {
           if (
             (action as SelectingAction).containsElement(
-              node.getCoords(),
-              this.engine.getDiagramModel()
+              nodeRectPoints.topLeft,
+              nodeRectPoints.bottomRight,
+              this.diagramModel
             )
           ) {
             node.setSelected();
           } else {
             node.setSelected(false);
           }
-        });
+        }
+      });
 
-      this.engine
-        .getDiagramModel()
-        .getLinks()
-        .forEach((link) => {
-          let allSelected = true;
+      this.diagramModel.getLinks().forEach((link) => {
+        let allSelected = true;
 
-          link.getPoints().forEach((point) => {
-            if (
-              (action as SelectingAction).containsElement(
-                point.getCoords(),
-                this.engine.getDiagramModel()
-              )
-            ) {
-              point.setSelected();
-            } else {
-              point.setSelected(false);
-              allSelected = false;
-            }
-          });
-
-          if (allSelected) {
-            link.setSelected();
+        link.getPoints().forEach((point) => {
+          const pointPort = point.getParent().getPortForPoint(point);
+          const pointCoords = point.getCoords();
+          if (
+            (action as SelectingAction).containsElement(
+              pointCoords,
+              pointCoords,
+              this.diagramModel
+            ) &&
+            !pointPort
+          ) {
+            point.setSelected();
+          } else {
+            point.setSelected(false);
+            allSelected = false;
           }
         });
+
+        if (allSelected) {
+          link.setSelected();
+        }
+      });
 
       action.mouseX2 = relative.x;
       action.mouseY2 = relative.y;
 
-      this.engine.fireAction();
+      this.actionsManager.fireAction();
     } else if (action instanceof MoveItemsAction) {
       const coords: Coords = {
         x: event.clientX - action.mouseX,
         y: event.clientY - action.mouseY,
       };
 
-      const zoomLevel = this.engine.getDiagramModel().getZoomLevel() / 100;
+      const zoomLevel = this.diagramModel.getZoomLevel() / 100;
       action.selectionModels.forEach((selectionModel) => {
         // reset all previous magnets if any
         selectionModel.magnet = undefined;
@@ -172,17 +170,17 @@ export class MouseManager {
             x: selectionModel.initialX + coords.x / zoomLevel,
             y: selectionModel.initialY + coords.y / zoomLevel,
           };
-          const gridRelativeCoords = this.engine
-            .getDiagramModel()
-            .getGridPosition(newCoords);
+          const gridRelativeCoords = this.diagramModel.getGridPosition(
+            newCoords
+          );
 
           // magnetic inputs handling
           if (
             selectionModel.model instanceof PointModel &&
-            !isNil(this.engine.getDiagramModel().getPortMagneticRadius())
+            !isNil(this.diagramModel.getPortMagneticRadius())
           ) {
             // get all ports on canvas, check distances, if smaller then defined radius, magnetize!
-            const portsMap = this.engine.getDiagramModel().getAllPorts({
+            const portsMap = this.diagramModel.getAllPorts({
               filter: (p) => p.getMagnetic(),
             });
 
@@ -192,11 +190,13 @@ export class MouseManager {
                 portCoords.x - newCoords.x,
                 portCoords.y - newCoords.y
               );
-              if (
-                distance <=
-                this.engine.getDiagramModel().getPortMagneticRadius()
-              ) {
-                const portCenter = this.engine.getPortCenter(port);
+              if (distance <= this.diagramModel.getPortMagneticRadius()) {
+                const portCenter = this.canvasManager.getPortCenter(port);
+
+                if (!portCenter) {
+                  return;
+                }
+
                 selectionModel.model.setCoords(portCenter);
                 selectionModel.magnet = port;
                 return;
@@ -209,15 +209,20 @@ export class MouseManager {
           if (selectionModel.model instanceof NodeModel) {
             // update port coordinates as well
             selectionModel.model.getPorts().forEach((port) => {
-              const portCoords = this.engine.getPortCoords(port);
-              port.updateCoords(portCoords);
+              const portCoords = this.canvasManager.getPortCoords(port);
+
+              if (!portCoords) {
+                return;
+              }
+
+              port.updateCoords(portCoords, this.engine);
             });
           }
         } else if (selectionModel.model instanceof PointModel) {
           // will only run here when trying to create a point on an existing link
           // we want points that are connected to ports, to not necessarily snap to grid
           // this stuff needs to be pixel perfect, dont touch it
-          const newCoords = this.engine.getDiagramModel().getGridPosition({
+          const newCoords = this.diagramModel.getGridPosition({
             x: coords.x / zoomLevel,
             y: coords.y / zoomLevel,
           });
@@ -229,16 +234,14 @@ export class MouseManager {
         }
       });
 
-      this.engine.fireAction();
+      this.actionsManager.fireAction();
     } else if (action instanceof MoveCanvasAction) {
-      if (this.engine.getDiagramModel().getAllowCanvasTranslation()) {
-        this.engine
-          .getDiagramModel()
-          .setOffset(
-            action.initialOffsetX + (event.clientX - action.mouseX),
-            action.initialOffsetY + (event.clientY - action.mouseY)
-          );
-        this.engine.fireAction();
+      if (this.diagramModel.getAllowCanvasTranslation()) {
+        this.diagramModel.setOffset(
+          action.initialOffsetX + (event.clientX - action.mouseX),
+          action.initialOffsetY + (event.clientY - action.mouseY)
+        );
+        this.actionsManager.fireAction();
       }
     }
   }
@@ -255,22 +258,18 @@ export class MouseManager {
       // multiple selection
       if (event.shiftKey) {
         // initiate multiple selection selector
-        const relative = this.engine.getRelativePoint(
+        const relative = this.canvasManager.getRelativePoint(
           event.clientX,
           event.clientY
         );
         const selectionAction = new SelectingAction(relative.x, relative.y);
 
-        this.engine.startFiringAction(selectionAction);
+        this.actionsManager.startFiringAction(selectionAction);
       } else {
         // drag canvas action
-        this.engine.getDiagramModel().clearSelection();
-        this.engine.startFiringAction(
-          new MoveCanvasAction(
-            event.clientX,
-            event.clientY,
-            this.engine.getDiagramModel()
-          )
+        this.diagramModel.clearSelection();
+        this.actionsManager.startFiringAction(
+          new MoveCanvasAction(event.clientX, event.clientY, this.diagramModel)
         );
       }
     } else if (selectedModel.model instanceof PortModel) {
@@ -279,7 +278,7 @@ export class MouseManager {
         !selectedModel.model.isLocked() &&
         selectedModel.model.getCanCreateLinks()
       ) {
-        const relative = this.getRelativePoint(event);
+        const relative = this.canvasManager.getZoomAwareRelativePoint(event);
         const sourcePort = selectedModel.model;
         const link = sourcePort.createLinkModel();
 
@@ -295,31 +294,30 @@ export class MouseManager {
           link.getFirstPoint().setCoords(relative);
           link.getLastPoint().setCoords(relative);
 
-          this.engine.getDiagramModel().clearSelection();
+          this.diagramModel.clearSelection();
           link.getLastPoint().setSelected();
-          this.engine.getDiagramModel().addLink(link);
-
-          this.engine.startFiringAction(
+          this.diagramModel.addLink(link);
+          this.actionsManager.startFiringAction(
             new MoveItemsAction(event.clientX, event.clientY, this.engine)
           );
         }
       } else {
-        this.engine.getDiagramModel().clearSelection();
+        this.diagramModel.clearSelection();
       }
     } else if (
       selectedModel.model instanceof PointModel &&
       selectedModel.model.isConnectedToPort()
     ) {
-      this.engine.getDiagramModel().clearSelection();
+      this.diagramModel.clearSelection();
     } else {
       // its some other element, probably want to move it
-      if (!event.shiftKey && !selectedModel.model.getSelected()) {
-        this.engine.getDiagramModel().clearSelection();
+      if (!event.shiftKey && !selectedModel.model?.getSelected()) {
+        this.diagramModel.clearSelection();
       }
 
-      selectedModel.model.setSelected();
+      selectedModel.model?.setSelected();
 
-      this.engine.startFiringAction(
+      this.actionsManager.startFiringAction(
         new MoveItemsAction(event.clientX, event.clientY, this.engine)
       );
     }
@@ -328,11 +326,10 @@ export class MouseManager {
   }
 
   onMouseUp(event: MouseEvent) {
-    const action = this.engine.selectAction().getValue()?.action;
+    const action = this.actionsManager.getCurrentAction()?.action;
 
     // are we going to connect a link to something?
     if (action instanceof MoveItemsAction) {
-      this.engine.stopFiringAction();
       const element = this.getElement(event);
       action.selectionModels.forEach((model) => {
         // only care about points connecting to things
@@ -340,7 +337,7 @@ export class MouseManager {
           return;
         }
 
-        let el: BaseModel;
+        let el: BaseModel | null = null;
         if (model.magnet) {
           el = model.magnet;
         } else if (element && element.model) {
@@ -349,20 +346,20 @@ export class MouseManager {
 
         if (el instanceof PortModel && !this.engine.isModelLocked(el)) {
           const link = model.model.getLink();
-          if (link.getTargetPort() !== null) {
+          if (!isNil(link?.getTargetPort())) {
             // if this was a valid link already and we are adding a node in the middle, create 2 links from the original
-            if (link.getTargetPort() !== el && link.getSourcePort() !== el) {
-              const targetPort = link.getTargetPort();
-              const newLink = link.clone({});
-              newLink.setSourcePort(el);
-              newLink.setTargetPort(targetPort);
-              link.setTargetPort(el);
-              targetPort.removeLink(link);
-              newLink.removePointsBefore(
-                newLink.getPoints()[link.getPointIndex(model.model)]
-              );
-              link.removePointsAfter(model.model);
-              this.engine.getDiagramModel().addLink(newLink);
+            if (link?.getTargetPort() !== el && link?.getSourcePort() !== el) {
+              const targetPort = link?.getTargetPort();
+              const newLink = link?.clone({});
+              newLink?.setSourcePort(el);
+              newLink?.setTargetPort(targetPort);
+              link?.setTargetPort(el);
+              targetPort?.removeLink(link);
+              const idx = link?.getPointIndex(model.model);
+              !isNil(idx) &&
+                newLink?.removePointsBefore(newLink?.getPoints()[idx]);
+              link?.removePointsAfter(model.model);
+              this.diagramModel.addLink(newLink);
               // if we are connecting to the same target or source, destroy tweener points
             } else if (link.getTargetPort() === el) {
               link.removePointsAfter(model.model);
@@ -370,17 +367,17 @@ export class MouseManager {
               link.removePointsBefore(model.model);
             }
           } else {
-            link.setTargetPort(el);
-            const targetPort = link.getTargetPort();
-            const srcPort = link.getSourcePort();
+            link?.setTargetPort(el);
+            const targetPort = link?.getTargetPort();
+            const srcPort = link?.getSourcePort();
 
             if (
-              targetPort.id !== srcPort.id &&
-              srcPort.canLinkToPort(targetPort)
+              targetPort?.id !== srcPort?.id &&
+              srcPort?.canLinkToPort(targetPort)
             ) {
               // link is valid, fire the event
-              this.engine.startFiringAction(
-                new LinkCreatedAction(event.clientX, event.clientY, link)
+              this.actionsManager.startFiringAction(
+                new LinkCreatedAction(link)
               );
             }
           }
@@ -391,7 +388,7 @@ export class MouseManager {
       });
 
       // check for / destroy any loose links in any models which have been moved
-      if (!this.engine.getDiagramModel().getAllowLooseLinks()) {
+      if (!this.diagramModel.getAllowLooseLinks()) {
         action.selectionModels.forEach((model) => {
           // only care about points connecting to things
           if (!model || !(model.model instanceof PointModel)) {
@@ -399,12 +396,13 @@ export class MouseManager {
           }
 
           const selectedPoint: PointModel = model.model;
-          const link: LinkModel = selectedPoint.getLink();
-          if (link.getSourcePort() === null || link.getTargetPort() === null) {
-            link.destroy();
-            this.engine.startFiringAction(
-              new LooseLinkDestroyed(event.clientX, event.clientY, link)
-            );
+          const link = selectedPoint.getLink();
+          if (
+            link?.getSourcePort() === null ||
+            link?.getTargetPort() === null
+          ) {
+            this.diagramModel.deleteLink(link);
+            this.actionsManager.startFiringAction(new LooseLinkDestroyed(link));
           }
         });
       }
@@ -416,16 +414,16 @@ export class MouseManager {
           return;
         }
 
-        const link: LinkModel = model.model.getLink();
-        const sourcePort: PortModel = link.getSourcePort();
-        const targetPort: PortModel = link.getTargetPort();
+        const link = model.model.getLink();
+        const sourcePort = link?.getSourcePort();
+        const targetPort = link?.getTargetPort();
 
-        if (sourcePort !== null && targetPort !== null) {
+        if (link && sourcePort && targetPort) {
           if (!sourcePort.canLinkToPort(targetPort)) {
             // link not allowed
-            link.destroy();
-            this.engine.startFiringAction(
-              new InvalidLinkDestroyed(event.clientX, event.clientY, link)
+            if (link) this.diagramModel.deleteLink(link);
+            this.actionsManager.startFiringAction(
+              new InvalidLinkDestroyed(link)
             );
           } else if (
             targetPort
@@ -438,29 +436,29 @@ export class MouseManager {
               )
           ) {
             // link is a duplicate
-            link.destroy();
+            this.diagramModel.deleteLink(link);
           }
         }
       });
 
-      this.engine.stopFiringAction();
+      this.actionsManager.stopFiringAction();
     } else {
-      this.engine.stopFiringAction();
+      this.actionsManager.stopFiringAction();
     }
   }
 
   onMouseWheel(event: WheelEvent) {
-    if (!this.engine.getDiagramModel().getAllowCanvasZoom()) {
+    if (!this.diagramModel.getAllowCanvasZoom()) {
       return;
     }
 
     event.preventDefault();
     event.stopPropagation();
-    const currentZoomLevel = this.engine.getDiagramModel().getZoomLevel();
+    const currentZoomLevel = this.diagramModel.getZoomLevel();
 
     const oldZoomFactor = currentZoomLevel / 100;
 
-    let scrollDelta = this.engine.getDiagramModel().getInverseZoom()
+    let scrollDelta = this.diagramModel.getInverseZoom()
       ? -event.deltaY
       : event.deltaY;
 
@@ -477,10 +475,10 @@ export class MouseManager {
 
     if (currentZoomLevel + scrollDelta > 10) {
       const newZoomLvl = currentZoomLevel + scrollDelta;
-      this.engine.getDiagramModel().setZoomLevel(newZoomLvl);
+      this.diagramModel.setZoomLevel(newZoomLvl);
     }
 
-    const updatedZoomLvl = this.engine.getDiagramModel().getZoomLevel();
+    const updatedZoomLvl = this.diagramModel.getZoomLevel();
     const zoomFactor = updatedZoomLvl / 100;
 
     const boundingRect = (event.currentTarget as Element).getBoundingClientRect();
@@ -497,25 +495,24 @@ export class MouseManager {
 
     // compute width and height increment factor
     const xFactor =
-      (clientX - this.engine.getDiagramModel().getOffsetX()) /
-      oldZoomFactor /
-      clientWidth;
+      (clientX - this.diagramModel.getOffsetX()) / oldZoomFactor / clientWidth;
     const yFactor =
-      (clientY - this.engine.getDiagramModel().getOffsetY()) /
-      oldZoomFactor /
-      clientHeight;
+      (clientY - this.diagramModel.getOffsetY()) / oldZoomFactor / clientHeight;
 
-    const updatedXOffset =
-      this.engine.getDiagramModel().getOffsetX() - widthDiff * xFactor;
+    const updatedXOffset = this.diagramModel.getOffsetX() - widthDiff * xFactor;
     const updatedYOffset =
-      this.engine.getDiagramModel().getOffsetY() - heightDiff * yFactor;
+      this.diagramModel.getOffsetY() - heightDiff * yFactor;
 
-    this.engine.getDiagramModel().setOffset(updatedXOffset, updatedYOffset);
+    this.diagramModel.setOffset(updatedXOffset, updatedYOffset);
   }
 
   protected createMouseListeners() {
-    const mouseUp$ = fromEvent<MouseEvent>(document, 'mouseup').pipe(
+    const mouseUp$ = race([
+      fromEvent<MouseEvent>(document, 'mouseup'),
+      fromEvent<MouseEvent>(document, 'contextmenu'),
+    ]).pipe(
       tap((e) => this.onMouseUp(e)),
+      share(),
       take(1)
     );
 
@@ -525,7 +522,7 @@ export class MouseManager {
     );
 
     merge(mouseMove$, mouseUp$)
-      .pipe(takeUntil(this.engine.getDiagramModel().onEntityDestroy()))
+      .pipe(takeUntil(this.diagramModel.onEntityDestroy()))
       .subscribe();
   }
 }

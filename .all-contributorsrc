@@ -46,6 +46,24 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "yaelrabi",
+      "name": "yaelrabi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/75570026?v=4",
+      "profile": "https://github.com/yaelrabi",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Lihovod",
+      "name": "0",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7195708?v=4",
+      "profile": "https://github.com/Lihovod",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

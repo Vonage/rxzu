@@ -1,16 +1,18 @@
 <div
-  class="ngdx-diagram"
+  class="rxzu-diagram"
   #canvas
   (mousedown)="onMouseDown($event)"
   (wheel)="onMouseWheel($event)"
+  (keyup)="onKeyUp($event)"
+  tabindex="1"
 >
   <!-- Nodes Layer -->
-  <div class="ngdx-nodes-layer">
+  <div class="rxzu-nodes-layer">
     <ng-template #nodesLayer></ng-template>
   </div>
 
   <!-- Links Layer -->
-  <div class="ngdx-links-layer">
+  <div class="rxzu-links-layer">
     <ng-template #linksLayer></ng-template>
   </div>
 
@@ -19,10 +21,10 @@
     *ngIf="selectionBox$ | async as selectionBox"
     class="selector"
     [ngStyle]="{
-      top: selectionBox.dimensions.top + 'px',
-      left: selectionBox.dimensions.left + 'px',
-      width: selectionBox.dimensions.width + 'px',
-      height: selectionBox.dimensions.height + 'px'
+      top: selectionBox?.dimensions?.top + 'px',
+      left: selectionBox?.dimensions?.left + 'px',
+      width: selectionBox?.dimensions?.width + 'px',
+      height: selectionBox?.dimensions?.height + 'px'
     }"
   ></div>
 </div>

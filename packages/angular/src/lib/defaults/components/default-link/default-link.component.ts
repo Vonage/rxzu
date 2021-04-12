@@ -3,33 +3,33 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  Inject,
   OnInit,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import {
-  PointModel,
-  generateCurvePath,
-  Coords,
-  DefaultLinkModel,
-} from '@rxzu/core';
-import { combineLatest, Observable } from 'rxjs';
+import { PointModel, generateCurvePath, Coords, LinkModel } from '@rxzu/core';
+import { combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { MODEL } from '../../../injection.tokens';
 
 @Component({
-  selector: 'ngdx-default-link',
+  selector: 'rxzu-default-link',
   templateUrl: './default-link.component.html',
   styleUrls: ['./default-link.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DefaultLinkComponent
-  extends DefaultLinkModel
-  implements AfterViewInit, OnInit {
+export class DefaultLinkComponent implements OnInit, AfterViewInit {
   @ViewChild('labelLayer', { read: ViewContainerRef, static: true })
-  labelLayer: ViewContainerRef;
+  labelLayer!: ViewContainerRef;
 
-  constructor(private cdRef: ChangeDetectorRef) {
-    super({ type: 'ngdx-default-link' });
+  constructor(
+    @Inject(MODEL) public model: LinkModel,
+    private cdRef: ChangeDetectorRef
+  ) {}
+
+  ngOnInit() {
+    this.model.setPainted(true);
   }
 
   trackByPoints(i: number, point: PointModel) {
@@ -40,17 +40,13 @@ export class DefaultLinkComponent
     this.cdRef.detectChanges();
   }
 
-  ngOnInit() {
-    this.setPainted(true);
-  }
-
   ngAfterViewInit() {
-    const firstPCoords$ = this.getFirstPoint().selectCoords();
-    const lastPCoords$ = this.getLastPoint().selectCoords();
+    const firstPCoords$ = this.model.getFirstPoint().selectCoords();
+    const lastPCoords$ = this.model.getLastPoint().selectCoords();
 
     // Observe link coords and update drawing accordingly
     combineLatest([firstPCoords$, lastPCoords$])
-      .pipe(takeUntil(this.onEntityDestroy()))
+      .pipe(takeUntil(this.model.onEntityDestroy()))
       .subscribe(([firstPCoords, lastPCoords]) => {
         const points = [firstPCoords, lastPCoords];
 
@@ -69,11 +65,12 @@ export class DefaultLinkComponent
         const path = generateCurvePath(
           firstPCoords,
           lastPCoords,
-          isStraight ? 0 : this.curvyness
+          isStraight ? 0 : 50
         );
-        this.path$.set(path).emit();
+        this.model.setPath(path);
 
-        const label = this.getLabel();
+        const label = this.model.getLabel();
+
         // update label position
         if (label) {
           label.setCoords(this.calcCenterOfPath(firstPCoords, lastPCoords));
@@ -105,9 +102,5 @@ export class DefaultLinkComponent
       x: (firstPoint.x + secondPoint.x) / 2 + 20,
       y: (firstPoint.y + secondPoint.y) / 2 + 20,
     };
-  }
-
-  selectPath(): Observable<string> {
-    return this.path$.value$;
   }
 }

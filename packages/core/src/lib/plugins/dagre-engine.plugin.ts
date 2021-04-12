@@ -1,6 +1,5 @@
-import { Injectable } from '@angular/core';
-import { DiagramModel, PointModel } from '@rxzu/core';
 import { EdgeConfig, GraphLabel, NodeConfig, graphlib, layout } from 'dagre';
+import { DiagramModel, PointModel } from '../models';
 
 export interface DagreEngineOptions {
   graph?: GraphLabel;
@@ -11,9 +10,8 @@ export interface DagreEngineOptions {
   includeLinks?: boolean;
 }
 
-@Injectable()
 export class DagrePlugin {
-  g: graphlib.Graph;
+  g!: graphlib.Graph;
 
   instantiate() {
     try {
@@ -27,7 +25,6 @@ export class DagrePlugin {
 
   redistribute(model: DiagramModel, options: DagreEngineOptions = {}): void {
     this.instantiate();
-
     this.g.setGraph(options.graph || {});
 
     this.g.setDefaultEdgeLabel(() => {
@@ -48,11 +45,15 @@ export class DagrePlugin {
       // set edges
       if (link.getSourcePort() && link.getTargetPort()) {
         processedlinks[link.id] = true;
-        this.g.setEdge({
-          v: link.getSourcePort().getNode().id,
-          w: link.getTargetPort().getNode().id,
-          name: link.id,
-        });
+        const v = link.getSourcePort()?.getNode()?.id;
+        const w = link.getTargetPort()?.getNode()?.id;
+        v &&
+          w &&
+          this.g.setEdge({
+            v,
+            w,
+            name: link.id,
+          });
       }
     });
 
@@ -60,8 +61,10 @@ export class DagrePlugin {
     layout(this.g, options.layout);
 
     this.g.nodes().forEach((v) => {
-      const { x, y } = this.g.node(v);
-      model.getNode(v).setCoords({ x, y });
+      // returns the width, height, the x-coordinate of the center of the node, and the y-coordinate of the center of the node
+      const { x, y, width, height } = this.g.node(v);
+      // update the new coordinates of the node
+      model.getNode(v)?.setCoords({ x: x - width / 2, y: y - height / 2 });
     });
 
     // also include links?
@@ -70,13 +73,18 @@ export class DagrePlugin {
         const edge = this.g.edge(e);
         const link = model.getLink(e.name);
 
-        const points = [link.getFirstPoint()];
-        for (let i = 1; i < edge.points.length - 2; i++) {
-          points.push(
-            new PointModel(link, { x: edge.points[i].x, y: edge.points[i].y })
-          );
+        if (link) {
+          const points = [link?.getFirstPoint()];
+          for (let i = 1; i < edge.points.length - 2; i++) {
+            points.push(
+              new PointModel({
+                parent: link,
+                coords: { x: edge.points[i].x, y: edge.points[i].y },
+              })
+            );
+          }
+          link?.setPoints(points.concat(link?.getLastPoint()));
         }
-        link.setPoints(points.concat(link.getLastPoint()));
       });
     }
   }

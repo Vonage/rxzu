@@ -1,10 +1,11 @@
 <div
   class="default-node"
-  [ngStyle]="{
-    'height.px': height$ | async,
-    'width.px': width$ | async,
-    'background-color': color
+  [ngClass]="{
+    selected: model.selectSelected() | async,
+    hovered: model.selectHovered() | async
   }"
+  (mouseover)="model.setHovered()"
+  (mouseout)="model.setHovered(false)"
 >
   <div class="ports">
     <ng-template #portsLayer></ng-template>

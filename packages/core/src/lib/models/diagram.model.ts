@@ -1,62 +1,106 @@
 import { Observable } from 'rxjs';
-import { BaseEntity, BaseEntityType } from '../base.entity';
-import { DiagramEngineCore } from '../engine.core';
-import { Coords } from '../interfaces/coords.interface';
-import { SelectOptions } from '../interfaces/select-options.interface';
-import { SerializedDiagramModel } from '../interfaces/serialization.interface';
-import { createEntityState, createValueState } from '../state';
-import { coerceArray, ID, isEmptyArray, unique } from '../utils';
-import { EntityMap } from '../utils/types';
+import { BaseEntity } from '../base.entity';
+import { DiagramEngine } from '../engine.core';
+import { SelectOptions, Coords, BaseEntityType } from '../interfaces';
+import {
+  createEntityState,
+  createValueState,
+  EntityState,
+  ValueState,
+} from '../state';
+import { coerceArray, EntityMap, ID, isEmptyArray, unique } from '../utils';
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
 import { NodeModel } from './node.model';
 import { PortModel } from './port.model';
+import { PointModel } from './point.model';
+import {
+  DiagramModelOptions,
+  KeyBindigsOptions,
+} from '../interfaces/options.interface';
 
 export class DiagramModel extends BaseEntity {
-  protected nodes$ = createEntityState<NodeModel>([], this.entityPipe('nodes'));
-  protected links$ = createEntityState<LinkModel>([], this.entityPipe('links'));
-  protected offsetX$ = createValueState<number>(0, this.entityPipe('offsetX'));
-  protected offsetY$ = createValueState<number>(0, this.entityPipe('offsetY'));
-  protected zoom$ = createValueState<number>(100, this.entityPipe('zoom'));
-  protected maxZoomOut$ = createValueState<number>(
-    null,
-    this.entityPipe('maxZoomOut')
-  );
-  protected maxZoomIn$ = createValueState<number>(
-    null,
-    this.entityPipe('maxZoomIn')
-  );
-  protected gridSize$ = createValueState<number>(
-    0,
-    this.entityPipe('gridSize')
-  );
-  protected allowCanvasZoom$ = createValueState<boolean>(
-    true,
-    this.entityPipe('allowCanvasZoom')
-  );
-  protected allowCanvasTranslation$ = createValueState<boolean>(
-    true,
-    this.entityPipe('allowCanvasTranslation')
-  );
-  protected inverseZoom$ = createValueState<boolean>(
-    true,
-    this.entityPipe('inverseZoom')
-  );
-  protected allowLooseLinks$ = createValueState<boolean>(
-    true,
-    this.entityPipe('allowLooseLinks')
-  );
-  protected portMagneticRadius$ = createValueState<number>(
-    30,
-    this.entityPipe('portMagneticRadius')
-  );
+  private _diagramEngine?: DiagramEngine;
+  protected nodes$: EntityState<NodeModel>;
+  protected links$: EntityState<LinkModel>;
+  protected offsetX$: ValueState<number>;
+  protected offsetY$: ValueState<number>;
+  protected zoom$: ValueState<number>;
+  protected maxZoomOut$: ValueState<number>;
+  protected maxZoomIn$: ValueState<number>;
+  protected gridSize$: ValueState<number>;
+  protected allowCanvasZoom$: ValueState<boolean>;
+  protected allowCanvasTranslation$: ValueState<boolean>;
+  protected inverseZoom$: ValueState<boolean>;
+  protected allowLooseLinks$: ValueState<boolean>;
+  protected portMagneticRadius$: ValueState<number>;
+  protected keyBindings$: ValueState<KeyBindigsOptions>;
 
   constructor(
-    protected diagramEngine: DiagramEngineCore,
-    id?: string,
-    logPrefix = '[Diagram]'
+    options: DiagramModelOptions = {},
+    diagramEngine?: DiagramEngine
   ) {
-    super(id, logPrefix);
+    super({ type: 'diagram', logPrefix: '[Diagram]', ...options });
+
+    if (diagramEngine) {
+      this._diagramEngine = diagramEngine;
+    }
+
+    this.nodes$ = createEntityState([], this.entityPipe('nodes'));
+    this.links$ = createEntityState([], this.entityPipe('links'));
+    this.offsetX$ = createValueState(
+      options.offsetX ?? 0,
+      this.entityPipe('offsetX')
+    );
+    this.offsetY$ = createValueState(
+      options.offsetY ?? 0,
+      this.entityPipe('offsetY')
+    );
+    this.zoom$ = createValueState(options.zoom ?? 100, this.entityPipe('zoom'));
+    this.maxZoomOut$ = createValueState(
+      options.maxZoomOut ?? 0,
+      this.entityPipe('maxZoomOut')
+    );
+    this.maxZoomIn$ = createValueState(
+      options.maxZoomIn ?? 0,
+      this.entityPipe('maxZoomIn')
+    );
+    this.gridSize$ = createValueState(
+      options.gridSize ?? 0,
+      this.entityPipe('gridSize')
+    );
+    this.allowCanvasZoom$ = createValueState<boolean>(
+      options.allowCanvasZoom ?? true,
+      this.entityPipe('allowCanvasZoom')
+    );
+    this.allowCanvasTranslation$ = createValueState<boolean>(
+      options.allowCanvasTranslation ?? true,
+      this.entityPipe('allowCanvasTranslation')
+    );
+    this.inverseZoom$ = createValueState<boolean>(
+      options.inverseZoom ?? true,
+      this.entityPipe('inverseZoom')
+    );
+    this.allowLooseLinks$ = createValueState<boolean>(
+      options.allowLooseLinks ?? true,
+      this.entityPipe('allowLooseLinks')
+    );
+    this.portMagneticRadius$ = createValueState(
+      options.portMagneticRadius ?? 30,
+      this.entityPipe('portMagneticRadius')
+    );
+    this.keyBindings$ = createValueState(
+      options.keyBindings ?? {},
+      this.entityPipe('keyBindings')
+    );
+  }
+
+  set diagramEngine(value: DiagramEngine | undefined) {
+    this._diagramEngine = value;
+  }
+
+  get diagramEngine(): DiagramEngine | undefined {
+    return this._diagramEngine;
   }
 
   getNodes(): EntityMap<NodeModel> {
@@ -67,12 +111,12 @@ export class DiagramModel extends BaseEntity {
     return this.nodes$.array();
   }
 
-  getNode(id: ID): NodeModel | undefined {
-    return this.nodes$.get(id);
+  getNode(id?: ID | null): NodeModel | undefined {
+    return (id && this.nodes$.get(id)) || undefined;
   }
 
-  getLink(id: ID): LinkModel | undefined {
-    return this.links$.get(id);
+  getLink(id?: ID | null): LinkModel | undefined {
+    return (id && this.links$.get(id)) || undefined;
   }
 
   getLinks(): EntityMap<LinkModel> {
@@ -101,7 +145,7 @@ export class DiagramModel extends BaseEntity {
    * @returns Inserted Node
    */
   addNode(node: NodeModel): NodeModel {
-    this.nodes$.add(node).emit();
+    this.nodes$.add(node);
     return node;
   }
 
@@ -111,6 +155,7 @@ export class DiagramModel extends BaseEntity {
   deleteNode(nodeOrId: NodeModel | string): void {
     const nodeId: ID = typeof nodeOrId === 'string' ? nodeOrId : nodeOrId.id;
     const node = this.getNode(nodeId);
+    if (!node) return;
 
     for (const port of node.getPorts().values()) {
       for (const link of port.getLinks().values()) {
@@ -118,7 +163,7 @@ export class DiagramModel extends BaseEntity {
       }
     }
 
-    this.nodes$.remove(nodeId).emit();
+    this.nodes$.remove(nodeId);
   }
 
   /**
@@ -133,7 +178,7 @@ export class DiagramModel extends BaseEntity {
    * @returns Newly created link
    */
   addLink(link: LinkModel): LinkModel {
-    this.links$.add(link).emit();
+    this.links$.add(link);
     return link;
   }
 
@@ -142,12 +187,12 @@ export class DiagramModel extends BaseEntity {
    */
   deleteLink(linkOrId: LinkModel | string) {
     const linkId: ID = typeof linkOrId === 'string' ? linkOrId : linkOrId.id;
-    this.links$.remove(linkId).emit();
+    this.links$.remove(linkId);
   }
 
   reset() {
-    this.nodes$.clear().emit();
-    this.links$.clear().emit();
+    this.nodes$.clear();
+    this.links$.clear();
   }
 
   /**
@@ -157,23 +202,8 @@ export class DiagramModel extends BaseEntity {
     return this.links$.value$;
   }
 
-  // /**
-  //  * Serialize the diagram model to JSON
-  //  * @returns diagram model as a string
-  //  */
-  serialize(): SerializedDiagramModel {
-    const serializedNodes = this.nodes$.map((node) => node.serialize());
-    const serializedLinks = this.links$.map((link) => link.serialize());
-
-    return {
-      ...super.serialize(),
-      nodes: serializedNodes,
-      links: serializedLinks,
-    };
-  }
-
   setPortMagneticRadius(portMagneticRadius: number) {
-    this.portMagneticRadius$.set(portMagneticRadius).emit();
+    this.portMagneticRadius$.set(portMagneticRadius);
   }
 
   getPortMagneticRadius() {
@@ -185,7 +215,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   setAllowLooseLinks(allowLooseLinks: boolean) {
-    this.allowLooseLinks$.set(allowLooseLinks).emit();
+    this.allowLooseLinks$.set(allowLooseLinks);
   }
 
   getAllowLooseLinks() {
@@ -197,7 +227,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   setInverseZoom(inverseZoom: boolean) {
-    this.inverseZoom$.set(inverseZoom).emit();
+    this.inverseZoom$.set(inverseZoom);
   }
 
   getInverseZoom() {
@@ -208,8 +238,20 @@ export class DiagramModel extends BaseEntity {
     return this.inverseZoom$.select();
   }
 
+  setKeyBindings(keyBindings: KeyBindigsOptions) {
+    this.keyBindings$.set(keyBindings);
+  }
+
+  getKeyBindings() {
+    return this.keyBindings$.value;
+  }
+
+  selectKeyBindings() {
+    return this.keyBindings$.select();
+  }
+
   setAllowCanvasZoom(allowCanvasZoom: boolean) {
-    this.allowCanvasZoom$.set(allowCanvasZoom).emit();
+    this.allowCanvasZoom$.set(allowCanvasZoom);
   }
 
   getAllowCanvasZoom() {
@@ -221,7 +263,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   setAllowCanvasTranslation(allowCanvasTranslation: boolean) {
-    this.allowCanvasTranslation$.set(allowCanvasTranslation).emit();
+    this.allowCanvasTranslation$.set(allowCanvasTranslation);
   }
 
   getAllowCanvasTranslation() {
@@ -233,7 +275,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   setMaxZoomOut(maxZoomOut: number) {
-    this.maxZoomOut$.set(maxZoomOut).emit();
+    this.maxZoomOut$.set(maxZoomOut);
   }
 
   getMaxZoomOut() {
@@ -245,7 +287,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   setMaxZoomIn(maxZoomIn: number) {
-    this.maxZoomIn$.set(maxZoomIn).emit();
+    this.maxZoomIn$.set(maxZoomIn);
   }
 
   getMaxZoomIn() {
@@ -253,12 +295,12 @@ export class DiagramModel extends BaseEntity {
   }
 
   setOffset(x: number, y: number) {
-    this.offsetX$.set(x).emit();
-    this.offsetY$.set(y).emit();
+    this.offsetX$.set(x);
+    this.offsetY$.set(y);
   }
 
   setOffsetX(x: number) {
-    this.offsetX$.set(x).emit();
+    this.offsetX$.set(x);
   }
 
   getOffsetX(): number {
@@ -270,7 +312,7 @@ export class DiagramModel extends BaseEntity {
   }
 
   setOffsetY(y: number) {
-    this.offsetY$.set(y).emit();
+    this.offsetY$.set(y);
   }
 
   getOffsetY(): number {
@@ -290,7 +332,7 @@ export class DiagramModel extends BaseEntity {
       return;
     }
 
-    this.zoom$.set(z).emit();
+    this.zoom$.set(z);
   }
 
   getZoomLevel(): number {
@@ -301,7 +343,7 @@ export class DiagramModel extends BaseEntity {
     return this.zoom$.value$;
   }
 
-  getDiagramEngine(): DiagramEngineCore {
+  getDiagramEngine(): DiagramEngine | undefined {
     return this.diagramEngine;
   }
 
@@ -326,26 +368,32 @@ export class DiagramModel extends BaseEntity {
     };
   }
 
-  getSelectedItems(...filters: BaseEntityType[]): BaseModel[] {
+  getSelectedItems(
+    ...filters: Exclude<BaseEntityType, 'diagram' | 'label'>[]
+  ): (NodeModel | PointModel | PortModel | LinkModel)[] {
     filters = coerceArray(filters);
 
-    const items: BaseModel[] = [];
+    const items: (NodeModel | PointModel | PortModel | LinkModel)[] = [];
     const nodes = this.nodes$.array();
     const links = this.links$.array();
 
-    const selectedNodes = () =>
+    const selectedNodes = (): (NodeModel | PointModel)[] =>
       nodes.flatMap((node) => node.getSelectedEntities());
-    const selectedPorts = () =>
+    const selectedPorts = (): PortModel[] =>
       nodes.flatMap((node) =>
         node
           .getPortsArray()
-          .flatMap((port: PortModel) => port.getSelectedEntities())
+          .flatMap(
+            (port: PortModel) => port.getSelectedEntities() as PortModel[]
+          )
       );
-    const selectedLinks = () =>
-      links.flatMap((link) => link.getSelectedEntities());
-    const selectedPoints = () =>
+    const selectedLinks = (): LinkModel[] =>
+      links.flatMap((link) => link.getSelectedEntities() as LinkModel[]);
+    const selectedPoints = (): PointModel[] =>
       links.flatMap((link) =>
-        link.getPoints().flatMap((point) => point.getSelectedEntities())
+        link
+          .getPoints()
+          .flatMap((point) => point.getSelectedEntities() as PointModel[])
       );
 
     if (isEmptyArray(filters)) {
@@ -356,7 +404,10 @@ export class DiagramModel extends BaseEntity {
         ...selectedPoints()
       );
     } else {
-      const byType: Record<BaseEntityType, () => BaseModel[]> = {
+      const byType: Record<
+        Exclude<BaseEntityType, 'diagram' | 'label'>,
+        () => (NodeModel | PointModel | PortModel | LinkModel)[]
+      > = {
         node: selectedNodes,
         port: selectedPorts,
         link: selectedLinks,
@@ -390,11 +441,11 @@ export class DiagramModel extends BaseEntity {
   }
 
   addLinks(links: LinkModel[]) {
-    this.links$.addMany(links).emit();
+    this.links$.addMany(links);
   }
 
   addNodes(nodes: NodeModel[]) {
-    this.nodes$.addMany(nodes).emit();
+    this.nodes$.addMany(nodes);
   }
 
   destroy() {

@@ -1,6 +1,5 @@
 import { Observable } from 'rxjs';
-import { Coords } from '../interfaces/coords.interface';
-import { SerializedPointModel } from '../interfaces/serialization.interface';
+import { Coords, PointModelOptions } from '../interfaces';
 import { createValueState, ValueState } from '../state';
 import { BaseModel } from './base.model';
 import { LinkModel } from './link.model';
@@ -8,37 +7,36 @@ import { LinkModel } from './link.model';
 export class PointModel extends BaseModel<LinkModel> {
   protected coords$: ValueState<Coords>;
 
-  constructor(link: LinkModel, coords: Coords, id?: string, logPrefix = '[Point]') {
-    super(link.getType(), id, logPrefix);
-    this.coords$ = createValueState(coords, this.entityPipe('coords'));
-    this.setParent(link);
+  constructor(options: PointModelOptions = {}) {
+    super({ type: 'point', logPrefix: '[Point]', ...options });
+    this.coords$ = createValueState(
+      options.coords ?? { x: 0, y: 0 },
+      this.entityPipe('coords')
+    );
   }
 
-  serialize(): SerializedPointModel {
-    return {
-      ...super.serialize(),
-      coords: this.getCoords()
-    };
+  // serialize(): IPointModel {
+  //   return {
+  //     ...super.serialize(),
+  //     coords: this.getCoords(),
+  //   };
+  // }
+
+  isConnectedToPort(): boolean {
+    return this.getParent()?.getPortForPoint(this) !== null;
   }
 
-  isConnectedToPort() {
-    return this.getParent().getPortForPoint(this) !== null;
-  }
-
-  getLink(): LinkModel {
+  getLink(): LinkModel | null {
     return this.getParent();
   }
 
   destroy() {
-    if (this.getParent) {
-      this.getParent().removePoint(this);
-    }
-
+    this.getParent()?.removePoint(this);
     super.destroy();
   }
 
   setCoords(newCoords: Partial<Coords>) {
-    this.coords$.set({ ...this.getCoords(), ...newCoords }).emit();
+    this.coords$.set({ ...this.getCoords(), ...newCoords });
   }
 
   selectCoords(): Observable<Coords> {
