@@ -49,7 +49,7 @@ export class LinkModel<Extras = any> extends BaseModel<DiagramModel> {
   }
 
   setExtras<Extras>(extras: Partial<Extras>) {
-    this.extras$.set(extras as any);
+    this.extras$.set({ ...this.getExtras(), ...extras });
   }
 
   getExtras(): Extras {
