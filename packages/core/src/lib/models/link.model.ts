@@ -8,10 +8,10 @@ import { LabelModel } from './label.model';
 import { PointModel } from './point.model';
 import { PortModel } from './port.model';
 
-export class LinkModel extends BaseModel<DiagramModel> {
+export class LinkModel<Extras = any> extends BaseModel<DiagramModel> {
   protected sourcePort$: ValueState<PortModel | null>;
   protected targetPort$: ValueState<PortModel | null>;
-  protected extras$: ValueState<any>;
+  protected extras$: ValueState<Extras>;
   protected label$: ValueState<LabelModel | null>;
   protected path$: ValueState<string | null>;
   protected points$: ValueState<PointModel[]>;
@@ -48,17 +48,17 @@ export class LinkModel extends BaseModel<DiagramModel> {
     );
   }
 
-  setExtras<E>(extras: Partial<E>) {
-    this.extras$.set(extras);
+  setExtras<Extras>(extras: Partial<Extras>) {
+    this.extras$.set(extras as any);
   }
 
-  getExtras() {
+  getExtras(): Extras {
     return this.extras$.value;
   }
 
-  selectExtras<T>(
-    selector?: (extra: Partial<T>) => T[keyof T] | string | string[]
-  ): Observable<T> {
+  selectExtras(): Observable<Extras>;
+  selectExtras<R>(selector?: (extras: Extras) => R): Observable<R>;
+  selectExtras<R>(selector?: (extras: Extras) => R): Observable<R> {
     return this.extras$.select(selector);
   }
 

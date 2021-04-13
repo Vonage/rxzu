@@ -14,8 +14,8 @@ import { PortModel } from './port.model';
 import { PointModel } from './point.model';
 import { DiagramEngine } from '../engine.core';
 
-export class NodeModel extends BaseModel<DiagramModel> {
-  protected extras$: ValueState<any>;
+export class NodeModel<Extras = any> extends BaseModel<DiagramModel> {
+  protected extras$: ValueState<Extras>;
   protected ports$: EntityState<PortModel>;
   protected coords$: ValueState<Coords>;
   protected dimensions$: ValueState<Dimensions>;
@@ -193,17 +193,17 @@ export class NodeModel extends BaseModel<DiagramModel> {
       .pipe(this.withLog('selectHeight'));
   }
 
-  setExtras<E>(extras: Partial<E>) {
-    this.extras$.set(extras);
+  setExtras(extras: Partial<Extras>): void {
+    this.extras$.set({ ...this.getExtras(), ...extras });
   }
 
-  getExtras() {
+  getExtras(): Extras {
     return this.extras$.value;
   }
 
-  selectExtras<E>(
-    selector?: (extra: E) => E[keyof E] | string | string[]
-  ): Observable<E> {
+  selectExtras(): Observable<Extras>;
+  selectExtras<R>(selector?: (extras: Extras) => R): Observable<R>;
+  selectExtras<R>(selector?: (extras: Extras) => R): Observable<R> {
     return this.extras$.select(selector);
   }
 
