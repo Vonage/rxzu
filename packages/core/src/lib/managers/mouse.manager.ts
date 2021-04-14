@@ -15,6 +15,7 @@ import { isNil } from '../utils';
 
 export class MouseManager {
   protected engine: DiagramEngine;
+  protected readonly minValidZoom = 1;
 
   constructor(protected _diagramEngine: DiagramEngine) {
     this.engine = _diagramEngine;
@@ -473,7 +474,7 @@ export class MouseManager {
       scrollDelta /= 60;
     }
 
-    if (currentZoomLevel + scrollDelta > 10) {
+    if (currentZoomLevel + scrollDelta >= this.minValidZoom) {
       const newZoomLvl = currentZoomLevel + scrollDelta;
       this.diagramModel.setZoomLevel(newZoomLvl);
     }
