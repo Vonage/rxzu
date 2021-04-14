@@ -48,8 +48,8 @@ export class LinkModel<Extras = any> extends BaseModel<DiagramModel> {
     );
   }
 
-  setExtras<Extras>(extras: Partial<Extras>) {
-    this.extras$.set({ ...this.getExtras(), ...extras });
+  setExtras(extras: Extras) {
+    this.extras$.set(extras);
   }
 
   getExtras(): Extras {

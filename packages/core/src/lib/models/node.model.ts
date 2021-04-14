@@ -193,8 +193,8 @@ export class NodeModel<Extras = any> extends BaseModel<DiagramModel> {
       .pipe(this.withLog('selectHeight'));
   }
 
-  setExtras(extras: Partial<Extras>): void {
-    this.extras$.set({ ...this.getExtras(), ...extras });
+  setExtras(extras: Extras): void {
+    this.extras$.set(extras);
   }
 
   getExtras(): Extras {
