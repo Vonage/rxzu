@@ -1,3 +1,10 @@
+## [3.0.7](https://github.com/Vonage/rxzu/compare/v3.0.6...v3.0.7) (2021-04-18)
+
+
+### Bug Fixes
+
+* **dependencies:** add rxjs and dagre to peer dependencies to prevent conflicts ([d6a97fb](https://github.com/Vonage/rxzu/commit/d6a97fbce57523a678bb76f926509b94367cba80))
+
 ## [3.0.6](https://github.com/Vonage/rxzu/compare/v3.0.5...v3.0.6) (2021-04-14)
 
 
