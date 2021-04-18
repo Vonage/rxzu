@@ -1,3 +1,12 @@
+## [3.0.6](https://github.com/Vonage/rxzu/compare/v3.0.5...v3.0.6) (2021-04-14)
+
+
+### Bug Fixes
+
+* **extras:** set the value as passed ([db355ce](https://github.com/Vonage/rxzu/commit/db355ce4e9bf4121de9423c46c701b67add9892a))
+* **link:** merge with current extras ([0b5a3bc](https://github.com/Vonage/rxzu/commit/0b5a3bc0190ee1be3ecb4fa5d5eb9a1f56f9a98e))
+* **mouse:** change minimum zoom limitation ([67b1509](https://github.com/Vonage/rxzu/commit/67b150971e24a37779c856a87dbcfe7fd89d32dd))
+
 ## [3.0.5](https://github.com/Vonage/rxzu/compare/v3.0.4...v3.0.5) (2021-04-03)
 
 
