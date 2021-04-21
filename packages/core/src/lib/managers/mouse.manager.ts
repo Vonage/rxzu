@@ -8,6 +8,7 @@ import {
   LooseLinkDestroyed,
   InvalidLinkDestroyed,
 } from '../actions';
+import { DropAction } from '../actions/drop.action';
 import { DiagramEngine } from '../engine.core';
 import { Coords } from '../interfaces';
 import { NodeModel, PointModel, PortModel, BaseModel } from '../models';
@@ -442,6 +443,8 @@ export class MouseManager {
         }
       });
 
+      this.actionsManager.stopFiringAction();
+      this.actionsManager.startFiringAction(new DropAction(event, action.selectionModels));
       this.actionsManager.stopFiringAction();
     } else {
       this.actionsManager.stopFiringAction();
