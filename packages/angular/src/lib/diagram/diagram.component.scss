@@ -42,11 +42,4 @@
     left: 0;
     right: 0;
   }
-
-  .rxzu-links-layer,
-  .rxzu-nodes-layer {
-    &.rxzu-animate {
-      transition: transform 0.2s ease-in-out;
-    }
-  }
 }
