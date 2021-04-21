@@ -53,8 +53,8 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
 
   @ViewChild('canvas', { read: ElementRef, static: true })
   canvas?: ElementRef;
-  selectionBox$?: Observable<SelectingAction | null>;
 
+  selectionBox$?: Observable<SelectingAction | null>;
   mouseManager: MouseManager;
   keyboardManager: KeyboardManager;
   canvasManager: CanvasManager;

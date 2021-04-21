@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Host,
   Inject,
   IterableDiffers,
   OnInit,
@@ -10,9 +9,9 @@ import {
 } from '@angular/core';
 import {
   DefaultNodeComponent,
+  EngineService,
   MODEL,
   RxZuDiagramComponent,
-  EngineService,
 } from '@rxzu/angular';
 import { GHNodeModel } from '../../models';
 
