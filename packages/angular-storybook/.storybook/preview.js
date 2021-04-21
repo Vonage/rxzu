@@ -18,6 +18,7 @@ export const parameters = {
         'Drag And Drop',
         'Dynamic Ports',
         'Performance',
+        'Layout Animation',
         'Actions',
         'Themes',
         'Changelog',
