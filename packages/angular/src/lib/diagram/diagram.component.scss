@@ -1,4 +1,4 @@
-.rxzu-diagram {
+:host {
   position: relative;
   flex-grow: 1;
   display: flex;
@@ -41,5 +41,12 @@
     bottom: 0;
     left: 0;
     right: 0;
+  }
+
+  .rxzu-links-layer,
+  .rxzu-nodes-layer {
+    &.rxzu-animate {
+      transition: transform 0.5s ease-in-out;
+    }
   }
 }

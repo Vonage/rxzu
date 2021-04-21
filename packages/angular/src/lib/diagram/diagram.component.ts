@@ -3,33 +3,33 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  Inject,
   HostListener,
+  Inject,
   Input,
   NgZone,
   OnDestroy,
+  OnInit,
   Renderer2,
   ViewChild,
   ViewContainerRef,
-  OnInit,
 } from '@angular/core';
-import { combineLatest, noop, Observable, of } from 'rxjs';
-import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import {
-  SelectingAction,
-  MouseManager,
+  ActionsManager,
+  CanvasManager,
   DiagramModel,
   EngineSetup,
   KeyboardManager,
+  MouseManager,
   NodeModel,
-  CanvasManager,
-  ActionsManager,
+  SelectingAction,
 } from '@rxzu/core';
-import { ZonedClass, OutsideZone } from '../utils';
+import { combineLatest, noop, Observable, of } from 'rxjs';
+import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { EngineService } from '../engine.service';
-import { RegistryService } from '../registry.service';
 import { FactoryService } from '../factory.service';
 import { DIAGRAM_DEFAULT_OPTIONS } from '../injection.tokens';
+import { RegistryService } from '../registry.service';
+import { OutsideZone, ZonedClass } from '../utils';
 
 @Component({
   selector: 'rxzu-diagram',
@@ -38,6 +38,10 @@ import { DIAGRAM_DEFAULT_OPTIONS } from '../injection.tokens';
   styleUrls: ['diagram.component.scss'],
   providers: [EngineService, RegistryService, FactoryService],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    tabindex: '1',
+    class: 'rxzu-diagram',
+  },
 })
 export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
   /** The name of the diagram, if not set will be `'default'` */
@@ -50,9 +54,6 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
 
   @ViewChild('linksLayer', { read: ViewContainerRef, static: true })
   linksLayer?: ViewContainerRef;
-
-  @ViewChild('canvas', { read: ElementRef, static: true })
-  canvas?: ElementRef;
 
   selectionBox$?: Observable<SelectingAction | null>;
   mouseManager: MouseManager;
@@ -87,11 +88,7 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
         ...this.options,
       });
 
-    if (!this.canvas) {
-      return;
-    }
-
-    this.canvasManager.setCanvas(this.canvas.nativeElement);
+    this.canvasManager.setCanvas(this.host);
 
     this.diagramEngine.setup({
       ...this.options,
@@ -125,6 +122,24 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
    */
   zoomToNodes(nodes: NodeModel[], margin = 100): void {
     this.diagramEngine.zoomToNodes(nodes, margin);
+  }
+
+  @OutsideZone
+  @HostListener('mousedown', ['$event'])
+  onMouseDown(event: MouseEvent) {
+    this.mouseManager ? this.mouseManager.onMouseDown(event) : noop();
+  }
+
+  @OutsideZone
+  @HostListener('mousewheel', ['$event'])
+  onMouseWheel(event: WheelEvent) {
+    this.mouseManager ? this.mouseManager.onMouseWheel(event) : noop();
+  }
+
+  @OutsideZone
+  @HostListener('keyup', ['$event'])
+  onKeyUp(event: KeyboardEvent) {
+    this.keyboardManager ? this.keyboardManager.onKeyUp(event) : noop();
   }
 
   protected initNodes(): void {
@@ -170,11 +185,6 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
     this.mouseManager ? this.mouseManager.onMouseUp(event) : noop();
   }
 
-  @OutsideZone
-  onKeyUp(event: KeyboardEvent) {
-    this.keyboardManager ? this.keyboardManager.onKeyUp(event) : noop();
-  }
-
   @HostListener('window:copy', ['$event'])
   protected onCopy(event: ClipboardEvent) {
     this.keyboardManager ? this.keyboardManager.onCopy() : noop();
@@ -191,16 +201,6 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
   }
 
   @OutsideZone
-  onMouseDown(event: MouseEvent) {
-    this.mouseManager ? this.mouseManager.onMouseDown(event) : noop();
-  }
-
-  @OutsideZone
-  onMouseWheel(event: WheelEvent) {
-    this.mouseManager ? this.mouseManager.onMouseWheel(event) : noop();
-  }
-
-  @OutsideZone
   protected setLayerStyles(x: number, y: number, zoom: number): void {
     const nodesLayer = this.getNodesLayer();
     const linksLayer = this.getLinksLayer();
@@ -212,7 +212,7 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
     this.renderer.setStyle(linksLayer, style, value);
   }
 
-  protected initSubs() {
+  protected initLayoutChanges(): void {
     const diagramModel = this.diagramEngine?.getDiagramModel();
     if (!diagramModel) {
       return;
