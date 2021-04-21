@@ -5,3 +5,4 @@ export * from './options.interface';
 export * from './move-selection.interface';
 export * from './select-options.interface';
 export * from './setup.interface';
+export * from './animation.interface';

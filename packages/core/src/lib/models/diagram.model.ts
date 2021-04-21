@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import { BaseEntity } from '../base.entity';
 import { DiagramEngine } from '../engine.core';
 import { SelectOptions, Coords, BaseEntityType } from '../interfaces';
+import { AnimationConfig } from '../interfaces/animation.interface';
 import {
   createEntityState,
   createValueState,
@@ -35,6 +36,7 @@ export class DiagramModel extends BaseEntity {
   protected allowLooseLinks$: ValueState<boolean>;
   protected portMagneticRadius$: ValueState<number>;
   protected keyBindings$: ValueState<KeyBindigsOptions>;
+  protected animation$ = createValueState<AnimationConfig | null>(null);
 
   constructor(
     options: DiagramModelOptions = {},
@@ -341,6 +343,23 @@ export class DiagramModel extends BaseEntity {
 
   selectZoomLevel(): Observable<number> {
     return this.zoom$.value$;
+  }
+
+  selectAnimation(): Observable<AnimationConfig | null> {
+    return this.animation$.select();
+  }
+
+  animate(callback: () => void, config?: AnimationConfig): void {
+    const merged: AnimationConfig = {
+      timing: 200,
+      easing: 'ease-in-out',
+      ...config,
+    };
+    this.animation$.set(merged);
+    callback();
+    setTimeout(() => {
+      this.animation$.set(null);
+    }, merged.timing);
   }
 
   getDiagramEngine(): DiagramEngine | undefined {

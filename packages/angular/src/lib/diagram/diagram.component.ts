@@ -25,6 +25,7 @@ import {
 } from '@rxzu/core';
 import { combineLatest, noop, Observable, of } from 'rxjs';
 import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { AnimationConfig } from '@rxzu/core';
 import { EngineService } from '../engine.service';
 import { FactoryService } from '../factory.service';
 import { DIAGRAM_DEFAULT_OPTIONS } from '../injection.tokens';
@@ -96,7 +97,8 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
 
     this.initNodes();
     this.initSelectionBox();
-    this.initSubs();
+    this.initLayoutChanges();
+    this.initAnimation();
   }
 
   ngOnDestroy() {
@@ -228,6 +230,25 @@ export class RxZuDiagramComponent implements OnInit, OnDestroy, ZonedClass {
         tap(([x, y, zoom]) => this.setLayerStyles(x, y, zoom))
       )
       .subscribe();
+  }
+
+  @OutsideZone
+  protected initAnimation(): void {
+    this.model
+      .selectAnimation()
+      .pipe(takeUntil(this.model.onEntityDestroy()))
+      .subscribe((animate) => this.setAnimationStyles(animate));
+  }
+
+  protected setAnimationStyles(config: AnimationConfig | null): void {
+    [this.getNodesLayer(), this.getLinksLayer()].forEach((layer) => {
+      if (!config) {
+        layer!.style.transition = 'none';
+      } else {
+        const transition = `transform ${config.timing}ms ${config.easing}`;
+        layer!.style.transition = transition;
+      }
+    });
   }
 
   protected getNodesLayer(): HTMLDivElement | null {
