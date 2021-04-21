@@ -1,3 +1,23 @@
+# [3.2.0](https://github.com/Vonage/rxzu/compare/v3.1.0...v3.2.0) (2021-04-21)
+
+
+### Bug Fixes
+
+* **delete action:** fix delete key pressed action ([5b79614](https://github.com/Vonage/rxzu/commit/5b796144985326f589eb88ff0ef70ce0c2541718))
+* **delete action:** fix delete key pressed action ([7203014](https://github.com/Vonage/rxzu/commit/72030146ea7eb76d9cc81c5112d002c45f0e49ee))
+
+
+### Features
+
+* **engine:** add fit to center ability ([2ca0b26](https://github.com/Vonage/rxzu/commit/2ca0b26c41db084cbdf9244987871ce013387aaa))
+
+# [3.1.0](https://github.com/Vonage/rxzu/compare/v3.0.7...v3.1.0) (2021-04-21)
+
+
+### Features
+
+* **actions:** add drop action ([7233777](https://github.com/Vonage/rxzu/commit/7233777a01c3a81ba8fb2874d13fd8b734b5790d))
+
 ## [3.0.7](https://github.com/Vonage/rxzu/compare/v3.0.6...v3.0.7) (2021-04-18)
 
 

@@ -7,13 +7,14 @@ import {
   ViewChild,
 } from '@angular/core';
 import {
+  BaseModel,
   DiagramModel,
+  DispatchedAction,
   NodeModel,
   PortModel,
-  BaseModel,
   RxZuDiagramComponent,
-  DispatchedAction,
 } from '@rxzu/angular';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -78,10 +79,7 @@ export class ActionsExampleStoryComponent implements OnInit, AfterViewInit {
     this.diagram?.diagramEngine
       .getActionsManager()
       .observeActions()
-      .subscribe((e) => {
-        if (e !== null && e !== undefined) {
-          this.events.emit(e);
-        }
-      });
+      .pipe(filter((e) => !!e))
+      .subscribe((e) => this.events.emit(e!));
   }
 }
