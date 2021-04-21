@@ -14,6 +14,7 @@ export const parameters = {
         'Getting Started',
         'Zoom To Fit',
         'Zoom To Node',
+        'Fit To Center',
         'Auto Arrange',
         'Drag And Drop',
         'Dynamic Ports',
