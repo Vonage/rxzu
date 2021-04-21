@@ -104,7 +104,7 @@ export class CanvasManager {
     this.canvas$.set(canvas);
   }
 
-  getCanvas() {
+  getCanvas(): HTMLElement {
     if (!this.canvas$.value) {
       throw new Error(
         '[RxZu] No canvas found, please use `setCanvas` to assign one.'
