@@ -43,7 +43,6 @@ export class KeyboardManager {
       (event.altKey === modifiers.altKey) &&
       (event.metaKey === modifiers.metaKey)) {
       const deleteKeyPressedAction = new DeleteKeyPressedAction(this.engine, event);
-      console.log(deleteKeyPressedAction.deletedModels)
       this.actionsManager.startFiringAction(deleteKeyPressedAction);
       this.actionsManager.fireAction();
       this.actionsManager.stopFiringAction();
