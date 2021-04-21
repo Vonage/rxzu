@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/Vonage/rxzu/compare/v3.0.7...v3.1.0) (2021-04-21)
+
+
+### Features
+
+* **actions:** add drop action ([7233777](https://github.com/Vonage/rxzu/commit/7233777a01c3a81ba8fb2874d13fd8b734b5790d))
+
 ## [3.0.7](https://github.com/Vonage/rxzu/compare/v3.0.6...v3.0.7) (2021-04-18)
 
 
