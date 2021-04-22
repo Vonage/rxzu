@@ -1,11 +1,11 @@
 import { delay, filter, take } from 'rxjs/operators';
 import { BaseEntity } from './base.entity';
-import { DiagramModel, NodeModel } from './models';
+import { AbstractFactory } from './factories';
 import { DiagramModelOptions, EngineSetup } from './interfaces';
 import { KeyboardManager, MouseManager } from './managers';
-import { AbstractFactory } from './factories';
 import { ActionsManager } from './managers/actions.manager';
 import { CanvasManager } from './managers/canvas.manager';
+import { DiagramModel, NodeModel } from './models';
 
 export class DiagramEngine {
   protected actionsManager: ActionsManager;
@@ -203,9 +203,10 @@ export class DiagramEngine {
           );
 
           // calculate the zoom factor and set the new zoom
-          const xFactor = canvas.clientWidth / nodesLayersRect?.width;
-          const yFactor = canvas.clientHeight / nodesLayersRect.height;
-          const zoomFactor = Math.min(xFactor, yFactor);
+          const zoomFactor = this.calcZoomFactor(
+            nodesLayersRect.width,
+            nodesLayersRect.height
+          );
           diagramModel.setZoomLevel(zoomFactor * 100);
 
           // get canvas top and left values including the offset
@@ -231,5 +232,47 @@ export class DiagramEngine {
           );
         });
     }
+  }
+
+  fitToCenter(additionalZoom = 0) {
+    const canvas = this.getCanvasManager().getCanvas();
+    const model = this.diagramModel!;
+    const canvasRect = canvas.getBoundingClientRect();
+    const {
+      height: nodesHeight,
+      width: nodesWidth,
+    } = this.canvasManager.getNodeLayersRect(model!.getNodesArray());
+    const { height: canvasHeight, width: canvasWidth } = canvasRect;
+
+    const zoomFactor =
+      this.calcZoomFactor(nodesWidth, nodesHeight) / 1.15;
+    const withAdditional = this.coerceZoom(zoomFactor - additionalZoom, zoomFactor);
+    const x = (canvasWidth - nodesWidth * withAdditional) / 2;
+    const y = (canvasHeight - nodesHeight * withAdditional) / 2;
+
+    model.setZoomLevel(withAdditional * 100);
+    model.setOffset(x, y);
+  }
+
+  protected calcZoomFactor(width: number, height: number): number {
+    const canvas = this.getCanvasManager().getCanvas();
+    const xFactor = canvas.clientWidth / width;
+    const yFactor = canvas.clientHeight / height;
+    return Math.min(xFactor, yFactor);
+  }
+
+  protected coerceZoom(zoom: number, fallback?: number) {
+    const maxZoomIn = this.diagramModel!.getMaxZoomIn();
+    const maxZoomOut = this.diagramModel!.getMaxZoomOut();
+
+    if (zoom > maxZoomIn) {
+      return fallback ?? maxZoomIn;
+    }
+
+    if (zoom < maxZoomOut) {
+      return fallback ?? maxZoomOut;
+    }
+
+    return zoom;
   }
 }
