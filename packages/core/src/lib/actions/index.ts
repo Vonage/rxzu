@@ -10,3 +10,4 @@ export * from './invalid-link-destroyed.action';
 export * from './delete-key-pressed.action';
 export * from './copy.action';
 export * from './paste.action';
+export * from './drop.action';
