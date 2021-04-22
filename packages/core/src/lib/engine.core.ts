@@ -238,26 +238,20 @@ export class DiagramEngine {
     const canvas = this.getCanvasManager().getCanvas();
     const model = this.diagramModel!;
     const canvasRect = canvas.getBoundingClientRect();
-    const rect = this.canvasManager.getNodeLayersRect(model!.getNodesArray());
+    const {
+      height: nodesHeight,
+      width: nodesWidth,
+    } = this.canvasManager.getNodeLayersRect(model!.getNodesArray());
+    const { height: canvasHeight, width: canvasWidth } = canvasRect;
 
-    const { height, width } = canvasRect;
-    const nodesWidth = rect.width;
-    const nodesHeight = rect.height;
-    const zoomFactor = this.calcZoomFactor(nodesWidth, nodesHeight);
-    const factorDiff = (width / nodesWidth + height / nodesHeight) * 2;
-    const delta =
-      this.coerceZoom(
-        (zoomFactor - zoomFactor / factorDiff - additionalZoom) * 100
-      ) / 100;
+    const zoomFactor =
+      this.calcZoomFactor(nodesWidth, nodesHeight) / 1.15;
+    const withAdditional = this.coerceZoom(zoomFactor - additionalZoom, zoomFactor);
+    const x = (canvasWidth - nodesWidth * withAdditional) / 2;
+    const y = (canvasHeight - nodesHeight * withAdditional) / 2;
 
-    const centerX = width - nodesWidth * delta;
-    const centerY = height - nodesHeight * delta;
-
-    const x = centerX / 2;
-    const y = centerY / 2;
-
-    model.setZoomLevel(delta * 100);
-    model.setOffset(Math.max(0, x), Math.max(0, y));
+    model.setZoomLevel(withAdditional * 100);
+    model.setOffset(x, y);
   }
 
   protected calcZoomFactor(width: number, height: number): number {
@@ -271,11 +265,11 @@ export class DiagramEngine {
     const maxZoomIn = this.diagramModel!.getMaxZoomIn();
     const maxZoomOut = this.diagramModel!.getMaxZoomOut();
 
-    if (maxZoomIn && zoom > maxZoomIn) {
+    if (zoom > maxZoomIn) {
       return fallback ?? maxZoomIn;
     }
 
-    if (maxZoomOut && zoom < maxZoomOut) {
+    if (zoom < maxZoomOut) {
       return fallback ?? maxZoomOut;
     }
 
