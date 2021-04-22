@@ -37,7 +37,7 @@ export class FitToCenterStoryComponent implements OnInit, AfterViewInit {
     const inport = new PortModel();
     node2.addPort(inport);
 
-    for (let index = 0; index < 10; index++) {
+    for (let index = 0; index < 12; index++) {
       const nodeLoop = new NodeModel();
       nodeLoop.setCoords({
         x: 1000 * (Math.random() * 10),
@@ -72,6 +72,6 @@ export class FitToCenterStoryComponent implements OnInit, AfterViewInit {
   }
 
   center() {
-    this.diagramModel.diagramEngine!.fitToCenter();
+    this.diagramModel.diagramEngine!.fitToCenter(0.3);
   }
 }
