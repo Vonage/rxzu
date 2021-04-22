@@ -1,3 +1,11 @@
+## [3.2.1](https://github.com/Vonage/rxzu/compare/v3.2.0...v3.2.1) (2021-04-22)
+
+
+### Bug Fixes
+
+* export drop action ([389540d](https://github.com/Vonage/rxzu/commit/389540d082220acbb96a35186194426f9bef361b))
+* **fit-to-center:** fix calculation ([1edbc5d](https://github.com/Vonage/rxzu/commit/1edbc5d7593eba90799be9c48709e493808019fd))
+
 # [3.2.0](https://github.com/Vonage/rxzu/compare/v3.1.0...v3.2.0) (2021-04-21)
 
 
