@@ -72,6 +72,6 @@ export class FitToCenterStoryComponent implements OnInit, AfterViewInit {
   }
 
   center() {
-    this.diagramModel.diagramEngine!.fitToCenter(0.3);
+    this.diagramModel.diagramEngine!.fitToCenter();
   }
 }
