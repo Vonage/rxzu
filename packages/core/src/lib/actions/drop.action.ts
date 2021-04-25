@@ -1,4 +1,5 @@
-import { BaseAction, SelectionModel } from '@rxzu/core';
+import { SelectionModel } from '../interfaces/move-selection.interface';
+import { BaseAction } from './base.action';
 
 export class DropAction extends BaseAction {
   mouseEvent: MouseEvent;
