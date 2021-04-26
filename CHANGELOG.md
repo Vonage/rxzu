@@ -1,3 +1,10 @@
+## [3.2.2](https://github.com/Vonage/rxzu/compare/v3.2.1...v3.2.2) (2021-04-26)
+
+
+### Bug Fixes
+
+* **drop-action:** fix circular imports ([15b82e1](https://github.com/Vonage/rxzu/commit/15b82e1f2f91435bd7bc68521ef4372a591acd82))
+
 ## [3.2.1](https://github.com/Vonage/rxzu/compare/v3.2.0...v3.2.1) (2021-04-22)
 
 
