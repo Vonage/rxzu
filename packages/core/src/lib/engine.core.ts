@@ -265,11 +265,11 @@ export class DiagramEngine {
     const maxZoomIn = this.diagramModel!.getMaxZoomIn();
     const maxZoomOut = this.diagramModel!.getMaxZoomOut();
 
-    if (zoom > maxZoomIn) {
+    if (maxZoomIn && zoom > maxZoomIn) {
       return fallback ?? maxZoomIn;
     }
 
-    if (zoom < maxZoomOut) {
+    if (maxZoomOut && zoom < maxZoomOut) {
       return fallback ?? maxZoomOut;
     }
 
