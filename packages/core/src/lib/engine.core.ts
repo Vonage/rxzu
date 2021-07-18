@@ -269,7 +269,6 @@ export class DiagramEngine {
       return fallback ?? maxZoomIn;
     }
 
-    
     if (maxZoomOut && zoom < maxZoomOut) {
       return fallback ?? maxZoomOut;
     }
