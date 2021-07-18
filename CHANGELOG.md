@@ -1,3 +1,12 @@
+## [3.2.3](https://github.com/Vonage/rxzu/compare/v3.2.2...v3.2.3) (2021-07-18)
+
+
+### Bug Fixes
+
+* **engine:** fix coerce zoom using default zoom when not set ([ec8459a](https://github.com/Vonage/rxzu/commit/ec8459a10420163a138faacabd0b5f8136bcd060)), closes [#128](https://github.com/Vonage/rxzu/issues/128)
+* **release:** check relase ([3a787d0](https://github.com/Vonage/rxzu/commit/3a787d04507b8e546062c30fa7cceb6e62fd0d09))
+* **release:** check relase ([b64fff3](https://github.com/Vonage/rxzu/commit/b64fff32848d48a3b8ddbd5dfcbdadb335cb95e8))
+
 ## [3.2.2](https://github.com/Vonage/rxzu/compare/v3.2.1...v3.2.2) (2021-04-26)
 
 
