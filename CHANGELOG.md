@@ -1,3 +1,10 @@
+## [3.2.4](https://github.com/Vonage/rxzu/compare/v3.2.3...v3.2.4) (2021-07-19)
+
+
+### Bug Fixes
+
+* **release:** try fix release ([6af0b5b](https://github.com/Vonage/rxzu/commit/6af0b5b1391b6ea46e4e40218f19ab2bbe3a89d7))
+
 ## [3.2.3](https://github.com/Vonage/rxzu/compare/v3.2.2...v3.2.3) (2021-07-18)
 
 
