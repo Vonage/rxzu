@@ -177,7 +177,7 @@ export class DiagramEngine {
    * @param nodes set zoom and offset so that all those node will be seen at view
    * @param margin allow for further zooming out to make sure edges doesn't cut (in px)
    */
-  zoomToNodes(nodes: NodeModel[], margin = 0) {
+  zoomToNodes(nodes: NodeModel[], margin = 100) {
     this.zoomCanvasToNodes(nodes, margin, this.getZoomFactorForMulti, this.getTransformationForMulti);
   }
 
