@@ -178,6 +178,30 @@ export class DiagramEngine {
    * @param margin allow for further zooming out to make sure edges doesn't cut (in px)
    */
   zoomToNodes(nodes: NodeModel[], margin = 100) {
+    this.zoomCanvasToNodes(nodes, margin, this.getZoomFactorForMulti, this.getTransformationForMulti);
+  }
+
+  /**
+   * @description keep the canvas zoom levels and show node in center.
+   * @param node on which canvas will be zoomed
+   */
+  zoomToExactNodeKeepingZoom(node: NodeModel) {
+    this.zoomCanvasToNodes([node], 0, this.getZoomFactorForOne, this.getTransformationForOne.bind(this, node));
+  }
+
+  /**
+   * @description offset canvas and zoom level with nodes
+   * @param nodes to be zoomed
+   * @param margin allow for further zooming out to make sure edges doesn't cut (in px)
+   * @param getZoomFactor() dependent on keeping zoom or not
+   * @param transformPosition() move canvas relevant to condition
+   */
+  private zoomCanvasToNodes(
+    nodes: NodeModel[],
+    margin: number,
+    getZoomFactor: (nodesLayersRect: { width: number, height: number, top: number, left: number }) => number,
+    transformPosition: (canvasRect: DOMRect) => { x: number, y: number }
+  ) {
     if (!nodes || nodes.length === 0) {
       console.warn('[RxZu] No input nodes were found');
       return;
@@ -203,10 +227,7 @@ export class DiagramEngine {
           );
 
           // calculate the zoom factor and set the new zoom
-          const zoomFactor = this.calcZoomFactor(
-            nodesLayersRect.width,
-            nodesLayersRect.height
-          );
+          const zoomFactor = getZoomFactor.call(this, nodesLayersRect);
           diagramModel.setZoomLevel(zoomFactor * 100);
 
           // get canvas top and left values including the offset
@@ -225,10 +246,11 @@ export class DiagramEngine {
               nodesLayersRect.left * zoomFactor,
           };
 
+          const transformCoords = transformPosition(canvasRect);
           // set the new offset to the diagram
           diagramModel.setOffset(
-            canvasRelativeTopLeftPoint.left - nodesRectTopLeftPoint.left,
-            canvasRelativeTopLeftPoint.top - nodesRectTopLeftPoint.top
+            canvasRelativeTopLeftPoint.left - nodesRectTopLeftPoint.left + transformCoords.x,
+            canvasRelativeTopLeftPoint.top - nodesRectTopLeftPoint.top + transformCoords.y
           );
         });
     }
@@ -273,5 +295,33 @@ export class DiagramEngine {
     }
 
     return zoom;
+  }
+
+  /**
+   * @description get old zoom level and set zoom factor
+   */
+  private getZoomFactorForOne(_: any) {
+    return this.diagramModel!.getZoomLevel() / 100;
+  }
+
+  /**
+   * @description calculate the zoom factor and set the new zoom
+   */
+  private getZoomFactorForMulti(nodesLayersRect: { width: number, height: number, top: number, left: number }) {
+    return this.calcZoomFactor(nodesLayersRect.width, nodesLayersRect.height);
+  }
+
+  /**
+   * @description calculate coordinates to bring node to center
+   */
+  private getTransformationForOne(node: NodeModel, canvasRect: DOMRect) {
+    return { x: (canvasRect.width - node.getWidth()) / 2, y: (canvasRect.height - node.getHeight()) / 2 };
+  }
+
+  /**
+   * @description don't change calculated positions
+   */
+  private getTransformationForMulti(_: any) {
+    return { x: 0, y: 0 };
   }
 }
